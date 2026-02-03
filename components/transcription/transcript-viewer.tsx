@@ -37,7 +37,12 @@ function getSpeakerColor(speaker: string): string {
 }
 
 export function TranscriptViewer({ result, className }: TranscriptViewerProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>('speakers');
+  const hasSegments = result.segments && result.segments.length > 0;
+  const hasSpeakerText = result.speaker_text && result.speaker_text.length > 0;
+  
+  // Determine default view mode based on available data
+  const defaultViewMode: ViewMode = hasSegments ? 'speakers' : (hasSpeakerText ? 'speakers' : 'plain');
+  const [viewMode, setViewMode] = useState<ViewMode>(defaultViewMode);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async (text: string) => {
@@ -70,78 +75,108 @@ export function TranscriptViewer({ result, className }: TranscriptViewerProps) {
     URL.revokeObjectURL(url);
   };
 
-  // Group segments by speaker for display
-  const groupedSegments = result.segments.reduce((acc, segment) => {
-    const lastGroup = acc[acc.length - 1];
-    if (lastGroup && lastGroup.speaker === segment.speaker) {
-      lastGroup.segments.push(segment);
-      lastGroup.end = segment.end;
-      lastGroup.text += ' ' + segment.text;
-    } else {
-      acc.push({
-        speaker: segment.speaker || 'Unknown',
-        start: segment.start,
-        end: segment.end,
-        text: segment.text,
-        segments: [segment],
-      });
+  // Group segments by speaker for display (only if segments exist)
+  const groupedSegments = hasSegments 
+    ? result.segments!.reduce((acc, segment) => {
+        const lastGroup = acc[acc.length - 1];
+        if (lastGroup && lastGroup.speaker === segment.speaker) {
+          lastGroup.segments.push(segment);
+          lastGroup.end = segment.end;
+          lastGroup.text += ' ' + segment.text;
+        } else {
+          acc.push({
+            speaker: segment.speaker || 'Unknown',
+            start: segment.start,
+            end: segment.end,
+            text: segment.text,
+            segments: [segment],
+          });
+        }
+        return acc;
+      }, [] as Array<{ speaker: string; start: number; end: number; text: string; segments: TranscriptionSegment[] }>)
+    : [];
+
+  // Get detected language (handle both formats)
+  const detectedLanguage = result.detected_language || result.language;
+
+  // Get the best text to display for speaker view
+  const getSpeakerContent = () => {
+    if (hasSegments && groupedSegments.length > 0) {
+      return (
+        <div className="space-y-4">
+          {groupedSegments.map((group, index) => (
+            <div key={index} className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Badge className={cn('text-xs', getSpeakerColor(group.speaker))}>
+                  {group.speaker.replace('SPEAKER_', 'Speaker ')}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {formatTime(group.start)} - {formatTime(group.end)}
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed pl-2 border-l-2 border-muted">
+                {group.text}
+              </p>
+            </div>
+          ))}
+        </div>
+      );
     }
-    return acc;
-  }, [] as Array<{ speaker: string; start: number; end: number; text: string; segments: TranscriptionSegment[] }>);
+    
+    // Fallback to speaker_text if no segments
+    if (hasSpeakerText) {
+      return (
+        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+          {result.speaker_text}
+        </p>
+      );
+    }
+    
+    // Final fallback to plain text
+    return (
+      <p className="text-sm leading-relaxed whitespace-pre-wrap">
+        {result.text}
+      </p>
+    );
+  };
 
   return (
     <Card className={cn('', className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex items-center gap-4">
           <CardTitle className="text-lg font-medium">Transcription</CardTitle>
-          {result.detected_language && (
+          {detectedLanguage && (
             <Badge variant="secondary" className="text-xs">
-              {result.detected_language.toUpperCase()}
+              {detectedLanguage.toUpperCase()}
             </Badge>
           )}
         </div>
         
-        {/* View mode toggle */}
-        <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
-          {(['speakers', 'plain', 'segments'] as const).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setViewMode(mode)}
-              className={cn(
-                'px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
-                viewMode === mode
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              {mode === 'speakers' ? 'Speakers' : mode === 'plain' ? 'Plain' : 'Segments'}
-            </button>
-          ))}
-        </div>
+        {/* View mode toggle - only show if we have segments */}
+        {hasSegments && (
+          <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+            {(['speakers', 'plain', 'segments'] as const).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className={cn(
+                  'px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
+                  viewMode === mode
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {mode === 'speakers' ? 'Speakers' : mode === 'plain' ? 'Plain' : 'Segments'}
+              </button>
+            ))}
+          </div>
+        )}
       </CardHeader>
       
       <CardContent className="space-y-4">
         {/* Transcript content */}
         <div className="max-h-[500px] overflow-y-auto rounded-lg border bg-muted/30 p-4">
-          {viewMode === 'speakers' && (
-            <div className="space-y-4">
-              {groupedSegments.map((group, index) => (
-                <div key={index} className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Badge className={cn('text-xs', getSpeakerColor(group.speaker))}>
-                      {group.speaker.replace('SPEAKER_', 'Speaker ')}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {formatTime(group.start)} - {formatTime(group.end)}
-                    </span>
-                  </div>
-                  <p className="text-sm leading-relaxed pl-2 border-l-2 border-muted">
-                    {group.text}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
+          {viewMode === 'speakers' && getSpeakerContent()}
 
           {viewMode === 'plain' && (
             <p className="text-sm leading-relaxed whitespace-pre-wrap">
@@ -149,9 +184,9 @@ export function TranscriptViewer({ result, className }: TranscriptViewerProps) {
             </p>
           )}
 
-          {viewMode === 'segments' && (
+          {viewMode === 'segments' && hasSegments && (
             <div className="space-y-2">
-              {result.segments.map((segment, index) => (
+              {result.segments!.map((segment, index) => (
                 <div key={index} className="flex gap-3 text-sm">
                   <span className="text-xs text-muted-foreground font-mono whitespace-nowrap">
                     {formatTime(segment.start)}
@@ -166,6 +201,12 @@ export function TranscriptViewer({ result, className }: TranscriptViewerProps) {
               ))}
             </div>
           )}
+          
+          {viewMode === 'segments' && !hasSegments && (
+            <p className="text-sm text-muted-foreground italic">
+              Segment-level timing is not available for this transcription.
+            </p>
+          )}
         </div>
 
         {/* Actions */}
@@ -173,7 +214,7 @@ export function TranscriptViewer({ result, className }: TranscriptViewerProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleCopy(viewMode === 'speakers' ? result.speaker_text : result.text)}
+            onClick={() => handleCopy(result.speaker_text || result.text)}
           >
             {copied ? (
               <>
@@ -203,16 +244,18 @@ export function TranscriptViewer({ result, className }: TranscriptViewerProps) {
             TXT
           </Button>
           
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleDownload(result.speaker_text, 'transcription-speakers.txt')}
-          >
-            <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            With Speakers
-          </Button>
+          {hasSpeakerText && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDownload(result.speaker_text!, 'transcription-speakers.txt')}
+            >
+              <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              With Speakers
+            </Button>
+          )}
           
           <Button
             variant="outline"

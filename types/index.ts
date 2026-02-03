@@ -17,10 +17,11 @@ export interface WordSegment {
 
 export interface TranscriptionResult {
   text: string;
-  speaker_text: string;
-  segments: TranscriptionSegment[];
-  word_segments: WordSegment[];
-  detected_language: string;
+  speaker_text?: string;
+  segments?: TranscriptionSegment[];
+  word_segments?: WordSegment[];
+  detected_language?: string;
+  language?: string; // Alias pour detected_language (format RunPod)
 }
 
 export interface RunPodJobStatus {

@@ -7,7 +7,7 @@ import { TranscriptViewer } from '@/components/transcription/transcript-viewer';
 import { Button } from '@/components/ui/button';
 import type { TranscriptionState, TranscriptionResult, RunPodJobStatus } from '@/types';
 
-const POLL_INTERVAL = 2000; // 2 seconds
+const POLL_INTERVAL = 3000; // 3 seconds
 
 export default function Home() {
   const [state, setState] = useState<TranscriptionState>({
@@ -65,36 +65,90 @@ export default function Home() {
     });
 
     try {
-      // Simuler la progression de l'upload
-      const progressInterval = setInterval(() => {
-        setState(prev => ({
-          ...prev,
-          progress: Math.min(prev.progress + 10, 90),
-        }));
-      }, 200);
-
-      // Créer le FormData et envoyer
-      const formData = new FormData();
-      formData.append('audio', file);
-
-      const response = await fetch('/api/transcribe', {
+      // Étape 1: Demander une URL signée pour l'upload
+      const prepareResponse = await fetch('/api/upload', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          fileName: file.name,
+          fileSize: file.size,
+        }),
       });
 
-      clearInterval(progressInterval);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to start transcription');
+      if (!prepareResponse.ok) {
+        const error = await prepareResponse.json();
+        throw new Error(error.error || 'Failed to prepare upload');
       }
 
-      const { jobId } = await response.json();
+      const { uploadUrl, filePath } = await prepareResponse.json();
+
+      setState(prev => ({ ...prev, progress: 10 }));
+
+      // Étape 2: Upload direct vers Supabase avec progression
+      const xhr = new XMLHttpRequest();
+      
+      await new Promise<void>((resolve, reject) => {
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 80) + 10; // 10-90%
+            setState(prev => ({ ...prev, progress: percent }));
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        });
+
+        xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+        xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
+
+        xhr.open('PUT', uploadUrl);
+        xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+        xhr.send(file);
+      });
+
+      setState(prev => ({ ...prev, progress: 95 }));
+
+      // Étape 3: Obtenir l'URL de téléchargement
+      const completeResponse = await fetch('/api/upload/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePath }),
+      });
+
+      if (!completeResponse.ok) {
+        const error = await completeResponse.json();
+        throw new Error(error.error || 'Failed to complete upload');
+      }
+
+      const { audioUrl } = await completeResponse.json();
 
       setState(prev => ({
         ...prev,
         status: 'processing',
         progress: 100,
+      }));
+
+      // Étape 4: Lancer la transcription
+      const transcribeResponse = await fetch('/api/transcribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audioUrl }),
+      });
+
+      if (!transcribeResponse.ok) {
+        const error = await transcribeResponse.json();
+        throw new Error(error.error || 'Failed to start transcription');
+      }
+
+      const { jobId } = await transcribeResponse.json();
+
+      setState(prev => ({
+        ...prev,
         jobId,
       }));
 
@@ -179,6 +233,11 @@ export default function Home() {
                 progress={state.progress}
                 fileName={fileName}
               />
+              {state.status === 'processing' && (
+                <p className="text-center text-sm text-muted-foreground">
+                  This may take a few minutes depending on the audio length...
+                </p>
+              )}
             </div>
           )}
 

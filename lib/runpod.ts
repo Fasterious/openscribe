@@ -16,11 +16,11 @@ if (!RUNPOD_ENDPOINT_ID) {
 const RUNPOD_BASE_URL = `https://api.runpod.ai/v2/${RUNPOD_ENDPOINT_ID}`;
 
 interface RunPodInput {
-  audio_base64?: string;
-  audio_url?: string;
+  audio: string; // URL de l'audio (comme dans le script Python)
   language?: string;
-  batch_size?: number;
-  compute_type?: string;
+  diarize?: boolean;
+  min_speakers?: number;
+  max_speakers?: number;
 }
 
 interface RunPodRunResponse {
@@ -28,10 +28,16 @@ interface RunPodRunResponse {
   status: string;
 }
 
+// Structure de la réponse brute de RunPod
+interface RunPodRawOutput {
+  output?: TranscriptionResult; // Les données sont imbriquées dans output.output
+  status?: string;
+}
+
 interface RunPodStatusResponse {
   id: string;
   status: 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
-  output?: TranscriptionResult;
+  output?: RunPodRawOutput; // output contient { output: {...}, status: "success" }
   error?: string;
 }
 
@@ -63,6 +69,7 @@ export async function startTranscriptionJob(input: RunPodInput): Promise<string>
 
 /**
  * Vérifie le statut d'un job RunPod
+ * Note: La réponse RunPod a une structure imbriquée: output.output contient les vraies données
  */
 export async function getJobStatus(jobId: string): Promise<RunPodJobStatus> {
   if (!RUNPOD_API_KEY || !RUNPOD_ENDPOINT_ID) {
@@ -82,7 +89,26 @@ export async function getJobStatus(jobId: string): Promise<RunPodJobStatus> {
   }
 
   const data: RunPodStatusResponse = await response.json();
-  return data;
+  
+  // Extraire les données imbriquées: output.output contient les vraies données de transcription
+  let transcriptionOutput: TranscriptionResult | undefined;
+  
+  if (data.output) {
+    // Structure: { output: { output: { text, segments, ... }, status: "success" } }
+    if (data.output.output) {
+      transcriptionOutput = data.output.output;
+    } else if ('text' in data.output) {
+      // Fallback si la structure est directe (sans double imbrication)
+      transcriptionOutput = data.output as unknown as TranscriptionResult;
+    }
+  }
+
+  return {
+    id: data.id,
+    status: data.status,
+    output: transcriptionOutput,
+    error: data.error,
+  };
 }
 
 /**
