@@ -18,7 +18,7 @@ Démocratiser l'accès à la transcription de qualité professionnelle avec une 
 - **Transparence** : Code source visible, pricing clair, coûts réels communiqués
 - **Simplicité** : Moins de features, mais excellentes
 - **Accessibilité** : Prix abordable vs concurrence enterprise ($50+/user)
-- **Open Source** : La brique technique (worker) est open source
+- **Open Source** : Le code est visible et accessible
 
 ---
 
@@ -39,10 +39,10 @@ Démocratiser l'accès à la transcription de qualité professionnelle avec une 
 | Dovetail | $29-79/user/mois | Enterprise, complet | Plus simple, plus abordable |
 | Condens.io | ~€30/user/mois | Interviews UX | Plus transparent, open source |
 | Grain | $19-59/user/mois | Meetings | Focus transcription qualité |
-| Otter.ai | $16-30/user/mois | Généraliste | Qualité WhisperX, multilingue |
+| Otter.ai | $16-30/user/mois | Généraliste | Qualité Voxtral, multilingue |
 
 ### Proposition de valeur unique
-> "Transcription de qualité professionnelle (WhisperX + diarisation), simple, abordable, et transparent. Le worker est open source."
+> "Transcription de qualité professionnelle (Voxtral + diarisation), simple, abordable, et transparent."
 
 ### Tagline proposé
 > "Open source transcription for researchers"
@@ -51,27 +51,28 @@ Démocratiser l'accès à la transcription de qualité professionnelle avec une 
 
 ## 3. Architecture Technique
 
-### Projets séparés
+### Architecture simplifiée (Voxtral)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  PROJET 1: whisperx-runpod (EXISTANT)                          │
-│  ─────────────────────────────────────────────────────────────  │
-│  Rôle: Worker de transcription serverless                       │
-│  Tech: Python, Docker, WhisperX, RunPod                         │
-│  Licence: Open Source                                           │
-│  Repo: github.com/[user]/whisperx-runpod                       │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              │ API RunPod
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  PROJET 2: OpenScribe (CE PROJET)                              │
+│  OpenScribe (CE PROJET)                                        │
 │  ─────────────────────────────────────────────────────────────  │
 │  Rôle: Application web (frontend + backend)                     │
 │  Tech: Next.js, TypeScript, Tailwind, shadcn/ui                │
+│  Transcription: Voxtral API (Mistral AI)                       │
+│  Storage: Mistral Cloud (fichiers temporaires)                  │
 │  Licence: Source-available (visible mais licence commerciale)   │
 │  Repo: github.com/[user]/openscribe                            │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ API Mistral
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  MISTRAL AI                                                     │
+│  ─────────────────────────────────────────────────────────────  │
+│  • Voxtral: Transcription audio avec diarisation               │
+│  • Cloud Storage: URLs signées temporaires                      │
+│  • API synchrone (pas de polling nécessaire)                   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -83,10 +84,11 @@ Démocratiser l'accès à la transcription de qualité professionnelle avec une 
 | **Language** | TypeScript | Type safety, meilleure DX |
 | **Styling** | Tailwind CSS | Utilitaire, rapide, populaire |
 | **UI Components** | shadcn/ui | Moderne, minimaliste, copy-paste |
-| **Auth** | Supabase Auth | Email, OAuth, Magic Links intégré |
-| **Database** | Supabase (PostgreSQL) | SQL, RLS, temps réel |
-| **Storage** | Supabase Storage | S3-compatible, presigned URLs |
-| **Paiement** | Stripe | Standard industrie, webhooks |
+| **Transcription** | Voxtral (Mistral AI) | Rapide, précis, $0.003/min |
+| **Storage temporaire** | Mistral Cloud | URLs signées, pas de coût storage |
+| **Auth** | Supabase Auth (Phase 2+) | Email, OAuth, Magic Links intégré |
+| **Database** | Supabase (Phase 2+) | SQL, RLS, temps réel |
+| **Paiement** | Stripe (Phase 3+) | Standard industrie, webhooks |
 | **Déploiement** | Vercel | Optimisé Next.js, gratuit pour commencer |
 
 ### Architecture globale
@@ -105,18 +107,17 @@ Démocratiser l'accès à la transcription de qualité professionnelle avec une 
 │                         API ROUTES (Next.js)                            │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────┐ │
 │  │ /api/upload      │  │ /api/transcribe  │  │ /api/webhooks/stripe  │ │
-│  │ (presigned URL)  │  │ (lance RunPod)   │  │ (paiements)           │ │
+│  │ (Mistral Cloud)  │  │ (Voxtral sync)   │  │ (paiements)           │ │
 │  └──────────────────┘  └──────────────────┘  └───────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────────┘
          │                        │                        │
          ▼                        ▼                        ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────────────┐
-│   SUPABASE      │    │     RUNPOD      │    │        STRIPE           │
-│                 │    │                 │    │                         │
-│ • Auth          │    │ • whisperx-     │    │ • Checkout              │
-│ • Database      │    │   runpod worker │    │ • Subscriptions         │
-│ • Storage       │    │                 │    │ • Webhooks              │
-│ • Realtime      │    │                 │    │                         │
+│   MISTRAL AI    │    │    SUPABASE     │    │        STRIPE           │
+│                 │    │    (Phase 2+)   │    │       (Phase 3+)        │
+│ • Voxtral       │    │ • Auth          │    │ • Checkout              │
+│ • Cloud Storage │    │ • Database      │    │ • Subscriptions         │
+│                 │    │ • Realtime      │    │ • Webhooks              │
 └─────────────────┘    └─────────────────┘    └─────────────────────────┘
 ```
 
@@ -126,19 +127,19 @@ Démocratiser l'accès à la transcription de qualité professionnelle avec une 
 1. User upload fichier audio via drag & drop
          │
          ▼
-2. Fichier stocké temporairement (local ou Supabase Storage)
+2. Frontend envoie le fichier à /api/upload
          │
          ▼
-3. Frontend appelle /api/transcribe avec le fichier
+3. Backend upload vers Mistral Cloud et obtient une signed URL
          │
          ▼
-4. Backend lance job RunPod avec l'audio (base64 ou URL)
+4. Backend appelle /api/transcribe avec la signed URL
          │
          ▼
-5. Backend poll le statut RunPod jusqu'à complétion
+5. Voxtral transcrit l'audio (API synchrone - pas de polling)
          │
          ▼
-6. Résultat retourné et affiché dans l'interface
+6. Résultat retourné avec métriques (durée, temps, coût)
 ```
 
 ### Structure de fichiers - OpenScribe
@@ -146,17 +147,17 @@ Démocratiser l'accès à la transcription de qualité professionnelle avec une 
 ```
 openscribe/
 ├── app/
-│   ├── (marketing)/              # Pages publiques
+│   ├── (marketing)/              # Pages publiques (Phase 2+)
 │   │   ├── page.tsx              # Landing page / Hero
 │   │   ├── pricing/page.tsx      # Page tarifs
 │   │   └── about/page.tsx        # À propos
 │   │
-│   ├── (auth)/                   # Authentification
+│   ├── (auth)/                   # Authentification (Phase 2+)
 │   │   ├── login/page.tsx
 │   │   ├── signup/page.tsx
 │   │   └── callback/route.ts     # OAuth callback
 │   │
-│   ├── (dashboard)/              # App protégée (auth required)
+│   ├── (dashboard)/              # App protégée (Phase 2+)
 │   │   ├── layout.tsx            # Auth check + sidebar
 │   │   ├── page.tsx              # Dashboard principal
 │   │   ├── transcribe/page.tsx   # Upload + transcription
@@ -165,14 +166,13 @@ openscribe/
 │   │   └── billing/page.tsx      # Gestion abonnement/crédits
 │   │
 │   ├── api/
-│   │   ├── upload/route.ts       # Génère presigned URL
-│   │   ├── transcribe/route.ts   # Lance job RunPod
-│   │   ├── status/[id]/route.ts  # Statut d'un job
+│   │   ├── upload/route.ts       # Upload vers Mistral Cloud
+│   │   ├── transcribe/route.ts   # Transcription Voxtral
 │   │   └── webhooks/
-│   │       ├── stripe/route.ts   # Webhooks Stripe
-│   │       └── runpod/route.ts   # Webhooks RunPod (optionnel)
+│   │       └── stripe/route.ts   # Webhooks Stripe (Phase 3+)
 │   │
 │   ├── layout.tsx                # Root layout
+│   ├── page.tsx                  # Page principale (transcription)
 │   └── globals.css               # Styles globaux
 │
 ├── components/
@@ -185,20 +185,18 @@ openscribe/
 │       └── transcript-viewer.tsx
 │
 ├── lib/
-│   ├── supabase/
+│   ├── mistral.ts                # Client Mistral (Voxtral + Cloud)
+│   ├── supabase/                 # (Phase 2+)
 │   │   ├── client.ts             # Client browser
 │   │   ├── server.ts             # Client server
 │   │   └── middleware.ts         # Auth middleware
-│   ├── stripe/
+│   ├── stripe/                   # (Phase 3+)
 │   │   ├── client.ts
 │   │   └── webhooks.ts
-│   ├── runpod/
-│   │   └── client.ts             # API RunPod
 │   └── utils.ts
 │
 ├── types/
-│   ├── database.ts               # Types Supabase générés
-│   └── index.ts
+│   └── index.ts                  # Types TypeScript
 │
 ├── .env.local                    # Variables d'environnement
 ├── .env.example                  # Template
@@ -210,7 +208,7 @@ openscribe/
 
 ---
 
-## 4. Modèle de données (Supabase)
+## 4. Modèle de données (Supabase - Phase 2+)
 
 ### Tables principales
 
@@ -235,7 +233,6 @@ CREATE TABLE public.transcriptions (
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   title TEXT,
   status TEXT DEFAULT 'pending', -- pending, processing, completed, failed
-  audio_url TEXT, -- URL Supabase Storage
   audio_duration_seconds INTEGER,
   language TEXT,
   
@@ -243,11 +240,11 @@ CREATE TABLE public.transcriptions (
   transcript_text TEXT,
   transcript_speaker_text TEXT,
   transcript_segments JSONB,
-  transcript_word_segments JSONB,
   detected_language TEXT,
   
   -- Metadata
-  runpod_job_id TEXT,
+  transcription_time_ms INTEGER,
+  cost_usd DECIMAL(10,6),
   credits_used INTEGER,
   error_message TEXT,
   
@@ -291,11 +288,10 @@ CREATE POLICY "Users can view own transactions" ON public.credit_transactions
 
 ## 5. Modèle économique
 
-### Stratégie Open Core
+### Stratégie
 
 | Composant | Licence | Accès |
 |-----------|---------|-------|
-| whisperx-runpod (worker) | MIT / Apache 2.0 | Open Source, auto-hébergeable |
 | OpenScribe (webapp) | Source-available | Code visible, usage commercial payant |
 | Service hébergé | Commercial | openscribe.com |
 
@@ -303,24 +299,24 @@ CREATE POLICY "Users can view own transactions" ON public.credit_transactions
 
 | Tier | Prix | Inclus |
 |------|------|--------|
-| **Free** | 0€ | 30 min/mois, stockage 7 jours, watermark? |
+| **Free** | 0€ | 30 min/mois, pas de stockage permanent |
 | **Pay-as-you-go** | ~0.10-0.15€/min | Achat de crédits (packs 5€, 20€, 50€) |
-| **Pro** | 15-25€/mois | X heures/mois incluses, stockage illimité, pas de watermark |
+| **Pro** | 15-25€/mois | X heures/mois incluses, stockage illimité |
 | **Team** | 40-60€/user/mois | Collaboration, partage, analytics |
 
 ### Coûts estimés
 
 | Poste | Coût estimé |
 |-------|-------------|
-| RunPod (GPU) | ~0.02-0.05€/min de transcription |
+| **Voxtral (Mistral AI)** | **$0.003/min** de transcription |
 | Supabase | Gratuit → 25$/mois (Pro) |
 | Vercel | Gratuit → 20$/mois (Pro) |
 | Domaine | ~15€/an |
 
 ### Marge cible
-- Coût réel : ~0.05€/min
-- Prix client : ~0.12€/min
-- Marge brute : ~60%
+- Coût réel : ~$0.003/min (~0.003€/min)
+- Prix client : ~0.10€/min
+- Marge brute : ~97%
 
 ---
 
@@ -330,8 +326,10 @@ CREATE POLICY "Users can view own transactions" ON public.credit_transactions
 
 **Fonctionnalités:**
 - [x] Page d'upload audio (drag & drop)
-- [x] Transcription via RunPod WhisperX
+- [x] Transcription via Voxtral (Mistral AI)
+- [x] Upload fichiers via Mistral Cloud (signed URLs)
 - [x] Affichage résultat avec speakers
+- [x] Métriques de transcription (durée, temps, coût)
 - [x] Téléchargement (TXT, JSON)
 - [ ] Landing page (hero, features, pricing)
 - [ ] Auth (email + Google OAuth)
@@ -349,7 +347,7 @@ CREATE POLICY "Users can view own transactions" ON public.credit_transactions
 **Fonctionnalités:**
 - [ ] Authentification Supabase
 - [ ] Bibliothèque de transcriptions
-- [ ] Stockage permanent
+- [ ] Stockage permanent (Supabase Storage)
 - [ ] Système de crédits
 
 ### Phase 3 - Monetization
@@ -416,9 +414,8 @@ CREATE POLICY "Users can view own transactions" ON public.credit_transactions
 ```bash
 # .env.example pour OpenScribe
 
-# RunPod
-RUNPOD_API_KEY=xxx
-RUNPOD_ENDPOINT_ID=xxx
+# Mistral (Voxtral)
+MISTRAL_API_KEY=xxx
 
 # Supabase (Phase 2+)
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
@@ -440,12 +437,12 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 | Décision | Choix | Raison |
 |----------|-------|--------|
-| Projets séparés | Oui | Cycles de déploiement indépendants, technologies différentes |
+| Moteur transcription | Voxtral (Mistral AI) | Plus simple, moins cher ($0.003/min), API synchrone |
+| Storage temporaire | Mistral Cloud | Pas de coût storage, signed URLs intégrées |
 | Framework | Next.js 14+ | Full-stack, SSR, grande communauté, Vercel optimized |
-| BaaS | Supabase | Auth + DB + Storage tout-en-un, open source |
+| BaaS (Phase 2+) | Supabase | Auth + DB tout-en-un, open source |
 | Paiement | Stripe | Standard industrie, crédits + subscriptions |
 | Nom | OpenScribe | Évoque transparence + écriture, différenciant |
-| Licence worker | Open Source | Transparence, confiance, communauté |
 | Licence app | Source-available | Visible mais monétisable |
 | Pricing model | Crédits + abo optionnel | Flexible, pas de friction |
 | Phase 1 focus | Transcription simple | Valider avant d'ajouter des features |
@@ -460,12 +457,8 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 - [shadcn/ui](https://ui.shadcn.com/)
 - [Tailwind CSS](https://tailwindcss.com/docs)
 - [Stripe Docs](https://stripe.com/docs)
-- [RunPod API](https://docs.runpod.io/)
-
-### Projet existant
-- Worker WhisperX : `~/Cursor/Whisperx-Runpod`
-- Handler : `handler.py` (référence pour l'API RunPod)
-- Test script : `test_transcription.py` (référence pour appeler RunPod)
+- [Mistral AI Docs](https://docs.mistral.ai/)
+- [Voxtral Audio Transcription](https://docs.mistral.ai/capabilities/audio_transcription)
 
 ---
 
