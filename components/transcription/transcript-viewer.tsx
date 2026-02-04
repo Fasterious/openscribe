@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { TranscriptionResult, TranscriptionSegment } from '@/types';
+import { VOXTRAL_PRICE_PER_MINUTE } from '@/types';
 
 interface TranscriptViewerProps {
   result: TranscriptionResult;
@@ -18,6 +19,29 @@ function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function formatDuration(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  
+  if (hours > 0) {
+    return `${hours}h ${mins}m ${secs}s`;
+  } else if (mins > 0) {
+    return `${mins}m ${secs}s`;
+  }
+  return `${secs}s`;
+}
+
+function formatTranscriptionTime(ms: number): string {
+  const seconds = ms / 1000;
+  if (seconds >= 60) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.round(seconds % 60);
+    return `${mins}m ${secs}s`;
+  }
+  return `${seconds.toFixed(1)}s`;
 }
 
 function getSpeakerColor(speaker: string): string {
@@ -174,6 +198,36 @@ export function TranscriptViewer({ result, className }: TranscriptViewerProps) {
       </CardHeader>
       
       <CardContent className="space-y-4">
+        {/* Metrics bar */}
+        {(result.audioDurationSeconds || result.transcriptionTimeMs || result.cost !== undefined) && (
+          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+            {result.audioDurationSeconds && (
+              <div className="flex items-center gap-1.5">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Audio: <strong className="text-foreground">{formatDuration(result.audioDurationSeconds)}</strong></span>
+              </div>
+            )}
+            {result.transcriptionTimeMs && (
+              <div className="flex items-center gap-1.5">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>Transcription: <strong className="text-foreground">{formatTranscriptionTime(result.transcriptionTimeMs)}</strong></span>
+              </div>
+            )}
+            {result.cost !== undefined && result.cost > 0 && (
+              <div className="flex items-center gap-1.5">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Cost: <strong className="text-foreground">${result.cost.toFixed(4)}</strong> <span className="text-xs">(${VOXTRAL_PRICE_PER_MINUTE}/min)</span></span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Transcript content */}
         <div className="max-h-[500px] overflow-y-auto rounded-lg border bg-muted/30 p-4">
           {viewMode === 'speakers' && getSpeakerContent()}

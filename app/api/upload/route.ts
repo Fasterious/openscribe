@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadAndGetSignedUrl } from '@/lib/mistral';
 
-export const maxDuration = 60; // 1 minute max pour l'upload
+export const maxDuration = 300; // 5 minutes max pour l'upload de gros fichiers
 
 /**
  * POST /api/upload
@@ -31,15 +31,6 @@ export async function POST(request: NextRequest) {
     if (!allowedExtensions.includes(fileExtension)) {
       return NextResponse.json(
         { error: `Invalid file type. Supported: ${allowedExtensions.join(', ').toUpperCase()}` },
-        { status: 400 }
-      );
-    }
-
-    // Vérifier la taille (max 100MB pour Mistral)
-    const maxSize = 100 * 1024 * 1024;
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 100MB' },
         { status: 400 }
       );
     }

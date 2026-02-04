@@ -109,7 +109,7 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
         or click to browse
       </p>
       <p className="mt-4 text-xs text-muted-foreground/70">
-        Supports MP3, WAV, M4A, WebM, OGG (max 100MB)
+        Supports MP3, WAV, M4A, WebM, OGG, FLAC
       </p>
     </div>
   );

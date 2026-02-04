@@ -23,7 +23,14 @@ export interface TranscriptionResult {
   word_segments?: WordSegment[];
   detected_language?: string;
   language?: string;
+  // Métriques
+  audioDurationSeconds?: number;    // Durée totale de l'audio en secondes
+  transcriptionTimeMs?: number;     // Temps de transcription en millisecondes
+  cost?: number;                    // Coût estimé en USD
 }
+
+// Prix Voxtral par minute d'audio (en USD)
+export const VOXTRAL_PRICE_PER_MINUTE = 0.003;
 
 export type TranscriptionStatus = 'idle' | 'uploading' | 'processing' | 'completed' | 'error';
 

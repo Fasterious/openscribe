@@ -160,12 +160,16 @@ function convertMistralResponse(response: MistralTranscriptionResponse): Transcr
       .join('\n');
   }
 
+  // Durée audio depuis les métadonnées d'usage
+  const audioDurationSeconds = response.usage?.prompt_audio_seconds;
+
   return {
     text: response.text.trim(),
     speaker_text: speakerText,
     segments,
     detected_language: response.language,
     language: response.language,
+    audioDurationSeconds,
   };
 }
 
@@ -208,7 +212,7 @@ export async function transcribe(input: MistralTranscriptionInput): Promise<Tran
   // Note: language n'est pas compatible avec timestamp_granularities selon la doc
   // On laisse la détection automatique pour avoir les timestamps
   
-  const response = await fetch(MISTRAL_API_URL, {
+  const response = await fetch(MISTRAL_TRANSCRIPTION_URL, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${MISTRAL_API_KEY}`,
