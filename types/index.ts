@@ -4,8 +4,8 @@ export interface TranscriptionSegment {
   start: number;
   end: number;
   text: string;
-  speaker?: string;      // Format unifié (converti depuis speaker_id pour Mistral)
-  speaker_id?: string;   // Format brut Mistral
+  speaker?: string;      // Format unifié (converti depuis speaker_id)
+  speaker_id?: string;   // Format brut Mistral API
 }
 
 export interface WordSegment {
@@ -22,14 +22,7 @@ export interface TranscriptionResult {
   segments?: TranscriptionSegment[];
   word_segments?: WordSegment[];
   detected_language?: string;
-  language?: string; // Alias pour detected_language (format RunPod)
-}
-
-export interface RunPodJobStatus {
-  id: string;
-  status: 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
-  output?: TranscriptionResult;
-  error?: string;
+  language?: string;
 }
 
 export type TranscriptionStatus = 'idle' | 'uploading' | 'processing' | 'completed' | 'error';
@@ -39,5 +32,4 @@ export interface TranscriptionState {
   progress: number;
   result: TranscriptionResult | null;
   error: string | null;
-  jobId: string | null;
 }

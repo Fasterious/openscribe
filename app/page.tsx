@@ -5,9 +5,7 @@ import { UploadZone } from '@/components/transcription/upload-zone';
 import { ProgressTracker } from '@/components/transcription/progress-tracker';
 import { TranscriptViewer } from '@/components/transcription/transcript-viewer';
 import { Button } from '@/components/ui/button';
-import type { TranscriptionState, TranscriptionResult, RunPodJobStatus } from '@/types';
-
-const POLL_INTERVAL = 3000; // 3 seconds
+import type { TranscriptionState, TranscriptionResult } from '@/types';
 
 export default function Home() {
   const [state, setState] = useState<TranscriptionState>({
@@ -15,44 +13,8 @@ export default function Home() {
     progress: 0,
     result: null,
     error: null,
-    jobId: null,
   });
   const [fileName, setFileName] = useState<string>('');
-
-  const pollJobStatus = useCallback(async (jobId: string) => {
-    try {
-      const response = await fetch(`/api/transcribe/${jobId}`);
-      if (!response.ok) {
-        throw new Error('Failed to get job status');
-      }
-      
-      const status: RunPodJobStatus = await response.json();
-      
-      if (status.status === 'COMPLETED' && status.output) {
-        setState(prev => ({
-          ...prev,
-          status: 'completed',
-          progress: 100,
-          result: status.output as TranscriptionResult,
-        }));
-      } else if (status.status === 'FAILED') {
-        setState(prev => ({
-          ...prev,
-          status: 'error',
-          error: status.error || 'Transcription failed',
-        }));
-      } else if (status.status === 'IN_QUEUE' || status.status === 'IN_PROGRESS') {
-        // Continue polling
-        setTimeout(() => pollJobStatus(jobId), POLL_INTERVAL);
-      }
-    } catch (error) {
-      setState(prev => ({
-        ...prev,
-        status: 'error',
-        error: error instanceof Error ? error.message : 'Failed to get job status',
-      }));
-    }
-  }, []);
 
   const handleFileSelect = useCallback(async (file: File) => {
     setFileName(file.name);
@@ -61,7 +23,6 @@ export default function Home() {
       progress: 0,
       result: null,
       error: null,
-      jobId: null,
     });
 
     try {
@@ -69,7 +30,6 @@ export default function Home() {
       const formData = new FormData();
       formData.append('file', file);
 
-      // Utiliser XMLHttpRequest pour avoir la progression
       const uploadResponse = await new Promise<{ audioUrl: string }>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         
@@ -113,7 +73,7 @@ export default function Home() {
         progress: 80,
       }));
 
-      // Étape 4: Lancer la transcription (Voxtral - synchrone)
+      // Étape 2: Transcription via Voxtral (synchrone)
       const transcribeResponse = await fetch('/api/transcribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -125,24 +85,14 @@ export default function Home() {
         throw new Error(error.error || 'Failed to transcribe');
       }
 
-      const transcribeData = await transcribeResponse.json();
+      const { result } = await transcribeResponse.json();
 
-      // Voxtral retourne le résultat directement (synchrone)
-      if (transcribeData.result) {
-        setState(prev => ({
-          ...prev,
-          status: 'completed',
-          progress: 100,
-          result: transcribeData.result,
-        }));
-      } else if (transcribeData.jobId) {
-        // Fallback pour compatibilité avec RunPod (asynchrone)
-        setState(prev => ({
-          ...prev,
-          jobId: transcribeData.jobId,
-        }));
-        pollJobStatus(transcribeData.jobId);
-      }
+      setState({
+        status: 'completed',
+        progress: 100,
+        result: result as TranscriptionResult,
+        error: null,
+      });
     } catch (error) {
       setState(prev => ({
         ...prev,
@@ -150,7 +100,7 @@ export default function Home() {
         error: error instanceof Error ? error.message : 'An error occurred',
       }));
     }
-  }, [pollJobStatus]);
+  }, []);
 
   const handleReset = useCallback(() => {
     setState({
@@ -158,7 +108,6 @@ export default function Home() {
       progress: 0,
       result: null,
       error: null,
-      jobId: null,
     });
     setFileName('');
   }, []);
@@ -224,7 +173,7 @@ export default function Home() {
               />
               {state.status === 'processing' && (
                 <p className="text-center text-sm text-muted-foreground">
-                  This may take a few minutes depending on the audio length...
+                  Transcribing with Voxtral...
                 </p>
               )}
             </div>
