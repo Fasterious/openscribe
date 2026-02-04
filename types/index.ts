@@ -4,7 +4,8 @@ export interface TranscriptionSegment {
   start: number;
   end: number;
   text: string;
-  speaker?: string;
+  speaker?: string;      // Format unifié (converti depuis speaker_id pour Mistral)
+  speaker_id?: string;   // Format brut Mistral
 }
 
 export interface WordSegment {

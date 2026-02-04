@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { startTranscriptionJob } from '@/lib/runpod';
+import { transcribeFromUrl } from '@/lib/mistral';
 
 export const maxDuration = 300; // 5 minutes max pour le timeout
 
@@ -15,17 +15,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Lancer le job RunPod avec l'URL
-    const jobId = await startTranscriptionJob({
-      audio: audioUrl,
+    // Transcription synchrone via Voxtral (Mistral)
+    // Retourne directement le résultat (pas de polling nécessaire)
+    const result = await transcribeFromUrl(audioUrl, {
+      diarize: true,
       language: language || undefined,
     });
 
-    return NextResponse.json({ jobId });
+    // Retourne le résultat directement
+    // Format compatible avec l'ancien système (result au lieu de jobId)
+    return NextResponse.json({ result });
   } catch (error) {
     console.error('Transcription error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to start transcription' },
+      { error: error instanceof Error ? error.message : 'Failed to transcribe' },
       { status: 500 }
     );
   }

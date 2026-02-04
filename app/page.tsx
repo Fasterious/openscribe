@@ -133,7 +133,7 @@ export default function Home() {
         progress: 100,
       }));
 
-      // Étape 4: Lancer la transcription
+      // Étape 4: Lancer la transcription (Voxtral - synchrone)
       const transcribeResponse = await fetch('/api/transcribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -142,18 +142,27 @@ export default function Home() {
 
       if (!transcribeResponse.ok) {
         const error = await transcribeResponse.json();
-        throw new Error(error.error || 'Failed to start transcription');
+        throw new Error(error.error || 'Failed to transcribe');
       }
 
-      const { jobId } = await transcribeResponse.json();
+      const transcribeData = await transcribeResponse.json();
 
-      setState(prev => ({
-        ...prev,
-        jobId,
-      }));
-
-      // Start polling for results
-      pollJobStatus(jobId);
+      // Voxtral retourne le résultat directement (synchrone)
+      if (transcribeData.result) {
+        setState(prev => ({
+          ...prev,
+          status: 'completed',
+          progress: 100,
+          result: transcribeData.result,
+        }));
+      } else if (transcribeData.jobId) {
+        // Fallback pour compatibilité avec RunPod (asynchrone)
+        setState(prev => ({
+          ...prev,
+          jobId: transcribeData.jobId,
+        }));
+        pollJobStatus(transcribeData.jobId);
+      }
     } catch (error) {
       setState(prev => ({
         ...prev,
@@ -217,7 +226,7 @@ export default function Home() {
               Transcribe your audio
             </h1>
             <p className="text-lg text-muted-foreground">
-              Professional-quality transcription with speaker diarization, powered by WhisperX
+              Professional-quality transcription with speaker diarization, powered by Voxtral
             </p>
           </div>
 
@@ -321,7 +330,7 @@ export default function Home() {
                 </div>
                 <h3 className="font-medium">Fast & Accurate</h3>
                 <p className="text-sm text-muted-foreground">
-                  Powered by WhisperX
+                  Powered by Voxtral
                 </p>
               </div>
             </div>
