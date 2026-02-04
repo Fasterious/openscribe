@@ -1,26 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateFilePath, createUploadSignedUrl, createDownloadSignedUrl } from '@/lib/supabase';
+import { uploadAndGetSignedUrl } from '@/lib/mistral';
+
+export const maxDuration = 60; // 1 minute max pour l'upload
 
 /**
  * POST /api/upload
- * Retourne une URL signée pour l'upload direct vers Supabase
- * Le client uploadera directement vers Supabase (pas de limite de taille serveur)
+ * Upload le fichier vers le cloud Mistral et retourne une signed URL
+ * 
+ * Nouveau flux simplifié (sans Supabase Storage):
+ * 1. Client envoie le fichier ici
+ * 2. On uploade vers Mistral Cloud
+ * 3. On retourne la signed URL pour la transcription
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { fileName, fileSize } = body;
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
 
-    if (!fileName) {
+    if (!file) {
       return NextResponse.json(
-        { error: 'fileName is required' },
+        { error: 'No file provided' },
         { status: 400 }
       );
     }
 
     // Vérifier le type de fichier
     const allowedExtensions = ['mp3', 'wav', 'm4a', 'webm', 'ogg', 'mp4', 'flac'];
-    const fileExtension = fileName.split('.').pop()?.toLowerCase() || '';
+    const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
     
     if (!allowedExtensions.includes(fileExtension)) {
       return NextResponse.json(
@@ -29,29 +35,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier la taille (max 500MB)
-    const maxSize = 500 * 1024 * 1024;
-    if (fileSize && fileSize > maxSize) {
+    // Vérifier la taille (max 100MB pour Mistral)
+    const maxSize = 100 * 1024 * 1024;
+    if (file.size > maxSize) {
       return NextResponse.json(
-        { error: 'File too large. Maximum size is 500MB' },
+        { error: 'File too large. Maximum size is 100MB' },
         { status: 400 }
       );
     }
 
-    // Générer le chemin du fichier
-    const filePath = generateFilePath(fileName);
+    // Convertir le fichier en Buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    // Créer une URL signée pour l'upload
-    const uploadUrl = await createUploadSignedUrl(filePath);
+    // Upload vers Mistral Cloud et obtenir la signed URL
+    const { fileId, signedUrl } = await uploadAndGetSignedUrl(buffer, file.name);
 
     return NextResponse.json({ 
-      uploadUrl,
-      filePath,
+      audioUrl: signedUrl,
+      fileId,
+      fileName: file.name,
+      fileSize: file.size,
     });
   } catch (error) {
-    console.error('Upload preparation error:', error);
+    console.error('Upload error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to prepare upload' },
+      { error: error instanceof Error ? error.message : 'Failed to upload file' },
       { status: 500 }
     );
   }

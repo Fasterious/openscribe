@@ -8,7 +8,108 @@ if (!MISTRAL_API_KEY) {
   console.warn('Warning: MISTRAL_API_KEY is not set');
 }
 
-const MISTRAL_API_URL = 'https://api.mistral.ai/v1/audio/transcriptions';
+const MISTRAL_BASE_URL = 'https://api.mistral.ai/v1';
+const MISTRAL_TRANSCRIPTION_URL = `${MISTRAL_BASE_URL}/audio/transcriptions`;
+const MISTRAL_FILES_URL = `${MISTRAL_BASE_URL}/files`;
+
+// ============================================
+// MISTRAL CLOUD FILE STORAGE
+// ============================================
+
+interface MistralFileUploadResponse {
+  id: string;
+  object: string;
+  bytes: number;
+  created_at: number;
+  filename: string;
+  purpose: string;
+}
+
+interface MistralSignedUrlResponse {
+  url: string;
+  expires_at?: number;
+}
+
+/**
+ * Upload un fichier audio vers le cloud Mistral
+ * @returns L'ID du fichier uploadé
+ */
+export async function uploadToMistralCloud(
+  fileBuffer: Buffer,
+  fileName: string
+): Promise<string> {
+  if (!MISTRAL_API_KEY) {
+    throw new Error('MISTRAL_API_KEY is not configured');
+  }
+
+  const formData = new FormData();
+  const blob = new Blob([fileBuffer], { type: 'audio/mpeg' });
+  formData.append('file', blob, fileName);
+  formData.append('purpose', 'audio');
+
+  const response = await fetch(MISTRAL_FILES_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${MISTRAL_API_KEY}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to upload to Mistral cloud: ${error}`);
+  }
+
+  const result: MistralFileUploadResponse = await response.json();
+  return result.id;
+}
+
+/**
+ * Obtient une signed URL pour un fichier uploadé sur le cloud Mistral
+ * @param fileId - L'ID du fichier retourné par uploadToMistralCloud
+ * @param expiryHours - Durée de validité de l'URL (défaut: 24h)
+ */
+export async function getMistralSignedUrl(
+  fileId: string,
+  expiryHours: number = 24
+): Promise<string> {
+  if (!MISTRAL_API_KEY) {
+    throw new Error('MISTRAL_API_KEY is not configured');
+  }
+
+  const response = await fetch(`${MISTRAL_FILES_URL}/${fileId}/url?expiry=${expiryHours}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${MISTRAL_API_KEY}`,
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to get signed URL: ${error}`);
+  }
+
+  const result: MistralSignedUrlResponse = await response.json();
+  return result.url;
+}
+
+/**
+ * Upload un fichier et retourne directement la signed URL
+ * Combine uploadToMistralCloud + getMistralSignedUrl
+ */
+export async function uploadAndGetSignedUrl(
+  fileBuffer: Buffer,
+  fileName: string
+): Promise<{ fileId: string; signedUrl: string }> {
+  const fileId = await uploadToMistralCloud(fileBuffer, fileName);
+  const signedUrl = await getMistralSignedUrl(fileId);
+  return { fileId, signedUrl };
+}
+
+// ============================================
+// TRANSCRIPTION
+// ============================================
 
 export interface MistralTranscriptionInput {
   audioUrl?: string;        // URL publique de l'audio

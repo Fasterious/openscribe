@@ -65,72 +65,52 @@ export default function Home() {
     });
 
     try {
-      // Étape 1: Demander une URL signée pour l'upload
-      const prepareResponse = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          fileName: file.name,
-          fileSize: file.size,
-        }),
-      });
+      // Étape 1: Upload vers Mistral Cloud avec progression
+      const formData = new FormData();
+      formData.append('file', file);
 
-      if (!prepareResponse.ok) {
-        const error = await prepareResponse.json();
-        throw new Error(error.error || 'Failed to prepare upload');
-      }
-
-      const { uploadUrl, filePath } = await prepareResponse.json();
-
-      setState(prev => ({ ...prev, progress: 10 }));
-
-      // Étape 2: Upload direct vers Supabase avec progression
-      const xhr = new XMLHttpRequest();
-      
-      await new Promise<void>((resolve, reject) => {
+      // Utiliser XMLHttpRequest pour avoir la progression
+      const uploadResponse = await new Promise<{ audioUrl: string }>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        
         xhr.upload.addEventListener('progress', (event) => {
           if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 80) + 10; // 10-90%
+            const percent = Math.round((event.loaded / event.total) * 70); // 0-70%
             setState(prev => ({ ...prev, progress: percent }));
           }
         });
 
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch {
+              reject(new Error('Invalid response from server'));
+            }
           } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
+            try {
+              const error = JSON.parse(xhr.responseText);
+              reject(new Error(error.error || `Upload failed with status ${xhr.status}`));
+            } catch {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
           }
         });
 
         xhr.addEventListener('error', () => reject(new Error('Upload failed')));
         xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
 
-        xhr.open('PUT', uploadUrl);
-        xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-        xhr.send(file);
+        xhr.open('POST', '/api/upload');
+        xhr.send(formData);
       });
 
-      setState(prev => ({ ...prev, progress: 95 }));
-
-      // Étape 3: Obtenir l'URL de téléchargement
-      const completeResponse = await fetch('/api/upload/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filePath }),
-      });
-
-      if (!completeResponse.ok) {
-        const error = await completeResponse.json();
-        throw new Error(error.error || 'Failed to complete upload');
-      }
-
-      const { audioUrl } = await completeResponse.json();
+      const { audioUrl } = uploadResponse;
 
       setState(prev => ({
         ...prev,
         status: 'processing',
-        progress: 100,
+        progress: 80,
       }));
 
       // Étape 4: Lancer la transcription (Voxtral - synchrone)
