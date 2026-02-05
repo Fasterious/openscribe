@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n/context';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -14,6 +14,7 @@ interface AuthModalProps {
 type AuthMode = 'signin' | 'signup';
 
 export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -58,7 +59,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
       if (error) {
         setError(error.message);
       } else {
-        setMessage('Vérifiez votre email pour confirmer votre inscription !');
+        setMessage(t('auth.modal.checkEmail'));
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({
@@ -107,12 +108,12 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             </svg>
           </div>
           <h2 className="text-xl font-semibold">
-            {mode === 'signup' ? 'Créer un compte' : 'Se connecter'}
+            {mode === 'signup' ? t('auth.modal.signUp') : t('auth.modal.signIn')}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
             {mode === 'signup' 
-              ? 'Inscrivez-vous pour accéder à vos transcriptions'
-              : 'Connectez-vous à votre compte'
+              ? t('auth.modal.signUpSubtitle')
+              : t('auth.modal.signInSubtitle')
             }
           </p>
         </div>
@@ -143,7 +144,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continuer avec Google
+            {t('auth.modal.continueWithGoogle')}
           </Button>
         </div>
 
@@ -153,7 +154,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             <div className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">ou</span>
+            <span className="bg-background px-2 text-muted-foreground">{t('auth.modal.or')}</span>
           </div>
         </div>
 
@@ -161,7 +162,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         <form onSubmit={handleEmailAuth} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium mb-1.5">
-              Email
+              {t('auth.modal.email')}
             </label>
             <input
               id="email"
@@ -176,7 +177,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium mb-1.5">
-              Mot de passe
+              {t('auth.modal.password')}
             </label>
             <input
               id="password"
@@ -209,7 +210,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
             ) : null}
-            {mode === 'signup' ? "S'inscrire" : 'Se connecter'}
+            {mode === 'signup' ? t('auth.modal.signUpButton') : t('auth.modal.signInButton')}
           </Button>
         </form>
 
@@ -217,22 +218,22 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         <p className="text-center text-sm text-muted-foreground mt-6">
           {mode === 'signup' ? (
             <>
-              Déjà un compte ?{' '}
+              {t('auth.modal.alreadyAccount')}{' '}
               <button
                 onClick={() => setMode('signin')}
                 className="text-primary hover:underline font-medium"
               >
-                Se connecter
+                {t('auth.modal.signIn')}
               </button>
             </>
           ) : (
             <>
-              Pas encore de compte ?{' '}
+              {t('auth.modal.noAccount')}{' '}
               <button
                 onClick={() => setMode('signup')}
                 className="text-primary hover:underline font-medium"
               >
-                S'inscrire
+                {t('auth.modal.signUpButton')}
               </button>
             </>
           )}

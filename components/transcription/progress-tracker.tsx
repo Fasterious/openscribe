@@ -2,6 +2,7 @@
 
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n/context';
 import type { TranscriptionStatus } from '@/types';
 
 interface ProgressTrackerProps {
@@ -10,14 +11,6 @@ interface ProgressTrackerProps {
   fileName?: string;
   className?: string;
 }
-
-const statusMessages: Record<TranscriptionStatus, string> = {
-  idle: 'Ready to transcribe',
-  uploading: 'Uploading audio file...',
-  processing: 'Transcribing with WhisperX...',
-  completed: 'Transcription complete!',
-  error: 'An error occurred',
-};
 
 const statusIcons: Record<TranscriptionStatus, React.ReactNode> = {
   idle: (
@@ -49,7 +42,19 @@ const statusIcons: Record<TranscriptionStatus, React.ReactNode> = {
 };
 
 export function ProgressTracker({ status, progress, fileName, className }: ProgressTrackerProps) {
+  const { t } = useTranslation();
   const isActive = status === 'uploading' || status === 'processing';
+
+  const getStatusMessage = (status: TranscriptionStatus): string => {
+    switch (status) {
+      case 'uploading':
+        return t('progress.uploading');
+      case 'processing':
+        return t('progress.processing');
+      default:
+        return '';
+    }
+  };
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -63,7 +68,7 @@ export function ProgressTracker({ status, progress, fileName, className }: Progr
           {statusIcons[status]}
         </div>
         <div className="flex-1">
-          <p className="font-medium text-foreground">{statusMessages[status]}</p>
+          <p className="font-medium text-foreground">{getStatusMessage(status)}</p>
           {fileName && (
             <p className="text-sm text-muted-foreground truncate max-w-md">
               {fileName}
@@ -76,7 +81,7 @@ export function ProgressTracker({ status, progress, fileName, className }: Progr
         <div className="space-y-2">
           <Progress value={progress} className="h-2" />
           <p className="text-xs text-muted-foreground text-right">
-            {status === 'uploading' ? `${Math.round(progress)}%` : 'Processing...'}
+            {status === 'uploading' ? `${Math.round(progress)}%` : t('progress.processing')}
           </p>
         </div>
       )}

@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n/context';
 
 interface UploadZoneProps {
   onFileSelect: (file: File) => void;
@@ -10,6 +11,7 @@ interface UploadZoneProps {
 }
 
 export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProps) {
+  const { t } = useTranslation();
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -103,13 +105,13 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
       </div>
 
       <p className="mb-2 text-lg font-medium text-foreground">
-        {isDragOver ? 'Drop your audio file' : 'Drop your audio file here'}
+        {t('upload.dropzone')}
       </p>
       <p className="text-sm text-muted-foreground">
-        or click to browse
+        {t('upload.or')} <span className="text-primary font-medium">{t('upload.browse')}</span>
       </p>
       <p className="mt-4 text-xs text-muted-foreground/70">
-        Supports MP3, WAV, M4A, WebM, OGG, FLAC
+        {t('upload.formats')}
       </p>
     </div>
   );

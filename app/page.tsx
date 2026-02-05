@@ -6,7 +6,9 @@ import { ProgressTracker } from '@/components/transcription/progress-tracker';
 import { TranscriptViewer } from '@/components/transcription/transcript-viewer';
 import { AuthModal } from '@/components/auth/auth-modal';
 import { Button } from '@/components/ui/button';
+import { LanguageSelector } from '@/components/ui/language-selector';
 import { createClient } from '@/lib/supabase/client';
+import { useTranslation } from '@/lib/i18n/context';
 import type { TranscriptionState, TranscriptionResult } from '@/types';
 import type { User } from '@supabase/supabase-js';
 
@@ -16,6 +18,7 @@ const STORAGE_KEY_FILENAME = 'openscribe_pending_filename';
 const STORAGE_KEY_TRANSCRIPTION_ID = 'openscribe_pending_transcription_id';
 
 export default function Home() {
+  const { t } = useTranslation();
   const [state, setState] = useState<TranscriptionState>({
     status: 'idle',
     progress: 0,
@@ -297,27 +300,20 @@ export default function Home() {
             <span className="text-xl font-semibold">OpenScribe</span>
           </div>
           <nav className="flex items-center gap-4">
-            <a 
-              href="https://github.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              GitHub
-            </a>
+            <LanguageSelector />
             {!loading && (
               user ? (
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-muted-foreground hidden sm:inline">
                     {user.email}
                   </span>
                   <Button variant="outline" size="sm" onClick={handleSignOut}>
-                    Se déconnecter
+                    {t('header.signOut')}
                   </Button>
                 </div>
               ) : (
                 <Button size="sm" onClick={() => setAuthModalOpen(true)}>
-                  Se connecter
+                  {t('header.signIn')}
                 </Button>
               )
             )}
@@ -331,10 +327,10 @@ export default function Home() {
           {/* Hero */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold tracking-tight">
-              Transcribe your audio
+              {t('hero.title')}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Professional-quality transcription with speaker diarization, powered by Voxtral
+              {t('hero.subtitle')}
             </p>
           </div>
 
@@ -352,7 +348,7 @@ export default function Home() {
               />
               {state.status === 'processing' && (
                 <p className="text-center text-sm text-muted-foreground">
-                  Transcribing with Voxtral...
+                  {t('progress.transcribing')}
                 </p>
               )}
             </div>
@@ -376,7 +372,7 @@ export default function Home() {
                   />
                 </svg>
                 <h3 className="mt-4 text-lg font-medium text-red-800">
-                  Transcription failed
+                  {t('error.title')}
                 </h3>
                 <p className="mt-2 text-sm text-red-600">
                   {state.error}
@@ -384,7 +380,7 @@ export default function Home() {
               </div>
               <div className="flex justify-center">
                 <Button onClick={handleReset} variant="outline">
-                  Try again
+                  {t('error.tryAgain')}
                 </Button>
               </div>
             </div>
@@ -403,7 +399,7 @@ export default function Home() {
                   <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Transcribe another file
+                  {t('actions.transcribeAnother')}
                 </Button>
               </div>
             </div>
@@ -418,9 +414,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
-                <h3 className="font-medium">Speaker Detection</h3>
+                <h3 className="font-medium">{t('features.speakers.title')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Automatic speaker diarization
+                  {t('features.speakers.description')}
                 </p>
               </div>
               <div className="text-center space-y-2">
@@ -429,9 +425,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                   </svg>
                 </div>
-                <h3 className="font-medium">99+ Languages</h3>
+                <h3 className="font-medium">{t('features.languages.title')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Auto language detection
+                  {t('features.languages.description')}
                 </p>
               </div>
               <div className="text-center space-y-2">
@@ -440,9 +436,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h3 className="font-medium">Fast & Accurate</h3>
+                <h3 className="font-medium">{t('features.fast.title')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Powered by Voxtral
+                  {t('features.fast.description')}
                 </p>
               </div>
             </div>
@@ -454,7 +450,7 @@ export default function Home() {
       <footer className="border-t mt-auto">
         <div className="container mx-auto px-4 py-6">
           <p className="text-center text-sm text-muted-foreground">
-            OpenScribe - Open source transcription for researchers
+            {t('footer.text')}
           </p>
         </div>
       </footer>

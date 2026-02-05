@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n/context';
 import type { TranscriptionResult, TranscriptionSegment } from '@/types';
 import { VOXTRAL_PRICE_PER_MINUTE } from '@/types';
 
@@ -71,6 +72,7 @@ export function TranscriptViewer({
   isAuthenticated = false,
   onSignUpClick 
 }: TranscriptViewerProps) {
+  const { t } = useTranslation();
   const hasSegments = result.segments && result.segments.length > 0;
   const hasSpeakerText = result.speaker_text && result.speaker_text.length > 0;
   
@@ -211,7 +213,7 @@ export function TranscriptViewer({
     <Card className={cn('', className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex items-center gap-4">
-          <CardTitle className="text-lg font-medium">Transcription</CardTitle>
+          <CardTitle className="text-lg font-medium">{t('transcript.title')}</CardTitle>
           {detectedLanguage && (
             <Badge variant="secondary" className="text-xs">
               {detectedLanguage.toUpperCase()}
@@ -219,7 +221,7 @@ export function TranscriptViewer({
           )}
           {!isAuthenticated && (
             <Badge variant="outline" className="text-xs text-orange-600 border-orange-300 bg-orange-50">
-              Aperçu
+              {t('transcript.preview')}
             </Badge>
           )}
         </div>
@@ -238,7 +240,7 @@ export function TranscriptViewer({
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >
-                {mode === 'speakers' ? 'Speakers' : mode === 'plain' ? 'Plain' : 'Segments'}
+                {mode === 'speakers' ? t('transcript.speakers') : mode === 'plain' ? t('transcript.plain') : t('transcript.segments')}
               </button>
             ))}
           </div>
@@ -254,7 +256,7 @@ export function TranscriptViewer({
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Audio: <strong className="text-foreground">{formatDuration(result.audioDurationSeconds)}</strong></span>
+                <span>{t('transcript.audio')}: <strong className="text-foreground">{formatDuration(result.audioDurationSeconds)}</strong></span>
               </div>
             )}
             {result.transcriptionTimeMs && (
@@ -262,7 +264,7 @@ export function TranscriptViewer({
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                <span>Transcription: <strong className="text-foreground">{formatTranscriptionTime(result.transcriptionTimeMs)}</strong></span>
+                <span>{t('transcript.transcriptionTime')}: <strong className="text-foreground">{formatTranscriptionTime(result.transcriptionTimeMs)}</strong></span>
               </div>
             )}
             {result.cost !== undefined && result.cost > 0 && (
@@ -270,7 +272,7 @@ export function TranscriptViewer({
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Cost: <strong className="text-foreground">${result.cost.toFixed(4)}</strong> <span className="text-xs">(${VOXTRAL_PRICE_PER_MINUTE}/min)</span></span>
+                <span>{t('transcript.cost')}: <strong className="text-foreground">${result.cost.toFixed(4)}</strong> <span className="text-xs">(${VOXTRAL_PRICE_PER_MINUTE}/min)</span></span>
               </div>
             )}
           </div>
@@ -310,7 +312,7 @@ export function TranscriptViewer({
             
             {viewMode === 'segments' && !hasSegments && (
               <p className="text-sm text-muted-foreground italic">
-                Segment-level timing is not available for this transcription.
+                {t('transcript.noSegments')}
               </p>
             )}
           </div>
@@ -330,16 +332,16 @@ export function TranscriptViewer({
               </svg>
             </div>
             <h3 className="text-lg font-semibold mb-2">
-              Connectez-vous gratuitement
+              {t('auth.cta.title')}
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Connectez-vous pour voir la transcription complète, copier le texte et télécharger les fichiers.
+              {t('auth.cta.description')}
             </p>
             <Button onClick={onSignUpClick} className="gap-2">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
               </svg>
-              Se connecter
+              {t('auth.cta.button')}
             </Button>
           </div>
         )}
@@ -357,14 +359,14 @@ export function TranscriptViewer({
                 <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Copied!
+                {t('transcript.copied')}
               </>
             ) : (
               <>
                 <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
-                Copy
+                {t('transcript.copy')}
               </>
             )}
           </Button>
@@ -378,7 +380,7 @@ export function TranscriptViewer({
             <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            TXT
+            {t('transcript.downloadTxt')}
           </Button>
           
           {hasSpeakerText && (
@@ -391,7 +393,7 @@ export function TranscriptViewer({
               <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              With Speakers
+              {t('transcript.withSpeakers')}
             </Button>
           )}
           
@@ -404,7 +406,7 @@ export function TranscriptViewer({
             <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
             </svg>
-            JSON
+            {t('transcript.downloadJson')}
           </Button>
         </div>
       </CardContent>
