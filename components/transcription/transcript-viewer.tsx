@@ -321,7 +321,7 @@ export function TranscriptViewer({
           )}
         </div>
 
-        {/* Sign up CTA for non-authenticated users */}
+        {/* Sign in CTA for non-authenticated users */}
         {!isAuthenticated && (
           <div className="rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center">
             <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -330,16 +330,16 @@ export function TranscriptViewer({
               </svg>
             </div>
             <h3 className="text-lg font-semibold mb-2">
-              Créez un compte gratuit
+              Connectez-vous gratuitement
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Inscrivez-vous pour voir la transcription complète, copier le texte et télécharger les fichiers.
+              Connectez-vous pour voir la transcription complète, copier le texte et télécharger les fichiers.
             </p>
             <Button onClick={onSignUpClick} className="gap-2">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
               </svg>
-              S'inscrire gratuitement
+              Se connecter
             </Button>
           </div>
         )}
