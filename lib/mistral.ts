@@ -276,7 +276,7 @@ export async function transcribe(input: MistralTranscriptionInput): Promise<Tran
   if (input.audioUrl) {
     formData.append('file_url', input.audioUrl);
   } else if (input.audioBuffer) {
-    const blob = new Blob([input.audioBuffer], { type: 'audio/mpeg' });
+    const blob = new Blob([new Uint8Array(input.audioBuffer)], { type: 'audio/mpeg' });
     formData.append('file', blob, input.audioFileName || 'audio.mp3');
   }
 
