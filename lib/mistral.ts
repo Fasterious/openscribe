@@ -124,7 +124,7 @@ export async function uploadToMistralCloud(
   }
 
   const formData = new FormData();
-  const blob = new Blob([fileBuffer], { type: 'audio/mpeg' });
+  const blob = new Blob([new Uint8Array(fileBuffer)], { type: 'audio/mpeg' });
   formData.append('file', blob, fileName);
   formData.append('purpose', 'audio');
 
