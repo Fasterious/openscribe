@@ -72,6 +72,20 @@ export const translations = {
     
     // Actions
     'actions.transcribeAnother': 'Transcribe another file',
+    
+    // Feedback
+    'feedback.button': 'Feedback',
+    'feedback.title': 'Send us feedback',
+    'feedback.subtitle': '❓ Question, 💡 idea, ⚠️ problem or 💬 other — help us improve!',
+    'feedback.message': 'Your message',
+    'feedback.messagePlaceholder': 'Tell us what you think...',
+    'feedback.email': 'Email',
+    'feedback.emailPlaceholder': 'your@email.com',
+    'feedback.optional': 'optional',
+    'feedback.send': 'Send feedback',
+    'feedback.success.title': 'Thank you!',
+    'feedback.success.message': 'Your feedback has been received.',
+    'feedback.error': 'Failed to send feedback. Please try again.',
   },
   
   fr: {
@@ -147,6 +161,20 @@ export const translations = {
     
     // Actions
     'actions.transcribeAnother': 'Transcrire un autre fichier',
+    
+    // Feedback
+    'feedback.button': 'Avis',
+    'feedback.title': 'Envoyez-nous vos retours',
+    'feedback.subtitle': '❓ Question, 💡 idée, ⚠️ problème ou 💬 autre — aidez-nous à améliorer !',
+    'feedback.message': 'Votre message',
+    'feedback.messagePlaceholder': 'Dites-nous ce que vous pensez...',
+    'feedback.email': 'Email',
+    'feedback.emailPlaceholder': 'votre@email.com',
+    'feedback.optional': 'optionnel',
+    'feedback.send': 'Envoyer',
+    'feedback.success.title': 'Merci !',
+    'feedback.success.message': 'Votre retour a bien été reçu.',
+    'feedback.error': "Échec de l'envoi. Veuillez réessayer.",
   },
 
   es: {
@@ -222,6 +250,20 @@ export const translations = {
     
     // Actions
     'actions.transcribeAnother': 'Transcribir otro archivo',
+    
+    // Feedback
+    'feedback.button': 'Opinión',
+    'feedback.title': 'Envíanos tu opinión',
+    'feedback.subtitle': '❓ Pregunta, 💡 idea, ⚠️ problema o 💬 otro — ¡ayúdanos a mejorar!',
+    'feedback.message': 'Tu mensaje',
+    'feedback.messagePlaceholder': 'Cuéntanos qué piensas...',
+    'feedback.email': 'Email',
+    'feedback.emailPlaceholder': 'tu@email.com',
+    'feedback.optional': 'opcional',
+    'feedback.send': 'Enviar',
+    'feedback.success.title': '¡Gracias!',
+    'feedback.success.message': 'Tu opinión ha sido recibida.',
+    'feedback.error': 'Error al enviar. Por favor, inténtalo de nuevo.',
   },
 
   pt: {
@@ -297,6 +339,20 @@ export const translations = {
     
     // Actions
     'actions.transcribeAnother': 'Transcrever outro arquivo',
+    
+    // Feedback
+    'feedback.button': 'Opinião',
+    'feedback.title': 'Envie sua opinião',
+    'feedback.subtitle': '❓ Pergunta, 💡 ideia, ⚠️ problema ou 💬 outro — ajude-nos a melhorar!',
+    'feedback.message': 'Sua mensagem',
+    'feedback.messagePlaceholder': 'Conte-nos o que você pensa...',
+    'feedback.email': 'Email',
+    'feedback.emailPlaceholder': 'seu@email.com',
+    'feedback.optional': 'opcional',
+    'feedback.send': 'Enviar',
+    'feedback.success.title': 'Obrigado!',
+    'feedback.success.message': 'Seu feedback foi recebido.',
+    'feedback.error': 'Falha ao enviar. Por favor, tente novamente.',
   },
 
   de: {
@@ -372,6 +428,20 @@ export const translations = {
     
     // Actions
     'actions.transcribeAnother': 'Weitere Datei transkribieren',
+    
+    // Feedback
+    'feedback.button': 'Meinung',
+    'feedback.title': 'Senden Sie uns Ihre Meinung',
+    'feedback.subtitle': '❓ Frage, 💡 Idee, ⚠️ Problem oder 💬 Anderes — helfen Sie uns zu verbessern!',
+    'feedback.message': 'Ihre Nachricht',
+    'feedback.messagePlaceholder': 'Sagen Sie uns, was Sie denken...',
+    'feedback.email': 'E-Mail',
+    'feedback.emailPlaceholder': 'ihre@email.com',
+    'feedback.optional': 'optional',
+    'feedback.send': 'Senden',
+    'feedback.success.title': 'Danke!',
+    'feedback.success.message': 'Ihr Feedback wurde empfangen.',
+    'feedback.error': 'Fehler beim Senden. Bitte versuchen Sie es erneut.',
   },
 } as const;
 

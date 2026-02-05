@@ -5,6 +5,7 @@ import { UploadZone } from '@/components/transcription/upload-zone';
 import { ProgressTracker } from '@/components/transcription/progress-tracker';
 import { TranscriptViewer } from '@/components/transcription/transcript-viewer';
 import { AuthModal } from '@/components/auth/auth-modal';
+import { FeedbackButton } from '@/components/feedback/feedback-button';
 import { Button } from '@/components/ui/button';
 import { LanguageSelector } from '@/components/ui/language-selector';
 import { createClient } from '@/lib/supabase/client';
@@ -461,6 +462,9 @@ export default function Home() {
         onClose={() => setAuthModalOpen(false)}
         onSuccess={() => setAuthModalOpen(false)}
       />
+
+      {/* Feedback Button */}
+      <FeedbackButton />
     </div>
   );
 }
