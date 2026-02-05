@@ -13,6 +13,87 @@ const MISTRAL_TRANSCRIPTION_URL = `${MISTRAL_BASE_URL}/audio/transcriptions`;
 const MISTRAL_FILES_URL = `${MISTRAL_BASE_URL}/files`;
 
 // ============================================
+// RETRY LOGIC WITH EXPONENTIAL BACKOFF
+// ============================================
+
+interface RetryConfig {
+  maxRetries: number;
+  initialDelayMs: number;
+  maxDelayMs: number;
+  retryableStatuses: number[];
+}
+
+const DEFAULT_RETRY_CONFIG: RetryConfig = {
+  maxRetries: 3,
+  initialDelayMs: 1000,  // 1 seconde
+  maxDelayMs: 8000,      // 8 secondes max
+  retryableStatuses: [429, 503, 502, 500],  // Rate limit, Service unavailable, Bad gateway, Server error
+};
+
+/**
+ * Attend un délai donné
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Effectue une requête fetch avec retry automatique et backoff exponentiel
+ */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  config: RetryConfig = DEFAULT_RETRY_CONFIG
+): Promise<Response> {
+  let lastError: Error | null = null;
+  let delay = config.initialDelayMs;
+
+  for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+
+      // Si succès ou erreur non-retryable, retourner directement
+      if (response.ok || !config.retryableStatuses.includes(response.status)) {
+        return response;
+      }
+
+      // Erreur retryable - on va réessayer
+      const statusText = response.status === 429 
+        ? 'Rate limit exceeded' 
+        : `Server error (${response.status})`;
+      
+      console.warn(`[Mistral API] ${statusText}, attempt ${attempt + 1}/${config.maxRetries + 1}, retrying in ${delay}ms...`);
+      
+      // Si c'est la dernière tentative, retourner la réponse d'erreur
+      if (attempt === config.maxRetries) {
+        return response;
+      }
+
+      // Attendre avant de réessayer
+      await sleep(delay);
+      
+      // Backoff exponentiel avec jitter
+      delay = Math.min(delay * 2 + Math.random() * 500, config.maxDelayMs);
+      
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      
+      // Erreur réseau - réessayer si pas la dernière tentative
+      if (attempt === config.maxRetries) {
+        throw lastError;
+      }
+      
+      console.warn(`[Mistral API] Network error, attempt ${attempt + 1}/${config.maxRetries + 1}, retrying in ${delay}ms...`);
+      await sleep(delay);
+      delay = Math.min(delay * 2 + Math.random() * 500, config.maxDelayMs);
+    }
+  }
+
+  // Ne devrait jamais arriver, mais TypeScript veut un retour
+  throw lastError || new Error('Max retries exceeded');
+}
+
+// ============================================
 // MISTRAL CLOUD FILE STORAGE
 // ============================================
 
@@ -47,7 +128,7 @@ export async function uploadToMistralCloud(
   formData.append('file', blob, fileName);
   formData.append('purpose', 'audio');
 
-  const response = await fetch(MISTRAL_FILES_URL, {
+  const response = await fetchWithRetry(MISTRAL_FILES_URL, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${MISTRAL_API_KEY}`,
@@ -77,7 +158,7 @@ export async function getMistralSignedUrl(
     throw new Error('MISTRAL_API_KEY is not configured');
   }
 
-  const response = await fetch(`${MISTRAL_FILES_URL}/${fileId}/url?expiry=${expiryHours}`, {
+  const response = await fetchWithRetry(`${MISTRAL_FILES_URL}/${fileId}/url?expiry=${expiryHours}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${MISTRAL_API_KEY}`,
@@ -212,7 +293,7 @@ export async function transcribe(input: MistralTranscriptionInput): Promise<Tran
   // Note: language n'est pas compatible avec timestamp_granularities selon la doc
   // On laisse la détection automatique pour avoir les timestamps
   
-  const response = await fetch(MISTRAL_TRANSCRIPTION_URL, {
+  const response = await fetchWithRetry(MISTRAL_TRANSCRIPTION_URL, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${MISTRAL_API_KEY}`,

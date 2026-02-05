@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { UploadZone } from '@/components/transcription/upload-zone';
 import { ProgressTracker } from '@/components/transcription/progress-tracker';
 import { TranscriptViewer } from '@/components/transcription/transcript-viewer';
+import { AuthModal } from '@/components/auth/auth-modal';
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/client';
 import type { TranscriptionState, TranscriptionResult } from '@/types';
+import type { User } from '@supabase/supabase-js';
 
 export default function Home() {
   const [state, setState] = useState<TranscriptionState>({
@@ -15,6 +18,39 @@ export default function Home() {
     error: null,
   });
   const [fileName, setFileName] = useState<string>('');
+  const [user, setUser] = useState<User | null>(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const supabase = createClient();
+
+  // Vérifier l'état d'authentification au chargement
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+    };
+
+    checkUser();
+
+    // Écouter les changements d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const handleSignUpClick = useCallback(() => {
+    setAuthModalOpen(true);
+  }, []);
 
   const handleFileSelect = useCallback(async (file: File) => {
     setFileName(file.name);
@@ -142,6 +178,22 @@ export default function Home() {
             >
               GitHub
             </a>
+            {!loading && (
+              user ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground">
+                    {user.email}
+                  </span>
+                  <Button variant="outline" size="sm" onClick={handleSignOut}>
+                    Se déconnecter
+                  </Button>
+                </div>
+              ) : (
+                <Button size="sm" onClick={() => setAuthModalOpen(true)}>
+                  Se connecter
+                </Button>
+              )
+            )}
           </nav>
         </div>
       </header>
@@ -214,7 +266,11 @@ export default function Home() {
           {/* Result */}
           {state.status === 'completed' && state.result && (
             <div className="space-y-4">
-              <TranscriptViewer result={state.result} />
+              <TranscriptViewer 
+                result={state.result} 
+                isAuthenticated={!!user}
+                onSignUpClick={handleSignUpClick}
+              />
               <div className="flex justify-center">
                 <Button onClick={handleReset} variant="outline">
                   <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,6 +331,13 @@ export default function Home() {
           </p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        onSuccess={() => setAuthModalOpen(false)}
+      />
     </div>
   );
 }
