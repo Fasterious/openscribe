@@ -57,19 +57,19 @@ export function FeedbackButton({ className }: FeedbackButtonProps) {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button - subtle design like reference */}
       <button
         onClick={() => setIsOpen(true)}
         className={cn(
-          'fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-primary-foreground shadow-lg transition-all hover:scale-105 hover:shadow-xl',
+          'fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-card border border-border px-4 py-2.5 text-muted-foreground shadow-md transition-all hover:text-foreground hover:shadow-lg hover:border-primary/30',
           className
         )}
         aria-label={t('feedback.button')}
       >
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        <span className="text-sm font-medium hidden sm:inline">{t('feedback.button')}</span>
+        <span className="text-sm font-medium">{t('feedback.button')}</span>
       </button>
 
       {/* Modal */}
@@ -82,7 +82,7 @@ export function FeedbackButton({ className }: FeedbackButtonProps) {
           />
           
           {/* Modal content */}
-          <div className="relative bg-background rounded-t-xl sm:rounded-xl shadow-2xl w-full max-w-md mx-0 sm:mx-4 p-6 animate-in slide-in-from-bottom sm:fade-in sm:zoom-in-95 duration-200">
+          <div className="relative bg-card rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md mx-0 sm:mx-4 p-6 border border-border animate-in slide-in-from-bottom sm:fade-in sm:zoom-in-95 duration-200">
             {/* Close button */}
             <button
               onClick={() => setIsOpen(false)}
@@ -95,12 +95,12 @@ export function FeedbackButton({ className }: FeedbackButtonProps) {
 
             {success ? (
               <div className="text-center py-8">
-                <div className="mx-auto w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                  <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mx-auto w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mb-4">
+                  <svg className="h-8 w-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold">{t('feedback.success.title')}</h3>
+                <h3 className="text-lg font-semibold text-foreground">{t('feedback.success.title')}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{t('feedback.success.message')}</p>
               </div>
             ) : (
@@ -114,7 +114,7 @@ export function FeedbackButton({ className }: FeedbackButtonProps) {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Message */}
                   <div>
-                    <label htmlFor="feedback-message" className="block text-sm font-medium mb-1.5">
+                    <label htmlFor="feedback-message" className="block text-sm font-medium text-foreground mb-1.5">
                       {t('feedback.message')} *
                     </label>
                     <textarea
@@ -124,13 +124,13 @@ export function FeedbackButton({ className }: FeedbackButtonProps) {
                       placeholder={t('feedback.messagePlaceholder')}
                       required
                       rows={4}
-                      className="w-full px-3 py-2 rounded-lg border bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-input bg-background text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                     />
                   </div>
 
                   {/* Email (optional) */}
                   <div>
-                    <label htmlFor="feedback-email" className="block text-sm font-medium mb-1.5">
+                    <label htmlFor="feedback-email" className="block text-sm font-medium text-foreground mb-1.5">
                       {t('feedback.email')} <span className="text-muted-foreground font-normal">({t('feedback.optional')})</span>
                     </label>
                     <input
@@ -139,12 +139,12 @@ export function FeedbackButton({ className }: FeedbackButtonProps) {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={t('feedback.emailPlaceholder')}
-                      className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                     />
                   </div>
 
                   {error && (
-                    <div className="text-sm text-red-600 bg-red-50 rounded-lg p-3">
+                    <div className="text-sm text-destructive bg-destructive/10 rounded-xl p-3">
                       {error}
                     </div>
                   )}

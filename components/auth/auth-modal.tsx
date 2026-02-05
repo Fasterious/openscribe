@@ -89,11 +89,11 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
       />
       
       {/* Modal */}
-      <div className="relative bg-background rounded-xl shadow-2xl w-full max-w-md mx-4 p-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-card rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 border border-border animate-in fade-in zoom-in-95 duration-200">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -102,12 +102,12 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          <div className="mx-auto w-14 h-14 rounded-full bg-primary flex items-center justify-center mb-4">
+            <svg className="h-7 w-7 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-xl font-semibold text-foreground">
             {mode === 'signup' ? t('auth.modal.signUp') : t('auth.modal.signIn')}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
@@ -151,17 +151,17 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         {/* Divider */}
         <div className="relative mb-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t" />
+            <div className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">{t('auth.modal.or')}</span>
+            <span className="bg-card px-3 text-muted-foreground">{t('auth.modal.or')}</span>
           </div>
         </div>
 
         {/* Email form */}
         <form onSubmit={handleEmailAuth} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1.5">
+            <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
               {t('auth.modal.email')}
             </label>
             <input
@@ -171,12 +171,12 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="vous@example.com"
               required
-              className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1.5">
+            <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
               {t('auth.modal.password')}
             </label>
             <input
@@ -187,18 +187,18 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               placeholder="••••••••"
               required
               minLength={6}
-              className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
 
           {error && (
-            <div className="text-sm text-red-600 bg-red-50 rounded-lg p-3">
+            <div className="text-sm text-destructive bg-destructive/10 rounded-xl p-3">
               {error}
             </div>
           )}
 
           {message && (
-            <div className="text-sm text-green-600 bg-green-50 rounded-lg p-3">
+            <div className="text-sm text-accent bg-accent/10 rounded-xl p-3">
               {message}
             </div>
           )}

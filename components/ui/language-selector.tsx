@@ -32,13 +32,13 @@ export function LanguageSelector() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary border border-transparent hover:border-border transition-all"
         aria-label="Select language"
       >
         <span className="text-base">{currentLang.flag}</span>
-        <span className="hidden sm:inline">{currentLang.code.toUpperCase()}</span>
+        <span className="hidden sm:inline font-medium">{currentLang.code.toUpperCase()}</span>
         <svg 
-          className={cn("h-3 w-3 transition-transform", isOpen && "rotate-180")} 
+          className={cn("h-3.5 w-3.5 transition-transform", isOpen && "rotate-180")} 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
@@ -48,14 +48,14 @@ export function LanguageSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1 py-1 w-36 bg-background rounded-lg border shadow-lg z-50">
+        <div className="absolute right-0 mt-2 py-1.5 w-40 bg-card rounded-xl border border-border shadow-xl z-50">
           {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => handleSelect(lang.code)}
               className={cn(
-                "w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors",
-                language === lang.code && "bg-muted font-medium"
+                "w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-secondary transition-colors",
+                language === lang.code && "bg-secondary text-primary font-medium"
               )}
             >
               <span className="text-base">{lang.flag}</span>

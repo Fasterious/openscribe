@@ -80,13 +80,15 @@ Démocratiser l'accès à la transcription de qualité professionnelle avec une 
 
 | Couche | Technologie | Justification |
 |--------|-------------|---------------|
-| **Framework** | Next.js 14+ (App Router) | Full-stack, SSR, grande communauté |
+| **Framework** | Next.js 16+ (App Router) | Full-stack, SSR, grande communauté |
 | **Language** | TypeScript | Type safety, meilleure DX |
-| **Styling** | Tailwind CSS | Utilitaire, rapide, populaire |
-| **UI Components** | shadcn/ui | Moderne, minimaliste, copy-paste |
+| **Styling** | Tailwind CSS v4 | Utilitaire, rapide, CSS natif |
+| **UI Components** | shadcn/ui + Radix UI | Moderne, minimaliste, copy-paste |
+| **Icônes** | Lucide React | Cohérent, léger, open source |
 | **Transcription** | Voxtral (Mistral AI) | Rapide, précis, $0.003/min |
 | **Storage temporaire** | Mistral Cloud | URLs signées, pas de coût storage |
-| **Auth** | Supabase Auth (Phase 2+) | Email, OAuth, Magic Links intégré |
+| **Auth** | Supabase Auth ✅ | Google OAuth, Magic Links |
+| **i18n** | Context React custom ✅ | FR/EN/ES/PT/DE, léger, sans dépendance |
 | **Database** | Supabase (Phase 2+) | SQL, RLS, temps réel |
 | **Paiement** | Stripe (Phase 3+) | Standard industrie, webhooks |
 | **Déploiement** | Vercel | Optimisé Next.js, gratuit pour commencer |
@@ -142,7 +144,75 @@ Démocratiser l'accès à la transcription de qualité professionnelle avec une 
 6. Résultat retourné avec métriques (durée, temps, coût)
 ```
 
-### Structure de fichiers - OpenScribe
+### Structure de fichiers - OpenScribe (État actuel)
+
+```
+openscribe/
+├── app/
+│   ├── api/
+│   │   ├── feedback/route.ts     # Endpoint feedback utilisateur
+│   │   ├── transcribe/
+│   │   │   ├── route.ts          # Transcription Voxtral
+│   │   │   └── [id]/route.ts     # Récupération par ID (post-auth)
+│   │   └── upload/route.ts       # Upload vers Mistral Cloud
+│   │
+│   ├── auth/
+│   │   └── callback/route.ts     # OAuth callback Supabase
+│   │
+│   ├── layout.tsx                # Root layout + i18n provider
+│   ├── page.tsx                  # Page principale (transcription)
+│   ├── globals.css               # Styles globaux (Tailwind v4)
+│   └── favicon.ico
+│
+├── components/
+│   ├── auth/
+│   │   └── auth-modal.tsx        # Modal connexion (OAuth + Magic Link)
+│   ├── feedback/
+│   │   └── feedback-button.tsx   # Bouton feedback flottant
+│   ├── transcription/
+│   │   ├── upload-zone.tsx       # Zone drag & drop
+│   │   ├── progress-tracker.tsx  # Barre de progression
+│   │   └── transcript-viewer.tsx # Affichage résultat
+│   └── ui/                       # shadcn/ui components
+│       ├── badge.tsx
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── language-selector.tsx # Sélecteur FR/EN
+│       └── progress.tsx
+│
+├── lib/
+│   ├── i18n/
+│   │   ├── context.tsx           # React Context i18n
+│   │   └── translations.ts       # Traductions FR/EN/ES/PT/DE
+│   ├── supabase/
+│   │   ├── client.ts             # Client browser
+│   │   ├── server.ts             # Client server
+│   │   └── middleware.ts         # Auth middleware utils
+│   ├── mistral.ts                # Client Mistral (Voxtral + Cloud)
+│   ├── transcription-cache.ts    # Cache pour users non-auth
+│   └── utils.ts
+│
+├── scripts/                      # Scripts de test
+│   ├── test-mistral-cloud.ts
+│   ├── test-voxtral-local.ts
+│   └── test-voxtral.ts
+│
+├── types/
+│   └── index.ts                  # Types TypeScript
+│
+├── middleware.ts                 # Next.js middleware (auth refresh)
+├── .env.local                    # Variables d'environnement
+├── .env.example                  # Template
+├── package.json
+├── components.json               # Config shadcn/ui
+├── tsconfig.json
+├── next.config.ts
+├── postcss.config.mjs
+├── eslint.config.mjs
+└── README.md
+```
+
+### Structure prévue - Phases futures
 
 ```
 openscribe/
@@ -152,58 +222,21 @@ openscribe/
 │   │   ├── pricing/page.tsx      # Page tarifs
 │   │   └── about/page.tsx        # À propos
 │   │
-│   ├── (auth)/                   # Authentification (Phase 2+)
-│   │   ├── login/page.tsx
-│   │   ├── signup/page.tsx
-│   │   └── callback/route.ts     # OAuth callback
-│   │
 │   ├── (dashboard)/              # App protégée (Phase 2+)
 │   │   ├── layout.tsx            # Auth check + sidebar
 │   │   ├── page.tsx              # Dashboard principal
-│   │   ├── transcribe/page.tsx   # Upload + transcription
 │   │   ├── library/page.tsx      # Bibliothèque de transcriptions
 │   │   ├── settings/page.tsx     # Paramètres compte
 │   │   └── billing/page.tsx      # Gestion abonnement/crédits
 │   │
-│   ├── api/
-│   │   ├── upload/route.ts       # Upload vers Mistral Cloud
-│   │   ├── transcribe/route.ts   # Transcription Voxtral
-│   │   └── webhooks/
-│   │       └── stripe/route.ts   # Webhooks Stripe (Phase 3+)
-│   │
-│   ├── layout.tsx                # Root layout
-│   ├── page.tsx                  # Page principale (transcription)
-│   └── globals.css               # Styles globaux
-│
-├── components/
-│   ├── ui/                       # shadcn/ui components
-│   ├── forms/                    # Formulaires
-│   ├── layout/                   # Header, Footer, Sidebar
-│   └── transcription/            # Composants spécifiques
-│       ├── upload-zone.tsx
-│       ├── progress-tracker.tsx
-│       └── transcript-viewer.tsx
+│   └── api/
+│       └── webhooks/
+│           └── stripe/route.ts   # Webhooks Stripe (Phase 3+)
 │
 ├── lib/
-│   ├── mistral.ts                # Client Mistral (Voxtral + Cloud)
-│   ├── supabase/                 # (Phase 2+)
-│   │   ├── client.ts             # Client browser
-│   │   ├── server.ts             # Client server
-│   │   └── middleware.ts         # Auth middleware
-│   ├── stripe/                   # (Phase 3+)
-│   │   ├── client.ts
-│   │   └── webhooks.ts
-│   └── utils.ts
-│
-├── types/
-│   └── index.ts                  # Types TypeScript
-│
-├── .env.local                    # Variables d'environnement
-├── .env.example                  # Template
-├── package.json
-├── tailwind.config.ts
-├── tsconfig.json
-└── README.md
+│   └── stripe/                   # (Phase 3+)
+│       ├── client.ts
+│       └── webhooks.ts
 ```
 
 ---
@@ -331,8 +364,12 @@ CREATE POLICY "Users can view own transactions" ON public.credit_transactions
 - [x] Affichage résultat avec speakers
 - [x] Métriques de transcription (durée, temps, coût)
 - [x] Téléchargement (TXT, JSON)
+- [x] Internationalisation (FR/EN/ES/PT/DE) avec sélecteur de langue
+- [x] Auth (Google OAuth + Magic Link via Supabase)
+- [x] Preview transcription pour utilisateurs non authentifiés
+- [x] Cache temporaire pour récupérer transcription après auth
+- [x] Système de feedback utilisateur
 - [ ] Landing page (hero, features, pricing)
-- [ ] Auth (email + Google OAuth)
 - [ ] Système de crédits basique
 - [ ] Paiement Stripe (achat crédits)
 
@@ -342,13 +379,14 @@ CREATE POLICY "Users can view own transactions" ON public.credit_transactions
 - Collaboration
 - Fonctionnalités IA avancées
 
-### Phase 2 - Auth & Storage
+### Phase 2 - Storage & Credits
 
 **Fonctionnalités:**
-- [ ] Authentification Supabase
-- [ ] Bibliothèque de transcriptions
-- [ ] Stockage permanent (Supabase Storage)
-- [ ] Système de crédits
+- [x] Authentification Supabase (Google OAuth, Magic Link) ✅
+- [ ] Bibliothèque de transcriptions (stockage permanent)
+- [ ] Stockage permanent (Supabase Storage ou Database)
+- [ ] Système de crédits basique
+- [ ] Landing page marketing
 
 ### Phase 3 - Monetization
 
@@ -392,20 +430,33 @@ CREATE POLICY "Users can view own transactions" ON public.credit_transactions
 - **Accessible** : Contraste suffisant, responsive
 - **Rapide** : Feedback immédiat, états de chargement clairs
 
-### Palette de couleurs
+### Palette de couleurs (à définir - voir section Design System)
 ```css
---primary: #2563eb;      /* Bleu - confiance, tech */
---secondary: #f8fafc;    /* Gris très clair - fond */
---accent: #10b981;       /* Vert - succès, action */
---text: #1e293b;         /* Gris foncé - texte */
---muted: #64748b;        /* Gris moyen - texte secondaire */
+/* Couleurs actuelles (shadcn/ui defaults avec OKLCH) */
+/* À personnaliser pour l'identité OpenScribe */
+--primary: oklch(0.205 0 0);     /* Noir/gris foncé */
+--background: oklch(1 0 0);       /* Blanc */
+--muted-foreground: oklch(0.556 0 0); /* Gris moyen */
 ```
+
+> **Note**: Un design system complet (palette, typographie, logo) est à définir pour le MVP. Voir le prompt de brief créatif pour travailler avec un designer ou une IA de design.
 
 ### Inspirations UI
 - Linear (minimalisme, rapidité)
 - Notion (simplicité, espace)
 - Cal.com (open source feel)
 - Stripe (clarté, confiance)
+
+### Internationalisation (i18n) ✅
+
+L'application supporte actuellement 5 langues :
+- **Français (FR)** - langue par défaut
+- **Anglais (EN)**
+- **Espagnol (ES)**
+- **Portugais (PT)**
+- **Allemand (DE)**
+
+Système i18n custom léger via React Context (`lib/i18n/`). Sélecteur de langue dans le header.
 
 ---
 
@@ -439,13 +490,18 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 |----------|-------|--------|
 | Moteur transcription | Voxtral (Mistral AI) | Plus simple, moins cher ($0.003/min), API synchrone |
 | Storage temporaire | Mistral Cloud | Pas de coût storage, signed URLs intégrées |
-| Framework | Next.js 14+ | Full-stack, SSR, grande communauté, Vercel optimized |
-| BaaS (Phase 2+) | Supabase | Auth + DB tout-en-un, open source |
-| Paiement | Stripe | Standard industrie, crédits + subscriptions |
+| Framework | Next.js 16+ | Full-stack, SSR, grande communauté, Vercel optimized |
+| Styling | Tailwind CSS v4 | CSS natif, performance, DX moderne |
+| UI Components | shadcn/ui + Radix | Copy-paste, pas de dépendance npm, accessible |
+| Auth | Supabase Auth | Google OAuth + Magic Link, rapide à implémenter |
+| i18n | Context React custom | Léger, pas de dépendance, 5 langues (FR/EN/ES/PT/DE) |
+| BaaS | Supabase | Auth + DB tout-en-un, open source |
+| Paiement | Stripe (Phase 3) | Standard industrie, crédits + subscriptions |
 | Nom | OpenScribe | Évoque transparence + écriture, différenciant |
 | Licence app | Source-available | Visible mais monétisable |
 | Pricing model | Crédits + abo optionnel | Flexible, pas de friction |
-| Phase 1 focus | Transcription simple | Valider avant d'ajouter des features |
+| Preview non-auth | Transcription tronquée | Inciter inscription sans bloquer l'expérience |
+| Cache transcription | localStorage + API | Récupérer résultat complet après auth |
 
 ---
 

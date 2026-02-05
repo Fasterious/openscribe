@@ -51,13 +51,14 @@ function formatTranscriptionTime(ms: number): string {
 }
 
 function getSpeakerColor(speaker: string): string {
+  // Colors that match our indigo/teal theme
   const colors = [
-    'bg-blue-100 text-blue-800',
-    'bg-green-100 text-green-800',
-    'bg-purple-100 text-purple-800',
-    'bg-orange-100 text-orange-800',
-    'bg-pink-100 text-pink-800',
-    'bg-cyan-100 text-cyan-800',
+    'bg-primary/10 text-primary',
+    'bg-accent/20 text-accent-foreground',
+    'bg-chart-1/20 text-chart-1',
+    'bg-chart-2/20 text-chart-2',
+    'bg-chart-4/20 text-chart-4',
+    'bg-chart-5/20 text-chart-5',
   ];
   
   // Extract number from speaker name (e.g., "SPEAKER_00" -> 0)
@@ -210,17 +211,17 @@ export function TranscriptViewer({
   };
 
   return (
-    <Card className={cn('', className)}>
+    <Card className={cn('rounded-2xl border-border shadow-sm', className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <div className="flex items-center gap-4">
-          <CardTitle className="text-lg font-medium">{t('transcript.title')}</CardTitle>
+        <div className="flex items-center gap-3 flex-wrap">
+          <CardTitle className="text-lg font-semibold text-foreground">{t('transcript.title')}</CardTitle>
           {detectedLanguage && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs font-medium">
               {detectedLanguage.toUpperCase()}
             </Badge>
           )}
           {!isAuthenticated && (
-            <Badge variant="outline" className="text-xs text-orange-600 border-orange-300 bg-orange-50">
+            <Badge className="text-xs bg-amber-100 text-amber-700 border-amber-200">
               {t('transcript.preview')}
             </Badge>
           )}
@@ -228,15 +229,15 @@ export function TranscriptViewer({
         
         {/* View mode toggle - only show if we have segments */}
         {hasSegments && (
-          <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+          <div className="flex items-center gap-1 rounded-xl bg-secondary p-1">
             {(['speakers', 'plain', 'segments'] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setViewMode(mode)}
                 className={cn(
-                  'px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
+                  'px-3 py-1.5 text-xs font-medium rounded-lg transition-all',
                   viewMode === mode
-                    ? 'bg-background text-foreground shadow-sm'
+                    ? 'bg-card text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >
@@ -325,13 +326,13 @@ export function TranscriptViewer({
 
         {/* Sign in CTA for non-authenticated users */}
         {!isAuthenticated && (
-          <div className="rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center">
-            <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          <div className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center">
+            <div className="mx-auto w-14 h-14 rounded-full bg-primary flex items-center justify-center mb-4">
+              <svg className="h-7 w-7 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold mb-2">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               {t('auth.cta.title')}
             </h3>
             <p className="text-sm text-muted-foreground mb-4">

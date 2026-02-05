@@ -14,28 +14,28 @@ interface ProgressTrackerProps {
 
 const statusIcons: Record<TranscriptionStatus, React.ReactNode> = {
   idle: (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
     </svg>
   ),
   uploading: (
-    <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+    <svg className="h-6 w-6 animate-spin" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
     </svg>
   ),
   processing: (
-    <svg className="h-5 w-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-6 w-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
     </svg>
   ),
   completed: (
-    <svg className="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   ),
   error: (
-    <svg className="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   ),
@@ -57,18 +57,18 @@ export function ProgressTracker({ status, progress, fileName, className }: Progr
   };
 
   return (
-    <div className={cn('space-y-4', className)}>
-      <div className="flex items-center gap-3">
+    <div className={cn('bg-card rounded-2xl border border-border p-6 space-y-4', className)}>
+      <div className="flex items-center gap-4">
         <div className={cn(
-          'flex h-10 w-10 items-center justify-center rounded-full',
-          status === 'completed' ? 'bg-green-100' : 
-          status === 'error' ? 'bg-red-100' : 
-          'bg-primary/10'
+          'flex h-12 w-12 items-center justify-center rounded-full text-primary-foreground',
+          status === 'completed' ? 'bg-accent' : 
+          status === 'error' ? 'bg-destructive' : 
+          'bg-primary'
         )}>
           {statusIcons[status]}
         </div>
         <div className="flex-1">
-          <p className="font-medium text-foreground">{getStatusMessage(status)}</p>
+          <p className="font-semibold text-foreground">{getStatusMessage(status)}</p>
           {fileName && (
             <p className="text-sm text-muted-foreground truncate max-w-md">
               {fileName}

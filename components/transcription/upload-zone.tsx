@@ -65,32 +65,29 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={cn(
-        'relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 transition-all duration-200',
+        'relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed bg-card p-10 transition-all duration-300 shadow-sm',
         isDragOver && !disabled
-          ? 'border-primary bg-primary/5 scale-[1.02]'
-          : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+          ? 'border-primary bg-primary/5 scale-[1.01] shadow-md'
+          : 'border-border hover:border-primary/40 hover:shadow-md',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
     >
       <input
         type="file"
-        accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg"
+        accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.flac"
         onChange={handleFileInput}
         disabled={disabled}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
       />
       
-      {/* Upload icon */}
+      {/* Upload icon - circular with primary background */}
       <div className={cn(
-        'mb-4 rounded-full p-4 transition-colors',
-        isDragOver ? 'bg-primary/10' : 'bg-muted'
+        'mb-5 rounded-full p-4 transition-all duration-300',
+        isDragOver ? 'bg-primary scale-110' : 'bg-primary'
       )}>
         <svg
-          className={cn(
-            'h-8 w-8 transition-colors',
-            isDragOver ? 'text-primary' : 'text-muted-foreground'
-          )}
+          className="h-7 w-7 text-primary-foreground"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -98,19 +95,19 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={1.5}
+            strokeWidth={2}
             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
           />
         </svg>
       </div>
 
-      <p className="mb-2 text-lg font-medium text-foreground">
+      <p className="mb-2 text-base font-medium text-foreground">
         {t('upload.dropzone')}
       </p>
       <p className="text-sm text-muted-foreground">
-        {t('upload.or')} <span className="text-primary font-medium">{t('upload.browse')}</span>
+        {t('upload.or')} <span className="text-primary font-semibold cursor-pointer hover:underline">{t('upload.browse')}</span>
       </p>
-      <p className="mt-4 text-xs text-muted-foreground/70">
+      <p className="mt-4 text-xs text-muted-foreground">
         {t('upload.formats')}
       </p>
     </div>
