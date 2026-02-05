@@ -10,6 +10,11 @@ import { createClient } from '@/lib/supabase/client';
 import type { TranscriptionState, TranscriptionResult } from '@/types';
 import type { User } from '@supabase/supabase-js';
 
+// Clés localStorage pour persister la transcription
+const STORAGE_KEY_RESULT = 'openscribe_pending_result';
+const STORAGE_KEY_FILENAME = 'openscribe_pending_filename';
+const STORAGE_KEY_TRANSCRIPTION_ID = 'openscribe_pending_transcription_id';
+
 export default function Home() {
   const [state, setState] = useState<TranscriptionState>({
     status: 'idle',
@@ -21,36 +26,148 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  // ID de transcription pour récupérer le résultat complet après auth
+  const [transcriptionId, setTranscriptionId] = useState<string | null>(null);
 
   const supabase = createClient();
 
-  // Vérifier l'état d'authentification au chargement
+  // Vérifier l'état d'authentification et récupérer transcription en attente
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       setLoading(false);
+
+      // Si l'utilisateur vient de s'authentifier, récupérer la transcription en attente
+      if (user) {
+        const savedTranscriptionId = localStorage.getItem(STORAGE_KEY_TRANSCRIPTION_ID);
+        const savedFileName = localStorage.getItem(STORAGE_KEY_FILENAME);
+        
+        // Priorité : récupérer le résultat complet via l'API si on a un ID
+        if (savedTranscriptionId) {
+          if (savedFileName) {
+            setFileName(savedFileName);
+          }
+          await fetchFullTranscription(savedTranscriptionId);
+          // Nettoyer le localStorage
+          localStorage.removeItem(STORAGE_KEY_TRANSCRIPTION_ID);
+          localStorage.removeItem(STORAGE_KEY_FILENAME);
+          localStorage.removeItem(STORAGE_KEY_RESULT);
+        } else {
+          // Fallback : utiliser le résultat sauvegardé en localStorage
+          const savedResult = localStorage.getItem(STORAGE_KEY_RESULT);
+          if (savedResult) {
+            try {
+              const result = JSON.parse(savedResult) as TranscriptionResult;
+              setState({
+                status: 'completed',
+                progress: 100,
+                result,
+                error: null,
+              });
+              if (savedFileName) {
+                setFileName(savedFileName);
+              }
+              // Nettoyer le localStorage
+              localStorage.removeItem(STORAGE_KEY_RESULT);
+              localStorage.removeItem(STORAGE_KEY_FILENAME);
+            } catch {
+              // Ignorer les erreurs de parsing
+            }
+          }
+        }
+      }
     };
 
     checkUser();
 
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (event, session) => {
         setUser(session?.user ?? null);
+        
+        // Si l'utilisateur vient de se connecter, récupérer la transcription complète
+        if (event === 'SIGNED_IN' && session?.user) {
+          const savedTranscriptionId = localStorage.getItem(STORAGE_KEY_TRANSCRIPTION_ID);
+          if (savedTranscriptionId) {
+            const savedFileName = localStorage.getItem(STORAGE_KEY_FILENAME);
+            if (savedFileName) {
+              setFileName(savedFileName);
+            }
+            await fetchFullTranscription(savedTranscriptionId);
+            // Nettoyer le localStorage
+            localStorage.removeItem(STORAGE_KEY_TRANSCRIPTION_ID);
+            localStorage.removeItem(STORAGE_KEY_FILENAME);
+            localStorage.removeItem(STORAGE_KEY_RESULT);
+          }
+        }
       }
     );
 
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
 
+  // Récupérer la transcription complète après authentification
+  const fetchFullTranscription = async (id: string) => {
+    try {
+      const response = await fetch(`/api/transcribe/${id}`);
+      if (response.ok) {
+        const { result } = await response.json();
+        setState({
+          status: 'completed',
+          progress: 100,
+          result: result as TranscriptionResult,
+          error: null,
+        });
+        setTranscriptionId(null);
+      } else {
+        // L'ID a peut-être expiré, utiliser le résultat partiel sauvegardé
+        const savedResult = localStorage.getItem(STORAGE_KEY_RESULT);
+        if (savedResult) {
+          const result = JSON.parse(savedResult) as TranscriptionResult;
+          setState({
+            status: 'completed',
+            progress: 100,
+            result,
+            error: null,
+          });
+        }
+      }
+    } catch {
+      // En cas d'erreur, utiliser le résultat partiel sauvegardé
+      const savedResult = localStorage.getItem(STORAGE_KEY_RESULT);
+      if (savedResult) {
+        try {
+          const result = JSON.parse(savedResult) as TranscriptionResult;
+          setState({
+            status: 'completed',
+            progress: 100,
+            result,
+            error: null,
+          });
+        } catch {
+          // Ignorer les erreurs de parsing
+        }
+      }
+    }
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
 
   const handleSignUpClick = useCallback(() => {
+    // Sauvegarder la transcription en cours dans localStorage avant d'ouvrir l'auth
+    if (state.result) {
+      localStorage.setItem(STORAGE_KEY_RESULT, JSON.stringify(state.result));
+      localStorage.setItem(STORAGE_KEY_FILENAME, fileName);
+    }
+    // Sauvegarder l'ID de transcription pour récupérer le résultat complet après auth
+    if (transcriptionId) {
+      localStorage.setItem(STORAGE_KEY_TRANSCRIPTION_ID, transcriptionId);
+    }
     setAuthModalOpen(true);
-  }, []);
+  }, [state.result, fileName, transcriptionId]);
 
   const handleFileSelect = useCallback(async (file: File) => {
     setFileName(file.name);
@@ -121,7 +238,12 @@ export default function Home() {
         throw new Error(error.error || 'Failed to transcribe');
       }
 
-      const { result } = await transcribeResponse.json();
+      const { result, transcriptionId: tId, isPreview } = await transcribeResponse.json();
+
+      // Sauvegarder l'ID pour récupérer le résultat complet après auth
+      if (isPreview && tId) {
+        setTranscriptionId(tId);
+      }
 
       setState({
         status: 'completed',
@@ -146,6 +268,11 @@ export default function Home() {
       error: null,
     });
     setFileName('');
+    setTranscriptionId(null);
+    // Nettoyer le localStorage
+    localStorage.removeItem(STORAGE_KEY_RESULT);
+    localStorage.removeItem(STORAGE_KEY_FILENAME);
+    localStorage.removeItem(STORAGE_KEY_TRANSCRIPTION_ID);
   }, []);
 
   return (
