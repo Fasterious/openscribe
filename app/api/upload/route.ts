@@ -24,13 +24,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier le type de fichier
-    const allowedExtensions = ['mp3', 'wav', 'm4a', 'webm', 'ogg', 'mp4', 'flac'];
+    // Vérifier le type de fichier (formats officiels supportés par Voxtral)
+    const allowedExtensions = ['mp3', 'wav', 'm4a', 'flac', 'ogg'];
     const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
     
     if (!allowedExtensions.includes(fileExtension)) {
       return NextResponse.json(
-        { error: `Invalid file type. Supported: ${allowedExtensions.join(', ').toUpperCase()}` },
+        { error: `Invalid file type. Voxtral supports: MP3, WAV, M4A, FLAC, OGG` },
         { status: 400 }
       );
     }

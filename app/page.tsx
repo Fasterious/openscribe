@@ -340,7 +340,17 @@ export default function Home() {
 
           {/* Upload or Progress */}
           {state.status === 'idle' && (
-            <UploadZone onFileSelect={handleFileSelect} />
+            <>
+              <UploadZone onFileSelect={handleFileSelect} />
+              
+              {/* Privacy notice */}
+              <div className="flex items-start gap-2 rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-xs text-muted-foreground">
+                <svg className="h-4 w-4 flex-shrink-0 mt-0.5 text-muted-foreground/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p>{t('privacy.notice')}</p>
+              </div>
+            </>
           )}
 
           {(state.status === 'uploading' || state.status === 'processing') && (

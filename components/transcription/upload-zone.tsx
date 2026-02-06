@@ -1,8 +1,24 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/context';
+
+// Formats supportés par Voxtral (Mistral AI) - officiellement: mp3, wav, m4a, flac, ogg
+const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'flac', 'ogg'];
+const ALLOWED_MIME_TYPES = [
+  'audio/mpeg',
+  'audio/mp3', 
+  'audio/wav',
+  'audio/wave',
+  'audio/x-wav',
+  'audio/m4a',
+  'audio/x-m4a',
+  'audio/mp4',
+  'audio/flac',
+  'audio/x-flac',
+  'audio/ogg',
+];
 
 interface UploadZoneProps {
   onFileSelect: (file: File) => void;
@@ -13,6 +29,22 @@ interface UploadZoneProps {
 export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProps) {
   const { t } = useTranslation();
   const [isDragOver, setIsDragOver] = useState(false);
+  const [errorToast, setErrorToast] = useState<string | null>(null);
+
+  // Auto-hide error toast after 5 seconds
+  useEffect(() => {
+    if (errorToast) {
+      const timer = setTimeout(() => setErrorToast(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorToast]);
+
+  const isAudioFile = useCallback((file: File) => {
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    const hasValidExtension = ALLOWED_EXTENSIONS.includes(extension);
+    const hasValidMimeType = ALLOWED_MIME_TYPES.some(type => file.type === type || file.type.includes(type.split('/')[1]));
+    return hasValidExtension || hasValidMimeType;
+  }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -40,24 +72,26 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
       const file = files[0];
       if (isAudioFile(file)) {
         onFileSelect(file);
+      } else {
+        // Show error toast for invalid file type
+        setErrorToast(t('upload.invalidFormat'));
       }
     }
-  }, [disabled, onFileSelect]);
+  }, [disabled, onFileSelect, isAudioFile, t]);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      onFileSelect(files[0]);
+      const file = files[0];
+      if (isAudioFile(file)) {
+        onFileSelect(file);
+      } else {
+        setErrorToast(t('upload.invalidFormat'));
+      }
     }
     // Reset input
     e.target.value = '';
-  }, [onFileSelect]);
-
-  const isAudioFile = (file: File) => {
-    const audioTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/m4a', 'audio/mp4', 'audio/x-m4a', 'audio/webm', 'audio/ogg'];
-    return audioTypes.some(type => file.type.includes(type.split('/')[1])) || 
-           file.name.match(/\.(mp3|wav|m4a|webm|ogg)$/i);
-  };
+  }, [onFileSelect, isAudioFile, t]);
 
   return (
     <div
@@ -75,7 +109,7 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
     >
       <input
         type="file"
-        accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.flac"
+        accept=".mp3,.wav,.m4a,.flac,.ogg,audio/mpeg,audio/wav,audio/mp4,audio/flac,audio/ogg"
         onChange={handleFileInput}
         disabled={disabled}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
@@ -110,6 +144,26 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
       <p className="mt-4 text-xs text-muted-foreground">
         {t('upload.formats')}
       </p>
+
+      {/* Error toast for invalid file types */}
+      {errorToast && (
+        <div className="absolute -bottom-16 left-0 right-0 mx-auto max-w-md animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2 rounded-lg bg-destructive px-4 py-3 text-sm text-destructive-foreground shadow-lg">
+            <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>{errorToast}</span>
+            <button 
+              onClick={() => setErrorToast(null)}
+              className="ml-auto hover:opacity-70 transition-opacity"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

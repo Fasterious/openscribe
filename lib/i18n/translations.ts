@@ -12,7 +12,7 @@ export const translations = {
     'upload.dropzone': 'Drop your audio file here',
     'upload.or': 'or',
     'upload.browse': 'Browse files',
-    'upload.formats': 'Supports MP3, WAV, M4A, FLAC',
+    'upload.formats': 'Supports MP3, WAV, M4A, FLAC, OGG (up to 1 GB)',
     
     // Progress
     'progress.uploading': 'Uploading',
@@ -68,7 +68,13 @@ export const translations = {
     'features.fast.description': 'Powered by Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transcription for researchers, designers, journalists & creators',
+    'footer.text': 'OpenScribe - Transcription for researchers, designers, journalists & citizens',
+    
+    // Privacy notice
+    'privacy.notice': 'Audio files are sent to Mistral AI servers for transcription. They may use this data to improve their models. No files are permanently stored by this site.',
+    
+    // Upload errors
+    'upload.invalidFormat': 'Unsupported file format. Voxtral only accepts: MP3, WAV, M4A, FLAC, OGG',
     
     // Actions
     'actions.transcribeAnother': 'Transcribe another file',
@@ -101,7 +107,7 @@ export const translations = {
     'upload.dropzone': 'Déposez votre fichier audio ici',
     'upload.or': 'ou',
     'upload.browse': 'Parcourir les fichiers',
-    'upload.formats': 'Formats supportés : MP3, WAV, M4A, FLAC',
+    'upload.formats': 'Formats supportés : MP3, WAV, M4A, FLAC, OGG (jusqu\'à 1 Go)',
     
     // Progress
     'progress.uploading': 'Téléversement',
@@ -157,7 +163,13 @@ export const translations = {
     'features.fast.description': 'Propulsé par Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transcription pour chercheurs, designers, journalistes et créateurs',
+    'footer.text': 'OpenScribe - Transcription pour chercheurs, designers, journalistes et citoyens',
+    
+    // Privacy notice
+    'privacy.notice': 'Les fichiers audio sont envoyés aux serveurs de Mistral AI pour transcription. Ils peuvent utiliser ces données pour améliorer leurs modèles. Aucun fichier n\'est conservé de manière permanente par ce site.',
+    
+    // Upload errors
+    'upload.invalidFormat': 'Format de fichier non supporté. Voxtral accepte uniquement : MP3, WAV, M4A, FLAC, OGG',
     
     // Actions
     'actions.transcribeAnother': 'Transcrire un autre fichier',
@@ -190,7 +202,7 @@ export const translations = {
     'upload.dropzone': 'Suelta tu archivo de audio aquí',
     'upload.or': 'o',
     'upload.browse': 'Explorar archivos',
-    'upload.formats': 'Formatos soportados: MP3, WAV, M4A, FLAC',
+    'upload.formats': 'Formatos soportados: MP3, WAV, M4A, FLAC, OGG (hasta 1 GB)',
     
     // Progress
     'progress.uploading': 'Subiendo',
@@ -246,7 +258,13 @@ export const translations = {
     'features.fast.description': 'Impulsado por Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transcripción para investigadores, diseñadores, periodistas y creadores',
+    'footer.text': 'OpenScribe - Transcripción para investigadores, diseñadores, periodistas y ciudadanos',
+    
+    // Privacy notice
+    'privacy.notice': 'Los archivos de audio se envían a los servidores de Mistral AI para la transcripción. Pueden usar estos datos para mejorar sus modelos. Este sitio no almacena ningún archivo de forma permanente.',
+    
+    // Upload errors
+    'upload.invalidFormat': 'Formato de archivo no soportado. Voxtral solo acepta: MP3, WAV, M4A, FLAC, OGG',
     
     // Actions
     'actions.transcribeAnother': 'Transcribir otro archivo',
@@ -279,7 +297,7 @@ export const translations = {
     'upload.dropzone': 'Solte seu arquivo de áudio aqui',
     'upload.or': 'ou',
     'upload.browse': 'Procurar arquivos',
-    'upload.formats': 'Formatos suportados: MP3, WAV, M4A, FLAC',
+    'upload.formats': 'Formatos suportados: MP3, WAV, M4A, FLAC, OGG (até 1 GB)',
     
     // Progress
     'progress.uploading': 'Enviando',
@@ -335,7 +353,13 @@ export const translations = {
     'features.fast.description': 'Powered by Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transcrição para pesquisadores, designers, jornalistas e criadores',
+    'footer.text': 'OpenScribe - Transcrição para pesquisadores, designers, jornalistas e cidadãos',
+    
+    // Privacy notice
+    'privacy.notice': 'Os arquivos de áudio são enviados para os servidores da Mistral AI para transcrição. Eles podem usar esses dados para melhorar seus modelos. Nenhum arquivo é armazenado permanentemente por este site.',
+    
+    // Upload errors
+    'upload.invalidFormat': 'Formato de arquivo não suportado. Voxtral aceita apenas: MP3, WAV, M4A, FLAC, OGG',
     
     // Actions
     'actions.transcribeAnother': 'Transcrever outro arquivo',
@@ -368,7 +392,7 @@ export const translations = {
     'upload.dropzone': 'Audiodatei hier ablegen',
     'upload.or': 'oder',
     'upload.browse': 'Dateien durchsuchen',
-    'upload.formats': 'Unterstützte Formate: MP3, WAV, M4A, FLAC',
+    'upload.formats': 'Unterstützte Formate: MP3, WAV, M4A, FLAC, OGG (bis zu 1 GB)',
     
     // Progress
     'progress.uploading': 'Hochladen',
@@ -424,7 +448,13 @@ export const translations = {
     'features.fast.description': 'Powered by Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transkription für Forscher, Designer, Journalisten und Creator',
+    'footer.text': 'OpenScribe - Transkription für Forscher, Designer, Journalisten und Bürger',
+    
+    // Privacy notice
+    'privacy.notice': 'Audiodateien werden zur Transkription an die Server von Mistral AI gesendet. Sie können diese Daten zur Verbesserung ihrer Modelle verwenden. Keine Dateien werden dauerhaft von dieser Seite gespeichert.',
+    
+    // Upload errors
+    'upload.invalidFormat': 'Nicht unterstütztes Dateiformat. Voxtral akzeptiert nur: MP3, WAV, M4A, FLAC, OGG',
     
     // Actions
     'actions.transcribeAnother': 'Weitere Datei transkribieren',
