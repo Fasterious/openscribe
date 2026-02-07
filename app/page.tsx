@@ -8,6 +8,7 @@ import { AuthModal } from '@/components/auth/auth-modal';
 import { FeedbackButton } from '@/components/feedback/feedback-button';
 import { Button } from '@/components/ui/button';
 import { LanguageSelector } from '@/components/ui/language-selector';
+import { WaveformAnimation } from '@/components/ui/waveform-animation';
 import { createClient } from '@/lib/supabase/client';
 import { useTranslation } from '@/lib/i18n/context';
 import type { TranscriptionState, TranscriptionResult } from '@/types';
@@ -457,24 +458,9 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Wave decoration */}
-      <div className="wave-container mt-auto" aria-hidden="true">
-        <svg className="absolute" width="0" height="0">
-          <defs>
-            <clipPath id="wave-shape-1" clipPathUnits="objectBoundingBox">
-              <path d="M0,0.6 C0.1,0.4 0.2,0.8 0.3,0.6 C0.4,0.4 0.5,0.7 0.6,0.5 C0.7,0.3 0.8,0.6 0.9,0.4 C1,0.2 1,0.5 1,0.5 L1,1 L0,1 Z" />
-            </clipPath>
-            <clipPath id="wave-shape-2" clipPathUnits="objectBoundingBox">
-              <path d="M0,0.5 C0.1,0.7 0.2,0.3 0.3,0.5 C0.4,0.7 0.5,0.4 0.6,0.6 C0.7,0.8 0.8,0.5 0.9,0.7 C1,0.5 1,0.6 1,0.6 L1,1 L0,1 Z" />
-            </clipPath>
-            <clipPath id="wave-shape-3" clipPathUnits="objectBoundingBox">
-              <path d="M0,0.7 C0.1,0.5 0.2,0.6 0.3,0.4 C0.4,0.6 0.5,0.5 0.6,0.7 C0.7,0.5 0.8,0.7 0.9,0.5 C1,0.7 1,0.6 1,0.6 L1,1 L0,1 Z" />
-            </clipPath>
-          </defs>
-        </svg>
-        <div className="wave wave-3"></div>
-        <div className="wave wave-2"></div>
-        <div className="wave wave-1"></div>
+      {/* Waveform animation */}
+      <div className="mt-auto">
+        <WaveformAnimation className="opacity-80" />
       </div>
 
       {/* Footer */}

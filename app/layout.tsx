@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OpenScribe - Open Source Transcription",
-  description: "Professional-quality transcription powered by Voxtral. Simple, affordable, and transparent.",
+  title: "OpenScribe - Transcription gratuite & professionnelle",
+  description: "Transcription de qualité professionnelle avec identification des locuteurs. Simple, abordable et transparent.",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
