@@ -16,6 +16,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "OpenScribe - Open Source Transcription",
   description: "Professional-quality transcription powered by Voxtral. Simple, affordable, and transparent.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/logo.svg",
+  },
 };
 
 export default function RootLayout({

@@ -284,23 +284,13 @@ export default function Home() {
       {/* Header */}
       <header className="bg-card/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            {/* Logo - Microphone icon */}
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <svg 
-                className="h-5 w-5 text-primary-foreground" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" 
-                />
-              </svg>
-            </div>
+          <div className="flex items-center gap-1">
+            {/* Logo */}
+            <img 
+              src="/logo.svg" 
+              alt="OpenScribe logo" 
+              className="h-8 w-auto"
+            />
             <span className="text-xl font-semibold text-foreground">OpenScribe</span>
           </div>
           <nav className="flex items-center gap-3">
