@@ -49,8 +49,7 @@ export function WaveformAnimation({
       for (let i = 0; i < lineCount; i++) {
         const progress = i / (lineCount - 1); // 0 to 1
         
-        // Color gradient matching the reference image: cyan/teal → indigo/violet
-        // Start: #4ECDC4 (teal/cyan) → End: #667EEA (indigo/violet)
+        // Color gradient: cyan/teal → indigo/violet
         const r = Math.round(78 + progress * (102 - 78));
         const g = Math.round(205 + progress * (126 - 205));
         const b = Math.round(196 + progress * (234 - 196));
@@ -77,7 +76,6 @@ export function WaveformAnimation({
           const ballPosition = ((time * 0.08) % cycleLength) - 0.2;
           
           // Gaussian envelope - single peak that travels
-          // The width controls how many peaks are "lit up" around the maximum
           const gaussianWidth = 0.15;
           const distanceFromBall = normalizedX - ballPosition;
           const energyEnvelope = Math.exp(-Math.pow(distanceFromBall / gaussianWidth, 2));

@@ -60,8 +60,7 @@ export function deleteTranscription(id: string): void {
   transcriptionCache.delete(id);
 }
 
-// Pourcentage de contenu à montrer dans l'aperçu
-const PREVIEW_PERCENTAGE = 0.3;
+import { PREVIEW_PERCENTAGE } from '@/types';
 
 /**
  * Crée un aperçu limité de la transcription

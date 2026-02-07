@@ -40,14 +40,9 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload vers Mistral Cloud et obtenir la signed URL
-    const { fileId, signedUrl } = await uploadAndGetSignedUrl(buffer, file.name);
+    const { signedUrl } = await uploadAndGetSignedUrl(buffer, file.name);
 
-    return NextResponse.json({ 
-      audioUrl: signedUrl,
-      fileId,
-      fileName: file.name,
-      fileSize: file.size,
-    });
+    return NextResponse.json({ audioUrl: signedUrl });
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(

@@ -32,6 +32,9 @@ export interface TranscriptionResult {
 // Prix Voxtral par minute d'audio (en USD)
 export const VOXTRAL_PRICE_PER_MINUTE = 0.003;
 
+// Pourcentage de contenu visible dans l'aperçu (utilisateurs non authentifiés)
+export const PREVIEW_PERCENTAGE = 0.3;
+
 export type TranscriptionStatus = 'idle' | 'uploading' | 'processing' | 'completed' | 'error';
 
 export interface TranscriptionState {

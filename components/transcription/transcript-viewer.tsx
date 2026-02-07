@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/context';
 import type { TranscriptionResult, TranscriptionSegment } from '@/types';
-import { VOXTRAL_PRICE_PER_MINUTE } from '@/types';
+import { VOXTRAL_PRICE_PER_MINUTE, PREVIEW_PERCENTAGE } from '@/types';
 
 interface TranscriptViewerProps {
   result: TranscriptionResult;
@@ -17,9 +17,6 @@ interface TranscriptViewerProps {
 }
 
 type ViewMode = 'speakers' | 'plain' | 'segments';
-
-// Pourcentage de contenu visible sans authentification
-const PREVIEW_PERCENTAGE = 0.3; // 30%
 
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
