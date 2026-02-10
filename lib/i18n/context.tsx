@@ -8,7 +8,7 @@ const STORAGE_KEY = 'openscribe_language';
 interface I18nContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: TranslationKey, params?: Record<string, string>) => string;
 }
 
 const I18nContext = createContext<I18nContextType | null>(null);
@@ -54,8 +54,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, lang);
   };
 
-  const t = (key: TranslationKey): string => {
-    return translations[language][key] || translations.en[key] || key;
+  const t = (key: TranslationKey, params?: Record<string, string>): string => {
+    let text = translations[language][key] || translations.en[key] || key;
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+      });
+    }
+    return text;
   };
 
   // Prevent flash of wrong language
