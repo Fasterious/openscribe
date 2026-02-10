@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { UploadZone } from '@/components/transcription/upload-zone';
 import { ProgressTracker } from '@/components/transcription/progress-tracker';
 import { TranscriptViewer } from '@/components/transcription/transcript-viewer';
@@ -33,6 +33,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   // ID de transcription pour récupérer le résultat complet après auth
   const [transcriptionId, setTranscriptionId] = useState<string | null>(null);
+  // Estimation du temps restant pour la transcription (en secondes)
+  const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<number>(0);
+  // Référence pour l'intervalle de progression
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const supabase = createClient();
 
@@ -230,10 +234,39 @@ export default function Home() {
 
       const audioUrl = fileUrl;
 
+      // Estimer le temps de transcription basé sur la taille du fichier
+      // Formule: Pour MP3 ~128kbps, 1 MB ≈ 1 minute d'audio
+      // Mistral transcrit ~146x plus vite que le temps réel
+      // Donc: temps_transcription (s) = (taille_MB * 60) / 146
+      const fileSizeMB = file.size / (1024 * 1024);
+      const estimatedAudioDurationSeconds = fileSizeMB * 60; // Estimation grossière
+      const estimatedTranscriptionSeconds = Math.max(5, Math.ceil(estimatedAudioDurationSeconds / 146));
+      
+      setEstimatedTimeRemaining(estimatedTranscriptionSeconds);
+
+      // Démarrer la progression animée pendant la transcription
+      const startTime = Date.now();
+      const startProgress = 70; // On commence à 70% (après upload)
+      const endProgress = 95; // On finit à 95% (le 100% sera quand c'est vraiment fini)
+      
+      progressIntervalRef.current = setInterval(() => {
+        const elapsedSeconds = (Date.now() - startTime) / 1000;
+        const progressRatio = Math.min(elapsedSeconds / estimatedTranscriptionSeconds, 0.95);
+        const currentProgress = startProgress + (endProgress - startProgress) * progressRatio;
+        const remainingTime = Math.max(0, estimatedTranscriptionSeconds - elapsedSeconds);
+        
+        setState(prev => ({
+          ...prev,
+          status: 'processing',
+          progress: Math.round(currentProgress),
+        }));
+        setEstimatedTimeRemaining(Math.round(remainingTime));
+      }, 500);
+
       setState(prev => ({
         ...prev,
         status: 'processing',
-        progress: 80,
+        progress: startProgress,
       }));
 
       // Étape 3: Transcription via Voxtral (synchrone)
@@ -267,6 +300,13 @@ export default function Home() {
       
       const { result, transcriptionId: tId, isPreview } = responseData;
 
+      // Arrêter l'intervalle de progression
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      setEstimatedTimeRemaining(0);
+
       // Sauvegarder l'ID pour récupérer le résultat complet après auth
       if (isPreview && tId) {
         setTranscriptionId(tId);
@@ -279,6 +319,13 @@ export default function Home() {
         error: null,
       });
     } catch (error) {
+      // Arrêter l'intervalle de progression en cas d'erreur
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      setEstimatedTimeRemaining(0);
+
       setState(prev => ({
         ...prev,
         status: 'error',
@@ -372,6 +419,7 @@ export default function Home() {
                 status={state.status} 
                 progress={state.progress}
                 fileName={fileName}
+                estimatedTimeRemaining={state.status === 'processing' ? estimatedTimeRemaining : undefined}
               />
               {state.status === 'processing' && (
                 <p className="text-center text-sm text-muted-foreground">

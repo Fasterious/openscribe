@@ -10,6 +10,7 @@ interface ProgressTrackerProps {
   progress: number;
   fileName?: string;
   className?: string;
+  estimatedTimeRemaining?: number; // en secondes
 }
 
 const statusIcons: Record<TranscriptionStatus, React.ReactNode> = {
@@ -41,7 +42,22 @@ const statusIcons: Record<TranscriptionStatus, React.ReactNode> = {
   ),
 };
 
-export function ProgressTracker({ status, progress, fileName, className }: ProgressTrackerProps) {
+/**
+ * Formate le temps en minutes et secondes
+ */
+function formatTimeRemaining(seconds: number): string {
+  if (seconds <= 0) return '';
+  
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  
+  if (mins > 0) {
+    return `~${mins}m ${secs}s`;
+  }
+  return `~${secs}s`;
+}
+
+export function ProgressTracker({ status, progress, fileName, className, estimatedTimeRemaining }: ProgressTrackerProps) {
   const { t } = useTranslation();
   const isActive = status === 'uploading' || status === 'processing';
 
@@ -80,9 +96,18 @@ export function ProgressTracker({ status, progress, fileName, className }: Progr
       {isActive && (
         <div className="space-y-2">
           <Progress value={progress} className="h-2" />
-          <p className="text-xs text-muted-foreground text-right">
-            {status === 'uploading' ? `${Math.round(progress)}%` : t('progress.processing')}
-          </p>
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>
+              {status === 'processing' && estimatedTimeRemaining !== undefined && estimatedTimeRemaining > 0
+                ? formatTimeRemaining(estimatedTimeRemaining)
+                : ''}
+            </span>
+            <span>
+              {status === 'uploading' 
+                ? `${Math.round(progress)}%` 
+                : `${Math.round(progress)}%`}
+            </span>
+          </div>
         </div>
       )}
     </div>
