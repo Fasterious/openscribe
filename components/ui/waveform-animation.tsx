@@ -64,7 +64,11 @@ export function WaveformAnimation({
         // Line index from center (for spread effect)
         const lineFromCenter = (i - (lineCount - 1) / 2) / ((lineCount - 1) / 2);
 
-        for (let x = 0; x <= width; x += 2) {
+        // Pas proportionnel à la largeur pour un nombre de nœuds constant (~150 nœuds)
+        // Cela assure que l'effet de propagation paraît à la même vitesse sur tous les écrans
+        const step = Math.max(2, Math.round(width / 150));
+
+        for (let x = 0; x <= width; x += step) {
           // Normalized x position (0 to 1)
           const normalizedX = x / width;
           
@@ -84,8 +88,10 @@ export function WaveformAnimation({
           const minEnergy = 0.05;
           const amplitudeEnvelope = energyEnvelope * (1 - minEnergy) + minEnergy;
           
-          // High frequency carrier wave (the actual oscillation pattern)
-          const carrierFreq = 25;
+          // Fréquence de l'onde responsive : vagues proportionnelles à la largeur
+          // Chaque vague fait ~100px de large (visuellement cohérent sur tous les écrans)
+          // Desktop 1200px : ~24 → 8 vagues | Tablette 768px : ~16 → 5 vagues | Mobile 400px : 12 → 4 vagues
+          const carrierFreq = Math.max(12, Math.round(width / 50));
           const carrier = Math.sin(normalizedX * carrierFreq);
           
           // The wave shape - lines spread based on amplitude
