@@ -6,6 +6,10 @@ import { useTranslation } from '@/lib/i18n/context';
 
 // Formats supportés par Voxtral (Mistral AI) - officiellement: mp3, wav, m4a, flac, ogg
 const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'flac', 'ogg'];
+
+// Taille maximale: 1 GB (limite Mistral et Cloudflare R2)
+const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB
+const MAX_FILE_SIZE_DISPLAY = '1 GB';
 const ALLOWED_MIME_TYPES = [
   'audio/mpeg',
   'audio/mp3', 
@@ -46,6 +50,10 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
     return hasValidExtension || hasValidMimeType;
   }, []);
 
+  const isFileSizeValid = useCallback((file: File) => {
+    return file.size <= MAX_FILE_SIZE_BYTES;
+  }, []);
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -70,28 +78,31 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       const file = files[0];
-      if (isAudioFile(file)) {
-        onFileSelect(file);
-      } else {
-        // Show error toast for invalid file type
+      if (!isAudioFile(file)) {
         setErrorToast(t('upload.invalidFormat'));
+      } else if (!isFileSizeValid(file)) {
+        setErrorToast(t('upload.fileTooLarge', { maxSize: MAX_FILE_SIZE_DISPLAY }));
+      } else {
+        onFileSelect(file);
       }
     }
-  }, [disabled, onFileSelect, isAudioFile, t]);
+  }, [disabled, onFileSelect, isAudioFile, isFileSizeValid, t]);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0];
-      if (isAudioFile(file)) {
-        onFileSelect(file);
-      } else {
+      if (!isAudioFile(file)) {
         setErrorToast(t('upload.invalidFormat'));
+      } else if (!isFileSizeValid(file)) {
+        setErrorToast(t('upload.fileTooLarge', { maxSize: MAX_FILE_SIZE_DISPLAY }));
+      } else {
+        onFileSelect(file);
       }
     }
     // Reset input
     e.target.value = '';
-  }, [onFileSelect, isAudioFile, t]);
+  }, [onFileSelect, isAudioFile, isFileSizeValid, t]);
 
   return (
     <div

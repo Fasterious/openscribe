@@ -75,6 +75,7 @@ export const translations = {
     
     // Upload errors
     'upload.invalidFormat': 'Unsupported file format. Voxtral only accepts: MP3, WAV, M4A, FLAC, OGG',
+    'upload.fileTooLarge': 'File too large. Maximum size: {maxSize}',
     
     // Actions
     'actions.transcribeAnother': 'Transcribe another file',
@@ -170,6 +171,7 @@ export const translations = {
     
     // Upload errors
     'upload.invalidFormat': 'Format de fichier non supporté. Voxtral accepte uniquement : MP3, WAV, M4A, FLAC, OGG',
+    'upload.fileTooLarge': 'Fichier trop volumineux. Taille maximale : {maxSize}',
     
     // Actions
     'actions.transcribeAnother': 'Transcrire un autre fichier',
@@ -265,6 +267,7 @@ export const translations = {
     
     // Upload errors
     'upload.invalidFormat': 'Formato de archivo no soportado. Voxtral solo acepta: MP3, WAV, M4A, FLAC, OGG',
+    'upload.fileTooLarge': 'Archivo demasiado grande. Tamaño máximo: {maxSize}',
     
     // Actions
     'actions.transcribeAnother': 'Transcribir otro archivo',
@@ -360,6 +363,7 @@ export const translations = {
     
     // Upload errors
     'upload.invalidFormat': 'Formato de arquivo não suportado. Voxtral aceita apenas: MP3, WAV, M4A, FLAC, OGG',
+    'upload.fileTooLarge': 'Arquivo muito grande. Tamanho máximo: {maxSize}',
     
     // Actions
     'actions.transcribeAnother': 'Transcrever outro arquivo',
@@ -455,6 +459,7 @@ export const translations = {
     
     // Upload errors
     'upload.invalidFormat': 'Nicht unterstütztes Dateiformat. Voxtral akzeptiert nur: MP3, WAV, M4A, FLAC, OGG',
+    'upload.fileTooLarge': 'Datei zu groß. Maximale Größe: {maxSize}',
     
     // Actions
     'actions.transcribeAnother': 'Weitere Datei transkribieren',
