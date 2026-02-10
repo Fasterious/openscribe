@@ -96,18 +96,14 @@ export function ProgressTracker({ status, progress, fileName, className, estimat
       {isActive && (
         <div className="space-y-2">
           <Progress value={progress} className="h-2" />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>
-              {status === 'processing' && estimatedTimeRemaining !== undefined && estimatedTimeRemaining > 0
-                ? formatTimeRemaining(estimatedTimeRemaining)
-                : ''}
-            </span>
-            <span>
-              {status === 'uploading' 
-                ? `${Math.round(progress)}%` 
-                : `${Math.round(progress)}%`}
-            </span>
-          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            {status === 'uploading' 
+              ? `${Math.round(progress)}%`
+              : status === 'processing' && estimatedTimeRemaining !== undefined && estimatedTimeRemaining > 0
+                ? `${formatTimeRemaining(estimatedTimeRemaining)} • ${Math.round(progress)}%`
+                : `${Math.round(progress)}%`
+            }
+          </p>
         </div>
       )}
     </div>
