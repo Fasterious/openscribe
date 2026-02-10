@@ -96,7 +96,7 @@ export function ProgressTracker({ status, progress, fileName, className, estimat
       {isActive && (
         <div className="space-y-2">
           <Progress value={progress} className="h-2" />
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-xs text-muted-foreground text-right">
             {status === 'uploading' 
               ? `${Math.round(progress)}%`
               : status === 'processing' && estimatedTimeRemaining !== undefined && estimatedTimeRemaining > 0
