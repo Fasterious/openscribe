@@ -245,11 +245,27 @@ export default function Home() {
       });
 
       if (!transcribeResponse.ok) {
-        const error = await transcribeResponse.json();
-        throw new Error(error.error || 'Failed to transcribe');
+        // Essayer de parser comme JSON, sinon utiliser le texte brut
+        const errorText = await transcribeResponse.text();
+        let errorMessage = 'Failed to transcribe';
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || errorMessage;
+        } catch {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
-      const { result, transcriptionId: tId, isPreview } = await transcribeResponse.json();
+      const responseText = await transcribeResponse.text();
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch {
+        throw new Error(`Invalid response from server: ${responseText.substring(0, 100)}`);
+      }
+      
+      const { result, transcriptionId: tId, isPreview } = responseData;
 
       // Sauvegarder l'ID pour récupérer le résultat complet après auth
       if (isPreview && tId) {
