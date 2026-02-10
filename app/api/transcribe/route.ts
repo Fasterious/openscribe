@@ -6,14 +6,18 @@ import {
   storeTranscription, 
   createPreview 
 } from '@/lib/transcription-cache';
+import { deleteFile } from '@/lib/r2';
 import { VOXTRAL_PRICE_PER_MINUTE } from '@/types';
 
 export const maxDuration = 300; // 5 minutes max pour le timeout
 
 export async function POST(request: NextRequest) {
+  let fileKey: string | undefined;
+  
   try {
     const body = await request.json();
-    const { audioUrl, language } = body;
+    const { audioUrl, language, fileKey: fKey } = body;
+    fileKey = fKey; // Pour pouvoir supprimer en cas d'erreur aussi
 
     if (!audioUrl) {
       return NextResponse.json(
@@ -49,6 +53,17 @@ export async function POST(request: NextRequest) {
       cost: Math.round(cost * 10000) / 10000, // 4 décimales
     };
 
+    // Supprimer le fichier R2 après transcription réussie (nettoyage)
+    if (fileKey) {
+      try {
+        await deleteFile(fileKey);
+        console.log(`[R2] Deleted temporary file: ${fileKey}`);
+      } catch (deleteError) {
+        // Log mais ne pas faire échouer la requête si la suppression échoue
+        console.warn(`[R2] Failed to delete file ${fileKey}:`, deleteError);
+      }
+    }
+
     // Si authentifié, retourner le résultat complet
     if (isAuthenticated) {
       return NextResponse.json({ 
@@ -70,6 +85,17 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Transcription error:', error);
+    
+    // Tenter de supprimer le fichier R2 même en cas d'erreur
+    if (fileKey) {
+      try {
+        await deleteFile(fileKey);
+        console.log(`[R2] Deleted temporary file after error: ${fileKey}`);
+      } catch (deleteError) {
+        console.warn(`[R2] Failed to delete file ${fileKey}:`, deleteError);
+      }
+    }
+    
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to transcribe' },
       { status: 500 }

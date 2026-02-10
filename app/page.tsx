@@ -184,11 +184,25 @@ export default function Home() {
     });
 
     try {
-      // Étape 1: Upload vers Mistral Cloud avec progression
-      const formData = new FormData();
-      formData.append('file', file);
+      // Étape 1: Obtenir une URL d'upload presignée depuis R2
+      const urlResponse = await fetch('/api/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: file.name,
+          contentType: file.type || 'audio/mpeg',
+        }),
+      });
 
-      const uploadResponse = await new Promise<{ audioUrl: string }>((resolve, reject) => {
+      if (!urlResponse.ok) {
+        const error = await urlResponse.json();
+        throw new Error(error.error || 'Failed to get upload URL');
+      }
+
+      const { uploadUrl, fileUrl, fileKey } = await urlResponse.json();
+
+      // Étape 2: Upload direct vers R2 avec progression (pas de limite Vercel !)
+      await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         
         xhr.upload.addEventListener('progress', (event) => {
@@ -200,30 +214,21 @@ export default function Home() {
 
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              const response = JSON.parse(xhr.responseText);
-              resolve(response);
-            } catch {
-              reject(new Error('Invalid response from server'));
-            }
+            resolve();
           } else {
-            try {
-              const error = JSON.parse(xhr.responseText);
-              reject(new Error(error.error || `Upload failed with status ${xhr.status}`));
-            } catch {
-              reject(new Error(`Upload failed with status ${xhr.status}`));
-            }
+            reject(new Error(`Upload failed with status ${xhr.status}`));
           }
         });
 
         xhr.addEventListener('error', () => reject(new Error('Upload failed')));
         xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
 
-        xhr.open('POST', '/api/upload');
-        xhr.send(formData);
+        xhr.open('PUT', uploadUrl);
+        xhr.setRequestHeader('Content-Type', file.type || 'audio/mpeg');
+        xhr.send(file);
       });
 
-      const { audioUrl } = uploadResponse;
+      const audioUrl = fileUrl;
 
       setState(prev => ({
         ...prev,
@@ -231,11 +236,12 @@ export default function Home() {
         progress: 80,
       }));
 
-      // Étape 2: Transcription via Voxtral (synchrone)
+      // Étape 3: Transcription via Voxtral (synchrone)
+      // On passe fileKey pour que le serveur puisse supprimer le fichier R2 après transcription
       const transcribeResponse = await fetch('/api/transcribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ audioUrl }),
+        body: JSON.stringify({ audioUrl, fileKey }),
       });
 
       if (!transcribeResponse.ok) {
