@@ -55,7 +55,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: TranslationKey, params?: Record<string, string>): string => {
-    let text = translations[language][key] || translations.en[key] || key;
+    let text: string = translations[language][key] || translations.en[key] || key;
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
         text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
