@@ -58,6 +58,29 @@ export const translations = {
     'auth.modal.alreadyAccount': 'Already have an account?',
     'auth.modal.noAccount': "Don't have an account?",
     'auth.modal.checkEmail': 'Check your email to confirm your registration!',
+    'auth.modal.forgotPassword': 'Forgot password?',
+    
+    // Forgot Password page
+    'auth.forgotPassword.title': 'Reset your password',
+    'auth.forgotPassword.subtitle': 'Enter your email and we\'ll send you a reset link',
+    'auth.forgotPassword.sendButton': 'Send reset link',
+    'auth.forgotPassword.emailSent': 'Check your email! We\'ve sent you a link to reset your password.',
+    'auth.forgotPassword.backToSignIn': 'Back to sign in',
+    'auth.forgotPassword.backToHome': 'Back to home',
+    
+    // Reset Password page
+    'auth.resetPassword.title': 'Create new password',
+    'auth.resetPassword.subtitle': 'Enter your new password below',
+    'auth.resetPassword.newPassword': 'New password',
+    'auth.resetPassword.confirmPassword': 'Confirm password',
+    'auth.resetPassword.resetButton': 'Reset password',
+    'auth.resetPassword.success': 'Your password has been reset successfully!',
+    'auth.resetPassword.redirecting': 'Redirecting to home...',
+    'auth.resetPassword.passwordMismatch': 'Passwords do not match',
+    'auth.resetPassword.passwordTooShort': 'Password must be at least 6 characters',
+    'auth.resetPassword.invalidLink': 'Invalid or expired link',
+    'auth.resetPassword.invalidLinkDescription': 'This password reset link is invalid or has expired. Please request a new one.',
+    'auth.resetPassword.requestNewLink': 'Request new link',
     
     // Features
     'features.speakers.title': 'Speaker Detection',
@@ -154,6 +177,29 @@ export const translations = {
     'auth.modal.alreadyAccount': 'Déjà un compte ?',
     'auth.modal.noAccount': 'Pas encore de compte ?',
     'auth.modal.checkEmail': 'Vérifiez votre email pour confirmer votre inscription !',
+    'auth.modal.forgotPassword': 'Mot de passe oublié ?',
+    
+    // Forgot Password page
+    'auth.forgotPassword.title': 'Réinitialiser votre mot de passe',
+    'auth.forgotPassword.subtitle': 'Entrez votre email et nous vous enverrons un lien de réinitialisation',
+    'auth.forgotPassword.sendButton': 'Envoyer le lien',
+    'auth.forgotPassword.emailSent': 'Vérifiez votre email ! Nous vous avons envoyé un lien pour réinitialiser votre mot de passe.',
+    'auth.forgotPassword.backToSignIn': 'Retour à la connexion',
+    'auth.forgotPassword.backToHome': 'Retour à l\'accueil',
+    
+    // Reset Password page
+    'auth.resetPassword.title': 'Créer un nouveau mot de passe',
+    'auth.resetPassword.subtitle': 'Entrez votre nouveau mot de passe ci-dessous',
+    'auth.resetPassword.newPassword': 'Nouveau mot de passe',
+    'auth.resetPassword.confirmPassword': 'Confirmer le mot de passe',
+    'auth.resetPassword.resetButton': 'Réinitialiser le mot de passe',
+    'auth.resetPassword.success': 'Votre mot de passe a été réinitialisé avec succès !',
+    'auth.resetPassword.redirecting': 'Redirection vers l\'accueil...',
+    'auth.resetPassword.passwordMismatch': 'Les mots de passe ne correspondent pas',
+    'auth.resetPassword.passwordTooShort': 'Le mot de passe doit contenir au moins 6 caractères',
+    'auth.resetPassword.invalidLink': 'Lien invalide ou expiré',
+    'auth.resetPassword.invalidLinkDescription': 'Ce lien de réinitialisation est invalide ou a expiré. Veuillez en demander un nouveau.',
+    'auth.resetPassword.requestNewLink': 'Demander un nouveau lien',
     
     // Features
     'features.speakers.title': 'Détection des locuteurs',
@@ -250,6 +296,29 @@ export const translations = {
     'auth.modal.alreadyAccount': '¿Ya tienes cuenta?',
     'auth.modal.noAccount': '¿No tienes cuenta?',
     'auth.modal.checkEmail': '¡Revisa tu email para confirmar tu registro!',
+    'auth.modal.forgotPassword': '¿Olvidaste tu contraseña?',
+    
+    // Forgot Password page
+    'auth.forgotPassword.title': 'Restablecer tu contraseña',
+    'auth.forgotPassword.subtitle': 'Ingresa tu email y te enviaremos un enlace de restablecimiento',
+    'auth.forgotPassword.sendButton': 'Enviar enlace',
+    'auth.forgotPassword.emailSent': '¡Revisa tu email! Te hemos enviado un enlace para restablecer tu contraseña.',
+    'auth.forgotPassword.backToSignIn': 'Volver a iniciar sesión',
+    'auth.forgotPassword.backToHome': 'Volver al inicio',
+    
+    // Reset Password page
+    'auth.resetPassword.title': 'Crear nueva contraseña',
+    'auth.resetPassword.subtitle': 'Ingresa tu nueva contraseña a continuación',
+    'auth.resetPassword.newPassword': 'Nueva contraseña',
+    'auth.resetPassword.confirmPassword': 'Confirmar contraseña',
+    'auth.resetPassword.resetButton': 'Restablecer contraseña',
+    'auth.resetPassword.success': '¡Tu contraseña ha sido restablecida exitosamente!',
+    'auth.resetPassword.redirecting': 'Redirigiendo al inicio...',
+    'auth.resetPassword.passwordMismatch': 'Las contraseñas no coinciden',
+    'auth.resetPassword.passwordTooShort': 'La contraseña debe tener al menos 6 caracteres',
+    'auth.resetPassword.invalidLink': 'Enlace inválido o expirado',
+    'auth.resetPassword.invalidLinkDescription': 'Este enlace de restablecimiento es inválido o ha expirado. Por favor, solicita uno nuevo.',
+    'auth.resetPassword.requestNewLink': 'Solicitar nuevo enlace',
     
     // Features
     'features.speakers.title': 'Detección de hablantes',
@@ -346,6 +415,29 @@ export const translations = {
     'auth.modal.alreadyAccount': 'Já tem uma conta?',
     'auth.modal.noAccount': 'Não tem conta?',
     'auth.modal.checkEmail': 'Verifique seu email para confirmar seu cadastro!',
+    'auth.modal.forgotPassword': 'Esqueceu a senha?',
+    
+    // Forgot Password page
+    'auth.forgotPassword.title': 'Redefinir sua senha',
+    'auth.forgotPassword.subtitle': 'Insira seu email e enviaremos um link de redefinição',
+    'auth.forgotPassword.sendButton': 'Enviar link',
+    'auth.forgotPassword.emailSent': 'Verifique seu email! Enviamos um link para redefinir sua senha.',
+    'auth.forgotPassword.backToSignIn': 'Voltar para entrar',
+    'auth.forgotPassword.backToHome': 'Voltar ao início',
+    
+    // Reset Password page
+    'auth.resetPassword.title': 'Criar nova senha',
+    'auth.resetPassword.subtitle': 'Insira sua nova senha abaixo',
+    'auth.resetPassword.newPassword': 'Nova senha',
+    'auth.resetPassword.confirmPassword': 'Confirmar senha',
+    'auth.resetPassword.resetButton': 'Redefinir senha',
+    'auth.resetPassword.success': 'Sua senha foi redefinida com sucesso!',
+    'auth.resetPassword.redirecting': 'Redirecionando para o início...',
+    'auth.resetPassword.passwordMismatch': 'As senhas não coincidem',
+    'auth.resetPassword.passwordTooShort': 'A senha deve ter pelo menos 6 caracteres',
+    'auth.resetPassword.invalidLink': 'Link inválido ou expirado',
+    'auth.resetPassword.invalidLinkDescription': 'Este link de redefinição é inválido ou expirou. Por favor, solicite um novo.',
+    'auth.resetPassword.requestNewLink': 'Solicitar novo link',
     
     // Features
     'features.speakers.title': 'Detecção de falantes',
@@ -442,6 +534,29 @@ export const translations = {
     'auth.modal.alreadyAccount': 'Bereits ein Konto?',
     'auth.modal.noAccount': 'Noch kein Konto?',
     'auth.modal.checkEmail': 'Überprüfe deine E-Mail, um deine Registrierung zu bestätigen!',
+    'auth.modal.forgotPassword': 'Passwort vergessen?',
+    
+    // Forgot Password page
+    'auth.forgotPassword.title': 'Passwort zurücksetzen',
+    'auth.forgotPassword.subtitle': 'Gib deine E-Mail ein und wir senden dir einen Link zum Zurücksetzen',
+    'auth.forgotPassword.sendButton': 'Link senden',
+    'auth.forgotPassword.emailSent': 'Überprüfe deine E-Mail! Wir haben dir einen Link zum Zurücksetzen deines Passworts gesendet.',
+    'auth.forgotPassword.backToSignIn': 'Zurück zur Anmeldung',
+    'auth.forgotPassword.backToHome': 'Zurück zur Startseite',
+    
+    // Reset Password page
+    'auth.resetPassword.title': 'Neues Passwort erstellen',
+    'auth.resetPassword.subtitle': 'Gib unten dein neues Passwort ein',
+    'auth.resetPassword.newPassword': 'Neues Passwort',
+    'auth.resetPassword.confirmPassword': 'Passwort bestätigen',
+    'auth.resetPassword.resetButton': 'Passwort zurücksetzen',
+    'auth.resetPassword.success': 'Dein Passwort wurde erfolgreich zurückgesetzt!',
+    'auth.resetPassword.redirecting': 'Weiterleitung zur Startseite...',
+    'auth.resetPassword.passwordMismatch': 'Passwörter stimmen nicht überein',
+    'auth.resetPassword.passwordTooShort': 'Passwort muss mindestens 6 Zeichen lang sein',
+    'auth.resetPassword.invalidLink': 'Ungültiger oder abgelaufener Link',
+    'auth.resetPassword.invalidLinkDescription': 'Dieser Link zum Zurücksetzen ist ungültig oder abgelaufen. Bitte fordere einen neuen an.',
+    'auth.resetPassword.requestNewLink': 'Neuen Link anfordern',
     
     // Features
     'features.speakers.title': 'Sprechererkennung',
