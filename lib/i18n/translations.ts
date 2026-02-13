@@ -67,6 +67,7 @@ export const translations = {
     'auth.forgotPassword.emailSent': 'Check your email! We\'ve sent you a link to reset your password.',
     'auth.forgotPassword.backToSignIn': 'Back to sign in',
     'auth.forgotPassword.backToHome': 'Back to home',
+    'auth.forgotPassword.expiredLink': 'This link has expired. Please request a new one.',
     
     // Reset Password page
     'auth.resetPassword.title': 'Create new password',
@@ -186,6 +187,7 @@ export const translations = {
     'auth.forgotPassword.emailSent': 'Vérifiez votre email ! Nous vous avons envoyé un lien pour réinitialiser votre mot de passe.',
     'auth.forgotPassword.backToSignIn': 'Retour à la connexion',
     'auth.forgotPassword.backToHome': 'Retour à l\'accueil',
+    'auth.forgotPassword.expiredLink': 'Ce lien a expiré. Veuillez en demander un nouveau.',
     
     // Reset Password page
     'auth.resetPassword.title': 'Créer un nouveau mot de passe',
@@ -305,6 +307,7 @@ export const translations = {
     'auth.forgotPassword.emailSent': '¡Revisa tu email! Te hemos enviado un enlace para restablecer tu contraseña.',
     'auth.forgotPassword.backToSignIn': 'Volver a iniciar sesión',
     'auth.forgotPassword.backToHome': 'Volver al inicio',
+    'auth.forgotPassword.expiredLink': 'Este enlace ha expirado. Por favor, solicita uno nuevo.',
     
     // Reset Password page
     'auth.resetPassword.title': 'Crear nueva contraseña',
@@ -424,6 +427,7 @@ export const translations = {
     'auth.forgotPassword.emailSent': 'Verifique seu email! Enviamos um link para redefinir sua senha.',
     'auth.forgotPassword.backToSignIn': 'Voltar para entrar',
     'auth.forgotPassword.backToHome': 'Voltar ao início',
+    'auth.forgotPassword.expiredLink': 'Este link expirou. Por favor, solicite um novo.',
     
     // Reset Password page
     'auth.resetPassword.title': 'Criar nova senha',
@@ -543,6 +547,7 @@ export const translations = {
     'auth.forgotPassword.emailSent': 'Überprüfe deine E-Mail! Wir haben dir einen Link zum Zurücksetzen deines Passworts gesendet.',
     'auth.forgotPassword.backToSignIn': 'Zurück zur Anmeldung',
     'auth.forgotPassword.backToHome': 'Zurück zur Startseite',
+    'auth.forgotPassword.expiredLink': 'Dieser Link ist abgelaufen. Bitte fordere einen neuen an.',
     
     // Reset Password page
     'auth.resetPassword.title': 'Neues Passwort erstellen',

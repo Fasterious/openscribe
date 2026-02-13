@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/lib/i18n/context';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function ResetPasswordPage() {
@@ -15,41 +14,61 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [isValidSession, setIsValidSession] = useState<boolean | null>(null);
+  const [ready, setReady] = useState(false);
 
   const supabase = createClient();
 
+  const initSession = useCallback(async () => {
+    // 1. Check for hash fragment (implicit flow)
+    //    Supabase client auto-processes #access_token=...&type=recovery
+    //    and fires PASSWORD_RECOVERY or SIGNED_IN events
+
+    // 2. Check for code query param (PKCE flow)
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code) {
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (!error) {
+        // Clean the URL
+        window.history.replaceState({}, '', '/auth/reset-password');
+        setReady(true);
+        return;
+      }
+    }
+
+    // 3. Check for existing session (user might already be authenticated)
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      setReady(true);
+      return;
+    }
+
+    // 4. Wait a moment for Supabase client to process hash tokens
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const { data: { session: retrySession } } = await supabase.auth.getSession();
+    if (retrySession) {
+      setReady(true);
+      return;
+    }
+
+    // No valid session found - redirect to forgot password
+    router.replace('/auth/forgot-password?error=invalid_link');
+  }, [supabase.auth, router]);
+
   useEffect(() => {
-    // Listen for auth state changes, especially PASSWORD_RECOVERY event
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        // User clicked the recovery link and session is established
-        setIsValidSession(true);
-      } else if (event === 'SIGNED_IN' && session) {
-        // Also valid if user is signed in (recovery creates a session)
-        setIsValidSession(true);
+    // Listen for PASSWORD_RECOVERY event (fires when Supabase processes hash tokens)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+        setReady(true);
       }
     });
 
-    // Also check for existing session (in case event already fired)
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setIsValidSession(true);
-      } else {
-        // Wait a bit for the hash params to be processed
-        setTimeout(async () => {
-          const { data: { session: retrySession } } = await supabase.auth.getSession();
-          setIsValidSession(!!retrySession);
-        }, 500);
-      }
-    };
-    checkSession();
+    initSession();
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase.auth]);
+  }, [supabase.auth, initSession]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +93,6 @@ export default function ResetPasswordPage() {
       setError(error.message);
     } else {
       setSuccess(true);
-      // Redirect to home after 2 seconds
       setTimeout(() => {
         router.push('/');
       }, 2000);
@@ -83,39 +101,11 @@ export default function ResetPasswordPage() {
     setLoading(false);
   };
 
-  // Loading state while checking session
-  if (isValidSession === null) {
+  // Loading while establishing session
+  if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  // Invalid session - user didn't come from a reset link
-  if (!isValidSession) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="w-full max-w-md">
-          <div className="bg-card rounded-2xl shadow-2xl p-8 border border-border text-center">
-            <div className="mx-auto w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-              <svg className="h-7 w-7 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <h1 className="text-xl font-semibold text-foreground mb-2">
-              {t('auth.resetPassword.invalidLink')}
-            </h1>
-            <p className="text-sm text-muted-foreground mb-6">
-              {t('auth.resetPassword.invalidLinkDescription')}
-            </p>
-            <Link href="/auth/forgot-password">
-              <Button className="w-full">
-                {t('auth.resetPassword.requestNewLink')}
-              </Button>
-            </Link>
-          </div>
-        </div>
       </div>
     );
   }
