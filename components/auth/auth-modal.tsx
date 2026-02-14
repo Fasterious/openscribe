@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * Auth modal: signin, signup, forgot-password (email flow).
+ * NOTE: Reset password ne fonctionne pas entièrement en prod. Voir docs/AUTH_EMAIL_PASSWORD.md
+ */
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';

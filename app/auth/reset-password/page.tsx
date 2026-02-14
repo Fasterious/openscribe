@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * Page de réinitialisation mot de passe.
+ * NOTE: Problèmes en prod (redirection, otp_expired). Voir docs/AUTH_EMAIL_PASSWORD.md
+ */
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';

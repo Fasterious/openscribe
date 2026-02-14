@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * Demande de réinitialisation mot de passe (envoi email).
+ * NOTE: Le lien reçu ne fonctionne pas correctement. Voir docs/AUTH_EMAIL_PASSWORD.md
+ */
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
