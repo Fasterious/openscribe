@@ -40,20 +40,6 @@ export default function Home() {
 
   const supabase = createClient();
 
-  // Rediriger vers forgot-password si erreur Supabase (lien expiré, etc.)
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    // Check both query params and hash fragment (Supabase puts errors in both)
-    const params = new URLSearchParams(window.location.search);
-    const hashParams = new URLSearchParams(window.location.hash.replace('#', ''));
-    const errorCode = params.get('error_code') || hashParams.get('error_code');
-    const errorType = params.get('error') || hashParams.get('error');
-    if (errorType === 'access_denied' && (errorCode === 'otp_expired' || errorCode === 'otp_disabled')) {
-      window.history.replaceState({}, '', '/');
-      window.location.href = '/auth/forgot-password?error=expired_link';
-    }
-  }, []);
-
   // Vérifier l'état d'authentification et récupérer transcription en attente
   useEffect(() => {
     const checkUser = async () => {

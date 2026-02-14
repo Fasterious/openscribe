@@ -11,7 +11,7 @@ Open source transcription for researchers. Professional-quality transcription wi
 - **Multiple Export Formats**: TXT, TXT with speakers, JSON
 - **Transcription Metrics**: Audio duration, processing time, and cost displayed after transcription
 - **Internationalization**: Full support for French, English, Spanish, Portuguese, and German UI
-- **Authentication**: Google OAuth and Magic Link via Supabase
+- **Authentication**: Google OAuth via Supabase (MVP)
 - **Feedback System**: Built-in feedback button for user suggestions
 
 ## Quick Start
@@ -169,12 +169,16 @@ See [BLUEPRINT.md](./BLUEPRINT.md) for the complete roadmap and technical specif
 - [x] Export to TXT/JSON
 - [x] Transcription metrics display
 - [x] Internationalization (FR/EN/ES/PT/DE)
-- [x] Authentication (Supabase - Google OAuth + Magic Link)
+- [x] Authentication (Supabase - Google OAuth)
 - [x] Transcription preview for unauthenticated users
 - [x] Feedback system
 - [ ] Landing page (hero, features, pricing)
 - [ ] Credit system
 - [ ] Stripe payments
+
+## Auth Email/Password (archived)
+
+Email/password auth with reset is available in branch `feature/email-password-auth` but has known issues (reset link doesn't work). See `docs/AUTH_EMAIL_PASSWORD.md` in that branch for details.
 
 ## License
 
