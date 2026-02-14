@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { I18nProvider } from "@/lib/i18n/context";
@@ -14,14 +14,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#2F40C2",
+};
+
 export const metadata: Metadata = {
   title: "OpenScribe - Transcription gratuite & professionnelle",
-  description: "Transcription pro avec identification des locuteurs. Jusqu'à 1 Go, durée illimitée. Propulsé par Voxtral (Mistral AI).",
+  description:
+    "Transcription pro avec identification des locuteurs. Jusqu'à 1 Go, durée illimitée. Propulsé par Voxtral (Mistral AI).",
+  applicationName: "OpenScribe",
   icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     apple: "/logo.svg",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "OpenScribe",
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
