@@ -29,8 +29,16 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // Refreshing the auth token
-  await supabase.auth.getUser();
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // Don't block the request if Supabase is unreachable
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-supabase-auth-unavailable', '1');
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+    });
+  }
 
   return supabaseResponse;
 }

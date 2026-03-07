@@ -117,6 +117,9 @@ export const translations = {
     'feedback.success.title': 'Thank you!',
     'feedback.success.message': 'Your feedback has been received.',
     'feedback.error': 'Failed to send feedback. Please try again.',
+    
+    // Supabase auth unavailable
+    'supabase.unavailable': 'Authentication service temporarily unavailable. Sign-in may not work. We\'re working on it.',
   },
   
   fr: {
@@ -237,6 +240,9 @@ export const translations = {
     'feedback.success.title': 'Merci !',
     'feedback.success.message': 'Votre retour a bien été reçu.',
     'feedback.error': "Échec de l'envoi. Veuillez réessayer.",
+    
+    // Supabase auth unavailable
+    'supabase.unavailable': "Service d'authentification temporairement indisponible. La connexion peut ne pas fonctionner. Nous y travaillons.",
   },
 
   es: {
@@ -357,6 +363,9 @@ export const translations = {
     'feedback.success.title': '¡Gracias!',
     'feedback.success.message': 'Tu opinión ha sido recibida.',
     'feedback.error': 'Error al enviar. Por favor, inténtalo de nuevo.',
+    
+    // Supabase auth unavailable
+    'supabase.unavailable': 'Servicio de autenticación temporalmente no disponible. El inicio de sesión puede no funcionar. Estamos trabajando en ello.',
   },
 
   pt: {
@@ -477,6 +486,9 @@ export const translations = {
     'feedback.success.title': 'Obrigado!',
     'feedback.success.message': 'Seu feedback foi recebido.',
     'feedback.error': 'Falha ao enviar. Por favor, tente novamente.',
+    
+    // Supabase auth unavailable
+    'supabase.unavailable': 'Serviço de autenticação temporariamente indisponível. O login pode não funcionar. Estamos trabalhando nisso.',
   },
 
   de: {
@@ -597,6 +609,9 @@ export const translations = {
     'feedback.success.title': 'Danke!',
     'feedback.success.message': 'Ihr Feedback wurde empfangen.',
     'feedback.error': 'Fehler beim Senden. Bitte versuchen Sie es erneut.',
+    
+    // Supabase auth unavailable
+    'supabase.unavailable': 'Authentifizierungsdienst vorübergehend nicht verfügbar. Die Anmeldung funktioniert möglicherweise nicht. Wir arbeiten daran.',
   },
 } as const;
 
