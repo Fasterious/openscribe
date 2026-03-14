@@ -6,8 +6,8 @@ import { ProgressTracker } from '@/components/transcription/progress-tracker';
 import { TranscriptViewer } from '@/components/transcription/transcript-viewer';
 import { AuthModal } from '@/components/auth/auth-modal';
 import { FeedbackButton } from '@/components/feedback/feedback-button';
+import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
-import { LanguageSelector } from '@/components/ui/language-selector';
 import { WaveformAnimation } from '@/components/ui/waveform-animation';
 import { createClient } from '@/lib/supabase/client';
 import { useTranslation } from '@/lib/i18n/context';
@@ -364,38 +364,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="bg-card/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            {/* Logo */}
-            <img 
-              src="/logo.svg" 
-              alt="OpenScribe logo" 
-              className="h-8 w-auto"
-            />
-            <span className="text-xl font-semibold text-foreground">OpenScribe</span>
-          </div>
-          <nav className="flex items-center gap-3">
-            <LanguageSelector />
-            {!loading && (
-              user ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground hidden sm:inline">
-                    {user.email}
-                  </span>
-                  <Button variant="default" size="sm" onClick={handleSignOut}>
-                    {t('header.signOut')}
-                  </Button>
-                </div>
-              ) : (
-                <Button size="sm" onClick={() => setAuthModalOpen(true)}>
-                  {t('header.signIn')}
-                </Button>
-              )
-            )}
-          </nav>
-        </div>
-      </header>
+      <Header
+        user={user}
+        loading={loading}
+        onSignOut={handleSignOut}
+        onSignIn={handleSignUpClick}
+        manageAuth={false}
+      />
 
       {/* Main content */}
       <main className="flex-1 container mx-auto px-4 py-10">
