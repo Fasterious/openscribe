@@ -57,6 +57,8 @@ CREATE INDEX idx_workshop_responses_session
   ON public.workshop_responses(session_id);
 
 -- Enable Supabase Realtime for live updates
+-- REPLICA IDENTITY FULL is required for Realtime filters (e.g. session_id=eq.xxx)
+ALTER TABLE public.workshop_responses REPLICA IDENTITY FULL;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.workshop_responses;
 
 -- Workshop Analyses (clustering results)

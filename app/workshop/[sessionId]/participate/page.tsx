@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/client';
 import type { WorkshopSession, WorkshopResponse } from '@/types/workshop';
 
 const TOKEN_PREFIX = 'workshop_token_';
 
 export default function ParticipatePage() {
   const { sessionId } = useParams<{ sessionId: string }>();
+  const supabase = useRef(createClient()).current;
 
   const [session, setSession] = useState<WorkshopSession | null>(null);
   const [responses, setResponses] = useState<WorkshopResponse[]>([]);
@@ -74,22 +76,52 @@ export default function ParticipatePage() {
       .finally(() => setLoading(false));
   }, [sessionId, getToken, getName]);
 
-  // Poll for new responses every 3 seconds
+  // Supabase Realtime for live response updates
   useEffect(() => {
     if (loading) return;
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`/api/workshop/sessions/${sessionId}`);
-        if (!res.ok) return;
-        const data = await res.json();
-        setResponses(data.responses ?? []);
-      } catch {
-        // Silent fail on polling
-      }
-    }, 3000);
 
-    return () => clearInterval(interval);
-  }, [loading, sessionId]);
+    const channel = supabase
+      .channel(`participant-${sessionId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'workshop_responses',
+          filter: `session_id=eq.${sessionId}`,
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setResponses((prev) => {
+              if (prev.some((r) => r.id === payload.new.id)) return prev;
+              return [...prev, payload.new as WorkshopResponse];
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            setResponses((prev) =>
+              prev.map((r) =>
+                r.id === payload.new.id ? (payload.new as WorkshopResponse) : r
+              )
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loading, sessionId, supabase]);
+
+  const refreshResponses = async () => {
+    try {
+      const res = await fetch(`/api/workshop/sessions/${sessionId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setResponses(data.responses ?? []);
+    } catch {
+      // Silent fail
+    }
+  };
 
   const handleSubmit = async () => {
     if (!name.trim() || !responseText.trim()) return;
@@ -266,9 +298,20 @@ export default function ParticipatePage() {
           {/* Other responses */}
           {otherResponses.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-sm font-medium text-muted-foreground">
-                Réponses des autres participants ({otherResponses.length})
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-medium text-muted-foreground">
+                  Réponses des autres participants ({otherResponses.length})
+                </h2>
+                <button
+                  onClick={refreshResponses}
+                  title="Rafraîchir"
+                  className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+              </div>
               <div className="space-y-2">
                 {otherResponses.map((r) => (
                   <div

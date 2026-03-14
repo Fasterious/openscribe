@@ -53,28 +53,50 @@ export default function SessionView() {
     }
   }, [sessionId]);
 
-  // Fetch responses only (lightweight, for polling)
-  const fetchResponses = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/workshop/sessions/${sessionId}`);
-      if (!res.ok) return;
-      const data = await res.json();
-      setResponses(data.responses);
-    } catch {
-      // Silent fail on polling
-    }
-  }, [sessionId]);
-
   useEffect(() => {
     fetchSession();
   }, [fetchSession]);
 
-  // Poll for new responses every 3 seconds
+  // Supabase Realtime for live response updates + slow polling fallback
   useEffect(() => {
     if (loading) return;
-    const interval = setInterval(fetchResponses, 3000);
-    return () => clearInterval(interval);
-  }, [loading, fetchResponses]);
+
+    let realtimeActive = false;
+
+    const channel = supabase
+      .channel(`workshop-${sessionId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'workshop_responses',
+          filter: `session_id=eq.${sessionId}`,
+        },
+        (payload) => {
+          realtimeActive = true;
+          if (payload.eventType === 'INSERT') {
+            setResponses((prev) => {
+              if (prev.some((r) => r.id === payload.new.id)) return prev;
+              return [...prev, payload.new as WorkshopResponse];
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            setResponses((prev) =>
+              prev.map((r) =>
+                r.id === payload.new.id ? (payload.new as WorkshopResponse) : r
+              )
+            );
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('[Realtime] Status:', status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loading, sessionId, supabase]);
 
   const handleAnalyze = async () => {
     setAnalyzing(true);
@@ -165,6 +187,15 @@ export default function SessionView() {
                   </svg>
                   {responses.length} réponse{responses.length > 1 ? 's' : ''}
                 </span>
+                <button
+                  onClick={fetchSession}
+                  title="Rafraîchir les réponses"
+                  className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
                 <span
                   className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                     session.status === 'active'
