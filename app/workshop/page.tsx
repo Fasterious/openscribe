@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
+import { AuthModal } from '@/components/auth/auth-modal';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
@@ -16,6 +17,7 @@ export default function WorkshopDashboard() {
   const [loading, setLoading] = useState(true);
   const [sessions, setSessions] = useState<WorkshopSession[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -26,6 +28,7 @@ export default function WorkshopDashboard() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) setAuthModalOpen(false);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -54,6 +57,14 @@ export default function WorkshopDashboard() {
     );
   }
 
+  const handleNewSession = () => {
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
+    router.push('/workshop/create');
+  };
+
   if (!user && !isDevMode) {
     return (
       <div className="min-h-screen bg-background">
@@ -71,8 +82,16 @@ export default function WorkshopDashboard() {
             <p className="text-muted-foreground">
               Créez et gérez vos sessions d&apos;atelier collaboratif.
             </p>
+            <Button onClick={() => setAuthModalOpen(true)}>
+              Se connecter avec Google
+            </Button>
           </div>
         </main>
+        <AuthModal
+          isOpen={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+          onSuccess={() => setAuthModalOpen(false)}
+        />
       </div>
     );
   }
@@ -96,7 +115,7 @@ export default function WorkshopDashboard() {
                 Vos sessions d&apos;atelier collaboratif
               </p>
             </div>
-            <Button onClick={() => router.push('/workshop/create')}>
+            <Button onClick={handleNewSession}>
               <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -122,10 +141,7 @@ export default function WorkshopDashboard() {
                 Créez votre première session pour poser une question à votre
                 audience et collecter leurs retours en temps réel.
               </p>
-              <Button
-                className="mt-6"
-                onClick={() => router.push('/workshop/create')}
-              >
+              <Button className="mt-6" onClick={handleNewSession}>
                 Créer ma première session
               </Button>
             </div>
@@ -168,6 +184,12 @@ export default function WorkshopDashboard() {
           )}
         </div>
       </main>
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        onSuccess={() => setAuthModalOpen(false)}
+      />
     </div>
   );
 }

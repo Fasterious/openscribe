@@ -33,10 +33,10 @@ export default function SessionView() {
   const [selectedProvider, setSelectedProvider] = useState<LLMProvider>('gemini');
   const [showQR, setShowQR] = useState(true);
 
-  const participateUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}/workshop/${sessionId}/participate`
-      : '';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (typeof window !== 'undefined' ? window.location.origin : '');
+  const participateUrl = `${baseUrl}/workshop/${sessionId}/participate`;
 
   const fetchSession = useCallback(async () => {
     try {
@@ -53,51 +53,28 @@ export default function SessionView() {
     }
   }, [sessionId]);
 
+  // Fetch responses only (lightweight, for polling)
+  const fetchResponses = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/workshop/sessions/${sessionId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setResponses(data.responses);
+    } catch {
+      // Silent fail on polling
+    }
+  }, [sessionId]);
+
   useEffect(() => {
     fetchSession();
   }, [fetchSession]);
 
-  // Supabase Realtime: live response updates
+  // Poll for new responses every 3 seconds
   useEffect(() => {
-    const channel = supabase
-      .channel(`workshop-responses-${sessionId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'workshop_responses',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          setResponses((prev) => {
-            if (prev.some((r) => r.id === payload.new.id)) return prev;
-            return [...prev, payload.new as WorkshopResponse];
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'workshop_responses',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          setResponses((prev) =>
-            prev.map((r) =>
-              r.id === payload.new.id ? (payload.new as WorkshopResponse) : r
-            )
-          );
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [sessionId, supabase]);
+    if (loading) return;
+    const interval = setInterval(fetchResponses, 3000);
+    return () => clearInterval(interval);
+  }, [loading, fetchResponses]);
 
   const handleAnalyze = async () => {
     setAnalyzing(true);

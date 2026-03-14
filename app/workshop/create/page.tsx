@@ -1,18 +1,48 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
+import { AuthModal } from '@/components/auth/auth-modal';
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export default function CreateSession() {
   const router = useRouter();
+  const supabase = createClient();
+
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
   const [question, setQuestion] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+      setLoading(false);
+      if (!data.user) setAuthModalOpen(true);
+    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) setAuthModalOpen(false);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
   const handleCreate = async () => {
     if (!question.trim()) return;
+
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
+
     setCreating(true);
     setError(null);
 
@@ -36,9 +66,32 @@ export default function CreateSession() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-10 flex justify-center py-20">
+          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
+
+      {!user && (
+        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-3 text-center text-sm text-amber-700">
+          Vous devez être connecté pour créer une session.{' '}
+          <button
+            onClick={() => setAuthModalOpen(true)}
+            className="underline font-medium hover:text-amber-900"
+          >
+            Se connecter
+          </button>
+        </div>
+      )}
 
       <main className="container mx-auto px-4 py-10">
         <div className="max-w-xl mx-auto space-y-8">
@@ -110,6 +163,12 @@ export default function CreateSession() {
           </div>
         </div>
       </main>
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        onSuccess={() => setAuthModalOpen(false)}
+      />
     </div>
   );
 }

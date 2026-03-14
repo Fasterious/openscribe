@@ -3,14 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { createClient } from '@/lib/supabase/client';
 import type { WorkshopSession, WorkshopResponse } from '@/types/workshop';
 
 const TOKEN_PREFIX = 'workshop_token_';
 
 export default function ParticipatePage() {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const supabase = createClient();
 
   const [session, setSession] = useState<WorkshopSession | null>(null);
   const [responses, setResponses] = useState<WorkshopResponse[]>([]);
@@ -76,47 +74,22 @@ export default function ParticipatePage() {
       .finally(() => setLoading(false));
   }, [sessionId, getToken, getName]);
 
-  // Supabase Realtime
+  // Poll for new responses every 3 seconds
   useEffect(() => {
-    const channel = supabase
-      .channel(`participant-responses-${sessionId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'workshop_responses',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          setResponses((prev) => {
-            if (prev.some((r) => r.id === payload.new.id)) return prev;
-            return [...prev, payload.new as WorkshopResponse];
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'workshop_responses',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          setResponses((prev) =>
-            prev.map((r) =>
-              r.id === payload.new.id ? (payload.new as WorkshopResponse) : r
-            )
-          );
-        }
-      )
-      .subscribe();
+    if (loading) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/workshop/sessions/${sessionId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        setResponses(data.responses ?? []);
+      } catch {
+        // Silent fail on polling
+      }
+    }, 3000);
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [sessionId, supabase]);
+    return () => clearInterval(interval);
+  }, [loading, sessionId]);
 
   const handleSubmit = async () => {
     if (!name.trim() || !responseText.trim()) return;
