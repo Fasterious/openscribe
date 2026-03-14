@@ -187,6 +187,8 @@ export default function Home() {
       error: null,
     });
 
+    const uploadStartMs = Date.now();
+
     try {
       // Étape 1: Obtenir une URL d'upload presignée depuis R2
       const urlResponse = await fetch('/api/upload-url', {
@@ -208,7 +210,7 @@ export default function Home() {
       // Étape 2: Upload direct vers R2 avec progression (pas de limite Vercel !)
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        
+
         xhr.upload.addEventListener('progress', (event) => {
           if (event.lengthComputable) {
             const percent = Math.round((event.loaded / event.total) * 70); // 0-70%
@@ -232,6 +234,7 @@ export default function Home() {
         xhr.send(file);
       });
 
+      const uploadEndMs = Date.now();
       const audioUrl = fileUrl;
 
       // Estimer le temps de transcription basé sur la taille du fichier
@@ -271,10 +274,19 @@ export default function Home() {
 
       // Étape 3: Transcription via Voxtral (synchrone)
       // On passe fileKey pour que le serveur puisse supprimer le fichier R2 après transcription
+      // Métriques client pour analytics (temps upload, taille fichier)
       const transcribeResponse = await fetch('/api/transcribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ audioUrl, fileKey }),
+        body: JSON.stringify({
+          audioUrl,
+          fileKey,
+          metrics: {
+            uploadStartMs,
+            uploadEndMs,
+            fileSizeBytes: file.size,
+          },
+        }),
       });
 
       if (!transcribeResponse.ok) {

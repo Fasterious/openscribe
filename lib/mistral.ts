@@ -1,8 +1,17 @@
 // Mistral Voxtral API Client for audio transcription
 
+import { Agent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import type { TranscriptionResult, TranscriptionSegment } from '@/types';
 
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
+
+// Timeout 30 min pour la transcription - évite HeadersTimeoutError sur longs audios
+const TRANSCRIPTION_TIMEOUT_MS = 30 * 60 * 1000;
+const transcriptionAgent = new Agent({
+  headersTimeout: TRANSCRIPTION_TIMEOUT_MS,
+  bodyTimeout: TRANSCRIPTION_TIMEOUT_MS,
+  connectTimeout: 30000,
+});
 
 if (!MISTRAL_API_KEY) {
   console.warn('Warning: MISTRAL_API_KEY is not set');
@@ -21,13 +30,20 @@ interface RetryConfig {
   initialDelayMs: number;
   maxDelayMs: number;
   retryableStatuses: number[];
+  /** Agent undici pour timeouts longs (transcription) */
+  dispatcher?: InstanceType<typeof Agent>;
 }
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxRetries: 3,
   initialDelayMs: 1000,  // 1 seconde
-  maxDelayMs: 8000,      // 8 secondes max
+  maxDelayMs: 8000,     // 8 secondes max
   retryableStatuses: [429, 503, 502, 500],  // Rate limit, Service unavailable, Bad gateway, Server error
+};
+
+const TRANSCRIPTION_RETRY_CONFIG: RetryConfig = {
+  ...DEFAULT_RETRY_CONFIG,
+  dispatcher: transcriptionAgent,
 };
 
 /**
@@ -48,13 +64,25 @@ async function fetchWithRetry(
   let lastError: Error | null = null;
   let delay = config.initialDelayMs;
 
+  const fetchFn = config.dispatcher
+    ? async (u: string, o: RequestInit) => {
+        const prev = getGlobalDispatcher();
+        setGlobalDispatcher(config.dispatcher!);
+        try {
+          return await fetch(u, o);
+        } finally {
+          setGlobalDispatcher(prev);
+        }
+      }
+    : (u: string, o: RequestInit) => fetch(u, o);
+
   for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
     try {
-      const response = await fetch(url, options);
+      const response = await fetchFn(url, options);
 
       // Si succès ou erreur non-retryable, retourner directement
       if (response.ok || !config.retryableStatuses.includes(response.status)) {
-        return response;
+        return response as Response;
       }
 
       // Erreur retryable - on va réessayer
@@ -66,7 +94,7 @@ async function fetchWithRetry(
       
       // Si c'est la dernière tentative, retourner la réponse d'erreur
       if (attempt === config.maxRetries) {
-        return response;
+        return response as Response;
       }
 
       // Attendre avant de réessayer
@@ -293,13 +321,17 @@ export async function transcribe(input: MistralTranscriptionInput): Promise<Tran
   // Note: language n'est pas compatible avec timestamp_granularities selon la doc
   // On laisse la détection automatique pour avoir les timestamps
   
-  const response = await fetchWithRetry(MISTRAL_TRANSCRIPTION_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${MISTRAL_API_KEY}`,
+  const response = await fetchWithRetry(
+    MISTRAL_TRANSCRIPTION_URL,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${MISTRAL_API_KEY}`,
+      },
+      body: formData,
     },
-    body: formData,
-  });
+    TRANSCRIPTION_RETRY_CONFIG
+  );
 
   if (!response.ok) {
     const errorText = await response.text();

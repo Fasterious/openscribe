@@ -43,6 +43,8 @@ Edit `.env.local` and add your Mistral API key:
 MISTRAL_API_KEY=your_mistral_api_key
 ```
 
+**Métriques de transcription** : Pour enregistrer les temps d'upload et de transcription dans Supabase (analytics), ajoute `SUPABASE_SERVICE_ROLE_KEY` et exécute la migration. Voir [docs/METRICS_SETUP.md](./docs/METRICS_SETUP.md).
+
 ### Development
 
 ```bash
