@@ -798,10 +798,10 @@ function detectCategory(text: string): CategoryId {
 }
 
 const READABILITY_PALETTE = [
-  'oklch(0.58 0.22 25)',
-  'oklch(0.55 0.2 250)',
-  'oklch(0.58 0.2 150)',
-  'oklch(0.65 0.18 310)',
+  'oklch(0.55 0.22 25)',
+  'oklch(0.50 0.2 250)',
+  'oklch(0.55 0.2 150)',
+  'oklch(0.60 0.20 310)',
 ];
 
 interface LayoutWord {
@@ -814,37 +814,39 @@ interface LayoutWord {
   readabilityColor: number;
 }
 
-const CANONICAL_W = 800;
-const CANONICAL_H = 420;
+const LAYOUT_W = 1200;
+const LAYOUT_H = 800;
 
 function computeReadabilityColors(words: LayoutWord[]): number[] {
-  const CHAR_W_RATIO = 0.55;
+  const CHAR_W_RATIO = 0.58;
   const boxes = words.map((w) => {
     const halfW = (w.text.length * w.size * CHAR_W_RATIO) / 2;
-    const halfH = w.size / 2;
+    const halfH = w.size * 0.65;
     return { l: w.x - halfW, r: w.x + halfW, t: w.y - halfH, b: w.y + halfH };
   });
 
-  const GAP = 4;
+  const PROXIMITY = 20;
   const adj: Set<number>[] = words.map(() => new Set());
   for (let i = 0; i < words.length; i++) {
     for (let j = i + 1; j < words.length; j++) {
       const a = boxes[i], b = boxes[j];
-      if (a.l - GAP < b.r && a.r + GAP > b.l && a.t - GAP < b.b && a.b + GAP > b.t) {
+      if (a.l - PROXIMITY < b.r && a.r + PROXIMITY > b.l &&
+          a.t - PROXIMITY < b.b && a.b + PROXIMITY > b.t) {
         adj[i].add(j);
         adj[j].add(i);
       }
     }
   }
 
+  const N = READABILITY_PALETTE.length;
   const colors = new Array<number>(words.length).fill(-1);
-  const order = words.map((_, i) => i).sort((a, b) => words[b].size - words[a].size);
+  const order = words.map((_, i) => i).sort((a, b) => adj[b].size - adj[a].size || words[b].size - words[a].size);
   for (const i of order) {
     const used = new Set<number>();
     for (const n of adj[i]) if (colors[n] >= 0) used.add(colors[n]);
     let c = 0;
-    while (used.has(c)) c++;
-    colors[i] = c % READABILITY_PALETTE.length;
+    while (used.has(c) && c < N) c++;
+    colors[i] = c % N;
   }
   return colors;
 }
@@ -882,12 +884,15 @@ function WordCloudView({
     const minCount = Math.min(...clusters.map((c) => c.participant_count));
     const range = maxCount - minCount || 1;
 
+    const minFont = 20;
+    const maxFont = 72;
+
     const words = clusters
       .map((c, i) => {
         const t = (c.participant_count - minCount) / range;
         return {
           text: c.label,
-          size: 16 + t * 40,
+          size: minFont + t * (maxFont - minFont),
           clusterIndex: i,
           category: detectCategory(c.label),
         };
@@ -902,9 +907,9 @@ function WordCloudView({
       if (cancelled) return;
 
       cloudLayout<CloudWord>()
-        .size([CANONICAL_W, CANONICAL_H])
+        .size([LAYOUT_W, LAYOUT_H])
         .words(words.map((w) => ({ ...w })) as CloudWord[])
-        .padding(6)
+        .padding(3)
         .rotate(0)
         .font('system-ui, -apple-system, sans-serif')
         .fontSize((d) => d.size!)
@@ -969,8 +974,27 @@ function WordCloudView({
   }
 
   const clusters = result.clusters;
-  const scale = containerWidth > 0 ? containerWidth / CANONICAL_W : 1;
-  const displayHeight = CANONICAL_H * scale;
+
+  const bbox = useMemo(() => {
+    if (layoutWords.length === 0) return { minX: 0, maxX: 0, minY: 0, maxY: 0, w: 1, h: 1 };
+    const CHAR_W = 0.58;
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const w of layoutWords) {
+      const halfW = (w.text.length * w.size * CHAR_W) / 2;
+      const halfH = w.size * 0.65;
+      minX = Math.min(minX, w.x - halfW);
+      maxX = Math.max(maxX, w.x + halfW);
+      minY = Math.min(minY, w.y - halfH);
+      maxY = Math.max(maxY, w.y + halfH);
+    }
+    const pad = 16;
+    return { minX: minX - pad, maxX: maxX + pad, minY: minY - pad, maxY: maxY + pad, w: maxX - minX + 2 * pad, h: maxY - minY + 2 * pad };
+  }, [layoutWords]);
+
+  const scale = containerWidth > 0 ? containerWidth / bbox.w : 1;
+  const displayHeight = bbox.h * scale;
+  const centerX = (bbox.minX + bbox.maxX) / 2;
+  const centerY = (bbox.minY + bbox.maxY) / 2;
 
   function getWordColor(word: LayoutWord): string {
     if (colorMode === 'category') {
@@ -1056,8 +1080,8 @@ function WordCloudView({
               key={word.clusterIndex}
               className="absolute"
               style={{
-                left: `${(CANONICAL_W / 2 + word.x) * scale}px`,
-                top: `${(CANONICAL_H / 2 + word.y) * scale}px`,
+                left: `${(word.x - centerX + bbox.w / 2) * scale}px`,
+                top: `${(word.y - centerY + bbox.h / 2) * scale}px`,
                 transform: 'translate(-50%, -50%)',
                 pointerEvents: visible ? 'auto' : 'none',
               }}
