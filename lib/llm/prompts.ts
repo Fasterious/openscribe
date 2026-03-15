@@ -11,9 +11,9 @@ export function buildClusteringPrompt(input: ClusteringInput): string {
   return `Tu es un expert en analyse qualitative UX. Tu reçois des réponses de participants à une question posée lors d'un atelier collaboratif.
 
 Ta tâche :
-1. Lire chaque réponse et identifier les idées distinctes qu'elle contient (une réponse peut contenir plusieurs idées).
+1. Lire chaque réponse en entier et identifier TOUTES les idées distinctes qu'elle contient (une réponse peut contenir plusieurs idées, y compris à la fin du texte).
 2. Regrouper les idées similaires en clusters thématiques.
-3. Pour chaque cluster, fournir un label court, un résumé, le nombre de participants concernés, et les extraits pertinents avec attribution.
+3. Pour chaque cluster, fournir un label court, un résumé, le nombre de participants uniques, et les extraits pertinents avec attribution.
 
 Question posée : "${input.question}"
 
@@ -29,9 +29,9 @@ Réponds UNIQUEMENT en JSON valide (sans balises markdown) avec cette structure 
       "participant_count": 3,
       "excerpts": [
         {
-          "participant_name": "Prénom",
-          "response_id": "uuid du participant",
-          "excerpt": "extrait fidèle de la réponse"
+          "participant_name": "Prénom exact tel qu'indiqué",
+          "response_id": "UUID exact de la réponse (voir ci-dessus)",
+          "excerpt": "extrait fidèle, citation du texte original"
         }
       ]
     }
@@ -41,11 +41,11 @@ Réponds UNIQUEMENT en JSON valide (sans balises markdown) avec cette structure 
   "total_participants": 10
 }
 
-Règles :
-- Les clusters doivent être thématiquement distincts.
-- Un même participant peut apparaître dans plusieurs clusters s'il a exprimé plusieurs idées.
-- Les extraits doivent être des citations fidèles ou des paraphrases très proches du texte original.
+Règles OBLIGATOIRES :
+- response_id : utilise OBLIGATOIREMENT l'UUID exact fourni entre parenthèses après le nom (format "Participant: Nom (ID: xxx)"). Ne jamais inventer d'ID, ne jamais utiliser le nom à la place.
+- Un même participant DOIT apparaître dans PLUSIEURS clusters si sa réponse contient plusieurs idées thématiques distinctes. Chaque idée va dans le cluster correspondant, avec son propre extrait.
+- Extrais TOUS les verbatims pertinents, y compris ceux en fin de réponse. Ne néglige aucune partie du texte.
+- Les extraits doivent être des citations fidèles du texte original (pas de paraphrase libre).
 - Ordonne les clusters du plus mentionné au moins mentionné.
-- Le champ participant_count compte les participants uniques, pas les extraits.
-- Utilise les IDs exacts des participants fournis dans le champ response_id.`;
+- participant_count = nombre de participants UNIQUES dans ce cluster (compter les noms distincts, pas le nombre d'excerpts).`;
 }

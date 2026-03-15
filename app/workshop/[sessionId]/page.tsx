@@ -16,6 +16,10 @@ import type {
 } from '@/types/workshop';
 import { LLM_MODELS } from '@/types/workshop';
 
+function uniqueParticipantCount(cluster: Cluster): number {
+  return new Set(cluster.excerpts.map((e) => e.response_id)).size;
+}
+
 type Tab = 'clusters' | 'wordcloud' | 'raw';
 type TestPreset = '' | '20' | '40' | '60' | '80' | '100';
 
@@ -880,8 +884,8 @@ function WordCloudView({
     if (!result) return;
 
     const clusters = result.clusters;
-    const maxCount = Math.max(...clusters.map((c) => c.participant_count));
-    const minCount = Math.min(...clusters.map((c) => c.participant_count));
+    const maxCount = Math.max(...clusters.map((c) => uniqueParticipantCount(c)));
+    const minCount = Math.min(...clusters.map((c) => uniqueParticipantCount(c)));
     const range = maxCount - minCount || 1;
 
     const minFont = 20;
@@ -889,7 +893,7 @@ function WordCloudView({
 
     const words = clusters
       .map((c, i) => {
-        const t = (c.participant_count - minCount) / range;
+        const t = (uniqueParticipantCount(c) - minCount) / range;
         return {
           text: c.label,
           size: minFont + t * (maxFont - minFont),
@@ -1133,7 +1137,7 @@ function WordCloudView({
 
                   <div className="flex items-center gap-2 mb-3">
                     <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center">
-                      {cluster.participant_count}
+                      {uniqueParticipantCount(cluster)}
                     </span>
                     <h3 className="font-semibold text-foreground text-sm truncate">
                       {cluster.label}
@@ -1212,7 +1216,7 @@ function ClusterCard({
       >
         <div className="flex items-center gap-3 min-w-0">
           <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-semibold flex items-center justify-center">
-            {cluster.participant_count}
+            {uniqueParticipantCount(cluster)}
           </span>
           <div className="min-w-0">
             <h3 className="font-semibold text-foreground truncate">
