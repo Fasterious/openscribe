@@ -416,8 +416,9 @@ function ClustersView({
 }
 
 type CategoryId = 'problem' | 'need' | 'idea' | 'question' | 'strength' | 'other';
+type ColorMode = 'category' | 'readability';
 
-const WORD_CLOUD_CATEGORIES: { id: CategoryId; label: string; color: string; pattern?: RegExp }[] = [
+const CATEGORY_DEFS: { id: CategoryId; label: string; color: string; pattern?: RegExp }[] = [
   {
     id: 'problem',
     label: 'Problèmes',
@@ -448,24 +449,26 @@ const WORD_CLOUD_CATEGORIES: { id: CategoryId; label: string; color: string; pat
     color: 'oklch(0.6 0.2 290)',
     pattern: /force|atout|avantage|succès|réussite|satisfaction|point fort|strength|positive|qualité|bénéfice|apprécié|efficac|fierté|motivation/i,
   },
+  {
+    id: 'other',
+    label: 'Autre',
+    color: 'oklch(0.6 0.12 230)',
+  },
 ];
 
-const OTHER_CATEGORY: { id: CategoryId; label: string; color: string; pattern?: RegExp } = {
-  id: 'other',
-  label: 'Autre',
-  color: 'oklch(0.6 0.12 230)',
-};
-
-function detectCategory(label: string): CategoryId {
-  for (const cat of WORD_CLOUD_CATEGORIES) {
-    if (cat.pattern?.test(label)) return cat.id;
+function detectCategory(text: string): CategoryId {
+  for (const cat of CATEGORY_DEFS) {
+    if (cat.pattern?.test(text)) return cat.id;
   }
   return 'other';
 }
 
-function getCategoryColor(catId: CategoryId): string {
-  return WORD_CLOUD_CATEGORIES.find((c) => c.id === catId)?.color ?? OTHER_CATEGORY.color;
-}
+const READABILITY_PALETTE = [
+  'oklch(0.58 0.22 25)',
+  'oklch(0.55 0.2 250)',
+  'oklch(0.58 0.2 150)',
+  'oklch(0.65 0.18 310)',
+];
 
 interface LayoutWord {
   text: string;
@@ -474,6 +477,42 @@ interface LayoutWord {
   y: number;
   clusterIndex: number;
   category: CategoryId;
+  readabilityColor: number;
+}
+
+const CANONICAL_W = 800;
+const CANONICAL_H = 420;
+
+function computeReadabilityColors(words: LayoutWord[]): number[] {
+  const CHAR_W_RATIO = 0.55;
+  const boxes = words.map((w) => {
+    const halfW = (w.text.length * w.size * CHAR_W_RATIO) / 2;
+    const halfH = w.size / 2;
+    return { l: w.x - halfW, r: w.x + halfW, t: w.y - halfH, b: w.y + halfH };
+  });
+
+  const GAP = 4;
+  const adj: Set<number>[] = words.map(() => new Set());
+  for (let i = 0; i < words.length; i++) {
+    for (let j = i + 1; j < words.length; j++) {
+      const a = boxes[i], b = boxes[j];
+      if (a.l - GAP < b.r && a.r + GAP > b.l && a.t - GAP < b.b && a.b + GAP > b.t) {
+        adj[i].add(j);
+        adj[j].add(i);
+      }
+    }
+  }
+
+  const colors = new Array<number>(words.length).fill(-1);
+  const order = words.map((_, i) => i).sort((a, b) => words[b].size - words[a].size);
+  for (const i of order) {
+    const used = new Set<number>();
+    for (const n of adj[i]) if (colors[n] >= 0) used.add(colors[n]);
+    let c = 0;
+    while (used.has(c)) c++;
+    colors[i] = c % READABILITY_PALETTE.length;
+  }
+  return colors;
 }
 
 function WordCloudView({
@@ -487,82 +526,89 @@ function WordCloudView({
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [layoutWords, setLayoutWords] = useState<LayoutWord[]>([]);
-  const [cloudSize, setCloudSize] = useState({ width: 0, height: 0 });
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [colorMode, setColorMode] = useState<ColorMode>('category');
+  const [soloCategory, setSoloCategory] = useState<CategoryId | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
     const obs = new ResizeObserver((entries) => {
-      const { width } = entries[0].contentRect;
-      setCloudSize({ width, height: Math.max(280, Math.min(width * 0.55, 480)) });
+      setContainerWidth(entries[0].contentRect.width);
     });
     obs.observe(containerRef.current);
     return () => obs.disconnect();
   }, []);
 
   useEffect(() => {
-    if (!result || cloudSize.width === 0) return;
+    if (!result) return;
 
     const clusters = result.clusters;
     const maxCount = Math.max(...clusters.map((c) => c.participant_count));
     const minCount = Math.min(...clusters.map((c) => c.participant_count));
     const range = maxCount - minCount || 1;
 
-    const minFont = Math.max(14, Math.min(18, cloudSize.width / 50));
-    const maxFont = Math.max(28, Math.min(56, cloudSize.width / 14));
-
-    const words = clusters.map((c, i) => {
-      const t = (c.participant_count - minCount) / range;
-      return {
-        text: c.label,
-        size: minFont + t * (maxFont - minFont),
-        clusterIndex: i,
-        category: detectCategory(c.label),
-      };
-    });
+    const words = clusters
+      .map((c, i) => {
+        const t = (c.participant_count - minCount) / range;
+        return {
+          text: c.label,
+          size: 16 + t * 40,
+          clusterIndex: i,
+          category: detectCategory(c.label),
+        };
+      })
+      .sort((a, b) => b.size - a.size);
 
     let cancelled = false;
 
-    type CloudInputWord = (typeof words)[0] & { x?: number; y?: number; rotate?: number };
+    type CloudWord = (typeof words)[0] & { x?: number; y?: number; rotate?: number };
 
     import('d3-cloud').then(({ default: cloudLayout }) => {
       if (cancelled) return;
 
-      cloudLayout<CloudInputWord>()
-        .size([cloudSize.width, cloudSize.height])
-        .words(words.map((w) => ({ ...w })) as CloudInputWord[])
-        .padding(8)
+      cloudLayout<CloudWord>()
+        .size([CANONICAL_W, CANONICAL_H])
+        .words(words.map((w) => ({ ...w })) as CloudWord[])
+        .padding(6)
         .rotate(0)
         .font('system-ui, -apple-system, sans-serif')
         .fontSize((d) => d.size!)
         .spiral('archimedean')
+        .random(() => 0.5)
         .on('end', (output) => {
           if (cancelled) return;
-          setLayoutWords(
-            output
-              .filter((w) => w.x !== undefined && w.y !== undefined)
-              .map((w) => ({
-                text: w.text!,
-                size: w.size!,
-                x: w.x!,
-                y: w.y!,
-                clusterIndex: w.clusterIndex,
-                category: w.category,
-              }))
-          );
+          const placed = output
+            .filter((w) => w.x !== undefined && w.y !== undefined)
+            .map((w) => ({
+              text: w.text!,
+              size: w.size!,
+              x: w.x!,
+              y: w.y!,
+              clusterIndex: w.clusterIndex,
+              category: w.category,
+              readabilityColor: 0,
+            }));
+
+          const rColors = computeReadabilityColors(placed);
+          placed.forEach((w, i) => { w.readabilityColor = rColors[i]; });
+
+          setLayoutWords(placed);
         })
         .start();
     });
 
     return () => { cancelled = true; };
-  }, [result, cloudSize]);
+  }, [result]);
 
   const activeCategories = useMemo(() => {
     const catSet = new Set(layoutWords.map((w) => w.category));
-    const cats = WORD_CLOUD_CATEGORIES.filter((c) => catSet.has(c.id));
-    if (catSet.has('other')) cats.push(OTHER_CATEGORY);
-    return cats;
+    return CATEGORY_DEFS.filter((c) => catSet.has(c.id));
   }, [layoutWords]);
+
+  const handleLegendClick = (catId: CategoryId) => {
+    setSoloCategory((prev) => (prev === catId ? null : catId));
+  };
 
   if (analyzing) {
     return (
@@ -589,33 +635,103 @@ function WordCloudView({
   }
 
   const clusters = result.clusters;
+  const scale = containerWidth > 0 ? containerWidth / CANONICAL_W : 1;
+  const displayHeight = CANONICAL_H * scale;
+
+  function getWordColor(word: LayoutWord): string {
+    if (colorMode === 'category') {
+      return CATEGORY_DEFS.find((c) => c.id === word.category)?.color ?? CATEGORY_DEFS[5].color;
+    }
+    return READABILITY_PALETTE[word.readabilityColor] ?? READABILITY_PALETTE[0];
+  }
+
+  function isWordVisible(word: LayoutWord): boolean {
+    if (colorMode !== 'category' || soloCategory === null) return true;
+    return word.category === soloCategory;
+  }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      {/* Toggle */}
+      <div className="flex items-center justify-between">
+        <div className="inline-flex rounded-lg border border-border bg-muted/50 p-0.5">
+          {([
+            { id: 'category' as ColorMode, label: 'Par type' },
+            { id: 'readability' as ColorMode, label: 'Lisibilité' },
+          ]).map((mode) => (
+            <button
+              key={mode.id}
+              onClick={() => { setColorMode(mode.id); setSoloCategory(null); }}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                colorMode === mode.id
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {mode.label}
+            </button>
+          ))}
+        </div>
+
+        {colorMode === 'category' && activeCategories.length > 1 && (
+          <div className="flex flex-wrap items-center gap-x-1 gap-y-1">
+            {activeCategories.map((cat) => {
+              const isActive = soloCategory === null || soloCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => handleLegendClick(cat.id)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
+                    soloCategory === cat.id
+                      ? 'border-foreground/20 bg-foreground/5 text-foreground'
+                      : soloCategory === null
+                        ? 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                        : 'border-transparent text-muted-foreground/40 hover:text-muted-foreground hover:bg-muted/30'
+                  }`}
+                >
+                  <span
+                    className="w-2 h-2 rounded-full flex-shrink-0 transition-opacity"
+                    style={{
+                      backgroundColor: cat.color,
+                      opacity: isActive ? 1 : 0.3,
+                    }}
+                  />
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Cloud */}
       <div
         ref={containerRef}
         className="bg-card rounded-2xl border border-border relative overflow-visible"
-        style={{ height: `${cloudSize.height || 400}px` }}
+        style={{ height: `${displayHeight || 400}px` }}
         onClick={() => setActiveIndex(null)}
       >
         {layoutWords.map((word) => {
           const cluster = clusters[word.clusterIndex];
           const isActive = activeIndex === word.clusterIndex;
           const isDimmed = activeIndex !== null && !isActive;
+          const visible = isWordVisible(word);
 
           return (
             <div
               key={word.clusterIndex}
               className="absolute"
               style={{
-                left: `${cloudSize.width / 2 + word.x}px`,
-                top: `${cloudSize.height / 2 + word.y}px`,
+                left: `${(CANONICAL_W / 2 + word.x) * scale}px`,
+                top: `${(CANONICAL_H / 2 + word.y) * scale}px`,
                 transform: 'translate(-50%, -50%)',
+                pointerEvents: visible ? 'auto' : 'none',
               }}
-              onMouseEnter={() => setActiveIndex(word.clusterIndex)}
+              onMouseEnter={() => visible && setActiveIndex(word.clusterIndex)}
               onMouseLeave={() => setActiveIndex(null)}
               onClick={(e) => {
                 e.stopPropagation();
+                if (!visible) return;
                 setActiveIndex((prev) =>
                   prev === word.clusterIndex ? null : word.clusterIndex
                 );
@@ -624,10 +740,10 @@ function WordCloudView({
               <span
                 className="cursor-pointer inline-block select-none whitespace-nowrap"
                 style={{
-                  fontSize: `${word.size}px`,
+                  fontSize: `${word.size * scale}px`,
                   fontWeight: word.size > 36 ? 800 : word.size > 24 ? 700 : 600,
-                  color: getCategoryColor(word.category),
-                  opacity: isDimmed ? 0.15 : 0.9,
+                  color: getWordColor(word),
+                  opacity: !visible ? 0.06 : isDimmed ? 0.15 : 0.9,
                   transform: `scale(${isActive ? 1.08 : 1})`,
                   transition: 'opacity 0.3s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   lineHeight: 1,
@@ -636,7 +752,7 @@ function WordCloudView({
                 {word.text}
               </span>
 
-              {isActive && cluster && (
+              {isActive && cluster && visible && (
                 <div
                   className="absolute z-50 w-72 bg-card rounded-xl border border-border shadow-xl"
                   style={{
@@ -717,20 +833,6 @@ function WordCloudView({
           );
         })}
       </div>
-
-      {activeCategories.length > 1 && (
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
-          {activeCategories.map((cat) => (
-            <div key={cat.id} className="flex items-center gap-1.5">
-              <span
-                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ backgroundColor: cat.color }}
-              />
-              {cat.label}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
