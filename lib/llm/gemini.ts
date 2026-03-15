@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import type { LLMClient } from './types';
 
 export function createGeminiClient(): LLMClient {
@@ -7,14 +7,20 @@ export function createGeminiClient(): LLMClient {
     throw new Error('GOOGLE_GEMINI_API_KEY is not set');
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const ai = new GoogleGenAI({ apiKey });
 
   return {
     async analyze(prompt: string): Promise<string> {
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      return text;
+      const result = await ai.models.generateContent({
+        model: 'gemini-3.1-flash-lite-preview',
+        contents: prompt,
+        config: {
+          temperature: 0,
+          seed: 42,
+          responseMimeType: 'application/json',
+        },
+      });
+      return result.text ?? '';
     },
   };
 }

@@ -47,6 +47,6 @@ export interface WorkshopAnalysis {
 export type LLMProvider = 'gemini' | 'mistral';
 
 export const LLM_MODELS: Record<LLMProvider, { label: string; model: string }> = {
-  gemini: { label: 'Gemini 2.0 Flash', model: 'gemini-2.0-flash' },
+  gemini: { label: 'Gemini 3.1 Flash Lite Preview', model: 'gemini-3.1-flash-lite-preview' },
   mistral: { label: 'Mistral Small', model: 'mistral-small-latest' },
 };

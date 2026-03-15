@@ -19,7 +19,7 @@ export function createMistralClient(): LLMClient {
         body: JSON.stringify({
           model: 'mistral-small-latest',
           messages: [{ role: 'user', content: prompt }],
-          temperature: 0.1,
+          temperature: 0,
           response_format: { type: 'json_object' },
         }),
       });
