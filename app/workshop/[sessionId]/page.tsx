@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { Header } from '@/components/layout/header';
@@ -16,7 +16,7 @@ import type {
 } from '@/types/workshop';
 import { LLM_MODELS } from '@/types/workshop';
 
-type Tab = 'clusters' | 'raw';
+type Tab = 'clusters' | 'wordcloud' | 'raw';
 
 export default function SessionView() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -28,7 +28,7 @@ export default function SessionView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<Tab>('clusters');
+  const [activeTab, setActiveTab] = useState<Tab>('wordcloud');
   const [analyzing, setAnalyzing] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<LLMProvider>('gemini');
   const [showQR, setShowQR] = useState(true);
@@ -117,7 +117,7 @@ export default function SessionView() {
 
       const data = await res.json();
       setAnalysis(data.analysis ?? { clusters: data.result });
-      setActiveTab('clusters');
+      setActiveTab('wordcloud');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Analysis failed');
     } finally {
@@ -306,6 +306,7 @@ export default function SessionView() {
           <div className="border-b border-border">
             <nav className="flex gap-1">
               {[
+                { id: 'wordcloud' as Tab, label: 'Nuage de mots' },
                 { id: 'clusters' as Tab, label: 'Clusters' },
                 { id: 'raw' as Tab, label: 'Données brutes' },
               ].map((tab) => (
@@ -327,6 +328,14 @@ export default function SessionView() {
           {/* Tab content */}
           {activeTab === 'clusters' && (
             <ClustersView
+              result={analysisResult}
+              analyzing={analyzing}
+              responseCount={responses.length}
+            />
+          )}
+
+          {activeTab === 'wordcloud' && (
+            <WordCloudView
               result={analysisResult}
               analyzing={analyzing}
               responseCount={responses.length}
@@ -402,6 +411,326 @@ function ClustersView({
       {result.clusters.map((cluster: Cluster, idx: number) => (
         <ClusterCard key={idx} cluster={cluster} index={idx} />
       ))}
+    </div>
+  );
+}
+
+type CategoryId = 'problem' | 'need' | 'idea' | 'question' | 'strength' | 'other';
+
+const WORD_CLOUD_CATEGORIES: { id: CategoryId; label: string; color: string; pattern?: RegExp }[] = [
+  {
+    id: 'problem',
+    label: 'Problèmes',
+    color: 'oklch(0.6 0.22 25)',
+    pattern: /problème|difficulté|obstacle|frein|blocage|risque|danger|menace|faiblesse|limite|contrainte|défi|challenge|pain|problem|souci|complex|insuffisan|inadapt|frustrat|tension|conflit/i,
+  },
+  {
+    id: 'need',
+    label: 'Besoins',
+    color: 'oklch(0.6 0.19 250)',
+    pattern: /besoin|nécessité|attente|demande|exigence|manque|priorité|need|requirement|indispensable|essentiel|fondamental|accès|accompagnement|ressource|support|formation/i,
+  },
+  {
+    id: 'idea',
+    label: 'Améliorations',
+    color: 'oklch(0.62 0.19 150)',
+    pattern: /amélioration|idée|suggestion|proposition|innovation|solution|opportunité|piste|recommandation|optimisation|evolution|idea|improvement|créat|développ|mise en place|renforcement|modernis/i,
+  },
+  {
+    id: 'question',
+    label: 'Questionnements',
+    color: 'oklch(0.7 0.17 65)',
+    pattern: /question|interrogation|incertitude|doute|clarification|compréhension|inquiry|pourquoi|comment|\?|réflexion|préoccupation/i,
+  },
+  {
+    id: 'strength',
+    label: 'Points forts',
+    color: 'oklch(0.6 0.2 290)',
+    pattern: /force|atout|avantage|succès|réussite|satisfaction|point fort|strength|positive|qualité|bénéfice|apprécié|efficac|fierté|motivation/i,
+  },
+];
+
+const OTHER_CATEGORY: { id: CategoryId; label: string; color: string; pattern?: RegExp } = {
+  id: 'other',
+  label: 'Autre',
+  color: 'oklch(0.6 0.12 230)',
+};
+
+function detectCategory(label: string): CategoryId {
+  for (const cat of WORD_CLOUD_CATEGORIES) {
+    if (cat.pattern?.test(label)) return cat.id;
+  }
+  return 'other';
+}
+
+function getCategoryColor(catId: CategoryId): string {
+  return WORD_CLOUD_CATEGORIES.find((c) => c.id === catId)?.color ?? OTHER_CATEGORY.color;
+}
+
+interface LayoutWord {
+  text: string;
+  size: number;
+  x: number;
+  y: number;
+  clusterIndex: number;
+  category: CategoryId;
+}
+
+function WordCloudView({
+  result,
+  analyzing,
+  responseCount,
+}: {
+  result: AnalysisResult | null;
+  analyzing: boolean;
+  responseCount: number;
+}) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [layoutWords, setLayoutWords] = useState<LayoutWord[]>([]);
+  const [cloudSize, setCloudSize] = useState({ width: 0, height: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const obs = new ResizeObserver((entries) => {
+      const { width } = entries[0].contentRect;
+      setCloudSize({ width, height: Math.max(280, Math.min(width * 0.55, 480)) });
+    });
+    obs.observe(containerRef.current);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!result || cloudSize.width === 0) return;
+
+    const clusters = result.clusters;
+    const maxCount = Math.max(...clusters.map((c) => c.participant_count));
+    const minCount = Math.min(...clusters.map((c) => c.participant_count));
+    const range = maxCount - minCount || 1;
+
+    const minFont = Math.max(14, Math.min(18, cloudSize.width / 50));
+    const maxFont = Math.max(28, Math.min(56, cloudSize.width / 14));
+
+    const words = clusters.map((c, i) => {
+      const t = (c.participant_count - minCount) / range;
+      return {
+        text: c.label,
+        size: minFont + t * (maxFont - minFont),
+        clusterIndex: i,
+        category: detectCategory(c.label),
+      };
+    });
+
+    let cancelled = false;
+
+    type CloudInputWord = (typeof words)[0] & { x?: number; y?: number; rotate?: number };
+
+    import('d3-cloud').then(({ default: cloudLayout }) => {
+      if (cancelled) return;
+
+      cloudLayout<CloudInputWord>()
+        .size([cloudSize.width, cloudSize.height])
+        .words(words.map((w) => ({ ...w })) as CloudInputWord[])
+        .padding(8)
+        .rotate(0)
+        .font('system-ui, -apple-system, sans-serif')
+        .fontSize((d) => d.size!)
+        .spiral('archimedean')
+        .on('end', (output) => {
+          if (cancelled) return;
+          setLayoutWords(
+            output
+              .filter((w) => w.x !== undefined && w.y !== undefined)
+              .map((w) => ({
+                text: w.text!,
+                size: w.size!,
+                x: w.x!,
+                y: w.y!,
+                clusterIndex: w.clusterIndex,
+                category: w.category,
+              }))
+          );
+        })
+        .start();
+    });
+
+    return () => { cancelled = true; };
+  }, [result, cloudSize]);
+
+  const activeCategories = useMemo(() => {
+    const catSet = new Set(layoutWords.map((w) => w.category));
+    const cats = WORD_CLOUD_CATEGORIES.filter((c) => catSet.has(c.id));
+    if (catSet.has('other')) cats.push(OTHER_CATEGORY);
+    return cats;
+  }, [layoutWords]);
+
+  if (analyzing) {
+    return (
+      <div className="text-center py-16 space-y-4">
+        <div className="animate-spin h-10 w-10 border-3 border-primary border-t-transparent rounded-full mx-auto" />
+        <p className="text-muted-foreground">
+          Analyse de {responseCount} réponse{responseCount > 1 ? 's' : ''} en
+          cours...
+        </p>
+      </div>
+    );
+  }
+
+  if (!result) {
+    return (
+      <div className="text-center py-16 text-muted-foreground">
+        <p>
+          {responseCount === 0
+            ? 'En attente de réponses des participants...'
+            : `${responseCount} réponse${responseCount > 1 ? 's' : ''} reçue${responseCount > 1 ? 's' : ''}. Cliquez sur "Analyser les réponses" pour générer les clusters.`}
+        </p>
+      </div>
+    );
+  }
+
+  const clusters = result.clusters;
+
+  return (
+    <div className="space-y-4">
+      <div
+        ref={containerRef}
+        className="bg-card rounded-2xl border border-border relative overflow-visible"
+        style={{ height: `${cloudSize.height || 400}px` }}
+        onClick={() => setActiveIndex(null)}
+      >
+        {layoutWords.map((word) => {
+          const cluster = clusters[word.clusterIndex];
+          const isActive = activeIndex === word.clusterIndex;
+          const isDimmed = activeIndex !== null && !isActive;
+
+          return (
+            <div
+              key={word.clusterIndex}
+              className="absolute"
+              style={{
+                left: `${cloudSize.width / 2 + word.x}px`,
+                top: `${cloudSize.height / 2 + word.y}px`,
+                transform: 'translate(-50%, -50%)',
+              }}
+              onMouseEnter={() => setActiveIndex(word.clusterIndex)}
+              onMouseLeave={() => setActiveIndex(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveIndex((prev) =>
+                  prev === word.clusterIndex ? null : word.clusterIndex
+                );
+              }}
+            >
+              <span
+                className="cursor-pointer inline-block select-none whitespace-nowrap"
+                style={{
+                  fontSize: `${word.size}px`,
+                  fontWeight: word.size > 36 ? 800 : word.size > 24 ? 700 : 600,
+                  color: getCategoryColor(word.category),
+                  opacity: isDimmed ? 0.15 : 0.9,
+                  transform: `scale(${isActive ? 1.08 : 1})`,
+                  transition: 'opacity 0.3s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  lineHeight: 1,
+                }}
+              >
+                {word.text}
+              </span>
+
+              {isActive && cluster && (
+                <div
+                  className="absolute z-50 w-72 bg-card rounded-xl border border-border shadow-xl"
+                  style={{
+                    bottom: '100%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    marginBottom: '14px',
+                    padding: '16px',
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div
+                    className="absolute w-3 h-3 bg-card border-b border-r border-border"
+                    style={{
+                      bottom: '-7px',
+                      left: '50%',
+                      transform: 'translateX(-50%) rotate(45deg)',
+                    }}
+                  />
+
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center">
+                      {cluster.participant_count}
+                    </span>
+                    <h3 className="font-semibold text-foreground text-sm truncate">
+                      {cluster.label}
+                    </h3>
+                  </div>
+
+                  <p
+                    className="text-xs text-muted-foreground leading-relaxed mb-3"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {cluster.summary}
+                  </p>
+
+                  <div className="space-y-1.5">
+                    <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Extraits ({cluster.excerpts.length})
+                    </h4>
+                    {cluster.excerpts.slice(0, 3).map((excerpt, i) => (
+                      <div
+                        key={i}
+                        className="bg-muted/50 rounded-md px-3 py-2 text-xs"
+                      >
+                        <span className="font-medium text-foreground">
+                          {excerpt.participant_name}
+                        </span>
+                        <span className="text-muted-foreground"> : </span>
+                        <span
+                          className="text-foreground/80 italic"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          &quot;{excerpt.excerpt}&quot;
+                        </span>
+                      </div>
+                    ))}
+                    {cluster.excerpts.length > 3 && (
+                      <p className="text-xs text-muted-foreground text-center pt-1">
+                        +{cluster.excerpts.length - 3} extrait
+                        {cluster.excerpts.length - 3 > 1 ? 's' : ''}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {activeCategories.length > 1 && (
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+          {activeCategories.map((cat) => (
+            <div key={cat.id} className="flex items-center gap-1.5">
+              <span
+                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: cat.color }}
+              />
+              {cat.label}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
