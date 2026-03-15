@@ -17,6 +17,316 @@ import type {
 import { LLM_MODELS } from '@/types/workshop';
 
 type Tab = 'clusters' | 'wordcloud' | 'raw';
+type TestPreset = '' | '20' | '40' | '60' | '80' | '100';
+
+const FIRST_NAMES = [
+  'Alice', 'Bruno', 'Claire', 'David', 'Emma', 'François', 'Géraldine', 'Hugo',
+  'Isabelle', 'Julien', 'Karine', 'Léo', 'Marie', 'Nicolas', 'Ophélie', 'Pierre',
+  'Quentin', 'Roxane', 'Sébastien', 'Théo', 'Ursula', 'Vincent', 'Wendy', 'Xavier',
+  'Yasmine', 'Zoé', 'Antoine', 'Béatrice', 'Cédric', 'Delphine', 'Éric', 'Fatima',
+  'Guillaume', 'Hélène', 'Ivan', 'Jade', 'Kevin', 'Laure', 'Maxime', 'Nadia',
+  'Olivier', 'Pauline', 'Raphaël', 'Sophie', 'Thomas', 'Valérie', 'William', 'Yannick',
+  'Aurélie', 'Baptiste', 'Camille', 'Damien', 'Élise', 'Fabien', 'Gaëlle', 'Hervé',
+  'Inès', 'Joël', 'Katia', 'Lucas', 'Margaux', 'Nathan', 'Océane', 'Patrick',
+  'Rémi', 'Sarah', 'Tristan', 'Ugo', 'Virginie', 'Wanda', 'Yves', 'Zara',
+  'Adrien', 'Brigitte', 'Charles', 'Diane', 'Étienne', 'Flore', 'Gaspard', 'Hannah',
+  'Irène', 'Jacques', 'Lena', 'Marius', 'Noémie', 'Oscar', 'Priscilla', 'Roland',
+  'Sylvie', 'Thibaut', 'Ursule', 'Véronique', 'Wilfried', 'Ximena', 'Yolande', 'Zacharie',
+  'Arnaud', 'Blanche', 'Clément', 'Dorothée',
+];
+
+interface ClusterTemplate {
+  label: string;
+  summary: string;
+  responses: string[];
+}
+
+// Distribution Zipf inversée : 16, 14, 12, 10, 9, 8, 7, 6, 5, 4, 3, 3, 2, 1 = 100
+const ZIPF_DISTRIBUTION = [16, 14, 12, 10, 9, 8, 7, 6, 5, 4, 3, 3, 2, 1];
+
+const CLUSTER_TEMPLATES: ClusterTemplate[] = [
+  {
+    label: 'Problème de communication interne',
+    summary: 'Les participants soulignent un manque de communication entre les équipes, entraînant des doublons, des malentendus et une perte de temps considérable au quotidien.',
+    responses: [
+      "On ne sait jamais ce que font les autres équipes. J'ai déjà passé deux semaines sur un livrable pour découvrir qu'une autre équipe avait fait exactement la même chose en parallèle. C'est frustrant et c'est un gaspillage de ressources énorme.",
+      "Les informations se perdent entre les services, il n'y a pas de canal centralisé. On jongle entre les mails, Teams, le chat interne et les Post-it. Résultat : personne n'a la même version de l'info.",
+      "Je trouve que les réunions hebdo ne suffisent pas pour avoir une vraie visibilité. On a besoin d'outils de communication asynchrone qui permettent de suivre les avancées sans multiplier les réunions.",
+      "Les décisions sont prises sans consulter les personnes concernées.\nOn l'apprend par un mail collectif après coup et on doit s'adapter dans l'urgence.",
+      "Le manque de transparence crée de la frustration au quotidien. J'ai l'impression qu'il y a deux mondes : ceux qui savent et ceux qui subissent les décisions.\nÇa nuit clairement à l'engagement.",
+      "Ce qui me pose le plus problème, c'est qu'on n'a pas de source de vérité unique.\nChaque équipe a ses propres fichiers, ses propres process, et quand il faut collaborer c'est un vrai casse-tête.\nIl faudrait un wiki interne à jour.",
+      "J'ai rejoint l'équipe il y a 6 mois et j'ai mis des semaines à comprendre qui fait quoi. L'organigramme n'est pas à jour, les rôles ne sont pas clairs. Un onboarding plus structuré avec une cartographie des compétences serait un vrai plus.",
+      "La communication descendante existe, mais la communication montante est quasi inexistante.\nQuand on remonte des problèmes terrain, on a rarement un retour. Ça donne l'impression que nos feedbacks partent dans le vide.",
+      "Entre les sites de Paris et Lyon, la communication est catastrophique. On découvre des projets en cours par hasard.\nIl faudrait des points inter-sites réguliers, même courts.",
+      "On perd un temps fou à chercher la bonne information. Est-ce dans le mail de lundi ? Dans le compte-rendu de réunion ? Sur le drive partagé ?\nPersonne ne sait. Un outil de gestion de connaissances centralisé nous ferait gagner des heures chaque semaine.",
+      "Le problème c'est que chaque manager a sa propre façon de communiquer.\nCertains envoient des mails détaillés, d'autres ne disent rien.\nIl faudrait un standard de communication minimum.",
+      "J'apprécie les efforts récents avec la newsletter interne, mais ça ne suffit pas pour le quotidien opérationnel. On a besoin de transparence sur les décisions projet en temps réel.",
+      "Les informations critiques arrivent souvent trop tard. La dernière fois, on a appris le changement de deadline 48h avant l'échéance.\nC'est ingérable pour organiser le travail de l'équipe.",
+      "Quand il y a un incident en production, chaque équipe gère dans son coin.\nOn n'a pas de canal de crise transversal.\nLa dernière panne a duré 4h de plus que nécessaire à cause de ça.",
+      "Ce qui manque vraiment c'est un rituel de partage inter-équipes.\nPas une grande messe formelle, mais des démos courtes, informelles, pour voir ce que font les autres et créer des synergies.",
+      "La communication avec les prestataires externes est aussi un sujet. Ils n'ont pas accès aux mêmes outils que nous et l'information se perd dans des allers-retours de mails interminables.",
+    ],
+  },
+  {
+    label: 'Besoin de formation continue',
+    summary: 'Un besoin fort de montée en compétences est exprimé, notamment sur les nouveaux outils, les méthodes agiles et les compétences transversales nécessaires pour évoluer.',
+    responses: [
+      "J'aimerais avoir accès à plus de formations sur les outils qu'on utilise au quotidien.\nOn a déployé un nouveau CRM il y a 3 mois et je n'ai eu que 30 minutes de démo.\nJe n'utilise probablement que 20% des fonctionnalités.",
+      "On nous demande d'utiliser de nouveaux logiciels sans formation préalable.\nLe résultat c'est qu'on perd du temps à bidouiller au lieu d'être efficaces.\nUn parcours de formation structuré pour chaque outil serait un minimum.",
+      "La formation initiale à l'arrivée est correcte, mais ensuite il n'y a rien.\nLes métiers évoluent vite, et après 2-3 ans on se retrouve avec des compétences qui ne sont plus à jour.\nIl faudrait un plan de développement continu.",
+      "Il faudrait un budget formation individuel pour se perfectionner sur les sujets qui nous intéressent.\nD'autres entreprises proposent 1000-1500€ par an de budget personnel, c'est un vrai levier de motivation et de fidélisation.",
+      "Les webinaires internes sont utiles mais pas assez fréquents. On en a un par trimestre alors qu'il faudrait au moins un par mois.\nEt il faudrait varier les sujets : soft skills, technique, management, pas juste des présentations produit.",
+      "J'aimerais beaucoup qu'on mette en place des « learning hours » hebdomadaires.\nUne heure dédiée où chacun peut se former, regarder un cours en ligne, lire un article technique.\nChez mon ancien employeur ça marchait très bien.",
+      "Le problème c'est qu'on n'a pas le temps de se former.\nLa charge de travail est telle qu'on repousse toujours.\nLa formation devrait être planifiée et sanctuarisée dans l'agenda, pas optionnelle.",
+      "Les compétences data et IA deviennent incontournables dans notre métier.\nMais personne n'a été formé.\nOn regarde les autres entreprises se transformer pendant qu'on reste sur nos acquis.",
+      "Je souhaiterais des formations certifiantes qui puissent être valorisées.\nPas juste des présentations internes, mais de vrais parcours reconnus qui motivent les collaborateurs à investir du temps.",
+      "L'apprentissage entre pairs est sous-exploité chez nous.\nOn a des experts dans plein de domaines mais on ne partage pas assez.\nDes sessions de type « lunch & learn » ou « brown bag sessions » seraient géniales.",
+      "Pour les managers, il n'y a quasiment aucune formation au management.\nOn promeut des experts techniques à des postes de managers sans les accompagner.\nRésultat : ils sont malheureux et leurs équipes aussi.",
+      "J'ai demandé une formation il y a 8 mois. Elle a été validée par mon manager puis refusée par les RH pour raison budgétaire.\nLe processus est trop opaque et décourageant.",
+      "Il faudrait une plateforme e-learning accessible à tous, avec du contenu de qualité.\nType LinkedIn Learning ou Coursera.\nC'est un investissement mais le ROI en compétences est immense.",
+      "Les nouvelles méthodes de travail (Design Thinking, Lean, OKR) ne sont connues que par quelques personnes.\nSi on veut vraiment les adopter, il faut former massivement, pas juste envoyer un PDF.",
+    ],
+  },
+  {
+    label: 'Amélioration des outils numériques',
+    summary: 'Les outils actuels sont jugés obsolètes ou inadaptés aux usages modernes. Des suggestions concrètes de modernisation sont proposées avec un vrai sentiment d\'urgence.',
+    responses: [
+      "Notre CRM est lent et ne correspond plus à nos besoins actuels.\nIl plante régulièrement, l'interface date des années 2010, et il nous manque des fonctionnalités basiques comme le suivi des interactions multicanal.\nIl est temps de migrer.",
+      "Il faudrait moderniser notre intranet, personne ne l'utilise.\nLa dernière mise à jour date de 2019.\nQuand je cherche un document, c'est plus rapide de demander à un collègue que de naviguer dans l'arborescence.",
+      "Pourquoi ne pas adopter des outils collaboratifs modernes comme Notion, Slack ou Figma ?\nOn utilise encore des fichiers Word partagés par mail pour collaborer.\nEn 2026, c'est aberrant.",
+      "Les outils de reporting sont trop complexes pour un usage quotidien.\nChaque rapport nécessite 3h de manipulation Excel.\nUn outil de BI en self-service avec des dashboards pré-configurés changerait tout.",
+      "On devrait automatiser les tâches répétitives avec des workflows.\nJe passe 2h par jour sur des tâches administratives qui pourraient être automatisées :\nrelances, saisie de données, génération de rapports standards.",
+      "L'accès VPN est instable, ce qui rend le télétravail pénible.\nJe perds la connexion au moins 3 fois par jour.\nIl existe des solutions zero-trust plus modernes et plus fiables.",
+      "On a trop d'outils qui font la même chose.\nEntre l'outil officiel et les solutions adoptées par chaque équipe, on a 4 outils de gestion de tâches différents.\nIl faudrait rationaliser et choisir un seul outil pour chaque usage.",
+      "Notre outil de ticketing est une catastrophe UX.\nLes développeurs passent plus de temps à remplir les tickets qu'à coder.\nOn devrait migrer vers Jira ou Linear, quelque chose de moderne et rapide.",
+      "L'app mobile interne n'est pas responsive et certaines fonctionnalités ne marchent tout simplement pas sur téléphone.\nQuand on est en déplacement, c'est très handicapant.",
+      "Le stockage de fichiers est éclaté entre le NAS, SharePoint, Google Drive et des clés USB.\nOn ne retrouve plus rien.\nUne politique claire de stockage avec un seul outil serait salvatrice.",
+      "Les performances de notre ERP sont inacceptables.\nCharger une facture prend 15 secondes.\nMultiplié par 200 factures par jour, ça fait presque une heure perdue.",
+      "On n'a pas d'outil de signature électronique officiel.\nOn imprime, on signe, on scanne, on envoie par mail.\nC'est archaïque et ça ralentit tous les processus contractuels.",
+    ],
+  },
+  {
+    label: 'Questionnement sur la stratégie',
+    summary: 'Des interrogations profondes sur la direction stratégique de l\'organisation, le manque de vision claire et le besoin de cohérence entre le discours et les actions.',
+    responses: [
+      "Où va-t-on exactement ? La vision à 3 ans n'est pas claire.\nOn entend parler de transformation digitale, d'internationalisation, d'innovation, mais concrètement quelles sont les priorités ?\nJ'aimerais comprendre comment mon travail s'inscrit dans cette vision.",
+      "Comment notre travail au quotidien s'inscrit dans la stratégie globale ?\nOn fait des projets, on livre, mais on ne sait pas si c'est aligné avec les objectifs de l'entreprise.\nUn lien plus explicite entre stratégie et opérations serait motivant.",
+      "Les priorités changent trop souvent, c'est déstabilisant.\nEn 6 mois, on a eu 3 réorganisations et 2 changements de cap.\nLes équipes ont besoin de stabilité pour être performantes.",
+      "J'aimerais comprendre pourquoi certains projets sont abandonnés du jour au lendemain alors qu'on y a investi des mois de travail.\nUn minimum d'explication serait respectueux envers les équipes qui se sont investies.",
+      "La stratégie devrait être co-construite avec les collaborateurs.\nOn a une expertise terrain que la direction n'a pas.\nDes ateliers de co-construction stratégique créeraient de l'adhésion et de meilleures décisions.",
+      "On parle beaucoup d'innovation mais on ne nous donne pas les moyens d'innover.\nPas de budget R&D, pas de temps dédié, pas de droit à l'erreur.\nL'innovation ne se décrète pas, elle se cultive.",
+      "Le décalage entre le discours managérial (agilité, autonomie, confiance) et la réalité (process lourds, validations multiples, contrôle) est flagrant.\nIl faudrait aligner les actes avec les paroles.",
+      "Je me demande quelle est notre position face à la concurrence.\nOn ne nous partage jamais d'analyse concurrentielle.\nComprendre notre positionnement nous aiderait à mieux défendre notre offre.",
+      "L'absence de communication sur les résultats financiers crée de l'inquiétude.\nOn entend des rumeurs de restructuration sans avoir aucun élément factuel.\nLa transparence réduirait l'anxiété collective.",
+      "Notre marché évolue très vite avec l'arrivée de nouveaux acteurs tech.\nQuelle est notre réponse ?\nJ'ai l'impression qu'on attend de voir plutôt que d'anticiper.",
+    ],
+  },
+  {
+    label: 'Satisfaction sur l\'ambiance d\'équipe',
+    summary: 'L\'ambiance de travail et la cohésion d\'équipe sont unanimement saluées comme un point fort majeur de l\'organisation, source de motivation quotidienne.',
+    responses: [
+      "L'ambiance dans l'équipe est vraiment top, c'est ce qui me fait rester.\nMême dans les périodes de rush, on garde le sourire et on s'entraide.\nC'est rare et précieux.",
+      "Je me sens bien au travail grâce à mes collègues bienveillants.\nIl y a un vrai respect mutuel et une écoute sincère.\nQuand j'ai traversé une période difficile personnellement, tout le monde a été là.",
+      "L'entraide est naturelle ici, c'est appréciable.\nQuand quelqu'un est en difficulté sur un sujet, il y a toujours un collègue pour proposer son aide sans qu'on ait besoin de demander.",
+      "Les événements d'équipe (afterworks, team buildings, petits-déjeuners) renforcent notre cohésion.\nCe n'est pas juste du « fun corporate », ça crée de vrais liens humains qui facilitent ensuite le travail au quotidien.",
+      "C'est une vraie force de pouvoir compter les uns sur les autres.\nDans mon équipe, personne ne laisse tomber un collègue.\nCe sentiment de sécurité psychologique est la base de notre performance.",
+      "L'intégration des nouveaux est exemplaire.\nQuand je suis arrivé, tout le monde a pris le temps de m'accueillir, de m'expliquer, de m'inclure dans les rituels.\nJe me suis senti chez moi dès la première semaine.",
+      "La diversité de profils dans l'équipe est une richesse.\nOn a des parcours très différents et c'est ça qui rend nos discussions riches et nos solutions créatives.",
+      "Mon manager fait un excellent travail pour maintenir l'ambiance.\nIl est à l'écoute, il désamorce les tensions rapidement, et il sait célébrer les petites victoires.\nUn bon manager ça change tout.",
+      "Même en télétravail, l'esprit d'équipe reste fort.\nOn a gardé nos rituels (café virtuel du matin, rétrospectives fun) et ça maintient le lien humain malgré la distance.",
+    ],
+  },
+  {
+    label: 'Difficulté de recrutement',
+    summary: 'Le processus de recrutement est perçu comme trop lent et inadapté, entraînant une surcharge chronique pour les équipes existantes et une perte de candidats qualifiés.',
+    responses: [
+      "On n'arrive pas à recruter assez vite, les postes restent vacants 4 à 6 mois en moyenne.\nPendant ce temps, l'équipe absorbe la charge, ce qui crée de l'épuisement et de la démotivation.\nC'est un cercle vicieux : plus on est épuisés, moins l'équipe est attractive.",
+      "La surcharge de travail due au sous-effectif impacte la qualité de ce qu'on livre.\nOn fait du mieux qu'on peut mais on rogne sur les tests, la documentation, le polissage.\nÀ terme ça crée de la dette technique et des problèmes clients.",
+      "Il faudrait revoir notre marque employeur pour attirer plus de candidats.\nNotre site carrières est austère, nos offres d'emploi sont des copier-coller génériques.\nLes talents vont là où l'entreprise fait envie.",
+      "Les processus de validation RH sont trop lents.\nEntre l'identification du besoin et la publication de l'offre, il se passe 6 semaines.\nDans le marché actuel, les bons profils ne restent pas disponibles aussi longtemps.",
+      "On perd des bons candidats à cause de nos délais de réponse.\nLa dernière fois, un excellent profil a signé ailleurs pendant qu'on attendait le retour du comité de validation.\nIl faut raccourcir le process à 2 semaines max.",
+      "Le programme de cooptation n'est pas assez incitatif.\nLa prime est trop faible et versée trop tard.\nSi on la doublait et qu'on la versait à la fin de la période d'essai, on aurait beaucoup plus de recommandations.",
+      "On devrait être présents dans les écoles et les meetups tech.\nNotre visibilité dans l'écosystème est quasi nulle.\nLes étudiants et jeunes diplômés ne nous connaissent pas.",
+      "Les fiches de poste sont trop exigeantes et découragent des candidats qui pourraient monter en compétences.\n« 5 ans d'expérience minimum en React, TypeScript, AWS et GraphQL »… sérieusement ?\nOn cherche des licornes au lieu de former des potentiels.",
+    ],
+  },
+  {
+    label: 'Idée de mentorat interne',
+    summary: 'Proposition de créer un programme de mentorat structuré pour accompagner les nouveaux, favoriser le transfert de compétences et créer du lien intergénérationnel.',
+    responses: [
+      "Un système de parrainage pour les nouveaux arrivants serait très utile.\nLes premiers mois sont déterminants et avoir un référent qui n'est pas le manager direct permettrait de poser des questions « bêtes » sans pression.",
+      "Les seniors ont énormément de connaissances à transmettre mais ça se perd.\nDes sessions de mentorat régulières, même 1h par mois, permettraient de capitaliser sur cette expertise avant les départs en retraite.",
+      "Le mentorat pourrait aussi aider à la mobilité interne.\nAujourd'hui on ne connaît pas les métiers des autres services.\nUn mentor d'un autre département ouvrirait des perspectives de carrière.",
+      "J'aurais aimé avoir un mentor quand je suis arrivé dans l'entreprise.\nJ'ai mis 6 mois à comprendre les codes, la culture, les réseaux informels.\nAvec un parrain, ça aurait pris 6 semaines.",
+      "Ça créerait du lien intergénérationnel dans l'entreprise.\nLes juniors apporteraient leur regard neuf et leur maîtrise du digital,\nles seniors leur expérience et leur réseau.\nGagnant-gagnant.",
+      "J'ai vu ça fonctionner dans mon ancienne boîte.\nLe programme de mentorat était structuré : matching basé sur les objectifs, points mensuels, évaluation semestrielle.\nÇa avait un vrai impact sur la rétention des talents.",
+      "Le mentorat inversé serait intéressant aussi.\nLes juniors pourraient former les seniors aux nouveaux outils digitaux.\nÇa valorise les jeunes et ça décloisonne les générations.",
+    ],
+  },
+  {
+    label: 'Manque de reconnaissance',
+    summary: 'Les efforts individuels et collectifs ne sont pas suffisamment reconnus. L\'impact sur la motivation et l\'engagement est significatif.',
+    responses: [
+      "On fait des efforts considérables mais on n'a jamais de retour positif.\nLa seule fois où on entend parler de nous, c'est quand il y a un problème.\nUn feedback positif de temps en temps ferait tellement de bien.",
+      "La reconnaissance ne passe pas que par le salaire, un simple merci sincère compte énormément.\nUn mail de félicitations de la direction après un projet réussi, une mention en réunion d'équipe...\nCes petits gestes ont un impact immense sur le moral.",
+      "Il faudrait célébrer davantage les succès d'équipe.\nOn enchaîne les projets sans jamais marquer le coup.\nUn pot, un mail de remerciement, une rétrospective positive... quelque chose pour reconnaître le travail accompli.",
+      "Les évaluations annuelles ne reflètent pas le travail réel fourni pendant l'année.\nEn 30 minutes, on ne peut pas couvrir 12 mois d'efforts.\nDes points trimestriels seraient plus justes et plus utiles.",
+      "Un système de reconnaissance entre pairs serait motivant.\nPouvoir dire publiquement « merci à Claire pour son aide sur le projet X » valorise et crée une culture positive.",
+      "J'ai porté un projet stratégique pendant 8 mois, livré dans les temps et sous le budget.\nPas un mot de remerciement.\nMon collègue dans une autre boîte a eu un bonus et une promotion pour moins que ça.\nÇa fait réfléchir.",
+    ],
+  },
+  {
+    label: 'Besoin de flexibilité horaire',
+    summary: 'Le télétravail et les horaires flexibles sont fortement demandés pour améliorer l\'équilibre vie professionnelle/vie personnelle et la productivité.',
+    responses: [
+      "Le télétravail devrait être étendu à 3 jours par semaine minimum.\nLes jours où je suis au bureau, je passe 2h dans les transports et je suis constamment interrompu.\nMes jours de télétravail sont mes jours les plus productifs.",
+      "Les horaires rigides (9h-18h obligatoire) ne correspondent plus aux modes de vie actuels.\nCertains sont plus efficaces tôt le matin, d'autres tard le soir.\nLa flexibilité c'est faire confiance aux adultes pour organiser leur temps.",
+      "La flexibilité permettrait de mieux gérer les contraintes familiales sans culpabiliser.\nPouvoir emmener ses enfants à l'école et commencer à 9h30, c'est pas la mer à boire.\nLe résultat compte plus que les heures de présence.",
+      "On est plus productif quand on peut organiser son temps librement, c'est prouvé par toutes les études.\nLe présentéisme est un fléau français.\nJugeons les résultats, pas les heures de chaise.",
+      "D'autres entreprises du secteur offrent beaucoup plus de souplesse et ça joue directement sur l'attractivité.\nJ'ai deux collègues qui sont partis cette année pour des boîtes full remote.\nSi on ne s'adapte pas, on va continuer à perdre des talents.",
+    ],
+  },
+  {
+    label: 'Préoccupation écologique',
+    summary: 'Une réflexion croissante sur l\'impact environnemental de l\'organisation et des propositions concrètes pour réduire l\'empreinte carbone.',
+    responses: [
+      "On devrait réduire drastiquement les déplacements professionnels en avion.\nLa moitié des voyages pourraient être remplacés par des visioconférences.\nC'est bon pour la planète ET pour le budget.",
+      "Pourquoi ne pas passer au zéro papier dans tous les services ?\nOn imprime encore des tonnes de documents qui finissent à la poubelle.\nAvec la signature électronique et les outils digitaux, c'est parfaitement faisable.",
+      "L'entreprise devrait publier son bilan carbone annuel et se fixer des objectifs de réduction ambitieux.\nLes jeunes générations en particulier sont sensibles à cet engagement.\nC'est aussi un argument commercial face aux clients qui ont des critères RSE.",
+      "Les fournisseurs devraient être sélectionnés aussi sur des critères écologiques et pas uniquement sur le prix.\nOn ne peut pas prôner la responsabilité environnementale et acheter au moins-disant sans regarder l'impact.",
+    ],
+  },
+  {
+    label: 'Force de l\'expertise technique',
+    summary: 'Le niveau d\'expertise technique des équipes est reconnu comme un avantage compétitif majeur, source de fierté et de différenciation sur le marché.',
+    responses: [
+      "Notre expertise technique est reconnue par nos clients, c'est une vraie fierté.\nLors du dernier audit, le client a souligné la qualité exceptionnelle de notre code et de notre architecture.\nC'est le fruit d'années d'investissement dans les compétences.",
+      "On a des profils très pointus qui font la différence sur les appels d'offres.\nNotre capacité à résoudre des problèmes complexes est ce qui nous distingue de la concurrence.\nIl faut continuer à investir dans ces expertises.",
+      "La qualité de nos livrables est un vrai atout concurrentiel.\nLes clients savent que quand c'est nous, c'est solide, bien pensé et maintenable.\nCette réputation se construit projet après projet.",
+    ],
+  },
+  {
+    label: 'Risque de burn-out',
+    summary: 'Plusieurs signaux d\'alerte sur la charge de travail excessive et ses conséquences sur la santé mentale et physique des collaborateurs.',
+    responses: [
+      "La charge de travail est devenue insoutenable depuis 6 mois.\nJe travaille régulièrement le soir et le week-end pour tenir les délais.\nMon médecin m'a dit que je montrais des signes d'épuisement professionnel.\nIl faut que ça change.",
+      "Je vois des collègues au bord de l'épuisement et personne ne réagit.\nLes arrêts maladie se multiplient dans l'équipe.\nQuand quelqu'un s'arrête, sa charge est répartie sur les autres et ça aggrave le problème.\nC'est un engrenage dangereux.",
+      "Les deadlines irréalistes génèrent un stress permanent qui mine le moral de toute l'équipe.\nOn nous demande de livrer en 2 semaines ce qui en nécessite 6.\nPuis on nous reproche la qualité insuffisante. C'est absurde.",
+    ],
+  },
+  {
+    label: 'Suggestion d\'espaces collaboratifs',
+    summary: 'Repenser les espaces de travail pour favoriser la collaboration, la créativité et le bien-être, tout en préservant des zones de concentration.',
+    responses: [
+      "On manque cruellement d'espaces pour brainstormer en petit groupe.\nLes seules options sont la grande salle de réunion (toujours réservée) ou le couloir.\nDes petits espaces modulables avec des tableaux blancs seraient parfaits.",
+      "Les salles de réunion sont systématiquement occupées.\nJ'ai essayé de réserver un créneau la semaine prochaine : tout est pris.\nIl en faut plus, ou il faut mieux gérer les réservations fantômes.",
+      "Un espace type lab d'innovation serait vraiment stimulant.\nUn lieu dédié à l'expérimentation, avec du matériel de prototypage, des écrans, des post-its géants.\nÇa donnerait un signal fort sur la culture d'innovation.",
+    ],
+  },
+  {
+    label: 'Interrogation sur l\'IA',
+    summary: 'Questions et attentes autour de l\'intégration de l\'intelligence artificielle dans les processus de travail, entre enthousiasme et inquiétude.',
+    responses: [
+      "Comment l'IA va-t-elle impacter nos métiers concrètement ?\nJ'entends des discours contradictoires : certains disent que ça va tout révolutionner, d'autres que c'est du hype.\nJ'aimerais une vision claire de la direction sur ce sujet.",
+    ],
+  },
+];
+
+function buildFullTestDataset(): {
+  responses: WorkshopResponse[];
+  analysis: AnalysisResult;
+} {
+  const responses: WorkshopResponse[] = [];
+  const clusters: Cluster[] = [];
+  let nameIdx = 0;
+
+  CLUSTER_TEMPLATES.forEach((tpl, ci) => {
+    const count = ZIPF_DISTRIBUTION[ci];
+    const excerpts: { participant_name: string; response_id: string; excerpt: string }[] = [];
+
+    for (let j = 0; j < count; j++) {
+      const name = FIRST_NAMES[nameIdx % FIRST_NAMES.length];
+      nameIdx++;
+      const responseText = tpl.responses[j % tpl.responses.length];
+      const id = `test-${ci}-${j}`;
+      responses.push({
+        id,
+        session_id: 'test',
+        participant_name: name,
+        participant_token: `tok-${id}`,
+        response_text: responseText,
+        created_at: new Date(Date.now() - (100 - nameIdx) * 60000).toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      excerpts.push({ participant_name: name, response_id: id, excerpt: responseText.split('\n')[0] });
+    }
+
+    clusters.push({
+      label: tpl.label,
+      summary: tpl.summary,
+      participant_count: count,
+      excerpts,
+    });
+  });
+
+  return {
+    responses,
+    analysis: {
+      clusters,
+      global_summary: 'L\'analyse fait ressortir 14 thématiques majeures avec une forte concentration autour des problèmes de communication (16 mentions) et du besoin de formation (14 mentions). Les préoccupations opérationnelles (outils, recrutement, charge de travail) dominent, tandis que des signaux positifs sur l\'ambiance d\'équipe et l\'expertise technique constituent des leviers de rétention importants.',
+      total_responses: 100,
+      total_participants: 100,
+    },
+  };
+}
+
+let _cachedFull: ReturnType<typeof buildFullTestDataset> | null = null;
+function getFullTestDataset() {
+  if (!_cachedFull) _cachedFull = buildFullTestDataset();
+  return _cachedFull;
+}
+
+function generateTestData(participantCount: number): {
+  responses: WorkshopResponse[];
+  analysis: AnalysisResult;
+} {
+  const full = getFullTestDataset();
+  if (participantCount >= 100) return full;
+
+  const ratio = participantCount / 100;
+  const subResponses: WorkshopResponse[] = [];
+  const subClusters: Cluster[] = [];
+
+  for (const cluster of full.analysis.clusters) {
+    let subCount = Math.round(cluster.participant_count * ratio);
+    if (subCount < 1 && cluster.participant_count >= 1) subCount = Math.random() < ratio * 2 ? 1 : 0;
+    if (subCount === 0) continue;
+
+    subClusters.push({
+      label: cluster.label,
+      summary: cluster.summary,
+      participant_count: subCount,
+      excerpts: cluster.excerpts.slice(0, subCount),
+    });
+
+    const clusterResponses = full.responses.filter((r) =>
+      cluster.excerpts.some((e) => e.response_id === r.id)
+    );
+    subResponses.push(...clusterResponses.slice(0, subCount));
+  }
+
+  const actualTotal = subClusters.reduce((s, c) => s + c.participant_count, 0);
+
+  return {
+    responses: subResponses,
+    analysis: {
+      clusters: subClusters,
+      global_summary: `Échantillon de ${actualTotal} participants répartis en ${subClusters.length} clusters. Les thématiques dominantes restent la communication interne et le besoin de formation, avec une décroissance naturelle vers les sujets plus niches comme l'IA ou les espaces collaboratifs.`,
+      total_responses: actualTotal,
+      total_participants: actualTotal,
+    },
+  };
+}
 
 export default function SessionView() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -32,6 +342,7 @@ export default function SessionView() {
   const [analyzing, setAnalyzing] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<LLMProvider>('gemini');
   const [showQR, setShowQR] = useState(true);
+  const [testPreset, setTestPreset] = useState<TestPreset>('');
 
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -129,6 +440,18 @@ export default function SessionView() {
     navigator.clipboard.writeText(participateUrl);
   };
 
+  const testData = useMemo(() => {
+    if (!testPreset) return null;
+    return generateTestData(Number(testPreset));
+  }, [testPreset]);
+
+  const effectiveResponses = testPreset ? (testData?.responses ?? []) : responses;
+  const effectiveAnalysis: AnalysisResult | null = testPreset
+    ? (testData?.analysis ?? null)
+    : analysis
+      ? (analysis.clusters as unknown as AnalysisResult)
+      : null;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -154,10 +477,6 @@ export default function SessionView() {
   }
 
   if (!session) return null;
-
-  const analysisResult: AnalysisResult | null = analysis
-    ? (analysis.clusters as unknown as AnalysisResult)
-    : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -304,45 +623,60 @@ export default function SessionView() {
 
           {/* Tabs */}
           <div className="border-b border-border">
-            <nav className="flex gap-1">
-              {[
-                { id: 'wordcloud' as Tab, label: 'Nuage de mots' },
-                { id: 'clusters' as Tab, label: 'Clusters' },
-                { id: 'raw' as Tab, label: 'Données brutes' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
+            <div className="flex items-center justify-between">
+              <nav className="flex gap-1">
+                {[
+                  { id: 'wordcloud' as Tab, label: 'Nuage de mots' },
+                  { id: 'clusters' as Tab, label: 'Clusters' },
+                  { id: 'raw' as Tab, label: 'Données brutes' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === tab.id
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </nav>
+
+              <select
+                value={testPreset}
+                onChange={(e) => setTestPreset(e.target.value as TestPreset)}
+                className="text-xs rounded-md border border-dashed border-border bg-transparent px-2 py-1 text-muted-foreground/60 hover:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-colors mb-1"
+              >
+                <option value="">Données réelles</option>
+                <option value="20">Test · 20 participants</option>
+                <option value="40">Test · 40 participants</option>
+                <option value="60">Test · 60 participants</option>
+                <option value="80">Test · 80 participants</option>
+                <option value="100">Test · 100 participants</option>
+              </select>
+            </div>
           </div>
 
           {/* Tab content */}
           {activeTab === 'clusters' && (
             <ClustersView
-              result={analysisResult}
-              analyzing={analyzing}
-              responseCount={responses.length}
+              result={effectiveAnalysis}
+              analyzing={!testPreset && analyzing}
+              responseCount={effectiveResponses.length}
             />
           )}
 
           {activeTab === 'wordcloud' && (
             <WordCloudView
-              result={analysisResult}
-              analyzing={analyzing}
-              responseCount={responses.length}
+              result={effectiveAnalysis}
+              analyzing={!testPreset && analyzing}
+              responseCount={effectiveResponses.length}
             />
           )}
 
-          {activeTab === 'raw' && <RawDataView responses={responses} />}
+          {activeTab === 'raw' && <RawDataView responses={effectiveResponses} />}
 
           {error && (
             <div className="text-sm text-destructive bg-destructive/10 rounded-xl p-3">
