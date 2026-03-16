@@ -1192,9 +1192,7 @@ function WordCloudView({
                         fontWeight: 500,
                         fill: getWordColor(word),
                         opacity: !visible ? 0.06 : isDimmed ? 0.15 : 0.9,
-                        transform: isActive ? 'scale(1.08)' : 'scale(1)',
-                        transformOrigin: `${word.x}px ${word.y}px`,
-                        transition: 'opacity 0.3s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'opacity 0.3s ease',
                       }}
                     >
                       {word.text}
@@ -1210,7 +1208,7 @@ function WordCloudView({
           if (!cluster) return null;
           return (
             <div
-              className="absolute z-50 w-72 bg-card rounded-xl border border-border shadow-xl animate-in fade-in-0 zoom-in-95 duration-200"
+              className="absolute z-50 w-72 bg-card rounded-xl border border-border shadow-xl"
               style={{
                 left: tooltipAnchor.x,
                 top: tooltipAnchor.y,
