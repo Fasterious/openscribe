@@ -822,8 +822,6 @@ interface LayoutWord {
   readabilityColor: number;
 }
 
-const LAYOUT_W = 1200;
-const LAYOUT_H = 800;
 const MIN_FONT = 24;
 const MAX_FONT = 56;
 const PROXIMITY = 20;
@@ -874,6 +872,87 @@ function computeReadabilityColors(words: LayoutWord[]): number[] {
   return colors;
 }
 
+/** Couche par couche : mots ligne par ligne, du plus gros au plus petit, mesure Canvas précise */
+function packWordsLineByLine<T extends { text: string; count: number }>(
+  data: T[],
+  minFont: number,
+  maxFont: number
+): { words: (T & { size: number; width: number; height: number; cx: number; cy: number })[]; bounds: { minX: number; maxX: number; minY: number; maxY: number } } {
+  if (typeof document === 'undefined' || data.length === 0) {
+    return { words: [], bounds: { minX: 0, maxX: 1, minY: 0, maxY: 1 } };
+  }
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d')!;
+
+  const gapX = 32;
+  const gapY = 20;
+  const maxLineWidth = 1200;
+
+  const maxCount = Math.max(...data.map((d) => d.count));
+  const minCount = Math.min(...data.map((d) => d.count));
+  const range = maxCount - minCount || 1;
+
+  const words = data
+    .map((d) => {
+      const size = minFont + ((d.count - minCount) / range) * (maxFont - minFont);
+      ctx.font = `500 ${size}px system-ui, -apple-system, sans-serif`;
+      const width = ctx.measureText(d.text).width;
+      const height = size * 1.2;
+      return { ...d, size, width, height };
+    })
+    .sort((a, b) => b.size - a.size);
+
+  const lines: { words: typeof words; width: number; height: number }[] = [];
+  let currentLine = { words: [] as typeof words, width: 0, height: 0 };
+
+  for (const word of words) {
+    if (currentLine.words.length === 0) {
+      currentLine.words.push(word);
+      currentLine.width = word.width;
+      currentLine.height = word.height;
+    } else if (currentLine.width + gapX + word.width <= maxLineWidth) {
+      currentLine.words.push(word);
+      currentLine.width += gapX + word.width;
+      currentLine.height = Math.max(currentLine.height, word.height);
+    } else {
+      lines.push(currentLine);
+      currentLine = { words: [word], width: word.width, height: word.height };
+    }
+  }
+  if (currentLine.words.length > 0) lines.push(currentLine);
+
+  const placed: (T & { size: number; width: number; height: number; cx: number; cy: number })[] = [];
+  let currentY = 0;
+  let actualMaxWidth = 0;
+
+  for (const line of lines) {
+    actualMaxWidth = Math.max(actualMaxWidth, line.width);
+    let currentX = -line.width / 2;
+    const lineCenterY = currentY + line.height / 2;
+
+    for (const word of line.words) {
+      placed.push({
+        ...word,
+        cx: currentX + word.width / 2,
+        cy: lineCenterY,
+      });
+      currentX += word.width + gapX;
+    }
+    currentY += line.height + gapY;
+  }
+
+  return {
+    words: placed,
+    bounds: {
+      minX: -actualMaxWidth / 2,
+      maxX: actualMaxWidth / 2,
+      minY: 0,
+      maxY: currentY - (lines.length > 0 ? gapY : 0),
+    },
+  };
+}
+
 function WordCloudView({
   result,
   analyzing,
@@ -885,86 +964,41 @@ function WordCloudView({
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [layoutWords, setLayoutWords] = useState<LayoutWord[]>([]);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [layoutBounds, setLayoutBounds] = useState<{ minX: number; maxX: number; minY: number; maxY: number } | null>(null);
   const [colorMode, setColorMode] = useState<ColorMode>('category');
   const [soloCategory, setSoloCategory] = useState<CategoryId | null>(null);
+  const [tooltipAnchor, setTooltipAnchor] = useState<{ x: number; y: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const obs = new ResizeObserver((entries) => {
-      setContainerWidth(entries[0].contentRect.width);
-    });
-    obs.observe(containerRef.current);
-    return () => obs.disconnect();
-  }, []);
 
   useEffect(() => {
     if (!result) return;
 
     const clusters = result.clusters;
-    const maxCount = Math.max(...clusters.map((c) => uniqueParticipantCount(c)));
-    const minCount = Math.min(...clusters.map((c) => uniqueParticipantCount(c)));
-    const range = maxCount - minCount || 1;
+    const layerData = clusters.map((c, i) => ({
+      text: c.label,
+      count: uniqueParticipantCount(c),
+      clusterIndex: i,
+      category: detectCategory(c.label),
+    }));
 
-    const words = clusters
-      .map((c, i) => {
-        const t = (uniqueParticipantCount(c) - minCount) / range;
-        return {
-          text: c.label,
-          size: MIN_FONT + t * (MAX_FONT - MIN_FONT),
-          clusterIndex: i,
-          category: detectCategory(c.label),
-        };
-      })
-      .sort((a, b) => b.size - a.size);
-
-    let cancelled = false;
-
-    type CloudWord = (typeof words)[0] & { x?: number; y?: number; rotate?: number };
-
-    import('d3-cloud').then(({ default: cloudLayout }) => {
-      if (cancelled) return;
-
-      type CloudOutput = CloudWord & { x0?: number; y0?: number; x1?: number; y1?: number };
-
-      cloudLayout<CloudOutput>()
-        .size([LAYOUT_W, LAYOUT_H])
-        .words(words.map((w) => ({ ...w })) as CloudOutput[])
-        .padding(3)
-        .rotate(0)
-        .font('system-ui, -apple-system, sans-serif')
-        .fontWeight(500)
-        .fontSize((d) => d.size!)
-        .spiral('archimedean')
-        .random(() => 0.5)
-        .on('end', (output) => {
-          if (cancelled) return;
-          const placed = output
-            .filter((w) => w.x !== undefined && w.y !== undefined)
-            .map((w) => ({
-              text: w.text!,
-              size: w.size!,
-              x: w.x!,
-              y: w.y!,
-              x0: w.x0,
-              y0: w.y0,
-              x1: w.x1,
-              y1: w.y1,
-              clusterIndex: w.clusterIndex,
-              category: w.category,
-              readabilityColor: 0,
-            }));
-
-          const rColors = computeReadabilityColors(placed);
-          placed.forEach((w, i) => { w.readabilityColor = rColors[i]; });
-
-          setLayoutWords(placed);
-        })
-        .start();
-    });
-
-    return () => { cancelled = true; };
+    const { words: placed, bounds } = packWordsLineByLine(layerData, MIN_FONT, MAX_FONT);
+    const layoutWordsFromLayer: LayoutWord[] = placed.map((w) => ({
+      text: w.text,
+      size: w.size,
+      x: w.cx,
+      y: w.cy,
+      x0: -w.width / 2,
+      y0: -w.height / 2,
+      x1: w.width / 2,
+      y1: w.height / 2,
+      clusterIndex: w.clusterIndex,
+      category: w.category,
+      readabilityColor: 0,
+    }));
+    const rColors = computeReadabilityColors(layoutWordsFromLayer);
+    layoutWordsFromLayer.forEach((w, i) => { w.readabilityColor = rColors[i]; });
+    setLayoutWords(layoutWordsFromLayer);
+    setLayoutBounds(bounds);
   }, [result]);
 
   const activeCategories = useMemo(() => {
@@ -1003,32 +1037,22 @@ function WordCloudView({
   const clusters = result.clusters;
 
   const bbox = useMemo(() => {
-    if (layoutWords.length === 0) return { minX: 0, maxX: 0, minY: 0, maxY: 0, w: 1, h: 1 };
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    for (const w of layoutWords) {
-      if (w.x0 != null && w.y0 != null && w.x1 != null && w.y1 != null) {
-        minX = Math.min(minX, w.x + w.x0);
-        maxX = Math.max(maxX, w.x + w.x1);
-        minY = Math.min(minY, w.y + w.y0);
-        maxY = Math.max(maxY, w.y + w.y1);
-      } else {
-        const CHAR_W = 0.58;
-        const halfW = (w.text.length * w.size * CHAR_W) / 2;
-        const halfH = w.size * 0.65;
-        minX = Math.min(minX, w.x - halfW);
-        maxX = Math.max(maxX, w.x + halfW);
-        minY = Math.min(minY, w.y - halfH);
-        maxY = Math.max(maxY, w.y + halfH);
-      }
+    if (layoutBounds) {
+      const pad = 40;
+      return {
+        minX: layoutBounds.minX - pad,
+        maxX: layoutBounds.maxX + pad,
+        minY: layoutBounds.minY - pad,
+        maxY: layoutBounds.maxY + pad,
+        w: layoutBounds.maxX - layoutBounds.minX + pad * 2,
+        h: layoutBounds.maxY - layoutBounds.minY + pad * 2,
+      };
     }
-    const pad = 16;
-    return { minX: minX - pad, maxX: maxX + pad, minY: minY - pad, maxY: maxY + pad, w: maxX - minX + 2 * pad, h: maxY - minY + 2 * pad };
-  }, [layoutWords]);
+    return { minX: 0, maxX: 0, minY: 0, maxY: 0, w: 1, h: 1 };
+  }, [layoutBounds]);
 
-  const scale = containerWidth > 0 ? containerWidth / bbox.w : 1;
-  const displayHeight = bbox.h * scale;
-  const centerX = (bbox.minX + bbox.maxX) / 2;
-  const centerY = (bbox.minY + bbox.maxY) / 2;
+  const displayHeight = bbox.h;
+  const viewBox = layoutBounds ? `${bbox.minX} ${bbox.minY} ${bbox.w} ${bbox.h}` : null;
 
   function getWordColor(word: LayoutWord): string {
     if (colorMode === 'category') {
@@ -1044,8 +1068,8 @@ function WordCloudView({
 
   return (
     <div className="space-y-3">
-      {/* Toggle */}
-      <div className="flex items-center justify-between">
+      {/* Options : Par type / Lisibilité */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="inline-flex rounded-lg border border-border bg-muted/50 p-0.5">
           {([
             { id: 'category' as ColorMode, label: 'Par type' },
@@ -1099,131 +1123,151 @@ function WordCloudView({
       {/* Cloud */}
       <div
         ref={containerRef}
-        className="bg-card rounded-2xl border border-border relative overflow-visible"
-        style={{ height: `${displayHeight || 400}px` }}
-        onClick={() => setActiveIndex(null)}
+        className="bg-card rounded-2xl border border-border relative overflow-visible flex justify-center"
+        style={{
+          height: `${displayHeight || 400}px`,
+          minHeight: 400,
+          maxHeight: 'min(80vh, 800px)',
+        }}
+        onClick={() => { setActiveIndex(null); setTooltipAnchor(null); }}
       >
-        {layoutWords.map((word) => {
-          const cluster = clusters[word.clusterIndex];
-          const isActive = activeIndex === word.clusterIndex;
-          const isDimmed = activeIndex !== null && !isActive;
-          const visible = isWordVisible(word);
+        {viewBox ? (
+          <svg
+            width="100%"
+            height="100%"
+            viewBox={viewBox}
+            preserveAspectRatio="xMidYMid meet"
+            className="max-h-[600px]"
+          >
+            <g>
+              {layoutWords.map((word) => {
+                const cluster = clusters[word.clusterIndex];
+                const isActive = activeIndex === word.clusterIndex;
+                const isDimmed = activeIndex !== null && !isActive;
+                const visible = isWordVisible(word);
 
-          return (
-            <div
-              key={word.clusterIndex}
-              className="absolute"
-              style={{
-                left: `${(word.x - centerX + bbox.w / 2) * scale}px`,
-                top: `${(word.y - centerY + bbox.h / 2) * scale}px`,
-                transform: 'translate(-50%, -50%)',
-                pointerEvents: visible ? 'auto' : 'none',
-              }}
-              onMouseEnter={() => visible && setActiveIndex(word.clusterIndex)}
-              onMouseLeave={() => setActiveIndex(null)}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!visible) return;
-                setActiveIndex((prev) =>
-                  prev === word.clusterIndex ? null : word.clusterIndex
-                );
-              }}
-            >
-              <span
-                className="cursor-pointer inline-block select-none whitespace-nowrap"
-                style={{
-                  fontSize: `${word.size * scale}px`,
-                  fontWeight: word.size > 36 ? 800 : word.size > 24 ? 700 : 600,
-                  color: getWordColor(word),
-                  opacity: !visible ? 0.06 : isDimmed ? 0.15 : 0.9,
-                  transform: `scale(${isActive ? 1.08 : 1})`,
-                  transition: 'opacity 0.3s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  lineHeight: 1,
-                }}
-              >
-                {word.text}
-              </span>
-
-              {isActive && cluster && visible && (
-                <div
-                  className="absolute z-50 w-72 bg-card rounded-xl border border-border shadow-xl"
-                  style={{
-                    bottom: '100%',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    marginBottom: '14px',
-                    padding: '16px',
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div
-                    className="absolute w-3 h-3 bg-card border-b border-r border-border"
-                    style={{
-                      bottom: '-7px',
-                      left: '50%',
-                      transform: 'translateX(-50%) rotate(45deg)',
+                return (
+                  <g
+                    key={word.clusterIndex}
+                    style={{ cursor: 'pointer', pointerEvents: visible ? 'auto' : 'none' }}
+                    onMouseEnter={(e) => {
+                      if (!visible) return;
+                      setActiveIndex(word.clusterIndex);
+                      const el = e.currentTarget as SVGGElement;
+                      const container = containerRef.current;
+                      if (!el || !container) return;
+                      const rect = el.getBoundingClientRect();
+                      const containerRect = container.getBoundingClientRect();
+                      const TOOLTIP_W = 288;
+                      const TOOLTIP_H_EST = 280;
+                      const GAP = 12;
+                      const spaceRight = containerRect.right - rect.right;
+                      const spaceLeft = rect.left - containerRect.left;
+                      const side = spaceRight >= TOOLTIP_W + GAP || spaceRight >= spaceLeft ? 'right' : 'left';
+                      const x = side === 'right' ? rect.right - containerRect.left + GAP : rect.left - containerRect.left - TOOLTIP_W - GAP;
+                      let y = rect.top - containerRect.top + rect.height / 2;
+                      y = Math.max(TOOLTIP_H_EST / 2, Math.min(containerRect.height - TOOLTIP_H_EST / 2, y));
+                      setTooltipAnchor({ x, y });
                     }}
-                  />
-
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center">
-                      {uniqueParticipantCount(cluster)}
-                    </span>
-                    <h3 className="font-semibold text-foreground text-sm truncate">
-                      {cluster.label}
-                    </h3>
-                  </div>
-
-                  <p
-                    className="text-xs text-muted-foreground leading-relaxed mb-3"
-                    style={{
-                      display: '-webkit-box',
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
+                    onMouseLeave={() => {
+                      setActiveIndex(null);
+                      setTooltipAnchor(null);
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!visible) return;
+                      setActiveIndex((prev) =>
+                        prev === word.clusterIndex ? null : word.clusterIndex
+                      );
                     }}
                   >
-                    {cluster.summary}
-                  </p>
-
-                  <div className="space-y-1.5">
-                    <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Extraits ({cluster.excerpts.length})
-                    </h4>
-                    {cluster.excerpts.slice(0, 3).map((excerpt, i) => (
-                      <div
-                        key={i}
-                        className="bg-muted/50 rounded-md px-3 py-2 text-xs"
-                      >
-                        <span className="font-medium text-foreground">
-                          {excerpt.participant_name}
-                        </span>
-                        <span className="text-muted-foreground"> : </span>
-                        <span
-                          className="text-foreground/80 italic"
-                          style={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          &quot;{excerpt.excerpt}&quot;
-                        </span>
-                      </div>
-                    ))}
-                    {cluster.excerpts.length > 3 && (
-                      <p className="text-xs text-muted-foreground text-center pt-1">
-                        +{cluster.excerpts.length - 3} extrait
-                        {cluster.excerpts.length - 3 > 1 ? 's' : ''}
-                      </p>
-                    )}
+                    <text
+                      x={word.x}
+                      y={word.y}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      style={{
+                        fontSize: `${word.size}px`,
+                        fontFamily: 'system-ui, -apple-system, sans-serif',
+                        fontWeight: 500,
+                        fill: getWordColor(word),
+                        opacity: !visible ? 0.06 : isDimmed ? 0.15 : 0.9,
+                        transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                        transformOrigin: `${word.x}px ${word.y}px`,
+                        transition: 'opacity 0.3s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                      }}
+                    >
+                      {word.text}
+                    </text>
+                  </g>
+                );
+              })}
+            </g>
+          </svg>
+        ) : null}
+        {activeIndex !== null && tooltipAnchor && (() => {
+          const cluster = clusters[activeIndex];
+          if (!cluster) return null;
+          return (
+            <div
+              className="absolute z-50 w-72 bg-card rounded-xl border border-border shadow-xl animate-in fade-in-0 zoom-in-95 duration-200"
+              style={{
+                left: tooltipAnchor.x,
+                top: tooltipAnchor.y,
+                transform: 'translateY(-50%)',
+                padding: '16px',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center">
+                  {uniqueParticipantCount(cluster)}
+                </span>
+                <h3 className="font-semibold text-foreground text-sm truncate">
+                  {cluster.label}
+                </h3>
+              </div>
+              <p
+                className="text-xs text-muted-foreground leading-relaxed mb-3"
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {cluster.summary}
+              </p>
+              <div className="space-y-1.5">
+                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Extraits ({cluster.excerpts.length})
+                </h4>
+                {cluster.excerpts.slice(0, 3).map((excerpt, i) => (
+                  <div key={i} className="bg-muted/50 rounded-md px-3 py-2 text-xs">
+                    <span className="font-medium text-foreground">{excerpt.participant_name}</span>
+                    <span className="text-muted-foreground"> : </span>
+                    <span
+                      className="text-foreground/80 italic"
+                      style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      &quot;{excerpt.excerpt}&quot;
+                    </span>
                   </div>
-                </div>
-              )}
+                ))}
+                {cluster.excerpts.length > 3 && (
+                  <p className="text-xs text-muted-foreground text-center pt-1">
+                    +{cluster.excerpts.length - 3} extrait{cluster.excerpts.length - 3 > 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
             </div>
           );
-        })}
+        })()}
       </div>
     </div>
   );
