@@ -813,6 +813,10 @@ interface LayoutWord {
   size: number;
   x: number;
   y: number;
+  x0?: number;
+  y0?: number;
+  x1?: number;
+  y1?: number;
   clusterIndex: number;
   category: CategoryId;
   readabilityColor: number;
@@ -820,22 +824,37 @@ interface LayoutWord {
 
 const LAYOUT_W = 1200;
 const LAYOUT_H = 800;
+const MIN_FONT = 24;
+const MAX_FONT = 56;
+const PROXIMITY = 20;
+
+function getWordBox(w: LayoutWord): { l: number; r: number; t: number; b: number } {
+  if (w.x0 != null && w.y0 != null && w.x1 != null && w.y1 != null) {
+    return {
+      l: w.x + w.x0 - PROXIMITY,
+      r: w.x + w.x1 + PROXIMITY,
+      t: w.y + w.y0 - PROXIMITY,
+      b: w.y + w.y1 + PROXIMITY,
+    };
+  }
+  const CHAR_W_RATIO = 0.58;
+  const halfW = (w.text.length * w.size * CHAR_W_RATIO) / 2;
+  const halfH = w.size * 0.65;
+  return {
+    l: w.x - halfW - PROXIMITY,
+    r: w.x + halfW + PROXIMITY,
+    t: w.y - halfH - PROXIMITY,
+    b: w.y + halfH + PROXIMITY,
+  };
+}
 
 function computeReadabilityColors(words: LayoutWord[]): number[] {
-  const CHAR_W_RATIO = 0.58;
-  const boxes = words.map((w) => {
-    const halfW = (w.text.length * w.size * CHAR_W_RATIO) / 2;
-    const halfH = w.size * 0.65;
-    return { l: w.x - halfW, r: w.x + halfW, t: w.y - halfH, b: w.y + halfH };
-  });
-
-  const PROXIMITY = 20;
+  const boxes = words.map((w) => getWordBox(w));
   const adj: Set<number>[] = words.map(() => new Set());
   for (let i = 0; i < words.length; i++) {
     for (let j = i + 1; j < words.length; j++) {
       const a = boxes[i], b = boxes[j];
-      if (a.l - PROXIMITY < b.r && a.r + PROXIMITY > b.l &&
-          a.t - PROXIMITY < b.b && a.b + PROXIMITY > b.t) {
+      if (a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t) {
         adj[i].add(j);
         adj[j].add(i);
       }
@@ -888,15 +907,12 @@ function WordCloudView({
     const minCount = Math.min(...clusters.map((c) => uniqueParticipantCount(c)));
     const range = maxCount - minCount || 1;
 
-    const minFont = 20;
-    const maxFont = 72;
-
     const words = clusters
       .map((c, i) => {
         const t = (uniqueParticipantCount(c) - minCount) / range;
         return {
           text: c.label,
-          size: minFont + t * (maxFont - minFont),
+          size: MIN_FONT + t * (MAX_FONT - MIN_FONT),
           clusterIndex: i,
           category: detectCategory(c.label),
         };
@@ -910,12 +926,15 @@ function WordCloudView({
     import('d3-cloud').then(({ default: cloudLayout }) => {
       if (cancelled) return;
 
-      cloudLayout<CloudWord>()
+      type CloudOutput = CloudWord & { x0?: number; y0?: number; x1?: number; y1?: number };
+
+      cloudLayout<CloudOutput>()
         .size([LAYOUT_W, LAYOUT_H])
-        .words(words.map((w) => ({ ...w })) as CloudWord[])
+        .words(words.map((w) => ({ ...w })) as CloudOutput[])
         .padding(3)
         .rotate(0)
         .font('system-ui, -apple-system, sans-serif')
+        .fontWeight(500)
         .fontSize((d) => d.size!)
         .spiral('archimedean')
         .random(() => 0.5)
@@ -928,6 +947,10 @@ function WordCloudView({
               size: w.size!,
               x: w.x!,
               y: w.y!,
+              x0: w.x0,
+              y0: w.y0,
+              x1: w.x1,
+              y1: w.y1,
               clusterIndex: w.clusterIndex,
               category: w.category,
               readabilityColor: 0,
@@ -981,15 +1004,22 @@ function WordCloudView({
 
   const bbox = useMemo(() => {
     if (layoutWords.length === 0) return { minX: 0, maxX: 0, minY: 0, maxY: 0, w: 1, h: 1 };
-    const CHAR_W = 0.58;
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     for (const w of layoutWords) {
-      const halfW = (w.text.length * w.size * CHAR_W) / 2;
-      const halfH = w.size * 0.65;
-      minX = Math.min(minX, w.x - halfW);
-      maxX = Math.max(maxX, w.x + halfW);
-      minY = Math.min(minY, w.y - halfH);
-      maxY = Math.max(maxY, w.y + halfH);
+      if (w.x0 != null && w.y0 != null && w.x1 != null && w.y1 != null) {
+        minX = Math.min(minX, w.x + w.x0);
+        maxX = Math.max(maxX, w.x + w.x1);
+        minY = Math.min(minY, w.y + w.y0);
+        maxY = Math.max(maxY, w.y + w.y1);
+      } else {
+        const CHAR_W = 0.58;
+        const halfW = (w.text.length * w.size * CHAR_W) / 2;
+        const halfH = w.size * 0.65;
+        minX = Math.min(minX, w.x - halfW);
+        maxX = Math.max(maxX, w.x + halfW);
+        minY = Math.min(minY, w.y - halfH);
+        maxY = Math.max(maxY, w.y + halfH);
+      }
     }
     const pad = 16;
     return { minX: minX - pad, maxX: maxX + pad, minY: minY - pad, maxY: maxY + pad, w: maxX - minX + 2 * pad, h: maxY - minY + 2 * pad };
