@@ -2,7 +2,7 @@ import type { LLMClient } from './types';
 
 const MISTRAL_CHAT_URL = 'https://api.mistral.ai/v1/chat/completions';
 
-export function createMistralClient(): LLMClient {
+export function createMistralClient(model: string): LLMClient {
   const apiKey = process.env.MISTRAL_API_KEY;
   if (!apiKey) {
     throw new Error('MISTRAL_API_KEY is not set');
@@ -17,7 +17,7 @@ export function createMistralClient(): LLMClient {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'mistral-small-latest',
+          model,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0,
           response_format: { type: 'json_object' },

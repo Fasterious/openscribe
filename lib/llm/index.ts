@@ -1,5 +1,6 @@
 import type { LLMClient, ClusteringInput, AnalysisResult } from './types';
 import type { LLMProvider } from '@/types/workshop';
+import { LLM_MODELS } from '@/types/workshop';
 import { createGeminiClient } from './gemini';
 import { createMistralClient } from './mistral';
 import { buildClusteringPrompt } from './prompts';
@@ -8,8 +9,10 @@ export function getLLMClient(provider: LLMProvider): LLMClient {
   switch (provider) {
     case 'gemini':
       return createGeminiClient();
-    case 'mistral':
-      return createMistralClient();
+    case 'mistral-small':
+    case 'mistral-medium':
+    case 'mistral-large':
+      return createMistralClient(LLM_MODELS[provider].model);
     default:
       throw new Error(`Unknown LLM provider: ${provider}`);
   }

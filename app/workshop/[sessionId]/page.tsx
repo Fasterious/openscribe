@@ -1006,6 +1006,21 @@ function WordCloudView({
     return CATEGORY_DEFS.filter((c) => catSet.has(c.id));
   }, [layoutWords]);
 
+  const bbox = useMemo(() => {
+    if (layoutBounds) {
+      const pad = 40;
+      return {
+        minX: layoutBounds.minX - pad,
+        maxX: layoutBounds.maxX + pad,
+        minY: layoutBounds.minY - pad,
+        maxY: layoutBounds.maxY + pad,
+        w: layoutBounds.maxX - layoutBounds.minX + pad * 2,
+        h: layoutBounds.maxY - layoutBounds.minY + pad * 2,
+      };
+    }
+    return { minX: 0, maxX: 0, minY: 0, maxY: 0, w: 1, h: 1 };
+  }, [layoutBounds]);
+
   const handleLegendClick = (catId: CategoryId) => {
     setSoloCategory((prev) => (prev === catId ? null : catId));
   };
@@ -1035,21 +1050,6 @@ function WordCloudView({
   }
 
   const clusters = result.clusters;
-
-  const bbox = useMemo(() => {
-    if (layoutBounds) {
-      const pad = 40;
-      return {
-        minX: layoutBounds.minX - pad,
-        maxX: layoutBounds.maxX + pad,
-        minY: layoutBounds.minY - pad,
-        maxY: layoutBounds.maxY + pad,
-        w: layoutBounds.maxX - layoutBounds.minX + pad * 2,
-        h: layoutBounds.maxY - layoutBounds.minY + pad * 2,
-      };
-    }
-    return { minX: 0, maxX: 0, minY: 0, maxY: 0, w: 1, h: 1 };
-  }, [layoutBounds]);
 
   const displayHeight = bbox.h;
   const viewBox = layoutBounds ? `${bbox.minX} ${bbox.minY} ${bbox.w} ${bbox.h}` : null;
