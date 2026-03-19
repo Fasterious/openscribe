@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import type { LLMClient } from './types';
 
-export function createGeminiClient(): LLMClient {
+export function createGeminiClient(model: string): LLMClient {
   const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GOOGLE_GEMINI_API_KEY is not set');
@@ -12,7 +12,7 @@ export function createGeminiClient(): LLMClient {
   return {
     async analyze(prompt: string): Promise<string> {
       const result = await ai.models.generateContent({
-        model: 'gemini-3.1-flash-lite-preview',
+        model,
         contents: prompt,
         config: {
           temperature: 0,

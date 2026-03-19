@@ -20,6 +20,7 @@ export function createMistralClient(model: string): LLMClient {
           model,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0,
+          random_seed: 42,
           response_format: { type: 'json_object' },
         }),
       });

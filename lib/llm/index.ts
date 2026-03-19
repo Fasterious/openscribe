@@ -8,7 +8,8 @@ import { buildClusteringPrompt } from './prompts';
 export function getLLMClient(provider: LLMProvider): LLMClient {
   switch (provider) {
     case 'gemini':
-      return createGeminiClient();
+    case 'gemini-pro':
+      return createGeminiClient(LLM_MODELS[provider].model);
     case 'mistral-small':
     case 'mistral-medium':
     case 'mistral-large':

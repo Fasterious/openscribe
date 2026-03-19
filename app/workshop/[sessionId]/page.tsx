@@ -22,6 +22,145 @@ function uniqueParticipantCount(cluster: Cluster): number {
 
 type Tab = 'clusters' | 'wordcloud' | 'raw';
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildExportHtml(
+  session: WorkshopSession,
+  responses: WorkshopResponse[],
+  analysis: AnalysisResult | null
+): string {
+  const title = escapeHtml(session.question);
+  const date = new Date().toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  // Section 1: Nuage de mots (Word cloud SVG)
+  let wordCloudSection = '<p>Aucune analyse disponible. Lancez l\'analyse pour générer le nuage de mots.</p>';
+  if (analysis && analysis.clusters.length > 0) {
+    const layerData = analysis.clusters.map((c, i) => ({
+      text: c.label,
+      count: uniqueParticipantCount(c),
+      clusterIndex: i,
+      category: detectCategory(c.label),
+    }));
+    const { words: placed, bounds } = packWordsLineByLine(layerData, 24, 56);
+    const pad = 40;
+    const w = bounds.maxX - bounds.minX + pad * 2;
+    const h = bounds.maxY - bounds.minY + pad * 2;
+    const viewBox = `${bounds.minX - pad} ${bounds.minY - pad} ${w} ${h}`;
+    const svgWords = placed
+      .map((w) => {
+        const color = CATEGORY_DEFS.find((c) => c.id === w.category)?.color ?? CATEGORY_DEFS[5].color;
+        return `<text x="${w.cx}" y="${w.cy}" text-anchor="middle" dominant-baseline="central" style="font-size:${w.size}px;font-family:system-ui,sans-serif;font-weight:500;fill:${color}">${escapeHtml(w.text)}</text>`;
+      })
+      .join('');
+    wordCloudSection = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="100%" height="400" style="max-height:400px"><g>${svgWords}</g></svg>`;
+  }
+
+  // Section 2: Clusters
+  let clustersSection = '<p>Aucune analyse disponible. Lancez l\'analyse pour générer les clusters.</p>';
+  if (analysis && analysis.clusters.length > 0) {
+    let clustersHtml = '';
+    if (analysis.global_summary) {
+      clustersHtml += `<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:20px;margin-bottom:24px">
+        <h3 style="font-weight:600;margin:0 0 8px 0">Synthèse globale</h3>
+        <p style="margin:0;font-size:14px;color:#333">${escapeHtml(analysis.global_summary)}</p>
+        <p style="margin:8px 0 0 0;font-size:12px;color:#666">${analysis.total_participants} participant(s) — ${analysis.clusters.length} cluster(s) identifié(s)</p>
+      </div>`;
+    }
+    analysis.clusters.forEach((cluster, idx) => {
+      const count = uniqueParticipantCount(cluster);
+      clustersHtml += `<div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:16px">
+        <div style="padding:16px 20px;background:#fafafa;border-bottom:1px solid #e5e7eb">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#e0f2fe;color:#0284c7;font-size:14px;font-weight:600;margin-right:12px">${count}</span>
+          <strong style="font-size:16px">${escapeHtml(cluster.label)}</strong>
+        </div>
+        <div style="padding:16px 20px">
+          <p style="margin:0 0 12px 0;font-size:14px;color:#4b5563">${escapeHtml(cluster.summary)}</p>
+          <h4 style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0">Extraits (${cluster.excerpts.length})</h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${cluster.excerpts
+              .map(
+                (e) =>
+                  `<div style="background:#f3f4f6;border-radius:8px;padding:12px 16px;font-size:14px">
+                <span style="font-weight:500">${escapeHtml(e.participant_name)}</span>
+                <span style="color:#6b7280"> : </span>
+                <span style="font-style:italic;color:#374151">"${escapeHtml(e.excerpt)}"</span>
+              </div>`
+              )
+              .join('')}
+          </div>
+        </div>
+      </div>`;
+    });
+    clustersSection = clustersHtml;
+  }
+
+  // Section 3: Données brutes
+  let rawSection = '<p>Aucune réponse pour le moment.</p>';
+  if (responses.length > 0) {
+    rawSection = `<table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead>
+        <tr style="background:#f3f4f6;border-bottom:1px solid #e5e7eb">
+          <th style="text-align:left;padding:12px 16px;font-weight:500;color:#6b7280;width:160px">Participant</th>
+          <th style="text-align:left;padding:12px 16px;font-weight:500;color:#6b7280">Réponse</th>
+          <th style="text-align:left;padding:12px 16px;font-weight:500;color:#6b7280;width:100px">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${responses
+          .map(
+            (r) =>
+              `<tr style="border-bottom:1px solid #e5e7eb">
+            <td style="padding:12px 16px;font-weight:500;vertical-align:top">${escapeHtml(r.participant_name)}</td>
+            <td style="padding:12px 16px;vertical-align:top;white-space:pre-wrap">${escapeHtml(r.response_text)}</td>
+            <td style="padding:12px 16px;color:#6b7280;vertical-align:top;font-size:12px">${new Date(r.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td>
+          </tr>`
+          )
+          .join('')}
+      </tbody>
+    </table>`;
+  }
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Export Workshop - ${title}</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 32px; color: #111; line-height: 1.5; }
+    h1 { font-size: 24px; margin: 0 0 8px 0; }
+    .meta { color: #6b7280; font-size: 14px; margin-bottom: 32px; }
+    h2 { font-size: 18px; margin: 32px 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #0284c7; color: #0284c7; }
+    @media print { body { padding: 16px; } h2 { page-break-before: always; } h2:first-of-type { page-break-before: avoid; } }
+  </style>
+</head>
+<body>
+  <h1>${title}</h1>
+  <p class="meta">Export du ${date} — ${responses.length} réponse(s)</p>
+
+  <h2>1. Nuage de mots</h2>
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;margin-bottom:24px">${wordCloudSection}</div>
+
+  <h2>2. Clusters</h2>
+  <div style="margin-bottom:24px">${clustersSection}</div>
+
+  <h2>3. Données brutes</h2>
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden">${rawSection}</div>
+</body>
+</html>`;
+}
+
 export default function SessionView() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const supabase = createClient();
@@ -136,6 +275,17 @@ export default function SessionView() {
   const effectiveAnalysis: AnalysisResult | null = analysis
     ? (analysis.clusters as unknown as AnalysisResult)
     : null;
+
+  const handleExport = useCallback(() => {
+    const html = buildExportHtml(session!, responses, effectiveAnalysis);
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `workshop-${session?.question?.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '-') || sessionId}-${new Date().toISOString().slice(0, 10)}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [session, sessionId, responses, effectiveAnalysis]);
 
   if (loading) {
     return (
@@ -328,6 +478,16 @@ export default function SessionView() {
                   </button>
                 ))}
               </nav>
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border border-dashed border-border bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                title="Exporter les résultats (HTML)"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Exporter
+              </button>
             </div>
           </div>
 
