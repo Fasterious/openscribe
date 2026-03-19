@@ -813,13 +813,18 @@ function WordCloudView({
   analyzing: boolean;
   responseCount: number;
 }) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  /** Panneau plein détail (clic) — fixe à droite de la page, hors du cadre du nuage */
+  const [pinnedClusterIndex, setPinnedClusterIndex] = useState<number | null>(null);
+  /** Survol — tooltip d’origine à côté du mot */
+  const [hoverClusterIndex, setHoverClusterIndex] = useState<number | null>(null);
   const [layoutWords, setLayoutWords] = useState<LayoutWord[]>([]);
   const [layoutBounds, setLayoutBounds] = useState<{ minX: number; maxX: number; minY: number; maxY: number } | null>(null);
   const [colorMode, setColorMode] = useState<ColorMode>('category');
   const [soloCategory, setSoloCategory] = useState<CategoryId | null>(null);
   const [tooltipAnchor, setTooltipAnchor] = useState<{ x: number; y: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const focusClusterIndex = pinnedClusterIndex ?? hoverClusterIndex;
 
   useEffect(() => {
     if (!result) return;
@@ -971,7 +976,7 @@ function WordCloudView({
         )}
       </div>
 
-      {/* Cloud */}
+      {/* Nuage — taille inchangée (pas de flex avec le panneau) */}
       <div
         ref={containerRef}
         className="bg-card rounded-2xl border border-border relative overflow-visible flex justify-center"
@@ -980,7 +985,11 @@ function WordCloudView({
           minHeight: 400,
           maxHeight: 'min(80vh, 800px)',
         }}
-        onClick={() => { setActiveIndex(null); setTooltipAnchor(null); }}
+        onClick={() => {
+          setPinnedClusterIndex(null);
+          setHoverClusterIndex(null);
+          setTooltipAnchor(null);
+        }}
       >
         {viewBox ? (
           <svg
@@ -993,8 +1002,8 @@ function WordCloudView({
             <g>
               {layoutWords.map((word) => {
                 const cluster = clusters[word.clusterIndex];
-                const isActive = activeIndex === word.clusterIndex;
-                const isDimmed = activeIndex !== null && !isActive;
+                const isFocused = focusClusterIndex === word.clusterIndex;
+                const isDimmed = focusClusterIndex !== null && !isFocused;
                 const visible = isWordVisible(word);
 
                 return (
@@ -1003,7 +1012,7 @@ function WordCloudView({
                     style={{ cursor: 'pointer', pointerEvents: visible ? 'auto' : 'none' }}
                     onMouseEnter={(e) => {
                       if (!visible) return;
-                      setActiveIndex(word.clusterIndex);
+                      setHoverClusterIndex(word.clusterIndex);
                       const el = e.currentTarget as SVGGElement;
                       const container = containerRef.current;
                       if (!el || !container) return;
@@ -1021,15 +1030,17 @@ function WordCloudView({
                       setTooltipAnchor({ x, y });
                     }}
                     onMouseLeave={() => {
-                      setActiveIndex(null);
+                      setHoverClusterIndex(null);
                       setTooltipAnchor(null);
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (!visible) return;
-                      setActiveIndex((prev) =>
+                      setPinnedClusterIndex((prev) =>
                         prev === word.clusterIndex ? null : word.clusterIndex
                       );
+                      setHoverClusterIndex(null);
+                      setTooltipAnchor(null);
                     }}
                   >
                     <text
@@ -1054,70 +1065,140 @@ function WordCloudView({
             </g>
           </svg>
         ) : null}
-        {activeIndex !== null && tooltipAnchor && (() => {
-          const cluster = clusters[activeIndex];
+        {hoverClusterIndex !== null &&
+          tooltipAnchor &&
+          (() => {
+            const cluster = clusters[hoverClusterIndex];
+            if (!cluster) return null;
+            return (
+              <div
+                className="absolute z-50 w-72 bg-card rounded-xl border border-border shadow-xl"
+                style={{
+                  left: tooltipAnchor.x,
+                  top: tooltipAnchor.y,
+                  transform: 'translateY(-50%)',
+                  padding: '16px',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center">
+                    {uniqueParticipantCount(cluster)}
+                  </span>
+                  <h3 className="font-semibold text-foreground text-sm truncate">
+                    {cluster.label}
+                  </h3>
+                </div>
+                <p
+                  className="text-xs text-muted-foreground leading-relaxed mb-3"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {cluster.summary}
+                </p>
+                <div className="space-y-1.5">
+                  <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Extraits ({cluster.excerpts.length})
+                  </h4>
+                  {cluster.excerpts.slice(0, 3).map((excerpt, i) => (
+                    <div key={i} className="bg-muted/50 rounded-md px-3 py-2 text-xs">
+                      <span className="font-medium text-foreground">{excerpt.participant_name}</span>
+                      <span className="text-muted-foreground"> : </span>
+                      <span
+                        className="text-foreground/80 italic"
+                        style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        &quot;{excerpt.excerpt}&quot;
+                      </span>
+                    </div>
+                  ))}
+                  {cluster.excerpts.length > 3 && (
+                    <p className="text-xs text-muted-foreground text-center pt-1">
+                      +{cluster.excerpts.length - 3} extrait{cluster.excerpts.length - 3 > 1 ? 's' : ''}
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+      </div>
+
+      {/* Panneau détail : hors du cadre du nuage, glisse depuis la droite (viewport) */}
+      {pinnedClusterIndex !== null &&
+        (() => {
+          const cluster = clusters[pinnedClusterIndex];
           if (!cluster) return null;
           return (
-            <div
-              className="absolute z-50 w-72 bg-card rounded-xl border border-border shadow-xl"
-              style={{
-                left: tooltipAnchor.x,
-                top: tooltipAnchor.y,
-                transform: 'translateY(-50%)',
-                padding: '16px',
-              }}
+            <aside
+              className="fixed top-0 right-0 z-[110] h-dvh w-full max-w-md flex flex-col border-l border-border bg-card shadow-2xl animate-in slide-in-from-right duration-300"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center">
-                  {uniqueParticipantCount(cluster)}
-                </span>
-                <h3 className="font-semibold text-foreground text-sm truncate">
-                  {cluster.label}
-                </h3>
-              </div>
-              <p
-                className="text-xs text-muted-foreground leading-relaxed mb-3"
-                style={{
-                  display: '-webkit-box',
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                }}
-              >
-                {cluster.summary}
-              </p>
-              <div className="space-y-1.5">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Extraits ({cluster.excerpts.length})
-                </h4>
-                {cluster.excerpts.slice(0, 3).map((excerpt, i) => (
-                  <div key={i} className="bg-muted/50 rounded-md px-3 py-2 text-xs">
-                    <span className="font-medium text-foreground">{excerpt.participant_name}</span>
-                    <span className="text-muted-foreground"> : </span>
-                    <span
-                      className="text-foreground/80 italic"
-                      style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      &quot;{excerpt.excerpt}&quot;
+                <div className="p-4 border-b border-border flex items-start justify-between gap-2 shrink-0">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-semibold flex items-center justify-center">
+                      {uniqueParticipantCount(cluster)}
                     </span>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-foreground text-sm leading-snug">
+                        {cluster.label}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {cluster.excerpts.length} extrait{cluster.excerpts.length > 1 ? 's' : ''}
+                      </p>
+                    </div>
                   </div>
-                ))}
-                {cluster.excerpts.length > 3 && (
-                  <p className="text-xs text-muted-foreground text-center pt-1">
-                    +{cluster.excerpts.length - 3} extrait{cluster.excerpts.length - 3 > 1 ? 's' : ''}
-                  </p>
-                )}
-              </div>
-            </div>
+                  <button
+                    type="button"
+                    onClick={() => setPinnedClusterIndex(null)}
+                    className="flex-shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                    aria-label="Fermer"
+                  >
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
+                  <div>
+                    <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                      Résumé du cluster
+                    </h4>
+                    <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                      {cluster.summary}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                      Tous les extraits ({cluster.excerpts.length})
+                    </h4>
+                    <ul className="space-y-3">
+                      {cluster.excerpts.map((excerpt, i) => (
+                        <li
+                          key={`${excerpt.response_id}-${i}`}
+                          className="bg-muted/40 rounded-lg border border-border px-3 py-3 text-sm"
+                        >
+                          <span className="font-medium text-foreground">{excerpt.participant_name}</span>
+                          <span className="text-muted-foreground"> : </span>
+                          <span className="text-foreground/85 italic whitespace-pre-wrap block mt-1 pl-0">
+                            &quot;{excerpt.excerpt}&quot;
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+            </aside>
           );
         })()}
-      </div>
     </div>
   );
 }
