@@ -15,6 +15,7 @@ import type {
   Cluster,
 } from '@/types/workshop';
 import { LLM_MODELS } from '@/types/workshop';
+import { ImportModal } from '@/components/workshop/import-modal';
 
 function uniqueParticipantCount(cluster: Cluster): number {
   return new Set(cluster.excerpts.map((e) => e.response_id)).size;
@@ -175,6 +176,7 @@ export default function SessionView() {
   const [analyzing, setAnalyzing] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<LLMProvider>('gemini');
   const [showQR, setShowQR] = useState(true);
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -478,16 +480,29 @@ export default function SessionView() {
                   </button>
                 ))}
               </nav>
-              <button
-                onClick={handleExport}
-                className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border border-dashed border-border bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                title="Exporter les résultats (HTML)"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Exporter
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setImportModalOpen(true)}
+                  disabled={session.status === 'closed'}
+                  className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border border-dashed border-border bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                  title={session.status === 'closed' ? 'Session fermée' : 'Importer des réponses (CSV, Excel, TXT)'}
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4 4 4 0 018 0m-4 4V4" />
+                  </svg>
+                  Importer
+                </button>
+                <button
+                  onClick={handleExport}
+                  className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border border-dashed border-border bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  title="Exporter les résultats (HTML)"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Exporter
+                </button>
+              </div>
             </div>
           </div>
 
@@ -515,6 +530,14 @@ export default function SessionView() {
               {error}
             </div>
           )}
+
+          <ImportModal
+            isOpen={importModalOpen}
+            onClose={() => setImportModalOpen(false)}
+            sessionId={sessionId!}
+            sessionQuestion={session.question}
+            onImportSuccess={fetchSession}
+          />
         </div>
       </main>
     </div>

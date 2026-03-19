@@ -49,3 +49,26 @@ Règles OBLIGATOIRES :
 - Ordonne les clusters du plus mentionné au moins mentionné.
 - participant_count = nombre de participants UNIQUES dans ce cluster (compter les noms distincts, pas le nombre d'excerpts).`;
 }
+
+export function buildStructureTextPrompt(rawText: string): string {
+  return `Tu reçois du texte brut (notes, post-its, transcription d'atelier, liste de retours, etc.).
+
+Ta tâche : extraire une liste de réponses distinctes au format JSON strict.
+
+Règles :
+- Si un nom ou identifiant est explicite (ex: "Marie : ...", "Alice dit : ...", "Jean - ..."), utilise-le comme participant_name.
+- Si aucun nom n'est identifiable pour une réponse, utilise "Speaker 1", "Speaker 2", "Speaker 3", etc. dans l'ordre d'apparition.
+- Chaque entrée doit être une réponse distincte. Découpe le texte en réponses individuelles.
+- Ne fusionne pas des réponses différentes. Chaque idée/retour distinct = une entrée.
+- Retourne UNIQUEMENT le JSON, sans texte avant ou après, sans balises markdown.
+
+Format attendu :
+[
+  { "participant_name": "...", "response_text": "..." },
+  { "participant_name": "...", "response_text": "..." }
+]
+
+Texte à structurer :
+
+${rawText}`;
+}
