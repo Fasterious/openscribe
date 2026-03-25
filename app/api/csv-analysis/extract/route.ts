@@ -88,29 +88,58 @@ export async function POST(request: NextRequest) {
       const json = extractJSON(raw);
 
       try {
-        const extracted = JSON.parse(json);
-        if (!Array.isArray(extracted)) continue;
+        const parsed = JSON.parse(json);
 
+        // Mistral json_object mode may wrap the array in an object like { "quintuplets": [...] }
+        let extracted: unknown[];
+        if (Array.isArray(parsed)) {
+          extracted = parsed;
+        } else if (typeof parsed === 'object' && parsed !== null) {
+          const arrayValue = Object.values(parsed).find(Array.isArray);
+          if (arrayValue) {
+            extracted = arrayValue as unknown[];
+          } else {
+            console.warn(
+              `[CSV Extract] ${participant.id}: response is an object with no array value, skipping. Keys: ${Object.keys(parsed).join(', ')}`
+            );
+            continue;
+          }
+        } else {
+          console.warn(
+            `[CSV Extract] ${participant.id}: unexpected response type: ${typeof parsed}`
+          );
+          continue;
+        }
+
+        let extractedCount = 0;
         for (const item of extracted) {
-          if (!item.tag || !item.verbatim || !item.sentiment) continue;
+          if (!item || typeof item !== 'object') continue;
+          const entry = item as Record<string, unknown>;
+          if (!entry.tag || !entry.verbatim || !entry.sentiment) continue;
 
           allQuintuplets.push({
             id: `Q${String(globalIdx).padStart(4, '0')}`,
-            tag: item.tag.trim(),
-            verbatim: item.verbatim.trim(),
-            sentiment: ['positive', 'negative', 'suggestion'].includes(item.sentiment)
-              ? item.sentiment
+            tag: String(entry.tag).trim(),
+            verbatim: String(entry.verbatim).trim(),
+            sentiment: ['positive', 'negative', 'suggestion'].includes(String(entry.sentiment))
+              ? (String(entry.sentiment) as 'positive' | 'negative' | 'suggestion')
               : 'suggestion',
-            question: item.question?.trim() || '',
+            question: entry.question ? String(entry.question).trim() : '',
             participant_id: participant.id,
             participant_name: participant.name || '',
           });
           globalIdx++;
+          extractedCount++;
         }
+        console.log(
+          `[CSV Extract] ${participant.id}: ${extractedCount} quintuplets extracted`
+        );
       } catch (parseErr) {
         console.error(
           `[CSV Extract] Failed to parse response for ${participant.id}:`,
-          parseErr
+          parseErr,
+          '\nRaw response:',
+          json.slice(0, 500)
         );
       }
     }
