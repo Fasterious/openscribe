@@ -1,0 +1,142 @@
+'use client';
+
+import { sentimentEmoji } from '@/types/csv-analysis';
+import type { FinalAnalysis } from '@/types/csv-analysis';
+
+interface FinalReportProps {
+  analysis: FinalAnalysis;
+}
+
+export function FinalReport({ analysis }: FinalReportProps) {
+  return (
+    <div className="space-y-8">
+      <div className="bg-card rounded-xl border border-border p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-2">
+          Résumé exécutif
+        </h2>
+        <div className="flex gap-4 mb-4 text-sm text-muted-foreground">
+          <span>{analysis.total_quintuplets} verbatims analysés</span>
+          <span>{analysis.total_participants} participants</span>
+          <span>{analysis.total_clusters} grands thèmes</span>
+        </div>
+        <p className="text-sm text-foreground leading-relaxed">
+          {analysis.global_summary}
+        </p>
+      </div>
+
+      {analysis.clusters.map((cluster, idx) => (
+        <div
+          key={idx}
+          className="bg-card rounded-xl border border-border overflow-hidden"
+        >
+          <div className="px-6 py-5 border-b border-border">
+            <h3 className="text-base font-semibold text-foreground">
+              {idx + 1}. {cluster.title}
+            </h3>
+            <div className="flex gap-3 mt-1.5 text-xs text-muted-foreground">
+              <span>✅ {cluster.total_positive}</span>
+              <span>⚠️ {cluster.total_negative}</span>
+              <span>💡 {cluster.total_suggestion}</span>
+              <span className="text-muted-foreground/60">
+                · {cluster.unique_participants.length} participants uniques ({cluster.unique_participants.join(', ')})
+              </span>
+            </div>
+          </div>
+
+          <div className="divide-y divide-border/50">
+            {cluster.normalized_tags.map((tag, tagIdx) => (
+              <div key={tagIdx} className="px-6 py-4">
+                <h4 className="font-medium text-sm text-foreground mb-3">
+                  {tag.label}
+                </h4>
+
+                {tag.positive_count > 0 && (
+                  <div className="mb-2">
+                    <span className="text-xs font-medium text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
+                      {tag.positive_count} ✅ Positifs ({tag.quintuplets.filter(q => q.sentiment === 'positive').map(q => q.participant_id).filter((v, i, a) => a.indexOf(v) === i).length} participants : {tag.quintuplets.filter(q => q.sentiment === 'positive').map(q => q.participant_id).filter((v, i, a) => a.indexOf(v) === i).join(', ')})
+                    </span>
+                    <div className="mt-2 space-y-1.5 ml-2">
+                      {tag.quintuplets
+                        .filter((q) => q.sentiment === 'positive')
+                        .map((q, i) => (
+                          <p key={`${q.id}-pos-${i}`} className="text-sm text-muted-foreground">
+                            {sentimentEmoji(q.sentiment)} <span className="italic">&ldquo;{q.verbatim}&rdquo;</span>
+                            <span className="text-xs text-muted-foreground/60">
+                              {' '}— {q.question} — {q.participant_id}
+                              {q.participant_name ? ` (${q.participant_name})` : ''}
+                            </span>
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {tag.negative_count > 0 && (
+                  <div className="mb-2">
+                    <span className="text-xs font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+                      {tag.negative_count} ⚠️ Négatifs ({tag.quintuplets.filter(q => q.sentiment === 'negative').map(q => q.participant_id).filter((v, i, a) => a.indexOf(v) === i).length} participants : {tag.quintuplets.filter(q => q.sentiment === 'negative').map(q => q.participant_id).filter((v, i, a) => a.indexOf(v) === i).join(', ')})
+                    </span>
+                    <div className="mt-2 space-y-1.5 ml-2">
+                      {tag.quintuplets
+                        .filter((q) => q.sentiment === 'negative')
+                        .map((q, i) => (
+                          <p key={`${q.id}-neg-${i}`} className="text-sm text-muted-foreground">
+                            {sentimentEmoji(q.sentiment)} <span className="italic">&ldquo;{q.verbatim}&rdquo;</span>
+                            <span className="text-xs text-muted-foreground/60">
+                              {' '}— {q.question} — {q.participant_id}
+                              {q.participant_name ? ` (${q.participant_name})` : ''}
+                            </span>
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {tag.suggestion_count > 0 && (
+                  <div className="mb-2">
+                    <span className="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+                      {tag.suggestion_count} 💡 Suggestions ({tag.quintuplets.filter(q => q.sentiment === 'suggestion').map(q => q.participant_id).filter((v, i, a) => a.indexOf(v) === i).length} participants : {tag.quintuplets.filter(q => q.sentiment === 'suggestion').map(q => q.participant_id).filter((v, i, a) => a.indexOf(v) === i).join(', ')})
+                    </span>
+                    <div className="mt-2 space-y-1.5 ml-2">
+                      {tag.quintuplets
+                        .filter((q) => q.sentiment === 'suggestion')
+                        .map((q, i) => (
+                          <p key={`${q.id}-sug-${i}`} className="text-sm text-muted-foreground">
+                            {sentimentEmoji(q.sentiment)} <span className="italic">&ldquo;{q.verbatim}&rdquo;</span>
+                            <span className="text-xs text-muted-foreground/60">
+                              {' '}— {q.question} — {q.participant_id}
+                              {q.participant_name ? ` (${q.participant_name})` : ''}
+                            </span>
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {tag.summary && (
+                  <div className="mt-3 bg-secondary/30 rounded-lg p-3">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Résumé
+                    </span>
+                    <p className="mt-1 text-sm text-foreground">{tag.summary}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {cluster.summary && (
+            <div className="px-6 py-5 border-t border-border bg-primary/5">
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                Synthèse — {cluster.title}
+              </span>
+              <p className="mt-2 text-sm text-foreground leading-relaxed">
+                {cluster.summary}
+              </p>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}

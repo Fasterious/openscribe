@@ -13,6 +13,7 @@ import type { User } from '@supabase/supabase-js';
 const NAV_ITEMS = [
   { href: '/', label: 'Transcription' },
   { href: '/workshop', label: 'Workshop' },
+  { href: '/csv-analysis', label: 'Analyse CSV' },
 ];
 
 interface HeaderProps {
