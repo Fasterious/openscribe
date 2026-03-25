@@ -26,7 +26,26 @@ export interface Cluster {
   label: string;
   summary: string;
   participant_count: number;
-  excerpts: ClusterExcerpt[];
+  /** Extraits à tonalité positive (alignés avec « Pros (N) » dans summary, N = longueur) */
+  excerpts_pros?: ClusterExcerpt[];
+  /** Extraits à tonalité négative / amélioration (alignés avec « Cons (M) », M = longueur) */
+  excerpts_cons?: ClusterExcerpt[];
+  /** @deprecated Anciennes analyses (avant pros/cons) */
+  excerpts?: ClusterExcerpt[];
+}
+
+/** Tous les extraits du cluster (nouveau format : pros + cons ; ancien : excerpts seul) */
+export function getAllClusterExcerpts(cluster: Cluster): ClusterExcerpt[] {
+  const pros = cluster.excerpts_pros;
+  const cons = cluster.excerpts_cons;
+  if (Array.isArray(pros) || Array.isArray(cons)) {
+    return [...(pros ?? []), ...(cons ?? [])];
+  }
+  return cluster.excerpts ?? [];
+}
+
+export function hasSplitExcerpts(cluster: Cluster): boolean {
+  return Array.isArray(cluster.excerpts_pros) && Array.isArray(cluster.excerpts_cons);
 }
 
 export interface AnalysisResult {

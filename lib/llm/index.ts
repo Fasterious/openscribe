@@ -1,5 +1,5 @@
 import type { LLMClient, ClusteringInput, AnalysisResult } from './types';
-import type { LLMProvider } from '@/types/workshop';
+import type { LLMProvider, Cluster } from '@/types/workshop';
 import { LLM_MODELS } from '@/types/workshop';
 import { createGeminiClient } from './gemini';
 import { createMistralClient } from './mistral';
@@ -16,12 +16,37 @@ export function getLLMClient(provider: LLMProvider): LLMClient {
     case 'gemini-pro':
       return createGeminiClient(LLM_MODELS[provider].model);
     case 'mistral-small':
+      return createMistralClient(LLM_MODELS[provider].model, {
+        reasoningEffort: 'high',
+      });
     case 'mistral-medium':
     case 'mistral-large':
       return createMistralClient(LLM_MODELS[provider].model);
     default:
       throw new Error(`Unknown LLM provider: ${provider}`);
   }
+}
+
+/** Migre l’ancien format `excerpts` unique vers excerpts_pros / excerpts_cons */
+function normalizeClusterFromLLM(c: Cluster & { excerpts?: unknown }): Cluster {
+  const pros = c.excerpts_pros;
+  const cons = c.excerpts_cons;
+  if (Array.isArray(pros) || Array.isArray(cons)) {
+    return {
+      ...c,
+      excerpts_pros: Array.isArray(pros) ? pros : [],
+      excerpts_cons: Array.isArray(cons) ? cons : [],
+    };
+  }
+  const legacy = c.excerpts;
+  if (Array.isArray(legacy)) {
+    return {
+      ...c,
+      excerpts_pros: legacy as Cluster['excerpts_pros'],
+      excerpts_cons: [],
+    };
+  }
+  return { ...c, excerpts_pros: [], excerpts_cons: [] };
 }
 
 function extractJSON(text: string): string {
@@ -45,6 +70,7 @@ export async function runClustering(
     if (!result.clusters || !Array.isArray(result.clusters)) {
       throw new Error('Invalid response: missing clusters array');
     }
+    result.clusters = result.clusters.map(normalizeClusterFromLLM);
     return result;
   } catch (e) {
     console.error('[Clustering] Failed to parse LLM response:', raw);

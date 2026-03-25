@@ -13,12 +13,30 @@ import type {
   LLMProvider,
   AnalysisResult,
   Cluster,
+  ClusterExcerpt,
 } from '@/types/workshop';
-import { LLM_MODELS } from '@/types/workshop';
+import { LLM_MODELS, getAllClusterExcerpts, hasSplitExcerpts } from '@/types/workshop';
 import { ImportModal } from '@/components/workshop/import-modal';
 
 function uniqueParticipantCount(cluster: Cluster): number {
-  return new Set(cluster.excerpts.map((e) => e.response_id)).size;
+  return new Set(getAllClusterExcerpts(cluster).map((e) => e.response_id)).size;
+}
+
+function isProExcerpt(cluster: Cluster, ex: ClusterExcerpt): boolean {
+  return (cluster.excerpts_pros ?? []).some(
+    (p) => p.response_id === ex.response_id && p.excerpt === ex.excerpt
+  );
+}
+
+/** Aperçu tooltip : jusqu’à 3 extraits (pros puis cons si format scindé) */
+function tooltipPreviewExcerpts(cluster: Cluster): ClusterExcerpt[] {
+  if (hasSplitExcerpts(cluster)) {
+    return [
+      ...(cluster.excerpts_pros ?? []).slice(0, 2),
+      ...(cluster.excerpts_cons ?? []).slice(0, 2),
+    ].slice(0, 3);
+  }
+  return getAllClusterExcerpts(cluster).slice(0, 3);
 }
 
 type Tab = 'clusters' | 'wordcloud' | 'raw';
@@ -80,6 +98,8 @@ function buildExportHtml(
     }
     analysis.clusters.forEach((cluster, idx) => {
       const count = uniqueParticipantCount(cluster);
+      const pros = cluster.excerpts_pros ?? [];
+      const cons = cluster.excerpts_cons ?? [];
       clustersHtml += `<div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:16px">
         <div style="padding:16px 20px;background:#fafafa;border-bottom:1px solid #e5e7eb">
           <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#e0f2fe;color:#0284c7;font-size:14px;font-weight:600;margin-right:12px">${count}</span>
@@ -87,9 +107,39 @@ function buildExportHtml(
         </div>
         <div style="padding:16px 20px">
           <p style="margin:0 0 12px 0;font-size:14px;color:#4b5563">${escapeHtml(cluster.summary)}</p>
-          <h4 style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0">Extraits (${cluster.excerpts.length})</h4>
+          ${hasSplitExcerpts(cluster)
+            ? `${pros.length > 0
+                ? `<h4 style="font-size:11px;font-weight:600;color:#166534;text-transform:uppercase;letter-spacing:0.05em;margin:16px 0 8px 0">Extraits positifs (${pros.length})</h4>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+            ${pros
+              .map(
+                (e) =>
+                  `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 16px;font-size:14px">
+                <span style="font-weight:500">${escapeHtml(e.participant_name)}</span>
+                <span style="color:#6b7280"> : </span>
+                <span style="font-style:italic;color:#374151">"${escapeHtml(e.excerpt)}"</span>
+              </div>`
+              )
+              .join('')}
+          </div>`
+                : ''}${cons.length > 0
+                ? `<h4 style="font-size:11px;font-weight:600;color:#9a3412;text-transform:uppercase;letter-spacing:0.05em;margin:16px 0 8px 0">Limites / amélioration (${cons.length})</h4>
           <div style="display:flex;flex-direction:column;gap:8px">
-            ${cluster.excerpts
+            ${cons
+              .map(
+                (e) =>
+                  `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 16px;font-size:14px">
+                <span style="font-weight:500">${escapeHtml(e.participant_name)}</span>
+                <span style="color:#6b7280"> : </span>
+                <span style="font-style:italic;color:#374151">"${escapeHtml(e.excerpt)}"</span>
+              </div>`
+              )
+              .join('')}
+          </div>`
+                : ''}`
+            : `<h4 style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px 0">Extraits (${getAllClusterExcerpts(cluster).length})</h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${getAllClusterExcerpts(cluster)
               .map(
                 (e) =>
                   `<div style="background:#f3f4f6;border-radius:8px;padding:12px 16px;font-size:14px">
@@ -99,7 +149,7 @@ function buildExportHtml(
               </div>`
               )
               .join('')}
-          </div>
+          </div>`}
         </div>
       </div>`;
     });
@@ -1102,10 +1152,28 @@ function WordCloudView({
                 </p>
                 <div className="space-y-1.5">
                   <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Extraits ({cluster.excerpts.length})
+                    Extraits ({getAllClusterExcerpts(cluster).length})
                   </h4>
-                  {cluster.excerpts.slice(0, 3).map((excerpt, i) => (
-                    <div key={i} className="bg-muted/50 rounded-md px-3 py-2 text-xs">
+                  {tooltipPreviewExcerpts(cluster).map((excerpt, i) => (
+                    <div
+                      key={`${excerpt.response_id}-${i}`}
+                      className={`rounded-md px-3 py-2 text-xs ${
+                        hasSplitExcerpts(cluster)
+                          ? isProExcerpt(cluster, excerpt)
+                            ? 'bg-emerald-500/10 border border-emerald-500/20'
+                            : 'bg-orange-500/10 border border-orange-500/20'
+                          : 'bg-muted/50'
+                      }`}
+                    >
+                      {hasSplitExcerpts(cluster) && (
+                        <span
+                          className={`text-[10px] font-semibold uppercase tracking-wide block mb-0.5 ${
+                            isProExcerpt(cluster, excerpt) ? 'text-emerald-700' : 'text-orange-800'
+                          }`}
+                        >
+                          {isProExcerpt(cluster, excerpt) ? 'Pros' : 'Cons'}
+                        </span>
+                      )}
                       <span className="font-medium text-foreground">{excerpt.participant_name}</span>
                       <span className="text-muted-foreground"> : </span>
                       <span
@@ -1121,9 +1189,10 @@ function WordCloudView({
                       </span>
                     </div>
                   ))}
-                  {cluster.excerpts.length > 3 && (
+                  {getAllClusterExcerpts(cluster).length > 3 && (
                     <p className="text-xs text-muted-foreground text-center pt-1">
-                      +{cluster.excerpts.length - 3} extrait{cluster.excerpts.length - 3 > 1 ? 's' : ''}
+                      +{getAllClusterExcerpts(cluster).length - 3} extrait
+                      {getAllClusterExcerpts(cluster).length - 3 > 1 ? 's' : ''}
                     </p>
                   )}
                 </div>
@@ -1137,6 +1206,8 @@ function WordCloudView({
         (() => {
           const cluster = clusters[pinnedClusterIndex];
           if (!cluster) return null;
+          const pros = cluster.excerpts_pros ?? [];
+          const cons = cluster.excerpts_cons ?? [];
           return (
             <aside
               className="fixed top-0 right-0 z-[110] h-dvh w-full max-w-md flex flex-col border-l border-border bg-card shadow-2xl animate-in slide-in-from-right duration-300"
@@ -1152,7 +1223,13 @@ function WordCloudView({
                         {cluster.label}
                       </h3>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {cluster.excerpts.length} extrait{cluster.excerpts.length > 1 ? 's' : ''}
+                        {getAllClusterExcerpts(cluster).length} extrait
+                        {getAllClusterExcerpts(cluster).length > 1 ? 's' : ''}
+                        {hasSplitExcerpts(cluster) && (
+                          <span className="block text-[11px] mt-0.5">
+                            {pros.length} pros · {cons.length} cons
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -1176,25 +1253,72 @@ function WordCloudView({
                       {cluster.summary}
                     </p>
                   </div>
-                  <div>
-                    <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                      Tous les extraits ({cluster.excerpts.length})
-                    </h4>
-                    <ul className="space-y-3">
-                      {cluster.excerpts.map((excerpt, i) => (
-                        <li
-                          key={`${excerpt.response_id}-${i}`}
-                          className="bg-muted/40 rounded-lg border border-border px-3 py-3 text-sm"
-                        >
-                          <span className="font-medium text-foreground">{excerpt.participant_name}</span>
-                          <span className="text-muted-foreground"> : </span>
-                          <span className="text-foreground/85 italic whitespace-pre-wrap block mt-1 pl-0">
-                            &quot;{excerpt.excerpt}&quot;
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {hasSplitExcerpts(cluster) ? (
+                    <>
+                      {pros.length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-semibold text-emerald-800 uppercase tracking-wider mb-2">
+                            Extraits positifs ({pros.length})
+                          </h4>
+                          <ul className="space-y-3">
+                            {pros.map((excerpt, i) => (
+                              <li
+                                key={`pro-${excerpt.response_id}-${i}`}
+                                className="bg-emerald-500/10 rounded-lg border border-emerald-500/25 px-3 py-3 text-sm"
+                              >
+                                <span className="font-medium text-foreground">{excerpt.participant_name}</span>
+                                <span className="text-muted-foreground"> : </span>
+                                <span className="text-foreground/85 italic whitespace-pre-wrap block mt-1 pl-0">
+                                  &quot;{excerpt.excerpt}&quot;
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {cons.length > 0 && (
+                        <div>
+                          <h4 className="text-xs font-semibold text-orange-900 uppercase tracking-wider mb-2">
+                            Limites / amélioration ({cons.length})
+                          </h4>
+                          <ul className="space-y-3">
+                            {cons.map((excerpt, i) => (
+                              <li
+                                key={`con-${excerpt.response_id}-${i}`}
+                                className="bg-orange-500/10 rounded-lg border border-orange-500/25 px-3 py-3 text-sm"
+                              >
+                                <span className="font-medium text-foreground">{excerpt.participant_name}</span>
+                                <span className="text-muted-foreground"> : </span>
+                                <span className="text-foreground/85 italic whitespace-pre-wrap block mt-1 pl-0">
+                                  &quot;{excerpt.excerpt}&quot;
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div>
+                      <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                        Tous les extraits ({getAllClusterExcerpts(cluster).length})
+                      </h4>
+                      <ul className="space-y-3">
+                        {getAllClusterExcerpts(cluster).map((excerpt, i) => (
+                          <li
+                            key={`${excerpt.response_id}-${i}`}
+                            className="bg-muted/40 rounded-lg border border-border px-3 py-3 text-sm"
+                          >
+                            <span className="font-medium text-foreground">{excerpt.participant_name}</span>
+                            <span className="text-muted-foreground"> : </span>
+                            <span className="text-foreground/85 italic whitespace-pre-wrap block mt-1 pl-0">
+                              &quot;{excerpt.excerpt}&quot;
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
             </aside>
           );
@@ -1211,6 +1335,8 @@ function ClusterCard({
   index: number;
 }) {
   const [expanded, setExpanded] = useState(index < 3);
+  const pros = cluster.excerpts_pros ?? [];
+  const cons = cluster.excerpts_cons ?? [];
 
   return (
     <div className="bg-card rounded-2xl border border-border overflow-hidden">
@@ -1242,25 +1368,57 @@ function ClusterCard({
         <div className="px-5 pb-5 space-y-4 border-t border-border pt-4">
           <p className="text-sm text-muted-foreground">{cluster.summary}</p>
 
-          <div className="space-y-2">
-            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Extraits ({cluster.excerpts.length})
-            </h4>
-            {cluster.excerpts.map((excerpt, i) => (
-              <div
-                key={i}
-                className="bg-muted/50 rounded-lg px-4 py-3 text-sm"
-              >
-                <span className="font-medium text-foreground">
-                  {excerpt.participant_name}
-                </span>
-                <span className="text-muted-foreground"> : </span>
-                <span className="text-foreground/80 italic">
-                  &quot;{excerpt.excerpt}&quot;
-                </span>
-              </div>
-            ))}
-          </div>
+          {hasSplitExcerpts(cluster) ? (
+            <div className="space-y-4">
+              {pros.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-emerald-800 uppercase tracking-wider">
+                    Extraits positifs ({pros.length})
+                  </h4>
+                  {pros.map((excerpt, i) => (
+                    <div
+                      key={`pro-${i}`}
+                      className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-4 py-3 text-sm"
+                    >
+                      <span className="font-medium text-foreground">{excerpt.participant_name}</span>
+                      <span className="text-muted-foreground"> : </span>
+                      <span className="text-foreground/80 italic">&quot;{excerpt.excerpt}&quot;</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {cons.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-orange-900 uppercase tracking-wider">
+                    Limites / amélioration ({cons.length})
+                  </h4>
+                  {cons.map((excerpt, i) => (
+                    <div
+                      key={`con-${i}`}
+                      className="bg-orange-500/10 border border-orange-500/20 rounded-lg px-4 py-3 text-sm"
+                    >
+                      <span className="font-medium text-foreground">{excerpt.participant_name}</span>
+                      <span className="text-muted-foreground"> : </span>
+                      <span className="text-foreground/80 italic">&quot;{excerpt.excerpt}&quot;</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Extraits ({getAllClusterExcerpts(cluster).length})
+              </h4>
+              {getAllClusterExcerpts(cluster).map((excerpt, i) => (
+                <div key={i} className="bg-muted/50 rounded-lg px-4 py-3 text-sm">
+                  <span className="font-medium text-foreground">{excerpt.participant_name}</span>
+                  <span className="text-muted-foreground"> : </span>
+                  <span className="text-foreground/80 italic">&quot;{excerpt.excerpt}&quot;</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
