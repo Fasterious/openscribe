@@ -14,6 +14,25 @@ function extractJSON(text: string): string {
   return text.trim();
 }
 
+function extractPlainText(text: string): string {
+  let cleaned = text.trim();
+  // Strip markdown fences
+  const fenced = cleaned.match(/```(?:\w+)?\s*([\s\S]*?)```/);
+  if (fenced) cleaned = fenced[1].trim();
+  // If LLM returned JSON with a key like resume_executif, extract the value
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (typeof parsed === 'object' && parsed !== null) {
+      const values = Object.values(parsed).filter((v) => typeof v === 'string');
+      if (values.length > 0) return (values as string[]).join('\n\n');
+    }
+    if (typeof parsed === 'string') return parsed;
+  } catch {
+    // Not JSON — good, return as-is
+  }
+  return cleaned;
+}
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const {
@@ -116,11 +135,12 @@ Total : ${totalQuintuplets} verbatims analysés, ${allParticipants.size} partici
 
 Réponds UNIQUEMENT avec le texte du résumé, sans JSON ni balises.`;
 
-    const globalSummary = await client.analyze(globalPrompt);
+    const globalSummaryRaw = await client.analyze(globalPrompt);
+    const globalSummary = extractPlainText(globalSummaryRaw);
 
     const finalAnalysis: FinalAnalysis = {
       clusters: synthesizedClusters,
-      global_summary: globalSummary.trim(),
+      global_summary: globalSummary,
       total_quintuplets: totalQuintuplets,
       total_participants: allParticipants.size,
       total_clusters: synthesizedClusters.length,

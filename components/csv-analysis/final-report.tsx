@@ -1,26 +1,82 @@
 'use client';
 
 import { sentimentEmoji } from '@/types/csv-analysis';
+import { generateMarkdown, generateHTML, downloadFile } from '@/lib/csv-analysis/export';
 import type { FinalAnalysis } from '@/types/csv-analysis';
+
+function cleanSummaryText(text: string): string {
+  let cleaned = text.trim();
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (typeof parsed === 'object' && parsed !== null) {
+      const values = Object.values(parsed).filter((v) => typeof v === 'string');
+      if (values.length > 0) return (values as string[]).join('\n\n');
+    }
+    if (typeof parsed === 'string') return parsed;
+  } catch {
+    // Not JSON
+  }
+  return cleaned;
+}
 
 interface FinalReportProps {
   analysis: FinalAnalysis;
+  filename?: string;
 }
 
-export function FinalReport({ analysis }: FinalReportProps) {
+export function FinalReport({ analysis, filename }: FinalReportProps) {
+  const baseName = filename?.replace(/\.csv$/i, '') || 'analyse';
+
+  const cleanedAnalysis: FinalAnalysis = {
+    ...analysis,
+    global_summary: cleanSummaryText(analysis.global_summary),
+  };
+
+  const handleDownloadMarkdown = () => {
+    const md = generateMarkdown(cleanedAnalysis, filename);
+    downloadFile(md, `${baseName}_rapport.md`, 'text/markdown;charset=utf-8');
+  };
+
+  const handleDownloadHTML = () => {
+    const html = generateHTML(cleanedAnalysis, filename);
+    downloadFile(html, `${baseName}_rapport.html`, 'text/html;charset=utf-8');
+  };
+
   return (
     <div className="space-y-8">
       <div className="bg-card rounded-xl border border-border p-6">
-        <h2 className="text-lg font-semibold text-foreground mb-2">
-          Résumé exécutif
-        </h2>
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <h2 className="text-lg font-semibold text-foreground">
+            Résumé exécutif
+          </h2>
+          <div className="flex gap-2 flex-shrink-0">
+            <button
+              onClick={handleDownloadMarkdown}
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-border hover:bg-secondary transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Markdown
+            </button>
+            <button
+              onClick={handleDownloadHTML}
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-border hover:bg-secondary transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              HTML
+            </button>
+          </div>
+        </div>
         <div className="flex gap-4 mb-4 text-sm text-muted-foreground">
           <span>{analysis.total_quintuplets} verbatims analysés</span>
           <span>{analysis.total_participants} participants</span>
           <span>{analysis.total_clusters} grands thèmes</span>
         </div>
         <p className="text-sm text-foreground leading-relaxed">
-          {analysis.global_summary}
+          {cleanSummaryText(analysis.global_summary)}
         </p>
       </div>
 

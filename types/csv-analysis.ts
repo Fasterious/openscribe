@@ -46,6 +46,7 @@ export interface AnalysisCluster {
 
 export interface ParsedCsvData {
   questions: string[];
+  selected_questions?: string[];
   participants: {
     id: string;
     name: string;

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { session_id } = await request.json();
+  const { session_id, selected_questions } = await request.json();
 
   if (!session_id) {
     return NextResponse.json(
@@ -56,9 +56,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const questionsToAnalyze: string[] =
+    Array.isArray(selected_questions) && selected_questions.length > 0
+      ? selected_questions
+      : parsed.questions;
+
+  // Persist the selection
+  const updatedParsed = { ...parsed, selected_questions: questionsToAnalyze };
   await admin
     .from('csv_analysis_sessions')
-    .update({ status: 'extracting', current_step: 2 })
+    .update({
+      status: 'extracting',
+      current_step: 2,
+      step_1_parsed: updatedParsed,
+    })
     .eq('id', session_id);
 
   try {
@@ -67,12 +78,12 @@ export async function POST(request: NextRequest) {
     let globalIdx = 0;
 
     for (const participant of parsed.participants) {
-      const hasResponses = parsed.questions.some(
+      const hasResponses = questionsToAnalyze.some(
         (q) => participant.responses[q]?.trim()
       );
       if (!hasResponses) continue;
 
-      const prompt = buildExtractionPrompt(participant, parsed.questions);
+      const prompt = buildExtractionPrompt(participant, questionsToAnalyze);
       const raw = await client.analyze(prompt);
       const json = extractJSON(raw);
 

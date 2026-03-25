@@ -11,6 +11,21 @@ import { FinalReport } from '@/components/csv-analysis/final-report';
 import { createClient } from '@/lib/supabase/client';
 import type { CsvAnalysisSession, AnalysisStep } from '@/types/csv-analysis';
 
+function cleanSummaryText(text: string): string {
+  let cleaned = text.trim();
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (typeof parsed === 'object' && parsed !== null) {
+      const values = Object.values(parsed).filter((v) => typeof v === 'string');
+      if (values.length > 0) return (values as string[]).join('\n\n');
+    }
+    if (typeof parsed === 'string') return parsed;
+  } catch {
+    // Not JSON
+  }
+  return cleaned;
+}
+
 export default function CsvAnalysisPipeline() {
   const params = useParams();
   const router = useRouter();
@@ -22,6 +37,7 @@ export default function CsvAnalysisPipeline() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<'pipeline' | 'report'>('pipeline');
+  const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set());
 
   const fetchSession = useCallback(async () => {
     try {
@@ -46,9 +62,18 @@ export default function CsvAnalysisPipeline() {
     fetchSession();
   }, [fetchSession]);
 
+  useEffect(() => {
+    if (session?.step_1_parsed && selectedQuestions.size === 0) {
+      const parsed = session.step_1_parsed;
+      const initial = parsed.selected_questions ?? parsed.questions;
+      setSelectedQuestions(new Set(initial));
+    }
+  }, [session, selectedQuestions.size]);
+
   const runStep = async (
     endpoint: string,
-    nextStatus: AnalysisStep
+    nextStatus: AnalysisStep,
+    extraBody?: Record<string, unknown>
   ) => {
     setProcessing(true);
     setError(null);
@@ -56,7 +81,7 @@ export default function CsvAnalysisPipeline() {
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: analysisId }),
+        body: JSON.stringify({ session_id: analysisId, ...extraBody }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -70,7 +95,15 @@ export default function CsvAnalysisPipeline() {
     }
   };
 
-  const handleExtract = () => runStep('/api/csv-analysis/extract', 'extracting');
+  const handleExtract = () => {
+    if (selectedQuestions.size === 0) {
+      setError('Sélectionnez au moins une question à analyser.');
+      return;
+    }
+    runStep('/api/csv-analysis/extract', 'extracting', {
+      selected_questions: [...selectedQuestions],
+    });
+  };
   const handleCluster = () => runStep('/api/csv-analysis/cluster', 'clustering');
   const handleSynthesize = () => runStep('/api/csv-analysis/synthesize', 'synthesizing');
 
@@ -181,7 +214,7 @@ export default function CsvAnalysisPipeline() {
 
           {/* Report view */}
           {activeView === 'report' && finalAnalysis && (
-            <FinalReport analysis={finalAnalysis} />
+            <FinalReport analysis={finalAnalysis} filename={session.filename} />
           )}
 
           {/* Pipeline view */}
@@ -196,7 +229,7 @@ export default function CsvAnalysisPipeline() {
                         Étape 1 — Parsing CSV
                       </h2>
                       <p className="text-sm text-muted-foreground mt-0.5">
-                        {parsed.total_participants} participants · {parsed.total_questions} questions détectées
+                        {parsed.total_participants} participants · {parsed.total_questions} questions détectées · {selectedQuestions.size} sélectionnées
                       </p>
                     </div>
                     <span className="bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
@@ -204,16 +237,58 @@ export default function CsvAnalysisPipeline() {
                     </span>
                   </div>
                   <div className="px-5 py-4">
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        Questions identifiées
-                      </p>
-                      <div className="space-y-1">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Questions à analyser
+                        </p>
+                        {!quintuplets && (
+                          <button
+                            onClick={() => {
+                              if (selectedQuestions.size === parsed.questions.length) {
+                                setSelectedQuestions(new Set());
+                              } else {
+                                setSelectedQuestions(new Set(parsed.questions));
+                              }
+                            }}
+                            className="text-xs text-primary hover:underline"
+                          >
+                            {selectedQuestions.size === parsed.questions.length
+                              ? 'Tout désélectionner'
+                              : 'Tout sélectionner'}
+                          </button>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
                         {parsed.questions.map((q, i) => (
-                          <p key={i} className="text-sm text-foreground">
-                            <span className="text-muted-foreground mr-2">Q{i + 1}.</span>
-                            {q}
-                          </p>
+                          <label
+                            key={i}
+                            className={`flex items-start gap-3 text-sm p-2 rounded-lg transition-colors ${
+                              !quintuplets ? 'hover:bg-secondary/30 cursor-pointer' : ''
+                            } ${selectedQuestions.has(q) ? 'text-foreground' : 'text-muted-foreground'}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedQuestions.has(q)}
+                              disabled={!!quintuplets}
+                              onChange={() => {
+                                setSelectedQuestions((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(q)) {
+                                    next.delete(q);
+                                  } else {
+                                    next.add(q);
+                                  }
+                                  return next;
+                                });
+                              }}
+                              className="mt-0.5 rounded border-border text-primary focus:ring-primary"
+                            />
+                            <span>
+                              <span className="text-muted-foreground mr-1.5">Q{i + 1}.</span>
+                              {q}
+                            </span>
+                          </label>
                         ))}
                       </div>
                     </div>
@@ -347,7 +422,7 @@ export default function CsvAnalysisPipeline() {
                         <span>{finalAnalysis.total_clusters} thèmes</span>
                       </div>
                       <p className="text-sm text-foreground leading-relaxed">
-                        {finalAnalysis.global_summary}
+                        {cleanSummaryText(finalAnalysis.global_summary)}
                       </p>
                     </div>
                   </div>
