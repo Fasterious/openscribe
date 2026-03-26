@@ -17,6 +17,10 @@ function renderTagMarkdown(tag: NormalizedTag): string {
   const lines: string[] = [];
   lines.push(`#### ${tag.label}\n`);
 
+  if (tag.summary) {
+    lines.push(`> **Résumé :** ${tag.summary}\n`);
+  }
+
   const sentiments: { key: string; label: string; emoji: string }[] = [
     { key: 'positive', label: 'Positifs', emoji: '✅' },
     { key: 'negative', label: 'Négatifs', emoji: '⚠️' },
@@ -34,10 +38,6 @@ function renderTagMarkdown(tag: NormalizedTag): string {
       lines.push(`- ${verbatimLine(q)}`);
     }
     lines.push('');
-  }
-
-  if (tag.summary) {
-    lines.push(`> **Résumé :** ${tag.summary}\n`);
   }
 
   return lines.join('\n');
@@ -63,13 +63,13 @@ export function generateMarkdown(analysis: FinalAnalysis, filename?: string): st
       `✅ ${cluster.total_positive} · ⚠️ ${cluster.total_negative} · 💡 ${cluster.total_suggestion} · ${cluster.unique_participants.length} participants uniques (${cluster.unique_participants.join(', ')})\n`
     );
 
-    for (const tag of cluster.normalized_tags) {
-      lines.push(renderTagMarkdown(tag));
-    }
-
     if (cluster.summary) {
       lines.push(`### Synthèse — ${cluster.title}\n`);
       lines.push(`${cluster.summary}\n`);
+    }
+
+    for (const tag of cluster.normalized_tags) {
+      lines.push(renderTagMarkdown(tag));
     }
 
     lines.push(`---\n`);

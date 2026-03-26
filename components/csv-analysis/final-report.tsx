@@ -99,12 +99,32 @@ export function FinalReport({ analysis, filename }: FinalReportProps) {
             </div>
           </div>
 
+          {cluster.summary && (
+            <div className="px-6 py-4 border-b border-border bg-primary/5">
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                Synthèse — {cluster.title}
+              </span>
+              <p className="mt-2 text-sm text-foreground leading-relaxed">
+                {cluster.summary}
+              </p>
+            </div>
+          )}
+
           <div className="divide-y divide-border/50">
             {cluster.normalized_tags.map((tag, tagIdx) => (
               <div key={tagIdx} className="px-6 py-4">
                 <h4 className="font-medium text-sm text-foreground mb-3">
                   {tag.label}
                 </h4>
+
+                {tag.summary && (
+                  <div className="mb-3 bg-secondary/30 rounded-lg p-3">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Résumé
+                    </span>
+                    <p className="mt-1 text-sm text-foreground">{tag.summary}</p>
+                  </div>
+                )}
 
                 {tag.positive_count > 0 && (
                   <div className="mb-2">
@@ -168,29 +188,9 @@ export function FinalReport({ analysis, filename }: FinalReportProps) {
                     </div>
                   </div>
                 )}
-
-                {tag.summary && (
-                  <div className="mt-3 bg-secondary/30 rounded-lg p-3">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Résumé
-                    </span>
-                    <p className="mt-1 text-sm text-foreground">{tag.summary}</p>
-                  </div>
-                )}
               </div>
             ))}
           </div>
-
-          {cluster.summary && (
-            <div className="px-6 py-5 border-t border-border bg-primary/5">
-              <span className="text-xs font-semibold text-primary uppercase tracking-wide">
-                Synthèse — {cluster.title}
-              </span>
-              <p className="mt-2 text-sm text-foreground leading-relaxed">
-                {cluster.summary}
-              </p>
-            </div>
-          )}
         </div>
       ))}
     </div>

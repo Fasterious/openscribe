@@ -39,6 +39,15 @@ function TagSection({ tag }: { tag: NormalizedTag }) {
 
       {expanded && (
         <div className="px-4 pb-4 space-y-3">
+          {tag.summary && (
+            <div className="bg-secondary/30 rounded-lg p-3 text-sm text-foreground">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Résumé du tag
+              </span>
+              <p className="mt-1">{tag.summary}</p>
+            </div>
+          )}
+
           <div className="space-y-2">
             {tag.quintuplets.map((q) => (
               <div
@@ -56,15 +65,6 @@ function TagSection({ tag }: { tag: NormalizedTag }) {
               </div>
             ))}
           </div>
-
-          {tag.summary && (
-            <div className="bg-secondary/30 rounded-lg p-3 text-sm text-foreground">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Résumé du tag
-              </span>
-              <p className="mt-1">{tag.summary}</p>
-            </div>
-          )}
         </div>
       )}
     </div>
@@ -104,22 +104,22 @@ export function ClusterView({ clusters }: ClusterViewProps) {
             </div>
           </div>
 
-          <div className="p-4 space-y-2">
-            {cluster.normalized_tags.map((tag, tagIdx) => (
-              <TagSection key={tagIdx} tag={tag} />
-            ))}
-          </div>
-
           {cluster.summary && (
-            <div className="px-5 py-4 border-t border-border bg-primary/5">
+            <div className="px-5 py-4 border-b border-border bg-primary/5">
               <span className="text-xs font-medium text-primary uppercase tracking-wide">
-                Résumé du cluster
+                Synthèse du cluster
               </span>
               <p className="mt-1.5 text-sm text-foreground leading-relaxed">
                 {cluster.summary}
               </p>
             </div>
           )}
+
+          <div className="p-4 space-y-2">
+            {cluster.normalized_tags.map((tag, tagIdx) => (
+              <TagSection key={tagIdx} tag={tag} />
+            ))}
+          </div>
         </div>
       ))}
     </div>
