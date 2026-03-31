@@ -9,6 +9,7 @@ import {
 } from '@/lib/transcription-cache';
 import { deleteFile } from '@/lib/r2';
 import { VOXTRAL_PRICE_PER_MINUTE } from '@/types';
+import { isAllowedVoxtralTranscriptionLanguage } from '@/lib/voxtral-transcription-languages';
 
 export const maxDuration = 300; // 5 minutes max pour le timeout
 
@@ -27,8 +28,20 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.json();
-    const { audioUrl, language, fileKey: fKey, metrics: clientMetrics } = body;
+    const { audioUrl, language: languageRaw, fileKey: fKey, metrics: clientMetrics } = body;
     fileKey = fKey; // Pour pouvoir supprimer en cas d'erreur aussi
+
+    let language: string | undefined;
+    if (languageRaw != null && String(languageRaw).trim() !== '') {
+      const code = String(languageRaw).trim();
+      if (!isAllowedVoxtralTranscriptionLanguage(code)) {
+        return NextResponse.json(
+          { error: 'Invalid language code' },
+          { status: 400 }
+        );
+      }
+      language = code;
+    }
 
     if (!audioUrl) {
       return NextResponse.json(
@@ -42,13 +55,15 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     const isAuthenticated = !!user;
 
+    console.log('[Transcribe API] language received from client:', language ?? '(auto)');
+
     // Mesurer le temps de transcription
     const startTime = Date.now();
 
     // Transcription synchrone via Voxtral (Mistral)
     const result = await transcribeFromUrl(audioUrl, {
       diarize: true,
-      language: language || undefined,
+      language,
     });
 
     const transcriptionTimeMs = Date.now() - startTime;
@@ -57,11 +72,12 @@ export async function POST(request: NextRequest) {
     const audioDurationMinutes = (result.audioDurationSeconds || 0) / 60;
     const cost = audioDurationMinutes * VOXTRAL_PRICE_PER_MINUTE;
 
-    // Ajouter les métriques au résultat
+    // Ajouter les métriques et la trace du choix langue (auto vs code explicite)
     const enrichedResult = {
       ...result,
       transcriptionTimeMs,
       cost: Math.round(cost * 10000) / 10000, // 4 décimales
+      transcriptionLanguageRequest: (language ?? 'auto') as 'auto' | string,
     };
 
     // Supprimer le fichier R2 après transcription réussie (nettoyage)

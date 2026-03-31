@@ -13,10 +13,15 @@ export const translations = {
     'upload.or': 'or',
     'upload.browse': 'Browse files',
     'upload.formats': 'Supports MP3, WAV, M4A, FLAC, OGG (up to 1 GB)',
+    'upload.speakerLanguage': 'Speaker language',
+    'upload.speakerLanguageAuto': 'Automatic detection',
+    'upload.speakerLanguageHint':
+      'If you know the language, selecting it usually improves transcription quality.',
     
     // Progress
     'progress.uploading': 'Uploading',
     'progress.processing': 'Processing',
+    'progress.transcriptionLanguage': 'Transcription language',
     'progress.transcribing': 'Transcribing with Voxtral...',
     
     // Error
@@ -25,6 +30,8 @@ export const translations = {
     
     // Transcript viewer
     'transcript.title': 'Transcription',
+    'transcript.inputLanguage': 'Your selection',
+    'transcript.detectedLanguage': 'Detected',
     'transcript.preview': 'Preview',
     'transcript.speakers': 'Speakers',
     'transcript.plain': 'Plain',
@@ -136,10 +143,15 @@ export const translations = {
     'upload.or': 'ou',
     'upload.browse': 'Parcourir les fichiers',
     'upload.formats': 'Formats supportés : MP3, WAV, M4A, FLAC, OGG (jusqu\'à 1 Go)',
+    'upload.speakerLanguage': 'Langue des locuteurs',
+    'upload.speakerLanguageAuto': 'Détection automatique',
+    'upload.speakerLanguageHint':
+      'Si vous connaissez la langue, la choisir améliore en général la qualité de la transcription.',
     
     // Progress
     'progress.uploading': 'Téléversement',
     'progress.processing': 'Traitement',
+    'progress.transcriptionLanguage': 'Langue de transcription',
     'progress.transcribing': 'Transcription avec Voxtral...',
     
     // Error
@@ -148,6 +160,8 @@ export const translations = {
     
     // Transcript viewer
     'transcript.title': 'Transcription',
+    'transcript.inputLanguage': 'Votre choix',
+    'transcript.detectedLanguage': 'Détectée',
     'transcript.preview': 'Aperçu',
     'transcript.speakers': 'Locuteurs',
     'transcript.plain': 'Texte',
@@ -259,10 +273,15 @@ export const translations = {
     'upload.or': 'o',
     'upload.browse': 'Explorar archivos',
     'upload.formats': 'Formatos soportados: MP3, WAV, M4A, FLAC, OGG (hasta 1 GB)',
+    'upload.speakerLanguage': 'Idioma de los hablantes',
+    'upload.speakerLanguageAuto': 'Detección automática',
+    'upload.speakerLanguageHint':
+      'Si conoces el idioma, elegirlo suele mejorar la calidad de la transcripción.',
     
     // Progress
     'progress.uploading': 'Subiendo',
     'progress.processing': 'Procesando',
+    'progress.transcriptionLanguage': 'Idioma de la transcripción',
     'progress.transcribing': 'Transcribiendo con Voxtral...',
     
     // Error
@@ -271,6 +290,8 @@ export const translations = {
     
     // Transcript viewer
     'transcript.title': 'Transcripción',
+    'transcript.inputLanguage': 'Tu elección',
+    'transcript.detectedLanguage': 'Detectado',
     'transcript.preview': 'Vista previa',
     'transcript.speakers': 'Hablantes',
     'transcript.plain': 'Texto',
@@ -382,10 +403,15 @@ export const translations = {
     'upload.or': 'ou',
     'upload.browse': 'Procurar arquivos',
     'upload.formats': 'Formatos suportados: MP3, WAV, M4A, FLAC, OGG (até 1 GB)',
+    'upload.speakerLanguage': 'Idioma dos falantes',
+    'upload.speakerLanguageAuto': 'Deteção automática',
+    'upload.speakerLanguageHint':
+      'Se você souber o idioma, escolhê-lo em geral melhora a qualidade da transcrição.',
     
     // Progress
     'progress.uploading': 'Enviando',
     'progress.processing': 'Processando',
+    'progress.transcriptionLanguage': 'Idioma da transcrição',
     'progress.transcribing': 'Transcrevendo com Voxtral...',
     
     // Error
@@ -394,6 +420,8 @@ export const translations = {
     
     // Transcript viewer
     'transcript.title': 'Transcrição',
+    'transcript.inputLanguage': 'Sua escolha',
+    'transcript.detectedLanguage': 'Detectado',
     'transcript.preview': 'Prévia',
     'transcript.speakers': 'Falantes',
     'transcript.plain': 'Texto',
@@ -505,10 +533,15 @@ export const translations = {
     'upload.or': 'oder',
     'upload.browse': 'Dateien durchsuchen',
     'upload.formats': 'Unterstützte Formate: MP3, WAV, M4A, FLAC, OGG (bis zu 1 GB)',
+    'upload.speakerLanguage': 'Sprache der Sprecher',
+    'upload.speakerLanguageAuto': 'Automatische Erkennung',
+    'upload.speakerLanguageHint':
+      'Wenn Sie die Sprache kennen, verbessert deren Auswahl meist die Transkriptionsqualität.',
     
     // Progress
     'progress.uploading': 'Hochladen',
     'progress.processing': 'Verarbeitung',
+    'progress.transcriptionLanguage': 'Transkriptionssprache',
     'progress.transcribing': 'Transkription mit Voxtral...',
     
     // Error
@@ -517,6 +550,8 @@ export const translations = {
     
     // Transcript viewer
     'transcript.title': 'Transkription',
+    'transcript.inputLanguage': 'Ihre Auswahl',
+    'transcript.detectedLanguage': 'Erkannt',
     'transcript.preview': 'Vorschau',
     'transcript.speakers': 'Sprecher',
     'transcript.plain': 'Text',

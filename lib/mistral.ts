@@ -283,10 +283,20 @@ function convertMistralResponse(response: MistralTranscriptionResponse): Transcr
 }
 
 /**
- * Transcrit un fichier audio via l'API Voxtral (Mistral)
- * 
- * @param input - Options de transcription (URL ou Buffer)
- * @returns Résultat de transcription au format unifié
+ * Transcrit un fichier audio via l'API Voxtral (Mistral).
+ *
+ * Implémentation côté app :
+ * - L’UI permet de choisir une langue (liste Voxtral) ou la détection auto ; le code ISO est
+ *   validé dans `/api/transcribe` puis passé ici en champ `language` quand l’utilisateur en choisit une.
+ * - Requête **uniquement** en `multipart/form-data` : l’endpoint refuse le JSON (erreur explicite
+ *   « formatted as multipart/form-data »). On envoie `file_url` (flux OpenScribe après upload R2) ou `file`.
+ * - Champs typiques : `model`, `file_url` ou `file`, `language` (optionnel), `diarize`, `timestamp_granularities`.
+ *
+ * Limite du modèle (pas un bug d’intégration) :
+ * - Même avec `language` fixé (ex. `fr`), la sortie peut encore mélanger de l’anglais ou d’autres langues
+ *   sur des passages ambigus, du bruit, ou du contenu multilingue réel — comportement observé aussi sur
+ *   la plateforme officielle Mistral. Le paramètre `language` améliore la précision mais ne verrouille pas
+ *   à 100 % la langue de chaque segment.
  */
 export async function transcribe(input: MistralTranscriptionInput): Promise<TranscriptionResult> {
   if (!MISTRAL_API_KEY) {
@@ -297,10 +307,12 @@ export async function transcribe(input: MistralTranscriptionInput): Promise<Tran
     throw new Error('Either audioUrl or audioBuffer must be provided');
   }
 
+  const diarize = input.diarize !== false;
+  const language = input.language?.trim() || undefined;
+
   const formData = new FormData();
   formData.append('model', 'voxtral-mini-latest');
 
-  // Ajouter l'audio (URL ou fichier)
   if (input.audioUrl) {
     formData.append('file_url', input.audioUrl);
   } else if (input.audioBuffer) {
@@ -308,19 +320,20 @@ export async function transcribe(input: MistralTranscriptionInput): Promise<Tran
     formData.append('file', blob, input.audioFileName || 'audio.mp3');
   }
 
-  // Diarization (avec timestamps segment requis)
-  if (input.diarize !== false) {
-    formData.append('diarize', 'true');
-    formData.append('timestamp_granularities[]', 'segment');
-  } else {
-    // Sans diarization, on peut quand même avoir les timestamps
-    formData.append('timestamp_granularities[]', 'segment');
+  if (language) {
+    formData.append('language', language);
   }
 
-  // Langue (optionnel - sinon détection automatique)
-  // Note: language n'est pas compatible avec timestamp_granularities selon la doc
-  // On laisse la détection automatique pour avoir les timestamps
-  
+  formData.append('diarize', diarize ? 'true' : 'false');
+  formData.append('timestamp_granularities', 'segment');
+
+  // Log pour debug
+  const fields: Record<string, string> = {};
+  formData.forEach((value, key) => {
+    fields[key] = value instanceof Blob ? `[Blob ${value.size}b]` : String(value);
+  });
+  console.log('[Mistral Transcribe] FormData fields →', JSON.stringify(fields));
+
   const response = await fetchWithRetry(
     MISTRAL_TRANSCRIPTION_URL,
     {

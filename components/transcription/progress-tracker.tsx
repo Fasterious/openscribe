@@ -3,6 +3,7 @@
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/context';
+import { getVoxtralLanguageLabel } from '@/lib/voxtral-transcription-languages';
 import type { TranscriptionStatus } from '@/types';
 
 interface ProgressTrackerProps {
@@ -11,6 +12,8 @@ interface ProgressTrackerProps {
   fileName?: string;
   className?: string;
   estimatedTimeRemaining?: number; // en secondes
+  /** Code langue Voxtral choisi, ou '' si détection automatique */
+  speakerLanguageCode?: string;
 }
 
 const statusIcons: Record<TranscriptionStatus, React.ReactNode> = {
@@ -57,7 +60,14 @@ function formatTimeRemaining(seconds: number): string {
   return `~${secs}s`;
 }
 
-export function ProgressTracker({ status, progress, fileName, className, estimatedTimeRemaining }: ProgressTrackerProps) {
+export function ProgressTracker({
+  status,
+  progress,
+  fileName,
+  className,
+  estimatedTimeRemaining,
+  speakerLanguageCode = '',
+}: ProgressTrackerProps) {
   const { t } = useTranslation();
   const isActive = status === 'uploading' || status === 'processing';
 
@@ -90,6 +100,14 @@ export function ProgressTracker({ status, progress, fileName, className, estimat
               {fileName}
             </p>
           )}
+          <p className="text-xs text-muted-foreground mt-1">
+            {t('progress.transcriptionLanguage')}:{' '}
+            <span className="text-foreground/90 font-medium">
+              {speakerLanguageCode.trim()
+                ? `${getVoxtralLanguageLabel(speakerLanguageCode.trim()) ?? speakerLanguageCode.trim()} (${speakerLanguageCode.trim()})`
+                : t('upload.speakerLanguageAuto')}
+            </span>
+          </p>
         </div>
       </div>
 

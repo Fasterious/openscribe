@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { UploadZone } from '@/components/transcription/upload-zone';
+import { TranscriptionLanguageSelect } from '@/components/transcription/transcription-language-select';
 import { ProgressTracker } from '@/components/transcription/progress-tracker';
 import { TranscriptViewer } from '@/components/transcription/transcript-viewer';
 import { AuthModal } from '@/components/auth/auth-modal';
@@ -37,6 +38,8 @@ export default function Home() {
   const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<number>(0);
   // Référence pour l'intervalle de progression
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  /** Code ISO Mistral / Voxtral, ou chaîne vide = détection automatique */
+  const [speakerLanguage, setSpeakerLanguage] = useState('');
 
   const supabase = createClient();
 
@@ -281,6 +284,7 @@ export default function Home() {
         body: JSON.stringify({
           audioUrl,
           fileKey,
+          language: speakerLanguage.trim() || null,
           metrics: {
             uploadStartMs,
             uploadEndMs,
@@ -344,7 +348,7 @@ export default function Home() {
         error: error instanceof Error ? error.message : 'An error occurred',
       }));
     }
-  }, []);
+  }, [speakerLanguage]);
 
   const handleReset = useCallback(() => {
     setState({
@@ -388,6 +392,10 @@ export default function Home() {
           {/* Upload or Progress */}
           {state.status === 'idle' && (
             <>
+              <TranscriptionLanguageSelect
+                value={speakerLanguage}
+                onChange={setSpeakerLanguage}
+              />
               <UploadZone onFileSelect={handleFileSelect} />
               
               {/* Privacy notice */}
@@ -407,6 +415,7 @@ export default function Home() {
                 progress={state.progress}
                 fileName={fileName}
                 estimatedTimeRemaining={state.status === 'processing' ? estimatedTimeRemaining : undefined}
+                speakerLanguageCode={speakerLanguage}
               />
               {state.status === 'processing' && (
                 <p className="text-center text-sm text-muted-foreground">

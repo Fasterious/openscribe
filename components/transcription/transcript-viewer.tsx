@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/context';
 import type { TranscriptionResult, TranscriptionSegment } from '@/types';
+import { getVoxtralLanguageLabel } from '@/lib/voxtral-transcription-languages';
 import { VOXTRAL_PRICE_PER_MINUTE, PREVIEW_PERCENTAGE } from '@/types';
 
 interface TranscriptViewerProps {
@@ -166,6 +167,13 @@ export function TranscriptViewer({
   // Get detected language (handle both formats)
   const detectedLanguage = result.detected_language || result.language;
 
+  const inputLanguageDisplay =
+    result.transcriptionLanguageRequest === 'auto'
+      ? t('upload.speakerLanguageAuto')
+      : result.transcriptionLanguageRequest
+        ? `${getVoxtralLanguageLabel(result.transcriptionLanguageRequest) ?? result.transcriptionLanguageRequest} (${result.transcriptionLanguageRequest})`
+        : null;
+
   // Get the best text to display for speaker view
   const getSpeakerContent = () => {
     if (hasSegments && groupedSegments.length > 0) {
@@ -212,9 +220,14 @@ export function TranscriptViewer({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex items-center gap-3 flex-wrap">
           <CardTitle className="text-lg font-semibold text-foreground">{t('transcript.title')}</CardTitle>
+          {inputLanguageDisplay && (
+            <Badge variant="outline" className="text-xs font-normal text-muted-foreground border-border/80">
+              {t('transcript.inputLanguage')}: {inputLanguageDisplay}
+            </Badge>
+          )}
           {detectedLanguage && (
             <Badge variant="secondary" className="text-xs font-medium">
-              {detectedLanguage.toUpperCase()}
+              {t('transcript.detectedLanguage')}: {detectedLanguage.toUpperCase()}
             </Badge>
           )}
           {!isAuthenticated && (
