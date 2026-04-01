@@ -9,25 +9,45 @@ function isProvider(v: unknown): v is Provider {
   return typeof v === 'string' && (PROVIDERS as readonly string[]).includes(v);
 }
 
-async function validateMistralKey(key: string): Promise<boolean> {
+async function validateMistralKey(key: string): Promise<{ valid: boolean; detail?: string }> {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
     const res = await fetch('https://api.mistral.ai/v1/models', {
       headers: { Authorization: `Bearer ${key}` },
+      signal: controller.signal,
     });
-    return res.ok;
-  } catch {
-    return false;
+    clearTimeout(timeout);
+    if (res.ok) return { valid: true };
+    if (res.status === 401) return { valid: false, detail: 'Clé refusée par Mistral (401 Unauthorized).' };
+    const body = await res.text().catch(() => '');
+    console.error(`[API Keys] Mistral validation failed: ${res.status} ${body}`);
+    return { valid: false, detail: `Mistral API a répondu ${res.status}.` };
+  } catch (err) {
+    console.error('[API Keys] Mistral validation fetch error:', err);
+    // If we can't reach Mistral (network issue), accept the key optimistically
+    // so the user isn't blocked by a transient outage.
+    return { valid: true };
   }
 }
 
-async function validateGeminiKey(key: string): Promise<boolean> {
+async function validateGeminiKey(key: string): Promise<{ valid: boolean; detail?: string }> {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`,
+      { signal: controller.signal }
     );
-    return res.ok;
-  } catch {
-    return false;
+    clearTimeout(timeout);
+    if (res.ok) return { valid: true };
+    if (res.status === 400 || res.status === 403) return { valid: false, detail: 'Clé refusée par Google Gemini.' };
+    const body = await res.text().catch(() => '');
+    console.error(`[API Keys] Gemini validation failed: ${res.status} ${body}`);
+    return { valid: false, detail: `Gemini API a répondu ${res.status}.` };
+  } catch (err) {
+    console.error('[API Keys] Gemini validation fetch error:', err);
+    return { valid: true };
   }
 }
 
@@ -86,19 +106,28 @@ export async function POST(request: NextRequest) {
   const trimmedKey = apiKey.trim();
 
   // Validate the key with the provider
-  const isValid =
+  const validation =
     provider === 'mistral'
       ? await validateMistralKey(trimmedKey)
       : await validateGeminiKey(trimmedKey);
 
-  if (!isValid) {
+  if (!validation.valid) {
     return NextResponse.json(
-      { error: 'Invalid API key. Please check your key and try again.' },
+      { error: `Clé API invalide. ${validation.detail ?? 'Veuillez vérifier et réessayer.'}` },
       { status: 422 }
     );
   }
 
-  const encryptedKey = encrypt(trimmedKey);
+  let encryptedKey: string;
+  try {
+    encryptedKey = encrypt(trimmedKey);
+  } catch (err) {
+    console.error('[API Keys] Encryption error:', err);
+    return NextResponse.json(
+      { error: 'Erreur serveur : chiffrement indisponible. Vérifiez que ENCRYPTION_KEY est configuré.' },
+      { status: 500 }
+    );
+  }
   const columnEncrypted = `${provider}_api_key_encrypted`;
   const columnConfigured = `${provider}_key_configured`;
 
