@@ -18,7 +18,6 @@ export default function WorkshopDashboard() {
   const [sessions, setSessions] = useState<WorkshopSession[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -64,20 +63,6 @@ export default function WorkshopDashboard() {
       return;
     }
     router.push('/workshop/create');
-  };
-
-  const handleDelete = async (e: React.MouseEvent, sessionId: string) => {
-    e.stopPropagation();
-    if (!confirm('Supprimer cette session et toutes ses réponses ?')) return;
-    setDeletingId(sessionId);
-    try {
-      const res = await fetch(`/api/workshop/sessions/${sessionId}`, { method: 'DELETE' });
-      if (res.ok) {
-        setSessions((prev) => prev.filter((s) => s.id !== sessionId));
-      }
-    } finally {
-      setDeletingId(null);
-    }
   };
 
   if (!user && !isDevMode) {
@@ -195,13 +180,11 @@ export default function WorkshopDashboard() {
           ) : (
             <div className="space-y-3">
               {sessions.map((session) => (
-                <div
+                <button
                   key={session.id}
+                  type="button"
                   onClick={() => router.push(`/workshop/${session.id}`)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/workshop/${session.id}`); }}
-                  className="w-full text-left bg-card rounded-xl border border-border p-5 hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer"
+                  className="w-full text-left bg-card rounded-xl border border-border p-5 hover:border-primary/30 hover:shadow-sm transition-all"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
@@ -218,33 +201,17 @@ export default function WorkshopDashboard() {
                         })}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          session.status === 'active'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
-                        {session.status === 'active' ? 'Active' : 'Fermée'}
-                      </span>
-                      <button
-                        onClick={(e) => handleDelete(e, session.id)}
-                        disabled={deletingId === session.id}
-                        className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
-                        title="Supprimer la session"
-                      >
-                        {deletingId === session.id ? (
-                          <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-                        ) : (
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
+                    <span
+                      className={`flex-shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        session.status === 'active'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {session.status === 'active' ? 'Active' : 'Fermée'}
+                    </span>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}
