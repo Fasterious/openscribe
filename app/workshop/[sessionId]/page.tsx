@@ -234,6 +234,7 @@ function SessionView() {
 
   const [activeTab, setActiveTab] = useState<Tab>('wordcloud');
   const [analyzing, setAnalyzing] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState(0);
   const [selectedProvider, setSelectedProvider] = useState<LLMProvider>('gemini');
   const [showQR, setShowQR] = useState(true);
   const [importModalOpen, setImportModalOpen] = useState(false);
@@ -303,8 +304,22 @@ function SessionView() {
     };
   }, [loading, sessionId, supabase]);
 
+  const ANALYSIS_STEPS = [
+    'Extraction atomique des verbatims...',
+    'Normalisation & Clustering...',
+    'Synthèse par cluster...',
+    'Résumé exécutif...',
+  ];
+
   const handleAnalyze = async () => {
     setAnalyzing(true);
+    setAnalysisStep(0);
+    setError(null);
+
+    const stepTimer = setInterval(() => {
+      setAnalysisStep((prev) => Math.min(prev + 1, ANALYSIS_STEPS.length - 1));
+    }, 12000);
+
     try {
       const res = await fetch('/api/workshop/analyze', {
         method: 'POST',
@@ -315,6 +330,8 @@ function SessionView() {
         }),
       });
 
+      clearInterval(stepTimer);
+
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || 'Analysis failed');
@@ -324,9 +341,11 @@ function SessionView() {
       setAnalysis(data.analysis ?? { clusters: data.result });
       setActiveTab('wordcloud');
     } catch (e) {
+      clearInterval(stepTimer);
       setError(e instanceof Error ? e.message : 'Analysis failed');
     } finally {
       setAnalyzing(false);
+      setAnalysisStep(0);
     }
   };
 
@@ -477,7 +496,7 @@ function SessionView() {
               <div>
                 <h2 className="font-semibold text-foreground">Analyse</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  Clusterisez les réponses pour identifier les tendances
+                  Extraction, clustering et synthèse des réponses
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -505,6 +524,39 @@ function SessionView() {
                 </Button>
               </div>
             </div>
+
+            {/* Pipeline progress */}
+            {analyzing && (
+              <div className="mt-5 pt-5 border-t border-border">
+                <div className="flex items-center gap-3">
+                  {ANALYSIS_STEPS.map((step, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-all ${
+                        i < analysisStep
+                          ? 'bg-primary text-primary-foreground'
+                          : i === analysisStep
+                            ? 'bg-primary/20 text-primary ring-2 ring-primary/40'
+                            : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {i < analysisStep ? (
+                          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          i + 1
+                        )}
+                      </div>
+                      {i < ANALYSIS_STEPS.length - 1 && (
+                        <div className={`hidden sm:block w-8 h-0.5 ${i < analysisStep ? 'bg-primary' : 'bg-muted'}`} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground mt-3">
+                  {ANALYSIS_STEPS[analysisStep]}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Tabs */}
@@ -537,7 +589,7 @@ function SessionView() {
                   title={session.status === 'closed' ? 'Session fermée' : 'Importer des réponses (CSV, Excel, TXT)'}
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4 4 4 0 018 0m-4 4V4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                   </svg>
                   Importer
                 </button>
@@ -605,7 +657,7 @@ function ClustersView({
   if (analyzing) {
     return (
       <div className="text-center py-16 space-y-4">
-        <div className="animate-spin h-10 w-10 border-3 border-primary border-t-transparent rounded-full mx-auto" />
+        <div className="animate-spin h-10 w-10 border-[3px] border-primary border-t-transparent rounded-full mx-auto" />
         <p className="text-muted-foreground">
           Analyse de {responseCount} réponse{responseCount > 1 ? 's' : ''} en
           cours...
@@ -933,7 +985,7 @@ function WordCloudView({
   if (analyzing) {
     return (
       <div className="text-center py-16 space-y-4">
-        <div className="animate-spin h-10 w-10 border-3 border-primary border-t-transparent rounded-full mx-auto" />
+        <div className="animate-spin h-10 w-10 border-[3px] border-primary border-t-transparent rounded-full mx-auto" />
         <p className="text-muted-foreground">
           Analyse de {responseCount} réponse{responseCount > 1 ? 's' : ''} en
           cours...
@@ -948,7 +1000,7 @@ function WordCloudView({
         <p>
           {responseCount === 0
             ? 'En attente de réponses des participants...'
-            : `${responseCount} réponse${responseCount > 1 ? 's' : ''} reçue${responseCount > 1 ? 's' : ''}. Cliquez sur "Analyser les réponses" pour générer les clusters.`}
+            : `${responseCount} réponse${responseCount > 1 ? 's' : ''} reçue${responseCount > 1 ? 's' : ''}. Cliquez sur "Analyser les réponses" pour générer le nuage de mots.`}
         </p>
       </div>
     );

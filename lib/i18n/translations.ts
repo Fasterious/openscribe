@@ -131,7 +131,7 @@ export const translations = {
 
     // Landing page
     'landing.hero.title': 'Your qualitative research tools, powered by AI',
-    'landing.hero.subtitle': 'Transcribe, analyze, and collaborate — with your own API keys. Open source, transparent, and free.',
+    'landing.hero.subtitle': 'Transcribe, analyze, and collaborate — with your own API keys. Transparent, private, and free.',
     'landing.hero.cta': 'Get started',
     'landing.modules.transcription.title': 'Transcription',
     'landing.modules.transcription.description': 'Transcribe your interviews with automatic speaker identification. Powered by Voxtral (Mistral AI).',
@@ -302,7 +302,7 @@ export const translations = {
 
     // Landing page
     'landing.hero.title': 'Vos outils de recherche qualitative, propulsés par l\'IA',
-    'landing.hero.subtitle': 'Transcrivez, analysez et collaborez — avec vos propres clés API. Open source, transparent et gratuit.',
+    'landing.hero.subtitle': 'Transcrivez, analysez et collaborez — avec vos propres clés API. Transparent, privé et gratuit.',
     'landing.hero.cta': 'Commencer',
     'landing.modules.transcription.title': 'Transcription',
     'landing.modules.transcription.description': 'Transcrivez vos entretiens avec identification automatique des locuteurs. Propulsé par Voxtral (Mistral AI).',
@@ -472,7 +472,7 @@ export const translations = {
     'supabase.unavailable': 'Servicio de autenticación temporalmente no disponible. El inicio de sesión puede no funcionar. Estamos trabajando en ello.',
 
     'landing.hero.title': 'Tus herramientas de investigación cualitativa, impulsadas por IA',
-    'landing.hero.subtitle': 'Transcribe, analiza y colabora — con tus propias claves API. Open source, transparente y gratuito.',
+    'landing.hero.subtitle': 'Transcribe, analiza y colabora — con tus propias claves API. Transparente, privado y gratuito.',
     'landing.hero.cta': 'Empezar',
     'landing.modules.transcription.title': 'Transcripción',
     'landing.modules.transcription.description': 'Transcribe tus entrevistas con identificación automática de hablantes. Impulsado por Voxtral (Mistral AI).',
@@ -641,7 +641,7 @@ export const translations = {
     'supabase.unavailable': 'Serviço de autenticação temporariamente indisponível. O login pode não funcionar. Estamos trabalhando nisso.',
 
     'landing.hero.title': 'Suas ferramentas de pesquisa qualitativa, impulsionadas por IA',
-    'landing.hero.subtitle': 'Transcreva, analise e colabore — com suas próprias chaves API. Open source, transparente e gratuito.',
+    'landing.hero.subtitle': 'Transcreva, analise e colabore — com suas próprias chaves API. Transparente, privado e gratuito.',
     'landing.hero.cta': 'Começar',
     'landing.modules.transcription.title': 'Transcrição',
     'landing.modules.transcription.description': 'Transcreva suas entrevistas com identificação automática de falantes. Powered by Voxtral (Mistral AI).',
@@ -810,7 +810,7 @@ export const translations = {
     'supabase.unavailable': 'Authentifizierungsdienst vorübergehend nicht verfügbar. Die Anmeldung funktioniert möglicherweise nicht. Wir arbeiten daran.',
 
     'landing.hero.title': 'Ihre qualitativen Forschungstools, angetrieben von KI',
-    'landing.hero.subtitle': 'Transkribieren, analysieren und zusammenarbeiten — mit Ihren eigenen API-Schlüsseln. Open Source, transparent und kostenlos.',
+    'landing.hero.subtitle': 'Transkribieren, analysieren und zusammenarbeiten — mit Ihren eigenen API-Schlüsseln. Transparent, privat und kostenlos.',
     'landing.hero.cta': 'Loslegen',
     'landing.modules.transcription.title': 'Transkription',
     'landing.modules.transcription.description': 'Transkribieren Sie Ihre Interviews mit automatischer Sprechererkennung. Powered by Voxtral (Mistral AI).',

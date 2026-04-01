@@ -277,6 +277,36 @@ function CsvAnalysisDashboard() {
             <div className="flex justify-center py-8">
               <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
             </div>
+          ) : sessions.length === 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-card rounded-xl border border-border p-5 text-center">
+                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                  <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-foreground mb-1">Extraction atomique</h3>
+                <p className="text-sm text-muted-foreground">Chaque idée est extraite, taguée et associée à un sentiment</p>
+              </div>
+              <div className="bg-card rounded-xl border border-border p-5 text-center">
+                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                  <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-foreground mb-1">Clustering intelligent</h3>
+                <p className="text-sm text-muted-foreground">Regroupement et normalisation automatiques des thématiques</p>
+              </div>
+              <div className="bg-card rounded-xl border border-border p-5 text-center">
+                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                  <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="font-semibold text-foreground mb-1">Synthèse fidèle</h3>
+                <p className="text-sm text-muted-foreground">Résumés par cluster avec verbatims préservés et compteurs</p>
+              </div>
+            </div>
           ) : sessions.length > 0 ? (
             <div className="space-y-3">
               <h2 className="text-lg font-semibold text-foreground">Analyses précédentes</h2>
