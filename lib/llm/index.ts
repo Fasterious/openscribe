@@ -10,18 +10,24 @@ export interface StructuredResponse {
   response_text: string;
 }
 
-export function getLLMClient(provider: LLMProvider): LLMClient {
+export interface LLMClientOptions {
+  mistralApiKey?: string;
+  geminiApiKey?: string;
+}
+
+export function getLLMClient(provider: LLMProvider, keys?: LLMClientOptions): LLMClient {
   switch (provider) {
     case 'gemini':
     case 'gemini-pro':
-      return createGeminiClient(LLM_MODELS[provider].model);
+      return createGeminiClient(LLM_MODELS[provider].model, { apiKey: keys?.geminiApiKey });
     case 'mistral-small':
       return createMistralClient(LLM_MODELS[provider].model, {
         reasoningEffort: 'high',
+        apiKey: keys?.mistralApiKey,
       });
     case 'mistral-medium':
     case 'mistral-large':
-      return createMistralClient(LLM_MODELS[provider].model);
+      return createMistralClient(LLM_MODELS[provider].model, { apiKey: keys?.mistralApiKey });
     default:
       throw new Error(`Unknown LLM provider: ${provider}`);
   }
@@ -57,9 +63,10 @@ function extractJSON(text: string): string {
 
 export async function runClustering(
   provider: LLMProvider,
-  input: ClusteringInput
+  input: ClusteringInput,
+  keys?: LLMClientOptions
 ): Promise<AnalysisResult> {
-  const client = getLLMClient(provider);
+  const client = getLLMClient(provider, keys);
   const prompt = buildClusteringPrompt(input);
 
   const raw = await client.analyze(prompt);
@@ -82,9 +89,10 @@ export async function runClustering(
 
 export async function runStructureText(
   provider: LLMProvider,
-  rawText: string
+  rawText: string,
+  keys?: LLMClientOptions
 ): Promise<StructuredResponse[]> {
-  const client = getLLMClient(provider);
+  const client = getLLMClient(provider, keys);
   const prompt = buildStructureTextPrompt(rawText);
 
   const raw = await client.analyze(prompt);

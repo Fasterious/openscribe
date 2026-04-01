@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { runStructureText } from '@/lib/llm';
+import { getUserApiKey } from '@/lib/user-api-keys';
+import { getProviderType } from '@/lib/llm/provider-utils';
 import type { LLMProvider } from '@/types/workshop';
 
 export const maxDuration = 60;
@@ -33,7 +35,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const responses = await runStructureText(provider as LLMProvider, trimmed);
+    const apiProvider = getProviderType(provider as LLMProvider);
+    const apiKey = await getUserApiKey(user.id, apiProvider);
+    const keys = apiProvider === 'gemini'
+      ? { geminiApiKey: apiKey }
+      : { mistralApiKey: apiKey };
+
+    const responses = await runStructureText(provider as LLMProvider, trimmed, keys);
     return NextResponse.json({ responses });
   } catch (e) {
     console.error('[Import] Structure failed:', e);

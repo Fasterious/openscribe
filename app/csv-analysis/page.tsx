@@ -7,12 +7,21 @@ import { Header } from '@/components/layout/header';
 import { AuthModal } from '@/components/auth/auth-modal';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
-import { LLM_MODELS } from '@/types/workshop';
 import type { LLMProvider } from '@/types/workshop';
 import type { User } from '@supabase/supabase-js';
 import type { CsvAnalysisSession, ParsedCsvData } from '@/types/csv-analysis';
+import { ApiKeyStatusProvider } from '@/components/auth/require-api-key';
+import { LlmModelSelect } from '@/components/ui/llm-model-select';
 
-export default function CsvAnalysisDashboard() {
+export default function CsvAnalysisDashboardWrapper() {
+  return (
+    <ApiKeyStatusProvider>
+      <CsvAnalysisDashboard />
+    </ApiKeyStatusProvider>
+  );
+}
+
+function CsvAnalysisDashboard() {
   const router = useRouter();
   const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -244,17 +253,10 @@ export default function CsvAnalysisDashboard() {
 
                 <div className="flex items-center justify-center gap-3 mb-4">
                   <label className="text-sm text-muted-foreground">Modèle :</label>
-                  <select
+                  <LlmModelSelect
                     value={selectedModel}
-                    onChange={(e) => setSelectedModel(e.target.value as LLMProvider)}
-                    className="text-sm border border-border rounded-lg px-3 py-1.5 bg-background"
-                  >
-                    {Object.entries(LLM_MODELS).map(([key, val]) => (
-                      <option key={key} value={key}>
-                        {val.label}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedModel}
+                  />
                 </div>
 
                 <Button onClick={() => fileInputRef.current?.click()}>

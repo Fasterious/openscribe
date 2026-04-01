@@ -10,6 +10,8 @@ const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'flac', 'ogg'];
 // Taille maximale: 1 GB (limite Mistral et Cloudflare R2)
 const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB
 const MAX_FILE_SIZE_DISPLAY = '1 GB';
+const MAX_DURATION_SECONDS = 7200; // 2h — au-delà, le timeout Vercel (5 min) peut être dépassé
+const MAX_DURATION_DISPLAY = '2h';
 const ALLOWED_MIME_TYPES = [
   'audio/mpeg',
   'audio/mp3', 
@@ -30,10 +32,27 @@ interface UploadZoneProps {
   className?: string;
 }
 
+function getAudioDuration(file: File): Promise<number | null> {
+  return new Promise((resolve) => {
+    const audio = new Audio();
+    const url = URL.createObjectURL(file);
+    audio.addEventListener('loadedmetadata', () => {
+      URL.revokeObjectURL(url);
+      resolve(Number.isFinite(audio.duration) ? audio.duration : null);
+    });
+    audio.addEventListener('error', () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    });
+    audio.src = url;
+  });
+}
+
 export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProps) {
   const { t } = useTranslation();
   const [isDragOver, setIsDragOver] = useState(false);
   const [errorToast, setErrorToast] = useState<string | null>(null);
+  const [checking, setChecking] = useState(false);
 
   // Auto-hide error toast after 5 seconds
   useEffect(() => {
@@ -54,6 +73,28 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
     return file.size <= MAX_FILE_SIZE_BYTES;
   }, []);
 
+  const validateAndSelect = useCallback(async (file: File) => {
+    if (!isAudioFile(file)) {
+      setErrorToast(t('upload.invalidFormat'));
+      return;
+    }
+    if (!isFileSizeValid(file)) {
+      setErrorToast(t('upload.fileTooLarge', { maxSize: MAX_FILE_SIZE_DISPLAY }));
+      return;
+    }
+    setChecking(true);
+    try {
+      const duration = await getAudioDuration(file);
+      if (duration !== null && duration > MAX_DURATION_SECONDS) {
+        setErrorToast(t('upload.tooLong', { maxDuration: MAX_DURATION_DISPLAY }));
+        return;
+      }
+    } finally {
+      setChecking(false);
+    }
+    onFileSelect(file);
+  }, [isAudioFile, isFileSizeValid, onFileSelect, t]);
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -73,36 +114,21 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
     e.stopPropagation();
     setIsDragOver(false);
 
-    if (disabled) return;
+    if (disabled || checking) return;
 
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      const file = files[0];
-      if (!isAudioFile(file)) {
-        setErrorToast(t('upload.invalidFormat'));
-      } else if (!isFileSizeValid(file)) {
-        setErrorToast(t('upload.fileTooLarge', { maxSize: MAX_FILE_SIZE_DISPLAY }));
-      } else {
-        onFileSelect(file);
-      }
+      validateAndSelect(files[0]);
     }
-  }, [disabled, onFileSelect, isAudioFile, isFileSizeValid, t]);
+  }, [disabled, checking, validateAndSelect]);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      const file = files[0];
-      if (!isAudioFile(file)) {
-        setErrorToast(t('upload.invalidFormat'));
-      } else if (!isFileSizeValid(file)) {
-        setErrorToast(t('upload.fileTooLarge', { maxSize: MAX_FILE_SIZE_DISPLAY }));
-      } else {
-        onFileSelect(file);
-      }
+      validateAndSelect(files[0]);
     }
-    // Reset input
     e.target.value = '';
-  }, [onFileSelect, isAudioFile, isFileSizeValid, t]);
+  }, [validateAndSelect]);
 
   return (
     <div
@@ -111,10 +137,10 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
       onDrop={handleDrop}
       className={cn(
         'relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed bg-card p-10 transition-all duration-300 shadow-sm',
-        isDragOver && !disabled
+        isDragOver && !disabled && !checking
           ? 'border-primary bg-primary/5 scale-[1.01] shadow-md'
           : 'border-border hover:border-primary/40 hover:shadow-md',
-        disabled && 'opacity-50 cursor-not-allowed',
+        (disabled || checking) && 'opacity-50 cursor-not-allowed',
         className
       )}
     >
@@ -122,7 +148,7 @@ export function UploadZone({ onFileSelect, disabled, className }: UploadZoneProp
         type="file"
         accept=".mp3,.wav,.m4a,.flac,.ogg,audio/mpeg,audio/wav,audio/mp4,audio/flac,audio/ogg"
         onChange={handleFileInput}
-        disabled={disabled}
+        disabled={disabled || checking}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
       />
       

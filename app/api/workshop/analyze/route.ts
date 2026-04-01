@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { runClustering } from '@/lib/llm';
+import { getUserApiKey } from '@/lib/user-api-keys';
+import { getProviderType } from '@/lib/llm/provider-utils';
 import type { LLMProvider } from '@/types/workshop';
 
 export const maxDuration = 60;
@@ -55,6 +57,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const apiProvider = getProviderType(provider as LLMProvider);
+    const apiKey = await getUserApiKey(user.id, apiProvider);
+    const keys = apiProvider === 'gemini'
+      ? { geminiApiKey: apiKey }
+      : { mistralApiKey: apiKey };
+
     const result = await runClustering(provider as LLMProvider, {
       question: session.question,
       responses: responses.map((r) => ({
@@ -62,7 +70,7 @@ export async function POST(request: NextRequest) {
         participant_name: r.participant_name,
         text: r.response_text,
       })),
-    });
+    }, keys);
 
     // Store analysis
     const { data: analysis, error } = await admin

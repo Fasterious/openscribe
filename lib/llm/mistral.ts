@@ -26,9 +26,9 @@ export type MistralClientOptions = {
 
 export function createMistralClient(
   model: string,
-  options: MistralClientOptions = {}
+  options: MistralClientOptions & { apiKey?: string } = {}
 ): LLMClient {
-  const apiKey = process.env.MISTRAL_API_KEY?.trim();
+  const apiKey = options.apiKey?.trim() || process.env.MISTRAL_API_KEY?.trim();
   if (!apiKey) {
     throw new Error('MISTRAL_API_KEY is not set');
   }

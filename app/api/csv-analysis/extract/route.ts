@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getLLMClient } from '@/lib/llm';
+import { getUserApiKey } from '@/lib/user-api-keys';
+import { getProviderType } from '@/lib/llm/provider-utils';
 import { buildExtractionPrompt } from '@/lib/llm/csv-prompts';
 import type { LLMProvider } from '@/types/workshop';
 import type { ParsedCsvData, Quintuplet } from '@/types/csv-analysis';
@@ -73,7 +75,12 @@ export async function POST(request: NextRequest) {
     .eq('id', session_id);
 
   try {
-    const client = getLLMClient(session.model_used as LLMProvider);
+    const apiProvider = getProviderType(session.model_used as LLMProvider);
+    const apiKey = await getUserApiKey(user.id, apiProvider);
+    const keys = apiProvider === 'gemini'
+      ? { geminiApiKey: apiKey }
+      : { mistralApiKey: apiKey };
+    const client = getLLMClient(session.model_used as LLMProvider, keys);
     const allQuintuplets: Quintuplet[] = [];
     let globalIdx = 0;
 

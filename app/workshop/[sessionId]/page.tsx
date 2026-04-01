@@ -17,6 +17,8 @@ import type {
 } from '@/types/workshop';
 import { LLM_MODELS, getAllClusterExcerpts, hasSplitExcerpts } from '@/types/workshop';
 import { ImportModal } from '@/components/workshop/import-modal';
+import { ApiKeyStatusProvider } from '@/components/auth/require-api-key';
+import { LlmModelSelect } from '@/components/ui/llm-model-select';
 
 function uniqueParticipantCount(cluster: Cluster): number {
   return new Set(getAllClusterExcerpts(cluster).map((e) => e.response_id)).size;
@@ -212,7 +214,15 @@ function buildExportHtml(
 </html>`;
 }
 
-export default function SessionView() {
+export default function SessionViewWrapper() {
+  return (
+    <ApiKeyStatusProvider>
+      <SessionView />
+    </ApiKeyStatusProvider>
+  );
+}
+
+function SessionView() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const supabase = createClient();
 
@@ -471,21 +481,10 @@ export default function SessionView() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <select
+                <LlmModelSelect
                   value={selectedProvider}
-                  onChange={(e) =>
-                    setSelectedProvider(e.target.value as LLMProvider)
-                  }
-                  className="text-sm rounded-lg border border-input bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  {(Object.entries(LLM_MODELS) as [LLMProvider, { label: string }][]).map(
-                    ([key, { label }]) => (
-                      <option key={key} value={key}>
-                        {label}
-                      </option>
-                    )
-                  )}
-                </select>
+                  onChange={setSelectedProvider}
+                />
                 <Button
                   onClick={handleAnalyze}
                   disabled={analyzing || responses.length === 0}

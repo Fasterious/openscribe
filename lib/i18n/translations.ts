@@ -6,13 +6,13 @@ export const translations = {
     
     // Hero
     'hero.title': 'Transcribe your audio for free',
-    'hero.subtitle': 'Professional transcription with speaker identification. Up to 1 GB, no duration limit. Powered by Voxtral (Mistral AI)',
+    'hero.subtitle': 'Professional transcription with speaker identification. Up to 1 GB, up to 2 hours. Powered by Voxtral (Mistral AI)',
     
     // Upload
     'upload.dropzone': 'Drop your audio file here',
     'upload.or': 'or',
     'upload.browse': 'Browse files',
-    'upload.formats': 'Supports MP3, WAV, M4A, FLAC, OGG (up to 1 GB)',
+    'upload.formats': 'MP3, WAV, M4A, FLAC, OGG (up to 1 GB, max 2h)',
     'upload.speakerLanguage': 'Speaker language',
     'upload.speakerLanguageAuto': 'Automatic detection',
     'upload.speakerLanguageHint':
@@ -107,6 +107,7 @@ export const translations = {
     // Upload errors
     'upload.invalidFormat': 'Unsupported file format. Voxtral only accepts: MP3, WAV, M4A, FLAC, OGG',
     'upload.fileTooLarge': 'File too large. Maximum size: {maxSize}',
+    'upload.tooLong': 'Audio too long. Maximum duration: {maxDuration}',
     
     // Actions
     'actions.transcribeAnother': 'Transcribe another file',
@@ -127,6 +128,46 @@ export const translations = {
     
     // Supabase auth unavailable
     'supabase.unavailable': 'Authentication service temporarily unavailable. Sign-in may not work. We\'re working on it.',
+
+    // Landing page
+    'landing.hero.title': 'Your qualitative research tools, powered by AI',
+    'landing.hero.subtitle': 'Transcribe, analyze, and collaborate — with your own API keys. Open source, transparent, and free.',
+    'landing.hero.cta': 'Get started',
+    'landing.modules.transcription.title': 'Transcription',
+    'landing.modules.transcription.description': 'Transcribe your interviews with automatic speaker identification. Powered by Voxtral (Mistral AI).',
+    'landing.modules.workshop.title': 'Workshop',
+    'landing.modules.workshop.description': 'Run collaborative workshops and analyze participant responses with AI clustering.',
+    'landing.modules.csv.title': 'CSV Analysis',
+    'landing.modules.csv.description': 'Analyze your qualitative Google Forms data — tag extraction, clustering, and synthesis.',
+    'landing.modules.cta': 'Discover',
+    'landing.howItWorks.title': 'How it works',
+    'landing.howItWorks.step1.title': 'Sign in',
+    'landing.howItWorks.step1.description': 'Create an account with Google in one click.',
+    'landing.howItWorks.step2.title': 'Configure your API keys',
+    'landing.howItWorks.step2.description': 'Bring your own Mistral and/or Gemini keys. Your keys, your data.',
+    'landing.howItWorks.step3.title': 'Use the tools',
+    'landing.howItWorks.step3.description': 'Transcribe, analyze, and collaborate — no limits, no hidden costs.',
+
+    // API Keys settings
+    'settings.apiKeys.title': 'API Key Configuration',
+    'settings.apiKeys.subtitle': 'OpenScribe uses your own API keys. Your keys are encrypted and stored securely.',
+    'settings.apiKeys.mistral.title': 'Mistral API Key',
+    'settings.apiKeys.mistral.description': 'Required for audio transcription (Voxtral)',
+    'settings.apiKeys.gemini.title': 'Google Gemini API Key',
+    'settings.apiKeys.gemini.description': 'Required for Workshop and CSV Analysis',
+    'settings.apiKeys.getKey': 'Get your key',
+    'settings.apiKeys.placeholder': 'Paste your API key here',
+    'settings.apiKeys.validate': 'Validate and save',
+    'settings.apiKeys.validating': 'Validating...',
+    'settings.apiKeys.configured': 'Configured',
+    'settings.apiKeys.notConfigured': 'Not configured',
+    'settings.apiKeys.modify': 'Modify',
+    'settings.apiKeys.remove': 'Remove',
+    'settings.apiKeys.invalidKey': 'Invalid API key. Please check and try again.',
+    'settings.apiKeys.saved': 'Key saved successfully!',
+    'settings.apiKeys.removed': 'Key removed.',
+    'settings.apiKeys.required': 'Required to use this module. Configure your key in',
+    'settings.apiKeys.settingsLink': 'Settings',
   },
   
   fr: {
@@ -136,13 +177,13 @@ export const translations = {
     
     // Hero
     'hero.title': 'Transcrivez vos audios gratuitement',
-    'hero.subtitle': "Transcription professionnelle avec identification des locuteurs. Jusqu'à 1 Go, sans limite de durée. Propulsé par Voxtral (Mistral AI)",
+    'hero.subtitle': "Transcription professionnelle avec identification des locuteurs. Jusqu'à 1 Go, jusqu'à 2h. Propulsé par Voxtral (Mistral AI)",
     
     // Upload
     'upload.dropzone': 'Déposez votre fichier audio ici',
     'upload.or': 'ou',
     'upload.browse': 'Parcourir les fichiers',
-    'upload.formats': 'Formats supportés : MP3, WAV, M4A, FLAC, OGG (jusqu\'à 1 Go)',
+    'upload.formats': 'MP3, WAV, M4A, FLAC, OGG (max 1 Go, 2h)',
     'upload.speakerLanguage': 'Langue des locuteurs',
     'upload.speakerLanguageAuto': 'Détection automatique',
     'upload.speakerLanguageHint':
@@ -237,6 +278,7 @@ export const translations = {
     // Upload errors
     'upload.invalidFormat': 'Format de fichier non supporté. Voxtral accepte uniquement : MP3, WAV, M4A, FLAC, OGG',
     'upload.fileTooLarge': 'Fichier trop volumineux. Taille maximale : {maxSize}',
+    'upload.tooLong': 'Audio trop long. Durée maximale : {maxDuration}',
     
     // Actions
     'actions.transcribeAnother': 'Transcrire un autre fichier',
@@ -257,6 +299,46 @@ export const translations = {
     
     // Supabase auth unavailable
     'supabase.unavailable': "Service d'authentification temporairement indisponible. La connexion peut ne pas fonctionner. Nous y travaillons.",
+
+    // Landing page
+    'landing.hero.title': 'Vos outils de recherche qualitative, propulsés par l\'IA',
+    'landing.hero.subtitle': 'Transcrivez, analysez et collaborez — avec vos propres clés API. Open source, transparent et gratuit.',
+    'landing.hero.cta': 'Commencer',
+    'landing.modules.transcription.title': 'Transcription',
+    'landing.modules.transcription.description': 'Transcrivez vos entretiens avec identification automatique des locuteurs. Propulsé par Voxtral (Mistral AI).',
+    'landing.modules.workshop.title': 'Workshop',
+    'landing.modules.workshop.description': 'Animez des ateliers collaboratifs et analysez les réponses des participants avec un clustering IA.',
+    'landing.modules.csv.title': 'Analyse CSV',
+    'landing.modules.csv.description': 'Analysez vos données qualitatives Google Forms — extraction de tags, clustering et synthèse.',
+    'landing.modules.cta': 'Découvrir',
+    'landing.howItWorks.title': 'Comment ça marche',
+    'landing.howItWorks.step1.title': 'Connectez-vous',
+    'landing.howItWorks.step1.description': 'Créez un compte avec Google en un clic.',
+    'landing.howItWorks.step2.title': 'Configurez vos clés API',
+    'landing.howItWorks.step2.description': 'Apportez vos propres clés Mistral et/ou Gemini. Vos clés, vos données.',
+    'landing.howItWorks.step3.title': 'Utilisez les outils',
+    'landing.howItWorks.step3.description': 'Transcrivez, analysez et collaborez — sans limites, sans coûts cachés.',
+
+    // API Keys settings
+    'settings.apiKeys.title': 'Configuration des clés API',
+    'settings.apiKeys.subtitle': 'OpenScribe utilise vos propres clés API. Vos clés sont chiffrées et stockées de manière sécurisée.',
+    'settings.apiKeys.mistral.title': 'Clé API Mistral',
+    'settings.apiKeys.mistral.description': 'Requise pour la transcription audio (Voxtral)',
+    'settings.apiKeys.gemini.title': 'Clé API Google Gemini',
+    'settings.apiKeys.gemini.description': 'Requise pour le Workshop et l\'Analyse CSV',
+    'settings.apiKeys.getKey': 'Obtenir votre clé',
+    'settings.apiKeys.placeholder': 'Collez votre clé API ici',
+    'settings.apiKeys.validate': 'Valider et sauvegarder',
+    'settings.apiKeys.validating': 'Validation...',
+    'settings.apiKeys.configured': 'Configurée',
+    'settings.apiKeys.notConfigured': 'Non configurée',
+    'settings.apiKeys.modify': 'Modifier',
+    'settings.apiKeys.remove': 'Supprimer',
+    'settings.apiKeys.invalidKey': 'Clé API invalide. Veuillez vérifier et réessayer.',
+    'settings.apiKeys.saved': 'Clé sauvegardée avec succès !',
+    'settings.apiKeys.removed': 'Clé supprimée.',
+    'settings.apiKeys.required': 'Requise pour utiliser ce module. Configurez votre clé dans les',
+    'settings.apiKeys.settingsLink': 'Paramètres',
   },
 
   es: {
@@ -266,13 +348,13 @@ export const translations = {
     
     // Hero
     'hero.title': 'Transcribe tu audio gratis',
-    'hero.subtitle': 'Transcripción profesional con identificación de hablantes. Hasta 1 GB, sin límite de duración. Impulsado por Voxtral (Mistral AI)',
+    'hero.subtitle': 'Transcripción profesional con identificación de hablantes. Hasta 1 GB, hasta 2 horas. Impulsado por Voxtral (Mistral AI)',
     
     // Upload
     'upload.dropzone': 'Suelta tu archivo de audio aquí',
     'upload.or': 'o',
     'upload.browse': 'Explorar archivos',
-    'upload.formats': 'Formatos soportados: MP3, WAV, M4A, FLAC, OGG (hasta 1 GB)',
+    'upload.formats': 'MP3, WAV, M4A, FLAC, OGG (max 1 GB, 2h)',
     'upload.speakerLanguage': 'Idioma de los hablantes',
     'upload.speakerLanguageAuto': 'Detección automática',
     'upload.speakerLanguageHint':
@@ -367,6 +449,7 @@ export const translations = {
     // Upload errors
     'upload.invalidFormat': 'Formato de archivo no soportado. Voxtral solo acepta: MP3, WAV, M4A, FLAC, OGG',
     'upload.fileTooLarge': 'Archivo demasiado grande. Tamaño máximo: {maxSize}',
+    'upload.tooLong': 'Audio demasiado largo. Duración máxima: {maxDuration}',
     
     // Actions
     'actions.transcribeAnother': 'Transcribir otro archivo',
@@ -387,6 +470,44 @@ export const translations = {
     
     // Supabase auth unavailable
     'supabase.unavailable': 'Servicio de autenticación temporalmente no disponible. El inicio de sesión puede no funcionar. Estamos trabajando en ello.',
+
+    'landing.hero.title': 'Tus herramientas de investigación cualitativa, impulsadas por IA',
+    'landing.hero.subtitle': 'Transcribe, analiza y colabora — con tus propias claves API. Open source, transparente y gratuito.',
+    'landing.hero.cta': 'Empezar',
+    'landing.modules.transcription.title': 'Transcripción',
+    'landing.modules.transcription.description': 'Transcribe tus entrevistas con identificación automática de hablantes. Impulsado por Voxtral (Mistral AI).',
+    'landing.modules.workshop.title': 'Workshop',
+    'landing.modules.workshop.description': 'Realiza talleres colaborativos y analiza las respuestas de los participantes con clustering IA.',
+    'landing.modules.csv.title': 'Análisis CSV',
+    'landing.modules.csv.description': 'Analiza tus datos cualitativos de Google Forms — extracción de etiquetas, clustering y síntesis.',
+    'landing.modules.cta': 'Descubrir',
+    'landing.howItWorks.title': 'Cómo funciona',
+    'landing.howItWorks.step1.title': 'Inicia sesión',
+    'landing.howItWorks.step1.description': 'Crea una cuenta con Google en un clic.',
+    'landing.howItWorks.step2.title': 'Configura tus claves API',
+    'landing.howItWorks.step2.description': 'Trae tus propias claves Mistral y/o Gemini. Tus claves, tus datos.',
+    'landing.howItWorks.step3.title': 'Usa las herramientas',
+    'landing.howItWorks.step3.description': 'Transcribe, analiza y colabora — sin límites, sin costos ocultos.',
+
+    'settings.apiKeys.title': 'Configuración de claves API',
+    'settings.apiKeys.subtitle': 'OpenScribe utiliza tus propias claves API. Tus claves se cifran y almacenan de forma segura.',
+    'settings.apiKeys.mistral.title': 'Clave API Mistral',
+    'settings.apiKeys.mistral.description': 'Requerida para la transcripción de audio (Voxtral)',
+    'settings.apiKeys.gemini.title': 'Clave API Google Gemini',
+    'settings.apiKeys.gemini.description': 'Requerida para Workshop y Análisis CSV',
+    'settings.apiKeys.getKey': 'Obtener tu clave',
+    'settings.apiKeys.placeholder': 'Pega tu clave API aquí',
+    'settings.apiKeys.validate': 'Validar y guardar',
+    'settings.apiKeys.validating': 'Validando...',
+    'settings.apiKeys.configured': 'Configurada',
+    'settings.apiKeys.notConfigured': 'No configurada',
+    'settings.apiKeys.modify': 'Modificar',
+    'settings.apiKeys.remove': 'Eliminar',
+    'settings.apiKeys.invalidKey': 'Clave API inválida. Verifica e intenta de nuevo.',
+    'settings.apiKeys.saved': '¡Clave guardada exitosamente!',
+    'settings.apiKeys.removed': 'Clave eliminada.',
+    'settings.apiKeys.required': 'Requerida para usar este módulo. Configura tu clave en',
+    'settings.apiKeys.settingsLink': 'Configuración',
   },
 
   pt: {
@@ -396,13 +517,13 @@ export const translations = {
     
     // Hero
     'hero.title': 'Transcreva seu áudio gratuitamente',
-    'hero.subtitle': 'Transcrição profissional com identificação de falantes. Até 1 GB, sem limite de duração. Powered by Voxtral (Mistral AI)',
+    'hero.subtitle': 'Transcrição profissional com identificação de falantes. Até 1 GB, até 2 horas. Powered by Voxtral (Mistral AI)',
     
     // Upload
     'upload.dropzone': 'Solte seu arquivo de áudio aqui',
     'upload.or': 'ou',
     'upload.browse': 'Procurar arquivos',
-    'upload.formats': 'Formatos suportados: MP3, WAV, M4A, FLAC, OGG (até 1 GB)',
+    'upload.formats': 'MP3, WAV, M4A, FLAC, OGG (max 1 GB, 2h)',
     'upload.speakerLanguage': 'Idioma dos falantes',
     'upload.speakerLanguageAuto': 'Deteção automática',
     'upload.speakerLanguageHint':
@@ -497,6 +618,7 @@ export const translations = {
     // Upload errors
     'upload.invalidFormat': 'Formato de arquivo não suportado. Voxtral aceita apenas: MP3, WAV, M4A, FLAC, OGG',
     'upload.fileTooLarge': 'Arquivo muito grande. Tamanho máximo: {maxSize}',
+    'upload.tooLong': 'Áudio muito longo. Duração máxima: {maxDuration}',
     
     // Actions
     'actions.transcribeAnother': 'Transcrever outro arquivo',
@@ -517,6 +639,44 @@ export const translations = {
     
     // Supabase auth unavailable
     'supabase.unavailable': 'Serviço de autenticação temporariamente indisponível. O login pode não funcionar. Estamos trabalhando nisso.',
+
+    'landing.hero.title': 'Suas ferramentas de pesquisa qualitativa, impulsionadas por IA',
+    'landing.hero.subtitle': 'Transcreva, analise e colabore — com suas próprias chaves API. Open source, transparente e gratuito.',
+    'landing.hero.cta': 'Começar',
+    'landing.modules.transcription.title': 'Transcrição',
+    'landing.modules.transcription.description': 'Transcreva suas entrevistas com identificação automática de falantes. Powered by Voxtral (Mistral AI).',
+    'landing.modules.workshop.title': 'Workshop',
+    'landing.modules.workshop.description': 'Realize workshops colaborativos e analise as respostas dos participantes com clustering IA.',
+    'landing.modules.csv.title': 'Análise CSV',
+    'landing.modules.csv.description': 'Analise seus dados qualitativos do Google Forms — extração de tags, clustering e síntese.',
+    'landing.modules.cta': 'Descobrir',
+    'landing.howItWorks.title': 'Como funciona',
+    'landing.howItWorks.step1.title': 'Entre',
+    'landing.howItWorks.step1.description': 'Crie uma conta com Google em um clique.',
+    'landing.howItWorks.step2.title': 'Configure suas chaves API',
+    'landing.howItWorks.step2.description': 'Traga suas próprias chaves Mistral e/ou Gemini. Suas chaves, seus dados.',
+    'landing.howItWorks.step3.title': 'Use as ferramentas',
+    'landing.howItWorks.step3.description': 'Transcreva, analise e colabore — sem limites, sem custos ocultos.',
+
+    'settings.apiKeys.title': 'Configuração de chaves API',
+    'settings.apiKeys.subtitle': 'OpenScribe utiliza suas próprias chaves API. Suas chaves são criptografadas e armazenadas com segurança.',
+    'settings.apiKeys.mistral.title': 'Chave API Mistral',
+    'settings.apiKeys.mistral.description': 'Necessária para transcrição de áudio (Voxtral)',
+    'settings.apiKeys.gemini.title': 'Chave API Google Gemini',
+    'settings.apiKeys.gemini.description': 'Necessária para Workshop e Análise CSV',
+    'settings.apiKeys.getKey': 'Obter sua chave',
+    'settings.apiKeys.placeholder': 'Cole sua chave API aqui',
+    'settings.apiKeys.validate': 'Validar e salvar',
+    'settings.apiKeys.validating': 'Validando...',
+    'settings.apiKeys.configured': 'Configurada',
+    'settings.apiKeys.notConfigured': 'Não configurada',
+    'settings.apiKeys.modify': 'Modificar',
+    'settings.apiKeys.remove': 'Remover',
+    'settings.apiKeys.invalidKey': 'Chave API inválida. Verifique e tente novamente.',
+    'settings.apiKeys.saved': 'Chave salva com sucesso!',
+    'settings.apiKeys.removed': 'Chave removida.',
+    'settings.apiKeys.required': 'Necessária para usar este módulo. Configure sua chave em',
+    'settings.apiKeys.settingsLink': 'Configurações',
   },
 
   de: {
@@ -526,13 +686,13 @@ export const translations = {
     
     // Hero
     'hero.title': 'Transkribiere dein Audio kostenlos',
-    'hero.subtitle': 'Professionelle Transkription mit Sprechererkennung. Bis zu 1 GB, keine Zeitbegrenzung. Powered by Voxtral (Mistral AI)',
+    'hero.subtitle': 'Professionelle Transkription mit Sprechererkennung. Bis zu 1 GB, bis zu 2 Stunden. Powered by Voxtral (Mistral AI)',
     
     // Upload
     'upload.dropzone': 'Audiodatei hier ablegen',
     'upload.or': 'oder',
     'upload.browse': 'Dateien durchsuchen',
-    'upload.formats': 'Unterstützte Formate: MP3, WAV, M4A, FLAC, OGG (bis zu 1 GB)',
+    'upload.formats': 'MP3, WAV, M4A, FLAC, OGG (max 1 GB, 2h)',
     'upload.speakerLanguage': 'Sprache der Sprecher',
     'upload.speakerLanguageAuto': 'Automatische Erkennung',
     'upload.speakerLanguageHint':
@@ -627,6 +787,7 @@ export const translations = {
     // Upload errors
     'upload.invalidFormat': 'Nicht unterstütztes Dateiformat. Voxtral akzeptiert nur: MP3, WAV, M4A, FLAC, OGG',
     'upload.fileTooLarge': 'Datei zu groß. Maximale Größe: {maxSize}',
+    'upload.tooLong': 'Audio zu lang. Maximale Dauer: {maxDuration}',
     
     // Actions
     'actions.transcribeAnother': 'Weitere Datei transkribieren',
@@ -647,6 +808,44 @@ export const translations = {
     
     // Supabase auth unavailable
     'supabase.unavailable': 'Authentifizierungsdienst vorübergehend nicht verfügbar. Die Anmeldung funktioniert möglicherweise nicht. Wir arbeiten daran.',
+
+    'landing.hero.title': 'Ihre qualitativen Forschungstools, angetrieben von KI',
+    'landing.hero.subtitle': 'Transkribieren, analysieren und zusammenarbeiten — mit Ihren eigenen API-Schlüsseln. Open Source, transparent und kostenlos.',
+    'landing.hero.cta': 'Loslegen',
+    'landing.modules.transcription.title': 'Transkription',
+    'landing.modules.transcription.description': 'Transkribieren Sie Ihre Interviews mit automatischer Sprechererkennung. Powered by Voxtral (Mistral AI).',
+    'landing.modules.workshop.title': 'Workshop',
+    'landing.modules.workshop.description': 'Führen Sie kollaborative Workshops durch und analysieren Sie Teilnehmerantworten mit KI-Clustering.',
+    'landing.modules.csv.title': 'CSV-Analyse',
+    'landing.modules.csv.description': 'Analysieren Sie Ihre qualitativen Google Forms-Daten — Tag-Extraktion, Clustering und Synthese.',
+    'landing.modules.cta': 'Entdecken',
+    'landing.howItWorks.title': 'So funktioniert es',
+    'landing.howItWorks.step1.title': 'Anmelden',
+    'landing.howItWorks.step1.description': 'Erstellen Sie ein Konto mit Google in einem Klick.',
+    'landing.howItWorks.step2.title': 'API-Schlüssel konfigurieren',
+    'landing.howItWorks.step2.description': 'Bringen Sie Ihre eigenen Mistral und/oder Gemini Schlüssel mit. Ihre Schlüssel, Ihre Daten.',
+    'landing.howItWorks.step3.title': 'Tools verwenden',
+    'landing.howItWorks.step3.description': 'Transkribieren, analysieren und zusammenarbeiten — ohne Grenzen, ohne versteckte Kosten.',
+
+    'settings.apiKeys.title': 'API-Schlüssel Konfiguration',
+    'settings.apiKeys.subtitle': 'OpenScribe verwendet Ihre eigenen API-Schlüssel. Ihre Schlüssel werden verschlüsselt und sicher gespeichert.',
+    'settings.apiKeys.mistral.title': 'Mistral API-Schlüssel',
+    'settings.apiKeys.mistral.description': 'Erforderlich für Audio-Transkription (Voxtral)',
+    'settings.apiKeys.gemini.title': 'Google Gemini API-Schlüssel',
+    'settings.apiKeys.gemini.description': 'Erforderlich für Workshop und CSV-Analyse',
+    'settings.apiKeys.getKey': 'Schlüssel erhalten',
+    'settings.apiKeys.placeholder': 'API-Schlüssel hier einfügen',
+    'settings.apiKeys.validate': 'Validieren und speichern',
+    'settings.apiKeys.validating': 'Validierung...',
+    'settings.apiKeys.configured': 'Konfiguriert',
+    'settings.apiKeys.notConfigured': 'Nicht konfiguriert',
+    'settings.apiKeys.modify': 'Ändern',
+    'settings.apiKeys.remove': 'Entfernen',
+    'settings.apiKeys.invalidKey': 'Ungültiger API-Schlüssel. Bitte überprüfen und erneut versuchen.',
+    'settings.apiKeys.saved': 'Schlüssel erfolgreich gespeichert!',
+    'settings.apiKeys.removed': 'Schlüssel entfernt.',
+    'settings.apiKeys.required': 'Erforderlich um dieses Modul zu nutzen. Konfigurieren Sie Ihren Schlüssel in den',
+    'settings.apiKeys.settingsLink': 'Einstellungen',
   },
 } as const;
 

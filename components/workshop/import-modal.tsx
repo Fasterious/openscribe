@@ -5,7 +5,7 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { Button } from '@/components/ui/button';
 import type { LLMProvider } from '@/types/workshop';
-import { LLM_MODELS } from '@/types/workshop';
+import { LlmModelSelect } from '@/components/ui/llm-model-select';
 
 export interface ImportRow {
   participant_name: string;
@@ -410,21 +410,10 @@ export function ImportModal({
                           </Button>
                         )}
                         <div className="flex items-center gap-2">
-                          <select
+                          <LlmModelSelect
                             value={selectedProvider}
-                            onChange={(e) =>
-                              setSelectedProvider(e.target.value as LLMProvider)
-                            }
-                            className="text-sm rounded-lg border border-input bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                          >
-                            {(Object.entries(LLM_MODELS) as [LLMProvider, { label: string }][]).map(
-                              ([key, { label }]) => (
-                                <option key={key} value={key}>
-                                  {label}
-                                </option>
-                              )
-                            )}
-                          </select>
+                            onChange={setSelectedProvider}
+                          />
                           <Button
                             size="sm"
                             onClick={handleStructureFileWithAI}
@@ -458,21 +447,10 @@ export function ImportModal({
                     className="w-full min-h-[160px] rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                   <div className="flex items-center gap-3">
-                    <select
+                    <LlmModelSelect
                       value={selectedProvider}
-                      onChange={(e) =>
-                        setSelectedProvider(e.target.value as LLMProvider)
-                      }
-                      className="text-sm rounded-lg border border-input bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      {(Object.entries(LLM_MODELS) as [LLMProvider, { label: string }][]).map(
-                        ([key, { label }]) => (
-                          <option key={key} value={key}>
-                            {label}
-                          </option>
-                        )
-                      )}
-                    </select>
+                      onChange={setSelectedProvider}
+                    />
                     <Button
                       onClick={handlePasteAndStructure}
                       disabled={loading || pastedText.trim().length < 10}
