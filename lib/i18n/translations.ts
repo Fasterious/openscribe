@@ -99,7 +99,7 @@ export const translations = {
     'features.fast.description': 'Powered by Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transcription for researchers, designers, journalists & citizens',
+    'footer.text': 'OpenScribe - Transcription, collaborative workshops & qualitative CSV analysis for researchers, designers, journalists & citizens',
     
     // Privacy notice
     'privacy.notice': 'Audio files are sent to Mistral AI servers for transcription. They may use this data to improve their models. No files are permanently stored by this site.',
@@ -270,7 +270,7 @@ export const translations = {
     'features.fast.description': 'Propulsé par Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transcription pour chercheurs, designers, journalistes et citoyens',
+    'footer.text': 'OpenScribe - Transcription, Workshop et analyse CSV qualitative pour chercheurs, designers, journalistes et citoyens',
     
     // Privacy notice
     'privacy.notice': 'Les fichiers audio sont envoyés aux serveurs de Mistral AI pour transcription. Ils peuvent utiliser ces données pour améliorer leurs modèles. Aucun fichier n\'est conservé de manière permanente par ce site.',
@@ -441,7 +441,7 @@ export const translations = {
     'features.fast.description': 'Impulsado por Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transcripción para investigadores, diseñadores, periodistas y ciudadanos',
+    'footer.text': 'OpenScribe - Transcripción, talleres colaborativos y análisis cualitativo de CSV para investigadores, diseñadores, periodistas y ciudadanos',
     
     // Privacy notice
     'privacy.notice': 'Los archivos de audio se envían a los servidores de Mistral AI para la transcripción. Pueden usar estos datos para mejorar sus modelos. Este sitio no almacena ningún archivo de forma permanente.',
@@ -610,7 +610,7 @@ export const translations = {
     'features.fast.description': 'Powered by Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transcrição para pesquisadores, designers, jornalistas e cidadãos',
+    'footer.text': 'OpenScribe - Transcrição, workshops colaborativos e análise qualitativa de CSV para pesquisadores, designers, jornalistas e cidadãos',
     
     // Privacy notice
     'privacy.notice': 'Os arquivos de áudio são enviados para os servidores da Mistral AI para transcrição. Eles podem usar esses dados para melhorar seus modelos. Nenhum arquivo é armazenado permanentemente por este site.',
@@ -779,7 +779,7 @@ export const translations = {
     'features.fast.description': 'Powered by Voxtral',
     
     // Footer
-    'footer.text': 'OpenScribe - Transkription für Forscher, Designer, Journalisten und Bürger',
+    'footer.text': 'OpenScribe - Transkription, kollaborative Workshops und qualitative CSV-Analyse für Forscher, Designer, Journalisten und Bürger',
     
     // Privacy notice
     'privacy.notice': 'Audiodateien werden zur Transkription an die Server von Mistral AI gesendet. Sie können diese Daten zur Verbesserung ihrer Modelle verwenden. Keine Dateien werden dauerhaft von dieser Seite gespeichert.',
