@@ -56,26 +56,66 @@ function TranscriptionPageInner() {
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
 
-  // If not authenticated, show sign-in prompt
+  const handleReset = useCallback(() => {
+    setState({ status: 'idle', progress: 0, result: null, error: null });
+    setFileName('');
+  }, []);
+
   if (!loading && !user) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-background">
         <Header
           user={null}
           loading={false}
           onSignIn={() => setAuthModalOpen(true)}
           manageAuth={false}
         />
-        <main className="flex-1 flex items-center justify-center px-4">
-          <div className="text-center space-y-4 max-w-md">
+        <main className="container mx-auto px-4 py-10">
+          <div className="max-w-md mx-auto text-center space-y-6 py-20">
             <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
               <svg className="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold">{t('auth.cta.title')}</h2>
-            <p className="text-muted-foreground">{t('auth.cta.description')}</p>
-            <Button onClick={() => setAuthModalOpen(true)}>{t('header.signIn')}</Button>
+            <h1 className="text-2xl font-bold text-foreground">
+              {t('hero.title')}
+            </h1>
+            <p className="text-muted-foreground">
+              {t('hero.subtitle')}
+            </p>
+            <Button onClick={() => setAuthModalOpen(true)}>
+              {t('header.signIn')}
+            </Button>
+          </div>
+
+          <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+            <div className="bg-card rounded-xl border border-border p-5 text-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-foreground mb-1">{t('features.speakers.title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('features.speakers.description')}</p>
+            </div>
+            <div className="bg-card rounded-xl border border-border p-5 text-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-foreground mb-1">{t('features.languages.title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('features.languages.description')}</p>
+            </div>
+            <div className="bg-card rounded-xl border border-border p-5 text-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-foreground mb-1">{t('features.fast.title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('features.fast.description')}</p>
+            </div>
           </div>
         </main>
         <AuthModal
@@ -210,11 +250,6 @@ function TranscriptionPageInner() {
       }));
     }
   };
-
-  const handleReset = useCallback(() => {
-    setState({ status: 'idle', progress: 0, result: null, error: null });
-    setFileName('');
-  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
