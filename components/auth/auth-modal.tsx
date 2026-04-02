@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/lib/i18n/context';
@@ -9,10 +10,13 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  /** Path to redirect to after auth (defaults to current page) */
+  redirectTo?: string;
 }
 
-export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, onSuccess, redirectTo }: AuthModalProps) {
   const { t } = useTranslation();
+  const pathname = usePathname();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,10 +26,11 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     setLoading(true);
     setError(null);
 
+    const nextPath = redirectTo ?? pathname ?? '/';
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
       },
     });
 

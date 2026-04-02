@@ -14,19 +14,8 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | null>(null);
 
 function detectBrowserLanguage(): Language {
-  if (typeof window === 'undefined') return 'en';
-  
-  const browserLang = navigator.language.toLowerCase();
-  
-  // Check for exact match first
-  if (browserLang === 'fr' || browserLang.startsWith('fr-')) return 'fr';
-  if (browserLang === 'es' || browserLang.startsWith('es-')) return 'es';
-  if (browserLang === 'pt' || browserLang.startsWith('pt-')) return 'pt';
-  if (browserLang === 'de' || browserLang.startsWith('de-')) return 'de';
-  if (browserLang === 'en' || browserLang.startsWith('en-')) return 'en';
-  
-  // Default to English
-  return 'en';
+  // MVP: forcer le français par défaut
+  return 'fr';
 }
 
 function getSavedLanguage(): Language | null {
@@ -38,7 +27,7 @@ function getSavedLanguage(): Language | null {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>('fr');
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {

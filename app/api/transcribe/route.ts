@@ -2,17 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { transcribeFromUrl } from '@/lib/mistral';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import {
-  generateTranscriptionId,
-  storeTranscription,
-  createPreview,
-} from '@/lib/transcription-cache';
+import { getUserApiKey } from '@/lib/user-api-keys';
 import { deleteFile } from '@/lib/r2';
 import { VOXTRAL_PRICE_PER_MINUTE } from '@/types';
+import { isAllowedVoxtralTranscriptionLanguage } from '@/lib/voxtral-transcription-languages';
 
 export const maxDuration = 300; // 5 minutes max pour le timeout
 
-/** Formate une durée en ms en "Xh Ym Zs Wms" */
 function formatDurationMs(ms: number | null): string | null {
   if (ms == null) return null;
   const h = Math.floor(ms / 3600000);
@@ -27,8 +23,20 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.json();
-    const { audioUrl, language, fileKey: fKey, metrics: clientMetrics } = body;
-    fileKey = fKey; // Pour pouvoir supprimer en cas d'erreur aussi
+    const { audioUrl, language: languageRaw, fileKey: fKey, metrics: clientMetrics } = body;
+    fileKey = fKey;
+
+    let language: string | undefined;
+    if (languageRaw != null && String(languageRaw).trim() !== '') {
+      const code = String(languageRaw).trim();
+      if (!isAllowedVoxtralTranscriptionLanguage(code)) {
+        return NextResponse.json(
+          { error: 'Invalid language code' },
+          { status: 400 }
+        );
+      }
+      language = code;
+    }
 
     if (!audioUrl) {
       return NextResponse.json(
@@ -37,49 +45,59 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier si l'utilisateur est authentifié
+    // Auth obligatoire (BYOK)
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    const isAuthenticated = !!user;
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    // Mesurer le temps de transcription
+    // Récupérer la clé Mistral de l'utilisateur
+    let mistralKey: string;
+    try {
+      mistralKey = await getUserApiKey(user.id, 'mistral');
+    } catch {
+      return NextResponse.json(
+        { error: 'Clé API Mistral non configurée. Rendez-vous dans les paramètres pour la configurer.' },
+        { status: 403 }
+      );
+    }
+
+    console.log('[Transcribe API] language received from client:', language ?? '(auto)');
+
     const startTime = Date.now();
 
-    // Transcription synchrone via Voxtral (Mistral)
     const result = await transcribeFromUrl(audioUrl, {
       diarize: true,
-      language: language || undefined,
+      language,
+      apiKey: mistralKey,
     });
 
     const transcriptionTimeMs = Date.now() - startTime;
 
-    // Calculer le coût estimé
     const audioDurationMinutes = (result.audioDurationSeconds || 0) / 60;
     const cost = audioDurationMinutes * VOXTRAL_PRICE_PER_MINUTE;
 
-    // Ajouter les métriques au résultat
     const enrichedResult = {
       ...result,
       transcriptionTimeMs,
-      cost: Math.round(cost * 10000) / 10000, // 4 décimales
+      cost: Math.round(cost * 10000) / 10000,
+      transcriptionLanguageRequest: (language ?? 'auto') as 'auto' | string,
     };
 
-    // Supprimer le fichier R2 après transcription réussie (nettoyage)
+    // Supprimer le fichier R2 après transcription réussie
     if (fileKey) {
       try {
         await deleteFile(fileKey);
         console.log(`[R2] Deleted temporary file: ${fileKey}`);
       } catch (deleteError) {
-        // Log mais ne pas faire échouer la requête si la suppression échoue
         console.warn(`[R2] Failed to delete file ${fileKey}:`, deleteError);
       }
     }
 
-    // Enregistrer les métriques de transcription dans Supabase (analytics)
+    // Enregistrer les métriques de transcription (analytics)
     try {
-      if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-        console.log('[Metrics] SUPABASE_SERVICE_ROLE_KEY non défini, skip');
-      } else {
+      if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         const forwarded = request.headers.get('x-forwarded-for');
         const realIp = request.headers.get('x-real-ip');
         const clientIp = forwarded?.split(',')[0]?.trim() || realIp || null;
@@ -100,53 +118,26 @@ export async function POST(request: NextRequest) {
           audio_duration_seconds: result.audioDurationSeconds ?? null,
           client_ip: clientIp,
           source,
-          user_id: user?.id ?? null,
+          user_id: user.id,
         };
-        console.log('[Metrics] Insertion...', JSON.stringify(metricsRow));
 
         const admin = createAdminClient();
         const { error } = await admin.from('transcription_metrics').insert(metricsRow);
-
         if (error) {
           console.error('[Metrics] Erreur Supabase:', error.message, error.details);
-        } else {
-          console.log('[Metrics] OK');
         }
       }
     } catch (metricsError) {
       console.error('[Metrics] Failed:', metricsError);
-      if (metricsError instanceof Error) {
-        console.error('[Metrics] Stack:', metricsError.stack);
-      }
     }
 
-    // Si authentifié, retourner le résultat complet
-    if (isAuthenticated) {
-      return NextResponse.json({ 
-        result: enrichedResult,
-        isPreview: false,
-      });
-    }
-
-    // Si non authentifié, stocker le résultat complet et retourner l'aperçu
-    const transcriptionId = generateTranscriptionId();
-    storeTranscription(transcriptionId, enrichedResult);
-
-    const previewResult = createPreview(enrichedResult);
-
-    return NextResponse.json({ 
-      result: previewResult,
-      transcriptionId,
-      isPreview: true,
-    });
+    return NextResponse.json({ result: enrichedResult, isPreview: false });
   } catch (error) {
     console.error('Transcription error:', error);
     
-    // Tenter de supprimer le fichier R2 même en cas d'erreur
     if (fileKey) {
       try {
         await deleteFile(fileKey);
-        console.log(`[R2] Deleted temporary file after error: ${fileKey}`);
       } catch (deleteError) {
         console.warn(`[R2] Failed to delete file ${fileKey}:`, deleteError);
       }

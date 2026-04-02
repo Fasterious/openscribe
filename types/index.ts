@@ -23,6 +23,8 @@ export interface TranscriptionResult {
   word_segments?: WordSegment[];
   detected_language?: string;
   language?: string;
+  /** Choix utilisateur avant envoi : code ISO Voxtral ou 'auto' (détection automatique) */
+  transcriptionLanguageRequest?: 'auto' | string;
   // Métriques
   audioDurationSeconds?: number;    // Durée totale de l'audio en secondes
   transcriptionTimeMs?: number;     // Temps de transcription en millisecondes
