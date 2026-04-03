@@ -7,6 +7,7 @@ import { getProviderType } from '@/lib/llm/provider-utils';
 import { buildSynthesisPrompt } from '@/lib/llm/csv-prompts';
 import type { LLMProvider } from '@/types/workshop';
 import type { AnalysisCluster, FinalAnalysis } from '@/types/csv-analysis';
+import { interpretLlmFailure } from '@/lib/llm/user-facing-error';
 
 export const maxDuration = 300;
 
@@ -167,17 +168,15 @@ Réponds UNIQUEMENT avec le texte du résumé, sans JSON ni balises.`;
     return NextResponse.json({ analysis: finalAnalysis });
   } catch (e) {
     console.error('[CSV Synthesize] Failed:', e);
+    const { message, status } = interpretLlmFailure(e);
     await admin
       .from('csv_analysis_sessions')
       .update({
         status: 'error',
-        error_message: e instanceof Error ? e.message : 'Synthesis failed',
+        error_message: message,
       })
       .eq('id', session_id);
 
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'Synthesis failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status });
   }
 }

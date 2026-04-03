@@ -7,6 +7,7 @@ import { getProviderType } from '@/lib/llm/provider-utils';
 import { buildClusteringPrompt } from '@/lib/llm/csv-prompts';
 import type { LLMProvider } from '@/types/workshop';
 import type { Quintuplet, AnalysisCluster } from '@/types/csv-analysis';
+import { interpretLlmFailure } from '@/lib/llm/user-facing-error';
 
 export const maxDuration = 120;
 
@@ -132,17 +133,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ clusters });
   } catch (e) {
     console.error('[CSV Cluster] Failed:', e);
+    const { message, status } = interpretLlmFailure(e);
     await admin
       .from('csv_analysis_sessions')
       .update({
         status: 'error',
-        error_message: e instanceof Error ? e.message : 'Clustering failed',
+        error_message: message,
       })
       .eq('id', session_id);
 
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'Clustering failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status });
   }
 }

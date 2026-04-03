@@ -6,6 +6,7 @@ import { getUserApiKey } from '@/lib/user-api-keys';
 import { deleteFile } from '@/lib/r2';
 import { VOXTRAL_PRICE_PER_MINUTE } from '@/types';
 import { isAllowedVoxtralTranscriptionLanguage } from '@/lib/voxtral-transcription-languages';
+import { interpretLlmFailure } from '@/lib/llm/user-facing-error';
 
 export const maxDuration = 300; // 5 minutes max pour le timeout
 
@@ -143,9 +144,7 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to transcribe' },
-      { status: 500 }
-    );
+    const { message, status } = interpretLlmFailure(error);
+    return NextResponse.json({ error: message }, { status });
   }
 }

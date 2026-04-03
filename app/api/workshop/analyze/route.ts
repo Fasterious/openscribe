@@ -12,6 +12,7 @@ import {
 import type { LLMProvider } from '@/types/workshop';
 import type { Quintuplet, AnalysisCluster } from '@/types/csv-analysis';
 import type { Cluster, ClusterExcerpt, AnalysisResult } from '@/types/workshop';
+import { interpretLlmFailure } from '@/lib/llm/user-facing-error';
 
 export const maxDuration = 300;
 
@@ -331,9 +332,7 @@ Réponds UNIQUEMENT avec le texte du résumé, sans JSON ni balises.`;
     return NextResponse.json({ analysis });
   } catch (e) {
     console.error('[Workshop] Analysis pipeline failed:', e);
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'Analysis failed' },
-      { status: 500 }
-    );
+    const { message, status } = interpretLlmFailure(e);
+    return NextResponse.json({ error: message }, { status });
   }
 }

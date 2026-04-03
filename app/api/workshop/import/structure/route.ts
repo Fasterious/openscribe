@@ -4,6 +4,7 @@ import { runStructureText } from '@/lib/llm';
 import { getUserApiKey } from '@/lib/user-api-keys';
 import { getProviderType } from '@/lib/llm/provider-utils';
 import type { LLMProvider } from '@/types/workshop';
+import { interpretLlmFailure } from '@/lib/llm/user-facing-error';
 
 export const maxDuration = 60;
 
@@ -45,11 +46,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ responses });
   } catch (e) {
     console.error('[Import] Structure failed:', e);
-    return NextResponse.json(
-      {
-        error: e instanceof Error ? e.message : 'Échec de la structuration du texte',
-      },
-      { status: 500 }
-    );
+    const { message, status } = interpretLlmFailure(e);
+    return NextResponse.json({ error: message }, { status });
   }
 }
