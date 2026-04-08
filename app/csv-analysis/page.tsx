@@ -6,6 +6,9 @@ import Papa from 'papaparse';
 import { Header } from '@/components/layout/header';
 import { AuthModal } from '@/components/auth/auth-modal';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertContent } from '@/components/ui/alert';
 import { createClient } from '@/lib/supabase/client';
 import type { LLMProvider } from '@/types/workshop';
 import type { User } from '@supabase/supabase-js';
@@ -34,6 +37,7 @@ function CsvAnalysisDashboard() {
   const [uploading, setUploading] = useState(false);
   const [selectedModel, setSelectedModel] = useState<LLMProvider>('gemini');
   const [dragOver, setDragOver] = useState(false);
+  const [pageError, setPageError] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -66,6 +70,7 @@ function CsvAnalysisDashboard() {
       }
 
       setUploading(true);
+      setPageError(null);
 
       Papa.parse(file, {
         header: true,
@@ -74,7 +79,7 @@ function CsvAnalysisDashboard() {
           try {
             const headers = results.meta.fields || [];
             if (headers.length === 0) {
-              alert('Le fichier CSV est vide ou mal formaté.');
+              setPageError('Le fichier CSV est vide ou mal formaté.');
               setUploading(false);
               return;
             }
@@ -127,7 +132,7 @@ function CsvAnalysisDashboard() {
             router.push(`/csv-analysis/${session.id}`);
           } catch (e) {
             console.error('Failed to parse CSV:', e);
-            alert(
+            setPageError(
               `Erreur: ${e instanceof Error ? e.message : 'Impossible de parser le fichier'}`
             );
             setUploading(false);
@@ -135,7 +140,7 @@ function CsvAnalysisDashboard() {
         },
         error: (err) => {
           console.error('CSV parse error:', err);
-          alert('Erreur de parsing CSV: ' + err.message);
+          setPageError('Erreur de parsing CSV: ' + err.message);
           setUploading(false);
         },
       });
@@ -163,7 +168,7 @@ function CsvAnalysisDashboard() {
         <Header />
         <main className="container mx-auto px-4 py-10">
           <div className="flex justify-center py-20">
-            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+            <Spinner className="size-8 border-[3px]" />
           </div>
         </main>
       </div>
@@ -237,6 +242,13 @@ function CsvAnalysisDashboard() {
 
       <main className="container mx-auto px-4 py-10">
         <div className="max-w-3xl mx-auto space-y-8">
+          {pageError ? (
+            <Alert variant="destructive">
+              <AlertContent>
+                <p className="text-sm">{pageError}</p>
+              </AlertContent>
+            </Alert>
+          ) : null}
           <div>
             <h1 className="text-2xl font-bold text-foreground">Analyse CSV</h1>
             <p className="text-muted-foreground mt-1">
@@ -256,7 +268,7 @@ function CsvAnalysisDashboard() {
           >
             {uploading ? (
               <div className="flex flex-col items-center gap-3">
-                <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                <Spinner className="size-8 border-[3px]" />
                 <p className="text-sm text-muted-foreground">Parsing du fichier CSV...</p>
               </div>
             ) : (
@@ -297,7 +309,7 @@ function CsvAnalysisDashboard() {
 
           {loadingSessions ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+              <Spinner className="size-6 border-[3px]" />
             </div>
           ) : sessions.length === 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -353,21 +365,19 @@ function CsvAnalysisDashboard() {
                         })}
                       </p>
                     </div>
-                    <span
-                      className={`flex-shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        session.status === 'complete'
-                          ? 'bg-green-100 text-green-700'
-                          : session.status === 'error'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-amber-100 text-amber-700'
-                      }`}
-                    >
-                      {session.status === 'complete'
-                        ? 'Terminée'
-                        : session.status === 'error'
-                          ? 'Erreur'
-                          : `Étape ${session.current_step}/5`}
-                    </span>
+                    {session.status === 'complete' ? (
+                      <Badge className="shrink-0 border bg-success/15 text-success border-success/20">
+                        Terminée
+                      </Badge>
+                    ) : session.status === 'error' ? (
+                      <Badge variant="destructive" className="shrink-0">
+                        Erreur
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="shrink-0">
+                        Étape {session.current_step}/5
+                      </Badge>
+                    )}
                   </div>
                 </button>
               ))}

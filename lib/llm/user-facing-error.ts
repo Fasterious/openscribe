@@ -71,6 +71,26 @@ const LLM_UNAVAILABLE_FR =
   "Le service du modèle est momentanément indisponible ou surchargé (pannes ou maintenance côté fournisseur). " +
   'Réessayez dans quelques minutes ; si le problème continue, consultez le statut du service sur le site du fournisseur.';
 
+/**
+ * Réponse LLM inutilisable pour l'analyse (JSON incomplet, clusters absents, parse échoué).
+ * Souvent : limite de sortie / modèle trop léger / trop de données en une seule requête.
+ */
+function isMalformedLlmAnalysisOutput(raw: string): boolean {
+  const t = raw.toLowerCase();
+  if (t.includes('missing clusters array')) return true;
+  if (t.includes('invalid clustering response')) return true;
+  if (t.includes('invalid response: missing clusters')) return true;
+  if (t.includes('failed to parse clustering result')) return true;
+  if (t.includes('failed to structure text')) return true;
+  if (t.includes('response must be an array')) return true;
+  if (t.includes('failed to parse clustering')) return true;
+  return false;
+}
+
+const MALFORMED_ANALYSIS_JSON_FR =
+  "L'analyse s'est arrêtée : le modèle n'a pas renvoyé le JSON attendu (liste de clusters manquante ou réponse tronquée / mal formée), ce qui arrive souvent avec une sortie trop volumineuse, beaucoup de verbatims d'un coup, ou un modèle moins fiable pour ce format. " +
+  'Choisissez un modèle plus capable (ex. Gemini 3.1 Pro, Gemma 31B), réduisez le volume de réponses si possible, puis relancez l’analyse.';
+
 function rawErrorString(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
@@ -98,6 +118,9 @@ export function interpretLlmFailure(error: unknown): { message: string; status: 
   }
   if (isLlmServiceUnavailable(raw)) {
     return { message: LLM_UNAVAILABLE_FR, status: 503 };
+  }
+  if (isMalformedLlmAnalysisOutput(raw)) {
+    return { message: MALFORMED_ANALYSIS_JSON_FR, status: 500 };
   }
 
   return {

@@ -63,11 +63,26 @@ export interface WorkshopAnalysis {
   created_at: string;
 }
 
-export type LLMProvider = 'gemini' | 'gemini-pro' | 'mistral-small' | 'mistral-medium' | 'mistral-large';
+export type LLMProvider =
+  | 'gemini'
+  | 'gemini-pro'
+  | 'gemma-4-26b-a4b'
+  | 'gemma-4-31b'
+  | 'mistral-small'
+  | 'mistral-medium'
+  | 'mistral-large';
 
 export const LLM_MODELS: Record<LLMProvider, { label: string; model: string }> = {
   gemini: { label: 'Gemini 3.1 Flash Lite Preview', model: 'gemini-3.1-flash-lite-preview' },
   'gemini-pro': { label: 'Gemini 3.1 Pro Preview', model: 'gemini-3.1-pro-preview' },
+  'gemma-4-26b-a4b': {
+    label: 'Gemma 4 26B A4B IT (open)',
+    model: 'gemma-4-26b-a4b-it',
+  },
+  'gemma-4-31b': {
+    label: 'Gemma 4 31B IT (open)',
+    model: 'gemma-4-31b-it',
+  },
   'mistral-small': { label: 'Mistral Small 4', model: 'mistral-small-latest' },
   'mistral-medium': { label: 'Mistral Medium 3.1', model: 'mistral-medium-latest' },
   'mistral-large': { label: 'Mistral Large 3', model: 'mistral-large-latest' },

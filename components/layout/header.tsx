@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: '/transcription', label: 'Transcription' },
   { href: '/workshop', label: 'Workshop' },
   { href: '/csv-analysis', label: 'Analyse CSV' },
+  { href: '/persona', label: 'Personas' },
 ];
 
 interface HeaderProps {

@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { AuthModal } from '@/components/auth/auth-modal';
+import { Alert, AlertContent } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
@@ -71,7 +75,7 @@ export default function CreateSession() {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto px-4 py-10 flex justify-center py-20">
-          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+          <Spinner className="size-8 border-[2px]" />
         </main>
       </div>
     );
@@ -82,29 +86,38 @@ export default function CreateSession() {
       <Header />
 
       {!user && (
-        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-3 text-center text-sm text-amber-700">
-          Vous devez être connecté pour créer une session.{' '}
-          <button
-            onClick={() => setAuthModalOpen(true)}
-            className="underline font-medium hover:text-amber-900"
-          >
-            Se connecter
-          </button>
-        </div>
+        <Alert
+          variant="warning"
+          className="rounded-none border-x-0 border-t-0 py-3 justify-center"
+        >
+          <AlertContent className="text-center text-sm text-inherit">
+            Vous devez être connecté pour créer une session.{' '}
+            <button
+              type="button"
+              onClick={() => setAuthModalOpen(true)}
+              className="underline font-medium hover:opacity-90"
+            >
+              Se connecter
+            </button>
+          </AlertContent>
+        </Alert>
       )}
 
       <main className="container mx-auto px-4 py-10">
         <div className="max-w-xl mx-auto space-y-8">
           <div>
-            <button
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => router.push('/workshop')}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mb-4"
+              className="text-muted-foreground hover:text-foreground -ml-2 mb-4"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Retour
-            </button>
+            </Button>
             <h1 className="text-2xl font-bold text-foreground">
               Nouvelle session
             </h1>
@@ -116,27 +129,24 @@ export default function CreateSession() {
 
           <div className="bg-card rounded-2xl border border-border p-6 space-y-5">
             <div>
-              <label
-                htmlFor="question"
-                className="block text-sm font-medium text-foreground mb-2"
-              >
+              <Label htmlFor="question" className="block mb-2">
                 Votre question
-              </label>
-              <textarea
+              </Label>
+              <Textarea
                 id="question"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="Ex : Quels sont les principaux problèmes que vous rencontrez au quotidien dans votre travail ?"
                 rows={4}
-                className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                className="rounded-xl resize-none"
                 autoFocus
               />
             </div>
 
             {error && (
-              <div className="text-sm text-destructive bg-destructive/10 rounded-xl p-3">
-                {error}
-              </div>
+              <Alert variant="destructive" className="rounded-xl">
+                <AlertContent className="text-sm text-inherit">{error}</AlertContent>
+              </Alert>
             )}
 
             <div className="flex justify-end gap-3">
@@ -152,7 +162,10 @@ export default function CreateSession() {
               >
                 {creating ? (
                   <>
-                    <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full mr-2" />
+                    <Spinner
+                      size="sm"
+                      className="mr-2 border-primary-foreground/30 border-t-primary-foreground"
+                    />
                     Création...
                   </>
                 ) : (

@@ -2,6 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/lib/i18n/context';
 
 interface ProviderConfig {
@@ -94,7 +103,7 @@ function ProviderKeyCard({
         </div>
         <div className="flex-shrink-0">
           {configured ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-700 dark:text-green-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
               <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
@@ -132,12 +141,12 @@ function ProviderKeyCard({
           </a>
 
           <div className="flex gap-2">
-            <input
+            <Input
               type="password"
               value={keyInput}
               onChange={(e) => setKeyInput(e.target.value)}
               placeholder={t('settings.apiKeys.placeholder')}
-              className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="flex-1"
               onKeyDown={(e) => e.key === 'Enter' && handleSave()}
             />
             <Button size="sm" onClick={handleSave} disabled={loading || !keyInput.trim()}>
@@ -157,7 +166,7 @@ function ProviderKeyCard({
         <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">{error}</p>
       )}
       {success && (
-        <p className="text-sm text-green-700 dark:text-green-400 bg-green-500/10 rounded-lg px-3 py-2">{success}</p>
+        <p className="text-sm text-success bg-success/10 rounded-lg px-3 py-2">{success}</p>
       )}
     </div>
   );
@@ -185,10 +194,12 @@ export function ApiKeysSetup({ isOpen, onClose }: ApiKeysSetupProps) {
   }, []);
 
   useEffect(() => {
-    if (isOpen) fetchStatus();
+    if (!isOpen) return;
+    const id = window.setTimeout(() => {
+      void fetchStatus();
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [isOpen, fetchStatus]);
-
-  if (!isOpen) return null;
 
   const providers: ProviderConfig[] = [
     {
@@ -208,35 +219,38 @@ export function ApiKeysSetup({ isOpen, onClose }: ApiKeysSetupProps) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogContent
+        showCloseButton={false}
+        className="max-h-[90vh] max-w-lg overflow-y-auto rounded-2xl sm:max-w-lg"
+      >
+        <DialogClose asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 text-muted-foreground"
+            aria-label={t('settings.apiKeys.title')}
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </Button>
+        </DialogClose>
 
-      <div className="relative bg-card rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6 border border-border animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
-        >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        <div className="mb-6">
-          <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+        <DialogHeader className="items-center text-center space-y-0">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
             <svg className="h-7 w-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-foreground text-center">
-            {t('settings.apiKeys.title')}
-          </h2>
-          <p className="text-sm text-muted-foreground text-center mt-1">
-            {t('settings.apiKeys.subtitle')}
-          </p>
-        </div>
+          <DialogTitle className="text-xl">{t('settings.apiKeys.title')}</DialogTitle>
+          <DialogDescription className="mt-1">{t('settings.apiKeys.subtitle')}</DialogDescription>
+        </DialogHeader>
 
         <div className="space-y-4">
           {providers.map((config) => (
@@ -253,7 +267,7 @@ export function ApiKeysSetup({ isOpen, onClose }: ApiKeysSetupProps) {
             />
           ))}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

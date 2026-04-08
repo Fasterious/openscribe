@@ -9,6 +9,7 @@ import { AuthModal } from '@/components/auth/auth-modal';
 import { ApiKeyStatusProvider, ApiKeyBanner, useApiKeyStatus } from '@/components/auth/require-api-key';
 import { FeedbackButton } from '@/components/feedback/feedback-button';
 import { Header } from '@/components/layout/header';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { WaveformAnimation } from '@/components/ui/waveform-animation';
 import { createClient } from '@/lib/supabase/client';
@@ -289,12 +290,14 @@ function TranscriptionPageInner() {
                   onChange={setSpeakerLanguage}
                 />
                 <UploadZone onFileSelect={handleFileSelect} disabled={!mistralConfigured || !user} />
-                <div className="flex items-start gap-2 rounded-lg bg-muted/50 border border-border/50 px-4 py-3 text-xs text-muted-foreground">
+                <Alert variant="default" className="items-start text-xs">
                   <svg className="h-4 w-4 flex-shrink-0 mt-0.5 text-muted-foreground/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p>{t('privacy.notice')}</p>
-                </div>
+                  <AlertDescription className="text-xs [&_p]:leading-normal">
+                    {t('privacy.notice')}
+                  </AlertDescription>
+                </Alert>
               </>
             )}
 
@@ -317,15 +320,17 @@ function TranscriptionPageInner() {
 
             {state.status === 'error' && (
               <div className="space-y-4">
-                <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center">
-                  <div className="mx-auto w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-                    <svg className="h-7 w-7 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
+                <Alert variant="destructive" className="flex-col items-center text-center sm:flex-row sm:text-left sm:items-start py-8">
+                  <svg className="h-7 w-7 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div className="min-w-0 flex-1 space-y-2 text-center sm:text-left">
+                    <AlertTitle className="text-lg">{t('error.title')}</AlertTitle>
+                    <AlertDescription className="text-sm text-muted-foreground">
+                      {state.error}
+                    </AlertDescription>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground">{t('error.title')}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{state.error}</p>
-                </div>
+                </Alert>
                 <div className="flex justify-center">
                   <Button onClick={handleReset} variant="outline">{t('error.tryAgain')}</Button>
                 </div>

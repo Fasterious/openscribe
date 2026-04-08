@@ -19,6 +19,8 @@ export function getLLMClient(provider: LLMProvider, keys?: LLMClientOptions): LL
   switch (provider) {
     case 'gemini':
     case 'gemini-pro':
+    case 'gemma-4-26b-a4b':
+    case 'gemma-4-31b':
       return createGeminiClient(LLM_MODELS[provider].model, { apiKey: keys?.geminiApiKey });
     case 'mistral-small':
       return createMistralClient(LLM_MODELS[provider].model, {

@@ -7,7 +7,14 @@ import { useApiKeyStatus } from '@/components/auth/require-api-key';
 import { ApiKeysSetup } from '@/components/settings/api-keys-setup';
 
 function getBaseProvider(key: LLMProvider): 'mistral' | 'gemini' {
-  if (key === 'gemini' || key === 'gemini-pro') return 'gemini';
+  if (
+    key === 'gemini' ||
+    key === 'gemini-pro' ||
+    key === 'gemma-4-26b-a4b' ||
+    key === 'gemma-4-31b'
+  ) {
+    return 'gemini';
+  }
   return 'mistral';
 }
 

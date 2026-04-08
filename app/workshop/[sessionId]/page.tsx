@@ -4,7 +4,10 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { Header } from '@/components/layout/header';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import { createClient } from '@/lib/supabase/client';
 import type {
   WorkshopSession,
@@ -387,7 +390,7 @@ function SessionView() {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto px-4 py-10 flex justify-center py-20">
-          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+          <Spinner size="lg" className="size-8" />
         </main>
       </div>
     );
@@ -436,15 +439,11 @@ function SessionView() {
                   {responses.length} réponse{responses.length > 1 ? 's' : ''}
                 </span>
                 <span aria-hidden>·</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    session.status === 'active'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}
+                <Badge
+                  variant={session.status === 'active' ? 'default' : 'secondary'}
                 >
                   {session.status === 'active' ? 'Active' : 'Fermée'}
-                </span>
+                </Badge>
                 <span aria-hidden>·</span>
                 <span>
                   Créée le{' '}
@@ -502,11 +501,11 @@ function SessionView() {
                     et répondre à votre question.
                   </p>
                   <div className="flex items-center gap-2">
-                    <input
+                    <Input
                       type="text"
                       readOnly
                       value={participateUrl}
-                      className="flex-1 text-sm bg-muted rounded-lg px-3 py-2 text-muted-foreground border border-border"
+                      className="flex-1 text-sm bg-muted text-muted-foreground"
                     />
                     <Button variant="outline" size="sm" onClick={copyLink}>
                       Copier
@@ -537,7 +536,10 @@ function SessionView() {
                 >
                   {analyzing ? (
                     <>
-                      <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full mr-2" />
+                      <Spinner
+                        size="sm"
+                        className="mr-2 border-primary-foreground/30 border-t-primary-foreground"
+                      />
                       Analyse en cours...
                     </>
                   ) : (
@@ -684,7 +686,7 @@ function ClustersView({
   if (analyzing) {
     return (
       <div className="text-center py-16 space-y-4">
-        <div className="animate-spin h-10 w-10 border-[3px] border-primary border-t-transparent rounded-full mx-auto" />
+        <Spinner size="lg" className="mx-auto size-10 border-[3px]" />
         <p className="text-muted-foreground">
           Analyse de {responseCount} réponse{responseCount > 1 ? 's' : ''} en
           cours...
@@ -1012,7 +1014,7 @@ function WordCloudView({
   if (analyzing) {
     return (
       <div className="text-center py-16 space-y-4">
-        <div className="animate-spin h-10 w-10 border-[3px] border-primary border-t-transparent rounded-full mx-auto" />
+        <Spinner size="lg" className="mx-auto size-10 border-[3px]" />
         <p className="text-muted-foreground">
           Analyse de {responseCount} réponse{responseCount > 1 ? 's' : ''} en
           cours...

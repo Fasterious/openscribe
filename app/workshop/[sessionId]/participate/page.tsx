@@ -2,7 +2,12 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
+import { Alert, AlertContent } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
 import { createClient } from '@/lib/supabase/client';
 import type { WorkshopSession, WorkshopResponse } from '@/types/workshop';
 
@@ -168,7 +173,7 @@ export default function ParticipatePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+        <Spinner className="size-8 border-[2px]" />
       </div>
     );
   }
@@ -220,45 +225,39 @@ export default function ParticipatePage() {
           {!submitted ? (
             <div className="bg-card rounded-2xl border border-border p-5 space-y-4">
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-foreground mb-1.5"
-                >
+                <Label htmlFor="name" className="block mb-1.5">
                   Votre prénom
-                </label>
-                <input
+                </Label>
+                <Input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Prénom"
-                  className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="rounded-xl"
                   autoFocus={!name}
                 />
               </div>
 
               <div>
-                <label
-                  htmlFor="response"
-                  className="block text-sm font-medium text-foreground mb-1.5"
-                >
+                <Label htmlFor="response" className="block mb-1.5">
                   Votre réponse
-                </label>
-                <textarea
+                </Label>
+                <Textarea
                   id="response"
                   value={responseText}
                   onChange={(e) => setResponseText(e.target.value)}
                   placeholder="Partagez votre point de vue..."
                   rows={5}
-                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                  className="rounded-xl resize-none"
                   autoFocus={!!name}
                 />
               </div>
 
               {error && (
-                <div className="text-sm text-destructive bg-destructive/10 rounded-xl p-3">
-                  {error}
-                </div>
+                <Alert variant="destructive" className="rounded-xl">
+                  <AlertContent className="text-sm text-inherit">{error}</AlertContent>
+                </Alert>
               )}
 
               <Button
@@ -268,7 +267,10 @@ export default function ParticipatePage() {
               >
                 {submitting ? (
                   <>
-                    <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full mr-2" />
+                    <Spinner
+                      size="sm"
+                      className="mr-2 border-primary-foreground/30 border-t-primary-foreground"
+                    />
                     Envoi...
                   </>
                 ) : editing ? (
@@ -279,8 +281,8 @@ export default function ParticipatePage() {
               </Button>
             </div>
           ) : (
-            <div className="bg-card rounded-2xl border border-green-200 p-5 space-y-3">
-              <div className="flex items-center gap-2 text-green-700">
+            <div className="rounded-2xl border border-success/30 bg-success/10 p-5 space-y-3">
+              <div className="flex items-center gap-2 text-success">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>

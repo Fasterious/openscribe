@@ -9,6 +9,8 @@ export function getProviderType(provider: LLMProvider): ApiProvider {
   switch (provider) {
     case 'gemini':
     case 'gemini-pro':
+    case 'gemma-4-26b-a4b':
+    case 'gemma-4-31b':
       return 'gemini';
     case 'mistral-small':
     case 'mistral-medium':

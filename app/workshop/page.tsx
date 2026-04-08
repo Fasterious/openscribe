@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { AuthModal } from '@/components/auth/auth-modal';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import type { WorkshopSession } from '@/types/workshop';
@@ -48,7 +50,7 @@ export default function WorkshopDashboard() {
         <Header />
         <main className="container mx-auto px-4 py-10">
           <div className="flex justify-center py-20">
-            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+            <Spinner className="size-8 border-[2px]" />
           </div>
         </main>
       </div>
@@ -147,7 +149,7 @@ export default function WorkshopDashboard() {
 
           {loadingSessions ? (
             <div className="flex justify-center py-12">
-              <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+              <Spinner size="lg" />
             </div>
           ) : sessions.length === 0 ? (
             <div className="space-y-6">
@@ -223,15 +225,18 @@ export default function WorkshopDashboard() {
                         })}
                       </p>
                     </div>
-                    <span
-                      className={`flex-shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        session.status === 'active'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}
-                    >
-                      {session.status === 'active' ? 'Active' : 'Fermée'}
-                    </span>
+                    {session.status === 'active' ? (
+                      <Badge
+                        variant="outline"
+                        className="shrink-0 border-success/40 bg-success/10 text-success"
+                      >
+                        Active
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="shrink-0">
+                        Fermée
+                      </Badge>
+                    )}
                   </div>
                 </button>
               ))}

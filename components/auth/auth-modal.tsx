@@ -4,6 +4,14 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useTranslation } from '@/lib/i18n/context';
 
 interface AuthModalProps {
@@ -14,7 +22,7 @@ interface AuthModalProps {
   redirectTo?: string;
 }
 
-export function AuthModal({ isOpen, onClose, onSuccess, redirectTo }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, redirectTo }: AuthModalProps) {
   const { t } = useTranslation();
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
@@ -40,38 +48,39 @@ export function AuthModal({ isOpen, onClose, onSuccess, redirectTo }: AuthModalP
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      
-      <div className="relative bg-card rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 border border-border animate-in fade-in zoom-in-95 duration-200">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
-        >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-md rounded-2xl sm:max-w-md"
+      >
+        <DialogClose asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 text-muted-foreground"
+            aria-label="Close"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </Button>
+        </DialogClose>
 
-        <div className="text-center mb-6">
-          <div className="mx-auto w-14 h-14 rounded-full bg-primary flex items-center justify-center mb-4">
+        <DialogHeader className="items-center text-center space-y-0">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary">
             <svg className="h-7 w-7 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-foreground">
-            {t('auth.modal.signIn')}
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('auth.modal.signInSubtitle')}
-          </p>
-        </div>
+          <DialogTitle className="text-xl">{t('auth.modal.signIn')}</DialogTitle>
+          <DialogDescription className="mt-1">{t('auth.modal.signInSubtitle')}</DialogDescription>
+        </DialogHeader>
 
         <div>
           <Button
@@ -103,11 +112,9 @@ export function AuthModal({ isOpen, onClose, onSuccess, redirectTo }: AuthModalP
         </div>
 
         {error && (
-          <div className="mt-4 text-sm text-destructive bg-destructive/10 rounded-xl p-3">
-            {error}
-          </div>
+          <div className="text-sm text-destructive bg-destructive/10 rounded-xl p-3">{error}</div>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

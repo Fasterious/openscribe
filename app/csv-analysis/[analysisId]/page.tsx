@@ -4,6 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertContent } from '@/components/ui/alert';
 import { PipelineStepper } from '@/components/csv-analysis/pipeline-stepper';
 import { QuintupletTable } from '@/components/csv-analysis/quintuplet-table';
 import { ClusterView } from '@/components/csv-analysis/cluster-view';
@@ -119,7 +124,7 @@ export default function CsvAnalysisPipeline() {
         <Header />
         <main className="container mx-auto px-4 py-10">
           <div className="flex justify-center py-20">
-            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+            <Spinner className="size-8 border-[3px]" />
           </div>
         </main>
       </div>
@@ -156,15 +161,18 @@ export default function CsvAnalysisPipeline() {
           {/* Header */}
           <div className="flex items-start justify-between gap-4">
             <div>
-              <button
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => router.push('/csv-analysis')}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors mb-2 flex items-center gap-1"
+                className="mb-2 -ml-2 h-auto px-2 text-muted-foreground hover:text-foreground"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 Retour
-              </button>
+              </Button>
               <h1 className="text-xl font-bold text-foreground">{session.filename}</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Modèle : {session.model_used} · Créée le{' '}
@@ -187,9 +195,11 @@ export default function CsvAnalysisPipeline() {
 
           {/* Error */}
           {(error || session.error_message) && (
-            <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 text-sm text-destructive">
-              {error || session.error_message}
-            </div>
+            <Alert variant="destructive">
+              <AlertContent>
+                <p className="text-sm">{error || session.error_message}</p>
+              </AlertContent>
+            </Alert>
           )}
 
           {/* View toggle for complete analyses */}
@@ -232,9 +242,9 @@ export default function CsvAnalysisPipeline() {
                         {parsed.total_participants} participants · {parsed.total_questions} questions détectées · {selectedQuestions.size} sélectionnées
                       </p>
                     </div>
-                    <span className="bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <Badge className="border bg-success/15 text-success border-success/20">
                       Terminé
-                    </span>
+                    </Badge>
                   </div>
                   <div className="px-5 py-4">
                     <div className="space-y-3">
@@ -260,36 +270,44 @@ export default function CsvAnalysisPipeline() {
                         )}
                       </div>
                       <div className="space-y-1.5">
-                        {parsed.questions.map((q, i) => (
-                          <label
-                            key={i}
-                            className={`flex items-start gap-3 text-sm p-2 rounded-lg transition-colors ${
-                              !quintuplets ? 'hover:bg-secondary/30 cursor-pointer' : ''
-                            } ${selectedQuestions.has(q) ? 'text-foreground' : 'text-muted-foreground'}`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedQuestions.has(q)}
-                              disabled={!!quintuplets}
-                              onChange={() => {
-                                setSelectedQuestions((prev) => {
-                                  const next = new Set(prev);
-                                  if (next.has(q)) {
-                                    next.delete(q);
-                                  } else {
-                                    next.add(q);
-                                  }
-                                  return next;
-                                });
-                              }}
-                              className="mt-0.5 rounded border-border text-primary focus:ring-primary"
-                            />
-                            <span>
-                              <span className="text-muted-foreground mr-1.5">Q{i + 1}.</span>
-                              {q}
-                            </span>
-                          </label>
-                        ))}
+                        {parsed.questions.map((q, i) => {
+                          const qid = `csv-analysis-q-${i}`;
+                          return (
+                            <div
+                              key={i}
+                              className={`flex items-start gap-3 text-sm p-2 rounded-lg transition-colors ${
+                                !quintuplets ? 'hover:bg-secondary/30' : ''
+                              } ${selectedQuestions.has(q) ? 'text-foreground' : 'text-muted-foreground'}`}
+                            >
+                              <Checkbox
+                                id={qid}
+                                className="mt-0.5"
+                                checked={selectedQuestions.has(q)}
+                                disabled={!!quintuplets}
+                                onCheckedChange={() => {
+                                  setSelectedQuestions((prev) => {
+                                    const next = new Set(prev);
+                                    if (next.has(q)) {
+                                      next.delete(q);
+                                    } else {
+                                      next.add(q);
+                                    }
+                                    return next;
+                                  });
+                                }}
+                              />
+                              <Label
+                                htmlFor={qid}
+                                className={`font-normal leading-snug ${
+                                  !quintuplets ? 'cursor-pointer' : 'cursor-default'
+                                }`}
+                              >
+                                <span className="text-muted-foreground mr-1.5">Q{i + 1}.</span>
+                                {q}
+                              </Label>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -310,9 +328,9 @@ export default function CsvAnalysisPipeline() {
                     </p>
                   </div>
                   {quintuplets ? (
-                    <span className="bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <Badge className="border bg-success/15 text-success border-success/20">
                       Terminé
-                    </span>
+                    </Badge>
                   ) : (
                     <Button
                       size="sm"
@@ -321,7 +339,10 @@ export default function CsvAnalysisPipeline() {
                     >
                       {processing && session.status === 'extracting' ? (
                         <>
-                          <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin mr-1.5" />
+                          <Spinner
+                            size="sm"
+                            className="mr-1.5 border-primary-foreground/30 border-t-primary-foreground"
+                          />
                           Extraction en cours...
                         </>
                       ) : (
@@ -351,9 +372,9 @@ export default function CsvAnalysisPipeline() {
                     </p>
                   </div>
                   {clusters ? (
-                    <span className="bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <Badge className="border bg-success/15 text-success border-success/20">
                       Terminé
-                    </span>
+                    </Badge>
                   ) : (
                     <Button
                       size="sm"
@@ -362,7 +383,10 @@ export default function CsvAnalysisPipeline() {
                     >
                       {processing && session.status === 'clustering' ? (
                         <>
-                          <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin mr-1.5" />
+                          <Spinner
+                            size="sm"
+                            className="mr-1.5 border-primary-foreground/30 border-t-primary-foreground"
+                          />
                           Clustering en cours...
                         </>
                       ) : (
@@ -392,9 +416,9 @@ export default function CsvAnalysisPipeline() {
                     </p>
                   </div>
                   {finalAnalysis ? (
-                    <span className="bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <Badge className="border bg-success/15 text-success border-success/20">
                       Terminé
-                    </span>
+                    </Badge>
                   ) : (
                     <Button
                       size="sm"
@@ -403,7 +427,10 @@ export default function CsvAnalysisPipeline() {
                     >
                       {processing && session.status === 'synthesizing' ? (
                         <>
-                          <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin mr-1.5" />
+                          <Spinner
+                            size="sm"
+                            className="mr-1.5 border-primary-foreground/30 border-t-primary-foreground"
+                          />
                           Synthèse en cours...
                         </>
                       ) : (
