@@ -33,12 +33,18 @@ export interface CorrelationData {
   sortedIndices: number[];
 }
 
+export interface KResult {
+  clusters: PersonaCluster[];
+  correlationData: CorrelationData;
+}
+
 export interface PersonaAnalysisResult {
   clusters: PersonaCluster[];
   correlationData: CorrelationData;
   optimalK: number;
   silhouetteScores: { k: number; score: number }[];
   columnNames: string[];
+  allResults: Record<number, KResult>;
 }
 
 export type PersonaStep = 'upload' | 'configure' | 'analyzing' | 'complete' | 'error';

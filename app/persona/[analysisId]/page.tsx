@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { createClient } from '@/lib/supabase/client';
 import { PersonaDataTable } from '@/components/persona/data-table';
 import { RadarViz } from '@/components/persona/radar-viz';
@@ -26,6 +27,7 @@ export default function PersonaAnalysisPage() {
   const [session, setSession] = useState<PersonaSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('viz');
+  const [selectedK, setSelectedK] = useState<number | null>(null);
   const filter = useClusterFilter();
 
   useEffect(() => {
@@ -44,33 +46,42 @@ export default function PersonaAnalysisPage() {
 
   const result: PersonaAnalysisResult | null = session?.analysis_result ?? null;
 
+  const activeK = selectedK ?? result?.optimalK ?? 0;
+  const activeData = useMemo(() => {
+    if (!result) return null;
+    const kResult = result.allResults?.[activeK];
+    if (kResult) return kResult;
+    return { clusters: result.clusters, correlationData: result.correlationData };
+  }, [result, activeK]);
+
+  const activeClusters = activeData?.clusters ?? [];
+  const activeCorrelation = activeData?.correlationData ?? result?.correlationData;
+
   const allRespondents: PersonaRespondent[] = useMemo(() => {
-    if (!result) return [];
-    return result.clusters.flatMap((c) => c.members);
-  }, [result]);
+    return activeClusters.flatMap((c) => c.members);
+  }, [activeClusters]);
 
   const clusterMap = useMemo(() => {
     const map = new Map<string, { color: string; label: string }>();
-    result?.clusters.forEach((c) =>
+    activeClusters.forEach((c) =>
       c.members.forEach((m) => map.set(m.id, { color: c.color, label: c.label }))
     );
     return map;
-  }, [result]);
+  }, [activeClusters]);
 
   const orderedFromClusters = useMemo(() => {
-    if (!result) return [];
-    return result.clusters.flatMap((c) =>
+    return activeClusters.flatMap((c) =>
       [...c.members].sort((a, b) => {
         const na = parseInt(a.id.replace(/\D/g, '')) || 0;
         const nb = parseInt(b.id.replace(/\D/g, '')) || 0;
         return na - nb;
       })
     );
-  }, [result]);
+  }, [activeClusters]);
 
   const downloadCSV = () => {
     if (!result) return;
-    const csv = generatePersonaCSV(result.clusters, result.columnNames);
+    const csv = generatePersonaCSV(activeClusters, result.columnNames);
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -121,7 +132,10 @@ export default function PersonaAnalysisPage() {
           <div>
             <h1 className="text-xl font-bold text-foreground">{session.filename}</h1>
             <p className="text-[13px] text-muted-foreground">
-              {session.respondent_count} repondants · {session.cluster_count} clusters · {new Date(session.created_at).toLocaleDateString()}
+              {session.respondent_count} repondants · {activeClusters.length} clusters · {new Date(session.created_at).toLocaleDateString()}
+              {activeK !== result.optimalK && (
+                <span className="ml-1 text-primary">(k={activeK} selectionne)</span>
+              )}
             </p>
           </div>
           <div className="flex gap-2">
@@ -152,32 +166,55 @@ export default function PersonaAnalysisPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="text-sm font-semibold text-foreground">
-                    {result.clusters.length} personas identifiees
+                    {activeClusters.length} personas identifiees
                   </h3>
                   <span className="text-[12px] text-muted-foreground">
                     k optimal = {result.optimalK}
                   </span>
                 </div>
 
-                <div className="flex gap-2 flex-wrap mb-4">
-                  {result.silhouetteScores
-                    .sort((a, b) => a.k - b.k)
-                    .map((s) => (
-                      <div
-                        key={s.k}
-                        className={`px-3 py-1.5 rounded-lg text-[12px] border ${
-                          s.k === result.clusters.length
-                            ? 'border-primary bg-primary/10 text-primary font-medium'
-                            : 'border-border text-muted-foreground'
-                        }`}
-                      >
-                        k={s.k}: {s.score.toFixed(3)}
-                      </div>
-                    ))}
+                {/* Silhouette scores - clickable */}
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h4 className="text-[13px] font-medium text-foreground">Scores silhouette par k</h4>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="w-4 h-4 rounded-full border border-muted-foreground/40 text-muted-foreground text-[10px] leading-none flex items-center justify-center hover:border-primary hover:text-primary transition-colors">
+                            i
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-xs text-[12px] space-y-1.5 p-3">
+                          <p className="font-medium">Score silhouette</p>
+                          <p>Mesure la qualite du clustering sur une echelle de -1 a 1.</p>
+                          <p>Pour chaque individu, on compare sa distance moyenne aux membres de son propre groupe (a) avec la distance moyenne au groupe le plus proche (b) : <span className="font-mono text-[11px]">(b-a) / max(a,b)</span></p>
+                          <p><strong>Proche de 1</strong> = clusters bien separes. <strong>~0</strong> = frontiere floue. <strong>Negatif</strong> = individus potentiellement mal classes.</p>
+                          <p>Le tag avec une etoile indique le k optimal detecte automatiquement. Cliquez sur un tag pour basculer.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {[...result.silhouetteScores]
+                      .sort((a, b) => a.k - b.k)
+                      .map((s) => (
+                        <button
+                          key={s.k}
+                          onClick={() => setSelectedK(s.k)}
+                          className={`px-3 py-1.5 rounded-lg text-[12px] border transition-colors ${
+                            s.k === activeK
+                              ? 'border-primary bg-primary/10 text-primary font-medium'
+                              : 'border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
+                          }`}
+                        >
+                          k={s.k}: {s.score.toFixed(3)}{s.k === result.optimalK ? ' \u2605' : ''}
+                        </button>
+                      ))}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {result.clusters.map((c, ci) => (
+                  {activeClusters.map((c, ci) => (
                     <div key={ci} className="bg-muted/50 rounded-lg p-4 text-center">
                       <div className="w-4 h-4 rounded-full mx-auto mb-2" style={{ backgroundColor: c.color }} />
                       <p className="text-[13px] font-medium text-foreground">{c.label}</p>
@@ -214,9 +251,9 @@ export default function PersonaAnalysisPage() {
               />
             )}
 
-            {activeTab === 'correlation' && (
+            {activeTab === 'correlation' && activeCorrelation && (
               <CorrelationViz
-                correlationData={result.correlationData}
+                correlationData={activeCorrelation}
                 respondents={allRespondents}
                 clusterMap={clusterMap}
                 columnNames={result.columnNames}
@@ -225,10 +262,10 @@ export default function PersonaAnalysisPage() {
 
             {activeTab === 'viz' && (
               <div className="space-y-4">
-                <InteractiveLegend clusters={result.clusters} filter={filter} />
-                <RadarViz clusters={result.clusters} columnNames={result.columnNames} filter={filter} />
-                <LikertScales clusters={result.clusters} columnNames={result.columnNames} filter={filter} />
-                <HeatmapViz clusters={result.clusters} columnNames={result.columnNames} />
+                <InteractiveLegend clusters={activeClusters} filter={filter} />
+                <RadarViz clusters={activeClusters} columnNames={result.columnNames} filter={filter} />
+                <LikertScales clusters={activeClusters} columnNames={result.columnNames} filter={filter} />
+                <HeatmapViz clusters={activeClusters} columnNames={result.columnNames} />
               </div>
             )}
           </div>

@@ -4,6 +4,7 @@ import type {
   CorrelationData,
   PersonaAnalysisResult,
   SignatureVariable,
+  KResult,
 } from '@/types/persona';
 import { CLUSTER_COLORS } from '@/types/persona';
 
@@ -242,46 +243,36 @@ export function findOptimalK(
   respondents: PersonaRespondent[],
   totalMatrix: number[][],
   maxK?: number
-): { optimalK: number; scores: { k: number; score: number }[] } {
+): {
+  optimalK: number;
+  scores: { k: number; score: number }[];
+  groupsByK: Map<number, number[][]>;
+} {
   const n = respondents.length;
   const nQ = respondents[0].values.length;
   const upper = maxK ?? Math.min(Math.ceil(Math.sqrt(n)), 10);
   const lower = 2;
 
   const scores: { k: number; score: number }[] = [];
+  const groupsByK = new Map<number, number[][]>();
 
   for (let k = lower; k <= upper; k++) {
     const groups = greedyGrouping(respondents, totalMatrix, k);
     const score = computeSilhouetteScore(groups, totalMatrix, nQ);
     scores.push({ k, score });
+    groupsByK.set(k, groups);
   }
 
   scores.sort((a, b) => b.score - a.score);
-  return { optimalK: scores[0]?.k ?? 3, scores };
+  return { optimalK: scores[0]?.k ?? 3, scores, groupsByK };
 }
 
-// --- Main clustering ---
-
-export function runPersonaClustering(
+function buildClustersFromGroups(
+  groups: number[][],
   respondents: PersonaRespondent[],
   columnNames: string[],
-  k?: number
-): PersonaAnalysisResult {
-  const { perQuestion, totalMatrix } = buildCorrelationMatrices(respondents);
-
-  const { optimalK, scores: silhouetteScores } = findOptimalK(respondents, totalMatrix);
-  const effectiveK = k ?? optimalK;
-
-  const groups = greedyGrouping(respondents, totalMatrix, effectiveK);
-
-  const sortedIndices = groups.flat();
-  for (let i = 0; i < respondents.length; i++) {
-    if (!sortedIndices.includes(i)) sortedIndices.push(i);
-  }
-
-  const correlationData: CorrelationData = { perQuestion, totalMatrix, sortedIndices };
-
-  const clusters: PersonaCluster[] = groups.map((group, i) => {
+): PersonaCluster[] {
+  return groups.map((group, i) => {
     const members = group.map((idx) => respondents[idx]);
     const centroid = respondents[0].values.map((_, vi) => {
       if (members.length === 0) return 3;
@@ -295,8 +286,57 @@ export function runPersonaClustering(
       signatureVars: detectSignatureVars(members, columnNames),
     };
   });
+}
 
-  return { clusters, correlationData, optimalK, silhouetteScores, columnNames };
+function buildSortedIndices(groups: number[][], totalRespondents: number): number[] {
+  const sortedIndices = groups.flat();
+  for (let i = 0; i < totalRespondents; i++) {
+    if (!sortedIndices.includes(i)) sortedIndices.push(i);
+  }
+  return sortedIndices;
+}
+
+// --- Main clustering ---
+
+export function runPersonaClustering(
+  respondents: PersonaRespondent[],
+  columnNames: string[],
+  k?: number
+): PersonaAnalysisResult {
+  const { perQuestion, totalMatrix } = buildCorrelationMatrices(respondents);
+  const { optimalK, scores: silhouetteScores, groupsByK } = findOptimalK(respondents, totalMatrix);
+  const effectiveK = k ?? optimalK;
+
+  const allResults: Record<number, KResult> = {};
+  for (const [kVal, groups] of groupsByK) {
+    const clusters = buildClustersFromGroups(groups, respondents, columnNames);
+    const sortedIndices = buildSortedIndices(groups, respondents.length);
+    allResults[kVal] = {
+      clusters,
+      correlationData: { perQuestion, totalMatrix, sortedIndices },
+    };
+  }
+
+  const primary = allResults[effectiveK];
+  if (!primary) {
+    const groups = greedyGrouping(respondents, totalMatrix, effectiveK);
+    const clusters = buildClustersFromGroups(groups, respondents, columnNames);
+    const sortedIndices = buildSortedIndices(groups, respondents.length);
+    allResults[effectiveK] = {
+      clusters,
+      correlationData: { perQuestion, totalMatrix, sortedIndices },
+    };
+  }
+
+  const active = allResults[effectiveK];
+  return {
+    clusters: active.clusters,
+    correlationData: active.correlationData,
+    optimalK,
+    silhouetteScores,
+    columnNames,
+    allResults,
+  };
 }
 
 // --- CSV generation ---

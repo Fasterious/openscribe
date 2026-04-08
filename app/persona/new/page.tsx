@@ -31,6 +31,7 @@ export default function PersonaNewAnalysis() {
   const [step, setStep] = useState<Step>('columns');
   const [clusterCount, setClusterCount] = useState<number | 'auto'>('auto');
   const [result, setResult] = useState<PersonaAnalysisResult | null>(null);
+  const [selectedK, setSelectedK] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [autoDetecting, setAutoDetecting] = useState(false);
   const [idColumn, setIdColumn] = useState<number>(0);
@@ -176,6 +177,14 @@ export default function PersonaNewAnalysis() {
     a.click();
     URL.revokeObjectURL(url);
   }, [result, uploadData]);
+
+  const activeK = selectedK ?? result?.optimalK ?? 0;
+  const activeData = useMemo(() => {
+    if (!result) return null;
+    const kResult = result.allResults?.[activeK];
+    if (kResult) return kResult;
+    return { clusters: result.clusters, correlationData: result.correlationData };
+  }, [result, activeK]);
 
   if (!uploadData) {
     return (
@@ -355,50 +364,39 @@ export default function PersonaNewAnalysis() {
         )}
 
         {/* Step 3: Results (inline quick view, link to full) */}
-        {step === 'done' && result && (
+        {step === 'done' && result && activeData && (
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-semibold text-foreground">Analyse terminee</h3>
                   <p className="text-[13px] text-muted-foreground">
-                    {result.clusters.length} personas identifiees · k optimal = {result.optimalK}
+                    {activeData.clusters.length} personas identifiees · k optimal = {result.optimalK}
+                    {activeK !== result.optimalK && (
+                      <span className="ml-1 text-primary">(k={activeK} selectionne)</span>
+                    )}
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={downloadCSV}>
                     Telecharger CSV
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => { setStep('columns'); setResult(null); }}>
+                  <Button variant="outline" size="sm" onClick={() => { setStep('columns'); setResult(null); setSelectedK(null); }}>
                     Nouvelle analyse
                   </Button>
                 </div>
               </div>
 
-              {/* Silhouette scores */}
-              <div className="mb-6">
-                <h4 className="text-[13px] font-medium text-foreground mb-2">Scores silhouette par k</h4>
-                <div className="flex gap-2 flex-wrap">
-                  {result.silhouetteScores
-                    .sort((a, b) => a.k - b.k)
-                    .map((s) => (
-                      <div
-                        key={s.k}
-                        className={`px-3 py-1.5 rounded-lg text-[12px] border ${
-                          s.k === result.clusters.length
-                            ? 'border-primary bg-primary/10 text-primary font-medium'
-                            : 'border-border text-muted-foreground'
-                        }`}
-                      >
-                        k={s.k}: {s.score.toFixed(3)}
-                      </div>
-                    ))}
-                </div>
-              </div>
+              <SilhouetteScoreSection
+                scores={result.silhouetteScores}
+                activeK={activeK}
+                optimalK={result.optimalK}
+                onSelectK={setSelectedK}
+              />
 
               {/* Cluster cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {result.clusters.map((c, ci) => (
+                {activeData.clusters.map((c, ci) => (
                   <div key={ci} className="bg-muted/50 rounded-lg p-4 text-center">
                     <div className="w-4 h-4 rounded-full mx-auto mb-2" style={{ backgroundColor: c.color }} />
                     <p className="text-[13px] font-medium text-foreground">{c.label}</p>
@@ -426,11 +424,72 @@ export default function PersonaNewAnalysis() {
               </div>
             </div>
 
-            {/* Full analysis tabs - rendered inline */}
-            <PersonaAnalysisTabs result={result} respondents={respondents} />
+            <PersonaAnalysisTabs
+              clusters={activeData.clusters}
+              correlationData={activeData.correlationData}
+              columnNames={result.columnNames}
+              respondents={respondents}
+            />
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+// --- Shared silhouette score section ---
+
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+
+function SilhouetteScoreSection({
+  scores,
+  activeK,
+  optimalK,
+  onSelectK,
+}: {
+  scores: { k: number; score: number }[];
+  activeK: number;
+  optimalK: number;
+  onSelectK: (k: number) => void;
+}) {
+  return (
+    <div className="mb-6">
+      <div className="flex items-center gap-2 mb-2">
+        <h4 className="text-[13px] font-medium text-foreground">Scores silhouette par k</h4>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="w-4 h-4 rounded-full border border-muted-foreground/40 text-muted-foreground text-[10px] leading-none flex items-center justify-center hover:border-primary hover:text-primary transition-colors">
+                i
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-xs text-[12px] space-y-1.5 p-3">
+              <p className="font-medium">Score silhouette</p>
+              <p>Mesure la qualite du clustering sur une echelle de -1 a 1.</p>
+              <p>Pour chaque individu, on compare sa distance moyenne aux membres de son propre groupe (a) avec la distance moyenne au groupe le plus proche (b) : <span className="font-mono text-[11px]">(b-a) / max(a,b)</span></p>
+              <p><strong>Proche de 1</strong> = clusters bien separes. <strong>~0</strong> = frontiere floue. <strong>Negatif</strong> = individus potentiellement mal classes.</p>
+              <p>Le tag avec une etoile indique le k optimal detecte automatiquement. Cliquez sur un tag pour basculer.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        {[...scores]
+          .sort((a, b) => a.k - b.k)
+          .map((s) => (
+            <button
+              key={s.k}
+              onClick={() => onSelectK(s.k)}
+              className={`px-3 py-1.5 rounded-lg text-[12px] border transition-colors ${
+                s.k === activeK
+                  ? 'border-primary bg-primary/10 text-primary font-medium'
+                  : 'border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
+              }`}
+            >
+              k={s.k}: {s.score.toFixed(3)}{s.k === optimalK ? ' \u2605' : ''}
+            </button>
+          ))}
+      </div>
     </div>
   );
 }
@@ -443,14 +502,19 @@ import { LikertScales } from '@/components/persona/likert-scales';
 import { HeatmapViz } from '@/components/persona/heatmap-viz';
 import { CorrelationViz } from '@/components/persona/correlation-viz';
 import { InteractiveLegend, useClusterFilter } from '@/components/persona/interactive-legend';
+import type { PersonaCluster, CorrelationData } from '@/types/persona';
 
 type AnalysisTab = 'data' | 'correlation' | 'viz';
 
 function PersonaAnalysisTabs({
-  result,
+  clusters,
+  correlationData,
+  columnNames,
   respondents,
 }: {
-  result: PersonaAnalysisResult;
+  clusters: PersonaCluster[];
+  correlationData: CorrelationData;
+  columnNames: string[];
   respondents: PersonaRespondent[];
 }) {
   const [activeTab, setActiveTab] = useState<AnalysisTab>('viz');
@@ -458,21 +522,21 @@ function PersonaAnalysisTabs({
 
   const clusterMap = useMemo(() => {
     const map = new Map<string, { color: string; label: string }>();
-    result.clusters.forEach((c) =>
+    clusters.forEach((c) =>
       c.members.forEach((m) => map.set(m.id, { color: c.color, label: c.label }))
     );
     return map;
-  }, [result.clusters]);
+  }, [clusters]);
 
   const orderedFromClusters = useMemo(() => {
-    return result.clusters.flatMap((c) =>
+    return clusters.flatMap((c) =>
       [...c.members].sort((a, b) => {
         const na = parseInt(a.id.replace(/\D/g, '')) || 0;
         const nb = parseInt(b.id.replace(/\D/g, '')) || 0;
         return na - nb;
       })
     );
-  }, [result.clusters]);
+  }, [clusters]);
 
   const tabs: { id: AnalysisTab; label: string }[] = [
     { id: 'data', label: 'Donnees ordonnees' },
@@ -502,26 +566,26 @@ function PersonaAnalysisTabs({
         {activeTab === 'data' && (
           <DataTableComponent
             data={orderedFromClusters}
-            columnNames={result.columnNames}
+            columnNames={columnNames}
             clusterInfo={clusterMap}
           />
         )}
 
         {activeTab === 'correlation' && (
           <CorrelationViz
-            correlationData={result.correlationData}
+            correlationData={correlationData}
             respondents={respondents}
             clusterMap={clusterMap}
-            columnNames={result.columnNames}
+            columnNames={columnNames}
           />
         )}
 
         {activeTab === 'viz' && (
           <div className="space-y-4">
-            <InteractiveLegend clusters={result.clusters} filter={filter} />
-            <RadarViz clusters={result.clusters} columnNames={result.columnNames} filter={filter} />
-            <LikertScales clusters={result.clusters} columnNames={result.columnNames} filter={filter} />
-            <HeatmapViz clusters={result.clusters} columnNames={result.columnNames} />
+            <InteractiveLegend clusters={clusters} filter={filter} />
+            <RadarViz clusters={clusters} columnNames={columnNames} filter={filter} />
+            <LikertScales clusters={clusters} columnNames={columnNames} filter={filter} />
+            <HeatmapViz clusters={clusters} columnNames={columnNames} />
           </div>
         )}
       </div>
