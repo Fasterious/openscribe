@@ -168,6 +168,9 @@ export default function PersonaAnalysisPage() {
                   <h3 className="text-sm font-semibold text-foreground">
                     {activeClusters.length} personas identifiees
                   </h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                    {result.algorithm === 'subspace-cohesion' ? 'Cohesion subspace' : 'Correlation gloutonne'}
+                  </span>
                   <span className="text-[12px] text-muted-foreground">
                     k optimal = {result.optimalK}
                   </span>

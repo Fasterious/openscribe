@@ -38,6 +38,21 @@ export interface KResult {
   correlationData: CorrelationData;
 }
 
+export type ClusteringAlgorithm = 'greedy-correlation' | 'subspace-cohesion';
+
+export type Direction = 'H' | 'MH' | 'L' | 'ML' | 'N';
+
+export interface DirectionPatternItem {
+  varIdx: number;
+  direction: Direction;
+}
+
+export interface DirectionPattern {
+  items: DirectionPatternItem[];
+  support: number;
+  memberIndices: number[];
+}
+
 export interface PersonaAnalysisResult {
   clusters: PersonaCluster[];
   correlationData: CorrelationData;
@@ -45,6 +60,7 @@ export interface PersonaAnalysisResult {
   silhouetteScores: { k: number; score: number }[];
   columnNames: string[];
   allResults: Record<number, KResult>;
+  algorithm?: ClusteringAlgorithm;
 }
 
 export type PersonaStep = 'upload' | 'configure' | 'analyzing' | 'complete' | 'error';

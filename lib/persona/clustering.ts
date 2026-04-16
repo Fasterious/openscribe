@@ -5,6 +5,10 @@ import type {
   PersonaAnalysisResult,
   SignatureVariable,
   KResult,
+  ClusteringAlgorithm,
+  Direction,
+  DirectionPattern,
+  DirectionPatternItem,
 } from '@/types/persona';
 import { CLUSTER_COLORS } from '@/types/persona';
 
@@ -175,7 +179,7 @@ function detectSignatureVars(
     const variance = values.reduce((s, x) => s + (x - avg) ** 2, 0) / values.length;
 
     if (variance <= 0.8) {
-      const dir: 'high' | 'low' | 'mid' = avg >= 3.8 ? 'high' : avg <= 2.2 ? 'low' : 'mid';
+      const dir: 'high' | 'low' | 'mid' = avg >= 3.5 ? 'high' : avg <= 2.5 ? 'low' : 'mid';
       signatures.push({
         varIdx: v,
         columnName: columnNames[v] || `C${v + 1}`,
@@ -267,6 +271,329 @@ export function findOptimalK(
   return { optimalK: scores[0]?.k ?? 3, scores, groupsByK };
 }
 
+// --- Multi-Threshold Subspace Cohesion Algorithm ---
+
+function satisfiesThreshold(value: number, dir: Direction): boolean {
+  switch (dir) {
+    case 'H': return value >= 4;
+    case 'MH': return value >= 3;
+    case 'L': return value <= 2;
+    case 'ML': return value <= 3;
+    default: return false;
+  }
+}
+
+function thresholdMargin(value: number, dir: Direction): number {
+  switch (dir) {
+    case 'H': return value - 4;
+    case 'MH': return (value - 3) / 2;
+    case 'L': return 2 - value;
+    case 'ML': return (3 - value) / 2;
+    default: return 0;
+  }
+}
+
+function mineMultiThresholdPatterns(
+  respondents: PersonaRespondent[],
+  minSupport: number,
+  minLength: number = 3
+): DirectionPattern[] {
+  const n = respondents.length;
+  const nVars = respondents[0].values.length;
+  const dirs: Direction[] = ['H', 'L'];
+
+  const singleItems: { item: DirectionPatternItem; members: Set<number> }[] = [];
+  for (let v = 0; v < nVars; v++) {
+    for (const dir of dirs) {
+      const members = new Set<number>();
+      for (let i = 0; i < n; i++) {
+        if (satisfiesThreshold(respondents[i].values[v], dir)) {
+          members.add(i);
+        }
+      }
+      if (members.size >= minSupport && members.size <= n * 0.85) {
+        singleItems.push({ item: { varIdx: v, direction: dir }, members });
+      }
+    }
+  }
+
+  type Itemset = { items: DirectionPatternItem[]; members: Set<number> };
+  let currentLevel: Itemset[] = singleItems.map((si) => ({
+    items: [si.item],
+    members: si.members,
+  }));
+  const allPatterns: DirectionPattern[] = [];
+
+  while (currentLevel.length > 0) {
+    if (currentLevel[0]?.items.length >= minLength) {
+      for (const set of currentLevel) {
+        allPatterns.push({
+          items: [...set.items],
+          support: set.members.size,
+          memberIndices: Array.from(set.members),
+        });
+      }
+    }
+
+    const nextLevel: Itemset[] = [];
+    const seenKeys = new Set<string>();
+
+    for (const setA of currentLevel) {
+      const maxVar = Math.max(...setA.items.map((it) => it.varIdx));
+      const varsInSet = new Set(setA.items.map((it) => it.varIdx));
+
+      for (const si of singleItems) {
+        if (si.item.varIdx <= maxVar) continue;
+        if (varsInSet.has(si.item.varIdx)) continue;
+
+        const newMembers = new Set<number>();
+        for (const m of setA.members) {
+          if (si.members.has(m)) newMembers.add(m);
+        }
+        if (newMembers.size < minSupport) continue;
+
+        const newItems = [...setA.items, si.item];
+        const key = newItems.map((it) => `${it.varIdx}:${it.direction}`).sort().join('|');
+        if (seenKeys.has(key)) continue;
+        seenKeys.add(key);
+
+        nextLevel.push({ items: newItems, members: newMembers });
+      }
+    }
+
+    currentLevel = nextLevel;
+  }
+
+  return allPatterns;
+}
+
+function selectSeedPatterns(
+  patterns: DirectionPattern[],
+  k: number,
+  n: number
+): DirectionPattern[] {
+  if (patterns.length === 0) return [];
+
+  const selected: DirectionPattern[] = [];
+  const covered = new Set<number>();
+  const targetSize = Math.round(n / k);
+
+  while (selected.length < k) {
+    let bestIdx = -1;
+    let bestScore = -Infinity;
+    let bestRemaining: number[] = [];
+
+    for (let i = 0; i < patterns.length; i++) {
+      const p = patterns[i];
+      const remaining = p.memberIndices.filter((m) => !covered.has(m));
+      if (remaining.length < 2) continue;
+
+      const sizePenalty = 1 / (1 + Math.abs(remaining.length - targetSize) / targetSize * 0.5);
+      const score = (p.items.length ** 2) * remaining.length * sizePenalty;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = i;
+        bestRemaining = remaining;
+      }
+    }
+
+    if (bestIdx === -1) break;
+
+    selected.push({
+      items: patterns[bestIdx].items,
+      support: bestRemaining.length,
+      memberIndices: bestRemaining,
+    });
+    for (const m of bestRemaining) covered.add(m);
+  }
+
+  return selected;
+}
+
+function computeGroupPattern(
+  respondents: PersonaRespondent[],
+  groupIndices: number[]
+): DirectionPatternItem[] {
+  if (groupIndices.length === 0) return [];
+  const members = groupIndices.map((i) => respondents[i]);
+  const nVars = members[0].values.length;
+  const constraints: DirectionPatternItem[] = [];
+
+  for (let v = 0; v < nVars; v++) {
+    const values = members.map((m) => m.values[v]);
+    const minVal = Math.min(...values);
+    const maxVal = Math.max(...values);
+    const avg = values.reduce((s, x) => s + x, 0) / values.length;
+
+    if (minVal >= 4) {
+      constraints.push({ varIdx: v, direction: 'H' });
+    } else if (minVal >= 3 && avg >= 3.3) {
+      constraints.push({ varIdx: v, direction: 'MH' });
+    } else if (maxVal <= 2) {
+      constraints.push({ varIdx: v, direction: 'L' });
+    } else if (maxVal <= 3 && avg <= 2.7) {
+      constraints.push({ varIdx: v, direction: 'ML' });
+    }
+  }
+
+  return constraints;
+}
+
+function computeMatchScore(
+  values: number[],
+  pattern: DirectionPatternItem[],
+): number {
+  if (pattern.length === 0) return -Infinity;
+
+  let score = 0;
+  for (const c of pattern) {
+    if (satisfiesThreshold(values[c.varIdx], c.direction)) {
+      score += 1 + thresholdMargin(values[c.varIdx], c.direction) * 0.25;
+    } else {
+      score -= 2;
+    }
+  }
+  return score;
+}
+
+function cohesionGrouping(
+  respondents: PersonaRespondent[],
+  totalMatrix: number[][],
+  k: number
+): number[][] {
+  const n = respondents.length;
+
+  // Phase 1: Mine seed patterns with multi-threshold
+  let minSupport = Math.max(3, Math.floor(n / (k * 1.3)));
+  let patterns = mineMultiThresholdPatterns(respondents, minSupport);
+
+  while (patterns.length < k && minSupport > 2) {
+    minSupport--;
+    patterns = mineMultiThresholdPatterns(respondents, minSupport);
+  }
+
+  const seeds = selectSeedPatterns(patterns, k, n);
+
+  let groups: number[][] = seeds.map((p) => [...p.memberIndices]);
+  let groupPatterns: DirectionPatternItem[][] = seeds.map((p) => [...p.items]);
+
+  // Assign initially uncovered respondents
+  const initialCovered = new Set<number>(groups.flat());
+  for (let i = 0; i < n; i++) {
+    if (initialCovered.has(i)) continue;
+    if (groups.length === 0) {
+      groups.push([i]);
+      groupPatterns.push([]);
+      continue;
+    }
+    let bestG = 0;
+    let bestS = -Infinity;
+    for (let g = 0; g < groups.length; g++) {
+      const s = computeMatchScore(respondents[i].values, groupPatterns[g]);
+      if (s > bestS) { bestS = s; bestG = g; }
+    }
+    groups[bestG].push(i);
+  }
+
+  // Phase 2: Iterative refinement (Pattern-KMeans)
+  for (let iter = 0; iter < 50; iter++) {
+    const newPatterns = groups.map((group) =>
+      computeGroupPattern(respondents, group)
+    );
+
+    const newGroups: number[][] = Array.from({ length: groups.length }, () => []);
+
+    for (let i = 0; i < n; i++) {
+      let bestG = 0;
+      let bestS = -Infinity;
+
+      for (let g = 0; g < newPatterns.length; g++) {
+        const ps = computeMatchScore(respondents[i].values, newPatterns[g]);
+        const cs = groups[g].length > 0
+          ? groups[g].reduce((s, j) => s + totalMatrix[i][j], 0) / groups[g].length
+          : 0;
+        const s = ps * 1000 + cs;
+        if (s > bestS) { bestS = s; bestG = g; }
+      }
+
+      newGroups[bestG].push(i);
+    }
+
+    // Handle empty groups by moving worst-fit member from largest group
+    for (let g = 0; g < newGroups.length; g++) {
+      if (newGroups[g].length > 0) continue;
+      let largestIdx = 0;
+      for (let h = 1; h < newGroups.length; h++) {
+        if (newGroups[h].length > newGroups[largestIdx].length) largestIdx = h;
+      }
+      if (newGroups[largestIdx].length < 2) continue;
+      let worstMi = 0;
+      let worstScore = Infinity;
+      for (let mi = 0; mi < newGroups[largestIdx].length; mi++) {
+        const sc = computeMatchScore(
+          respondents[newGroups[largestIdx][mi]].values,
+          newPatterns[largestIdx]
+        );
+        if (sc < worstScore) { worstScore = sc; worstMi = mi; }
+      }
+      newGroups[g].push(...newGroups[largestIdx].splice(worstMi, 1));
+    }
+
+    const converged = groups.every((group, g) => {
+      const oldSet = new Set(group);
+      const newSet = new Set(newGroups[g]);
+      return oldSet.size === newSet.size && [...oldSet].every((x) => newSet.has(x));
+    });
+
+    groups = newGroups;
+    groupPatterns = newPatterns;
+    if (converged) break;
+  }
+
+  // Ensure k groups
+  while (groups.length < k) {
+    let largestIdx = 0;
+    for (let g = 1; g < groups.length; g++) {
+      if (groups[g].length > groups[largestIdx].length) largestIdx = g;
+    }
+    if (groups[largestIdx].length < 2) break;
+    const half = Math.ceil(groups[largestIdx].length / 2);
+    const splitOff = groups[largestIdx].splice(half);
+    groups.push(splitOff);
+  }
+
+  return groups;
+}
+
+function findOptimalKCohesion(
+  respondents: PersonaRespondent[],
+  totalMatrix: number[][],
+  maxK?: number
+): {
+  optimalK: number;
+  scores: { k: number; score: number }[];
+  groupsByK: Map<number, number[][]>;
+} {
+  const n = respondents.length;
+  const nQ = respondents[0].values.length;
+  const upper = maxK ?? Math.min(Math.ceil(Math.sqrt(n)), 10);
+  const lower = 2;
+
+  const scores: { k: number; score: number }[] = [];
+  const groupsByK = new Map<number, number[][]>();
+
+  for (let k = lower; k <= upper; k++) {
+    const groups = cohesionGrouping(respondents, totalMatrix, k);
+    const score = computeSilhouetteScore(groups, totalMatrix, nQ);
+    scores.push({ k, score });
+    groupsByK.set(k, groups);
+  }
+
+  scores.sort((a, b) => b.score - a.score);
+  return { optimalK: scores[0]?.k ?? 3, scores, groupsByK };
+}
+
 function buildClustersFromGroups(
   groups: number[][],
   respondents: PersonaRespondent[],
@@ -301,10 +628,16 @@ function buildSortedIndices(groups: number[][], totalRespondents: number): numbe
 export function runPersonaClustering(
   respondents: PersonaRespondent[],
   columnNames: string[],
-  k?: number
+  k?: number,
+  algorithm: ClusteringAlgorithm = 'greedy-correlation'
 ): PersonaAnalysisResult {
   const { perQuestion, totalMatrix } = buildCorrelationMatrices(respondents);
-  const { optimalK, scores: silhouetteScores, groupsByK } = findOptimalK(respondents, totalMatrix);
+
+  const useCohesion = algorithm === 'subspace-cohesion';
+  const findK = useCohesion ? findOptimalKCohesion : findOptimalK;
+  const groupFn = useCohesion ? cohesionGrouping : greedyGrouping;
+
+  const { optimalK, scores: silhouetteScores, groupsByK } = findK(respondents, totalMatrix);
   const effectiveK = k ?? optimalK;
 
   const allResults: Record<number, KResult> = {};
@@ -319,7 +652,7 @@ export function runPersonaClustering(
 
   const primary = allResults[effectiveK];
   if (!primary) {
-    const groups = greedyGrouping(respondents, totalMatrix, effectiveK);
+    const groups = groupFn(respondents, totalMatrix, effectiveK);
     const clusters = buildClustersFromGroups(groups, respondents, columnNames);
     const sortedIndices = buildSortedIndices(groups, respondents.length);
     allResults[effectiveK] = {
@@ -336,6 +669,7 @@ export function runPersonaClustering(
     silhouetteScores,
     columnNames,
     allResults,
+    algorithm,
   };
 }
 

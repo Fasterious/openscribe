@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
 import { ColumnSelector, type ColumnInfo } from '@/components/persona/column-selector';
 import { PersonaDataTable } from '@/components/persona/data-table';
-import type { PersonaRespondent } from '@/types/persona';
+import type { PersonaRespondent, ClusteringAlgorithm } from '@/types/persona';
 import { runPersonaClustering, generatePersonaCSV } from '@/lib/persona/clustering';
 import type { PersonaAnalysisResult } from '@/types/persona';
 import type { User } from '@supabase/supabase-js';
@@ -30,6 +30,7 @@ export default function PersonaNewAnalysis() {
   const [selectedColumns, setSelectedColumns] = useState<number[]>([]);
   const [step, setStep] = useState<Step>('columns');
   const [clusterCount, setClusterCount] = useState<number | 'auto'>('auto');
+  const [algorithm, setAlgorithm] = useState<ClusteringAlgorithm>('subspace-cohesion');
   const [result, setResult] = useState<PersonaAnalysisResult | null>(null);
   const [selectedK, setSelectedK] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -138,7 +139,7 @@ export default function PersonaNewAnalysis() {
     try {
       await new Promise((r) => setTimeout(r, 50));
       const k = clusterCount === 'auto' ? undefined : clusterCount;
-      const analysisResult = runPersonaClustering(respondents, columnNames, k);
+      const analysisResult = runPersonaClustering(respondents, columnNames, k, algorithm);
       setResult(analysisResult);
       setStep('done');
 
@@ -164,7 +165,7 @@ export default function PersonaNewAnalysis() {
       setError(e instanceof Error ? e.message : 'Erreur inconnue');
       setStep('preview');
     }
-  }, [respondents, columnNames, clusterCount, user, uploadData, selectedColumns]);
+  }, [respondents, columnNames, clusterCount, algorithm, user, uploadData, selectedColumns]);
 
   const downloadCSV = useCallback(() => {
     if (!result) return;
@@ -308,6 +309,48 @@ export default function PersonaNewAnalysis() {
             </div>
 
             <div className="bg-card border border-border rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-foreground mb-3">Algorithme de clustering</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {([
+                  {
+                    id: 'subspace-cohesion' as ClusteringAlgorithm,
+                    label: 'Cohesion subspace',
+                    desc: 'Maximise les variables convergentes pour TOUS les membres du groupe. Meilleure detection de personas distinctes.',
+                    tag: 'Recommande',
+                  },
+                  {
+                    id: 'greedy-correlation' as ClusteringAlgorithm,
+                    label: 'Correlation gloutonne',
+                    desc: 'Groupe les repondants par similarite par paires. Rapide, mais peut creer un effet de chaine entre membres.',
+                    tag: null,
+                  },
+                ]).map((algo) => (
+                  <button
+                    key={algo.id}
+                    onClick={() => setAlgorithm(algo.id)}
+                    className={`text-left p-4 rounded-lg border-2 transition-colors ${
+                      algorithm === algo.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/30'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-[13px] font-medium ${algorithm === algo.id ? 'text-primary' : 'text-foreground'}`}>
+                        {algo.label}
+                      </span>
+                      {algo.tag && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">
+                          {algo.tag}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{algo.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-xl p-5">
               <h3 className="text-sm font-semibold text-foreground mb-3">Nombre de clusters</h3>
               <div className="flex gap-2 flex-wrap">
                 <button
@@ -369,7 +412,12 @@ export default function PersonaNewAnalysis() {
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground">Analyse terminee</h3>
+                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                    Analyse terminee
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                      {result.algorithm === 'subspace-cohesion' ? 'Cohesion subspace' : 'Correlation gloutonne'}
+                    </span>
+                  </h3>
                   <p className="text-[13px] text-muted-foreground">
                     {activeData.clusters.length} personas identifiees · k optimal = {result.optimalK}
                     {activeK !== result.optimalK && (
