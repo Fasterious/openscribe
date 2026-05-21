@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate-pwa-icons": "node scripts/generate-pwa-icons.mjs"
+    "generate-pwa-icons": "node scripts/generate-pwa-icons.mjs",
+    "capture:screenshot": "node scripts/capture-fullpage-stitch.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.987.0",
@@ -38,6 +39,7 @@
     "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "playwright": "^1.52.0",
     "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
