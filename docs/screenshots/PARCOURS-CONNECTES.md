@@ -1,31 +1,35 @@
-# Captures — parcours connectés (à faire)
+# Captures — parcours connectés
 
-Les PNG dans ce dossier (racine) sont des **pages marketing déconnectées**.
+Session **mai 2026** sur [openscribe.fr](https://www.openscribe.fr/) avec compte Google (`compte.test@example.com`). Les captures Playwright headless **sans cookies** montrent la landing déconnectée — ne pas les confondre avec les PNG `*-connected.png` ci-dessous (navigateur Cursor, session active).
 
-## Prérequis (une fois)
+## Fichiers (connectés)
 
-1. Se connecter sur [openscribe.fr](https://www.openscribe.fr/) (Google)
-2. `/settings` — vérifier clés **Gemini** (CSV, workshop) et **Mistral** (transcription)
-3. Optionnel : exécuter `supabase/seed_workshop_20_responses.sql` sur une session workshop existante
-
-## Écrans cibles
-
-| Module | Route | Écran à capturer |
+| Fichier | Route | Contenu |
 | --- | --- | --- |
-| CSV | `/csv-analysis/[id]` | Stepper extraction → clusters → rapport |
-| Persona | `/persona/[id]` | Heatmap / clusters après import `public/samples/persona-demo-50.csv` |
-| Workshop | `/workshop/[sessionId]` | Nuage après analyse + seed |
-| Transcription | `/transcription` | Viewer avec locuteurs (audio test) |
-| Settings | `/settings` | Clés API configurées |
+| `persona-results-connected.png` | `/persona/new` (étape 3) | 4 personas, radar, heatmap |
+| `persona-columns-connected.png` | `/persona` | Écran d'accueil Personas (déconnecté) |
+| `persona-columns-browser.png` | `/persona/new` (étape 1) | Sélection colonnes Likert |
+| `persona-clustering-setup-browser.png` | `/persona/new` (étape 2) | Aperçu + algo + k |
+| `settings-api-keys-connected.png` | `/settings` | Modal BYOK Mistral + Gemini configurées |
 
-## Commande
+> **Captures du module Analyse CSV non versionnées.** Le matériel CSV publiable sera produit
+> à partir de la consultation-vitrine (voir `docs/STRATEGIE.md`).
+
+## Marketing déconnectés (référence)
+
+`landing.png`, `csv-analysis.png`, `persona.png`, `workshop.png`, `transcription.png` — pages publiques sans session.
+
+## Encore à faire (optionnel)
+
+| Module | Blocage |
+| --- | --- |
+| Workshop | Aucune session listée sur `/workshop` — créer session + `seed_workshop_20_responses.sql` puis capturer nuage |
+| Transcription | Pas de transcription terminée visible — upload audio test puis viewer locuteurs |
+
+## Commande headless (déconnecté uniquement)
 
 ```bash
-node scripts/capture-fullpage-stitch.mjs --url "https://www.openscribe.fr/csv-analysis/UUID" --out docs/screenshots/csv-stepper.png
+node scripts/capture-fullpage-stitch.mjs --url "https://www.openscribe.fr/" --out docs/screenshots/landing.png
 ```
 
-## Blocage actuel
-
-L’upload CSV et les pipelines LLM **exigent une session Supabase**. L’agent ne peut pas passer l’OAuth Google à ta place.
-
-**Quand tu es dispo (~2 min)** : connecte-toi dans l’onglet navigateur Cursor/Glass, dis « go captures connectées », je enchaîne les scénarios avec les samples.
+Pour les parcours authentifiés : exporter `storageState` Playwright après login, ou capturer via navigateur Cursor (comme cette passe).
