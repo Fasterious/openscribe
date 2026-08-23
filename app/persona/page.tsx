@@ -77,6 +77,7 @@ export default function PersonaDashboard() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [engine, setEngine] = useState<'v1' | 'v2'>('v1');
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -105,9 +106,9 @@ export default function PersonaDashboard() {
     (filename: string, headers: string[], rows: Record<string, string>[], totalRows: number) => {
       const sessionData = { filename, headers, rows: rows.slice(0, 1000), total_rows: totalRows };
       sessionStorage.setItem('persona_upload', JSON.stringify(sessionData));
-      router.push('/persona/new');
+      router.push(engine === 'v2' ? '/persona/v2' : '/persona/new');
     },
-    [router]
+    [router, engine]
   );
 
   const processFile = useCallback(
@@ -204,11 +205,53 @@ export default function PersonaDashboard() {
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground">Analyse de Personas</h1>
           <p className="text-muted-foreground mt-1">
             Identifiez automatiquement des groupes de personas a partir de questionnaires quantitatifs (echelles de Likert).
           </p>
+        </div>
+
+        {/* Engine version selector */}
+        <div className="mb-6 rounded-xl border border-border bg-card p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[13px] font-semibold text-foreground">Moteur d&apos;analyse</p>
+              <p className="text-[12px] text-muted-foreground">
+                {engine === 'v2'
+                  ? 'V2 (bêta) : motifs surprenants, classe « non assignés », qualité par sous-espace, stabilité, pipeline transparent. Résultat non sauvegardé — perdu au rechargement.'
+                  : 'V1 : clustering par corrélation paire-à-paire (échelles de Likert). Résultat sauvegardé dans votre historique.'}
+              </p>
+            </div>
+            <div className="inline-flex shrink-0 gap-1 rounded-lg bg-muted p-1">
+              {([
+                { id: 'v1' as const, label: 'V1 (stable)' },
+                { id: 'v2' as const, label: 'V2 (bêta)' },
+              ]).map((o) => (
+                <button
+                  key={o.id}
+                  onClick={() => setEngine(o.id)}
+                  className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors ${
+                    engine === o.id
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {engine === 'v2' && (
+            <div className="mt-3 border-t border-border pt-3">
+              <button
+                onClick={() => router.push('/persona/v2')}
+                className="text-[12px] font-medium text-primary hover:underline"
+              >
+                Ouvrir le module V2 et tester avec l&apos;exemple (sans importer) →
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Upload zone */}
