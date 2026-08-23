@@ -89,11 +89,24 @@ export async function PATCH(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json();
+  // Liste blanche : `.eq('creator_id', ...)` contraint le WHERE, pas le SET.
+  // Passer le body brut à .update() laisserait un créateur réécrire creator_id
+  // et transférer sa session à un tiers.
+  const body = await request.json().catch(() => null);
+  const patch: { status?: 'active' | 'closed' } = {};
+  if (body?.status === 'active' || body?.status === 'closed') {
+    patch.status = body.status;
+  }
+  if (Object.keys(patch).length === 0) {
+    return NextResponse.json(
+      { error: 'No updatable field provided' },
+      { status: 400 }
+    );
+  }
 
   const { data, error } = await supabase
     .from('workshop_sessions')
-    .update(body)
+    .update(patch)
     .eq('id', id)
     .eq('creator_id', user.id)
     .select()

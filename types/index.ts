@@ -34,6 +34,12 @@ export interface TranscriptionResult {
 // Prix Voxtral par minute d'audio (en USD)
 export const VOXTRAL_PRICE_PER_MINUTE = 0.003;
 
+// Taille maximale d'un upload audio (1 Go — limite Mistral et Cloudflare R2).
+// Partagée par le client (upload-zone) et le serveur (/api/upload-url) pour
+// qu'ils ne puissent pas diverger.
+export const MAX_UPLOAD_BYTES = 1 * 1024 * 1024 * 1024;
+export const MAX_UPLOAD_DISPLAY = '1 GB';
+
 // Pourcentage de contenu visible dans l'aperçu (utilisateurs non authentifiés)
 export const PREVIEW_PERCENTAGE = 0.3;
 

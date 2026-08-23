@@ -5,7 +5,7 @@ export function createGeminiClient(
   model: string,
   options?: { apiKey?: string }
 ): LLMClient {
-  const apiKey = options?.apiKey || process.env.GOOGLE_GEMINI_API_KEY;
+  const apiKey = options?.apiKey; // BYOK strict : pas de repli hébergeur
   if (!apiKey) {
     throw new Error('GOOGLE_GEMINI_API_KEY is not set');
   }

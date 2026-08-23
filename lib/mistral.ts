@@ -133,87 +133,6 @@ interface MistralSignedUrlResponse {
   expires_at?: number;
 }
 
-/**
- * Upload un fichier audio vers le cloud Mistral
- * @returns L'ID du fichier uploadé
- */
-export async function uploadToMistralCloud(
-  fileBuffer: Buffer,
-  fileName: string,
-  apiKey?: string
-): Promise<string> {
-  const key = apiKey || process.env.MISTRAL_API_KEY;
-  if (!key) {
-    throw new Error('MISTRAL_API_KEY is not configured');
-  }
-
-  const formData = new FormData();
-  const blob = new Blob([new Uint8Array(fileBuffer)], { type: 'audio/mpeg' });
-  formData.append('file', blob, fileName);
-  formData.append('purpose', 'audio');
-
-  const response = await fetchWithRetry(MISTRAL_FILES_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${key}`,
-    },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to upload to Mistral cloud: ${error}`);
-  }
-
-  const result: MistralFileUploadResponse = await response.json();
-  return result.id;
-}
-
-/**
- * Obtient une signed URL pour un fichier uploadé sur le cloud Mistral
- * @param fileId - L'ID du fichier retourné par uploadToMistralCloud
- * @param expiryHours - Durée de validité de l'URL (défaut: 24h)
- */
-export async function getMistralSignedUrl(
-  fileId: string,
-  expiryHours: number = 24,
-  apiKey?: string
-): Promise<string> {
-  const key = apiKey || process.env.MISTRAL_API_KEY;
-  if (!key) {
-    throw new Error('MISTRAL_API_KEY is not configured');
-  }
-
-  const response = await fetchWithRetry(`${MISTRAL_FILES_URL}/${fileId}/url?expiry=${expiryHours}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${key}`,
-      'Accept': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Failed to get signed URL: ${error}`);
-  }
-
-  const result: MistralSignedUrlResponse = await response.json();
-  return result.url;
-}
-
-/**
- * Upload un fichier et retourne directement la signed URL
- * Combine uploadToMistralCloud + getMistralSignedUrl
- */
-export async function uploadAndGetSignedUrl(
-  fileBuffer: Buffer,
-  fileName: string
-): Promise<{ fileId: string; signedUrl: string }> {
-  const fileId = await uploadToMistralCloud(fileBuffer, fileName);
-  const signedUrl = await getMistralSignedUrl(fileId);
-  return { fileId, signedUrl };
-}
-
 // ============================================
 // TRANSCRIPTION
 // ============================================
@@ -298,7 +217,9 @@ function convertMistralResponse(response: MistralTranscriptionResponse): Transcr
  *   à 100 % la langue de chaque segment.
  */
 export async function transcribe(input: MistralTranscriptionInput): Promise<TranscriptionResult> {
-  const key = input.apiKey || process.env.MISTRAL_API_KEY;
+  // BYOK strict : aucun repli sur une clé d'hébergeur, pour qu'aucun chemin de
+  // code ne puisse dépenser les crédits Mistral d'OpenScribe.
+  const key = input.apiKey;
   if (!key) {
     throw new Error('MISTRAL_API_KEY is not configured');
   }

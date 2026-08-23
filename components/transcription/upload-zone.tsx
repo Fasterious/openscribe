@@ -3,13 +3,14 @@
 import { useCallback, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n/context';
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_DISPLAY } from '@/types';
 
 // Formats supportés par Voxtral (Mistral AI) - officiellement: mp3, wav, m4a, flac, ogg
 const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'flac', 'ogg'];
 
-// Taille maximale: 1 GB (limite Mistral et Cloudflare R2)
-const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB
-const MAX_FILE_SIZE_DISPLAY = '1 GB';
+// Taille maximale : constante partagée avec /api/upload-url (types/index.ts)
+const MAX_FILE_SIZE_BYTES = MAX_UPLOAD_BYTES;
+const MAX_FILE_SIZE_DISPLAY = MAX_UPLOAD_DISPLAY;
 const MAX_DURATION_SECONDS = 7200; // 2h — au-delà, le timeout Vercel (5 min) peut être dépassé
 const MAX_DURATION_DISPLAY = '2h';
 const ALLOWED_MIME_TYPES = [

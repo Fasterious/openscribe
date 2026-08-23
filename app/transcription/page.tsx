@@ -146,6 +146,7 @@ function TranscriptionPageInner() {
         body: JSON.stringify({
           fileName: file.name,
           contentType: file.type || 'audio/mpeg',
+          fileSize: file.size,
         }),
       });
 

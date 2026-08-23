@@ -28,7 +28,7 @@ export function createMistralClient(
   model: string,
   options: MistralClientOptions & { apiKey?: string } = {}
 ): LLMClient {
-  const apiKey = options.apiKey?.trim() || process.env.MISTRAL_API_KEY?.trim();
+  const apiKey = options.apiKey?.trim(); // BYOK strict : pas de repli hébergeur
   if (!apiKey) {
     throw new Error('MISTRAL_API_KEY is not set');
   }
