@@ -39,6 +39,10 @@ const flag = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : u
 const DRY = args.includes('--dry-run');
 const BOARD_NAME = flag('--name') || 'OpenScribe';
 
+// Board cible par défaut. Sans --board, on complète celui-ci plutôt que d'en
+// créer un nouveau : créer un doublon serait le pire échec possible ici.
+const DEFAULT_BOARD = 'https://trello.com/b/ZyWDMYVz/open-scribe';
+
 const KEY = process.env.TRELLO_KEY;
 const TOKEN = process.env.TRELLO_TOKEN;
 
@@ -64,7 +68,7 @@ function parseBoardArg(v) {
   const m = v.match(/trello\.com\/b\/([A-Za-z0-9]+)/);
   return m ? m[1] : v;
 }
-const BOARD_ARG = parseBoardArg(flag('--board'));
+const BOARD_ARG = parseBoardArg(flag('--board') || DEFAULT_BOARD);
 
 // ---------- client API ----------
 

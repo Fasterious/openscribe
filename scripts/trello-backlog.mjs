@@ -1,4 +1,5 @@
 // Source de vérité du backlog OpenScribe.
+// Board Trello : https://trello.com/b/ZyWDMYVz/open-scribe (privé)
 // Consommée par scripts/trello-bootstrap.mjs (création du board Trello)
 // et par scripts/trello-backlog-md.mjs (génération de docs/BACKLOG.md).
 //

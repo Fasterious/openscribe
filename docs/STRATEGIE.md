@@ -118,6 +118,7 @@ place la fenêtre de crédibilité bien avant le scrutin.
 ## Voir aussi
 
 - [Backlog complet](./BACKLOG.md) — les 49 cartes, par lot, avec propriétaire
+- [Board Trello Open Scribe](https://trello.com/b/ZyWDMYVz/open-scribe) — privé ; généré depuis `scripts/trello-backlog.mjs`
 - [Sécurité — RLS et surfaces publiques](./SECURITE-RLS.md)
 - [BLUEPRINT — vision, architecture, état du code](../BLUEPRINT.md)
 - [Thèses Persona V1/V2/V3](./persona/)
