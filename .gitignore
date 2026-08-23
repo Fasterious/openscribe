@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# supabase cli local state — contient pooler-url avec les identifiants DB
+supabase/.temp/
