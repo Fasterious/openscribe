@@ -1,32 +1,60 @@
-# React + TypeScript + Vite
+# OpenScribe
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+**Comprendre ce que les gens disent, sans perdre le fil de leurs mots.**
 
-Currently, two official plugins are available:
+OpenScribe est une boîte à outils libre et gratuite pour la recherche utilisateur et l'analyse qualitative. Elle s'adresse aux chercheurs UX, aux designers, aux journalistes, aux associations et aux collectifs citoyens.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Vous importez les réponses d'un questionnaire ou la transcription d'un entretien. OpenScribe les découpe en idées, les regroupe par sujet et compte qui pense quoi. Le rapport qui en sort est vérifiable : chaque chiffre mène à la phrase exacte d'une personne.
 
-## React Compiler
+## Ce qui le rend différent
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **L'IA lit et rédige, OpenScribe vérifie.** Chaque citation est retrouvée mot pour mot dans les réponses, sinon elle est écartée et vous voyez laquelle. Chaque idée est rangée une seule fois. Tous les chiffres sont calculés par le programme, jamais par l'IA. Un nombre cité dans une synthèse qui ne correspond à rien est signalé « À vérifier ».
+- **On compte des personnes, pas des mentions.** Huit critiques de la même personne comptent pour une personne. Les avis partagés et les minorités constantes sont mis en évidence, pas noyés dans une moyenne.
+- **Reproductible.** La même analyse, relancée sur les mêmes données avec les mêmes réglages, donne le même rapport, mot pour mot.
+- **Vos données restent chez vous.** Pas de serveur ni de compte : tout reste dans votre navigateur. Seuls des pseudonymes (P1, P2…) et le texte des réponses partent vers le moteur d'IA que vous choisissez.
+- **Votre moteur, votre clé.** Mistral, Groq, Gemini, OpenRouter, ou Ollama sur votre propre ordinateur. Plusieurs fournisseurs ont une offre gratuite. Vous ne payez que ce que vous consommez chez eux.
+- **Des rapports qui se lisent bien.** Une étape de relecture rend les synthèses fluides et naturelles. Le programme refuse toute réécriture qui toucherait à une citation ou à un chiffre.
 
-## Expanding the Oxlint configuration
+## Essayer
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+Ouvrez l'application, puis cliquez sur **Essayer avec un exemple** : un rapport complet sur un questionnaire fictif s'affiche, sans clé ni inscription.
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+Pour analyser vos propres données, ajoutez un moteur dans **Moteurs d'IA**. L'écran vous aide à choisir.
+
+## Installer en local
+
+Il faut Node.js 20 ou plus récent.
+
+```bash
+git clone https://github.com/Fasterious/openscribe.git
+cd openscribe
+git checkout next
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Puis ouvrez l'adresse affichée (en général http://localhost:5173).
+
+| Commande | Rôle |
+|---|---|
+| `npm run dev` | Application en développement |
+| `npm run build` | Version statique dans `dist/`, à déposer sur n'importe quel hébergement de fichiers |
+| `npm test` | Tests des règles d'analyse |
+| `npm run e2e` | Tests de parcours dans un navigateur (ordinateur et mobile) |
+
+## Modules
+
+| Module | État |
+|---|---|
+| **Synthèse** : questionnaires et transcriptions → idées, sujets, rapport vérifiable | Disponible |
+| **Observation** : transcription d'entretiens, vidéo synchronisée avec le texte, étiquetage | Bientôt |
+| **Personas** : profils construits à partir des données | Bientôt |
+| **Atelier en direct**, **tests à distance** | Plus tard |
+
+## Méthode
+
+OpenScribe s'appuie sur des pratiques reconnues de l'analyse qualitative : unités de sens (idées atomiques), codage ouvert ou par grille, cartographie par affinités, synthèses étayées par les verbatims, et traçabilité de chaque affirmation jusqu'à sa source.
+
+## Licence
+
+[AGPL-3.0-or-later](LICENSE). Vous pouvez utiliser, modifier et redistribuer OpenScribe librement. Si vous proposez une version modifiée en service en ligne, vous devez en publier le code.
