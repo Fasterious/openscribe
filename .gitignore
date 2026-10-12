@@ -1,0 +1,13 @@
+node_modules
+dist
+*.local
+.env*
+!.env.example
+# Données réelles de participants : jamais dans le dépôt
+fixtures/private/
+# Résultats de tests
+test-results/
+playwright-report/
+e2e/screenshots/
+bridge/
+.DS_Store
