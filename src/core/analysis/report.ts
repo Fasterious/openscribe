@@ -2,7 +2,7 @@ import type { Corpus } from '../corpus'
 import { activeParticipants } from '../corpus'
 import { METRICS_VERSION } from './metrics'
 import { describeMetrics } from './pipeline'
-import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from './types'
+import type { AnalysisState, Group, Idea, IdeaCategory } from './types'
 
 /**
  * Export du rapport en Markdown et en HTML autonome.
@@ -40,10 +40,6 @@ function ideasOf(group: Group, byId: Map<string, Idea>): Idea[] {
   return group.ideaIds.map((id) => byId.get(id)!).filter(Boolean)
 }
 
-function countsLine(m: Metrics): string {
-  const c = m.participantsByCategory
-  return `${m.participants} personnes · positif ${c.positive} · négatif ${c.negative} · suggestion ${c.suggestion}${c.neutral ? ` · neutre ${c.neutral}` : ''} (en personnes) · ${m.mentions} mentions`
-}
 
 export function reportToMarkdown(state: AnalysisState, corpus: Corpus, title: string): string {
   const byId = new Map(state.ideas.map((i) => [i.id, i]))
@@ -52,7 +48,7 @@ export function reportToMarkdown(state: AnalysisState, corpus: Corpus, title: st
   if (state.globalSummary) out.push('## Résumé', '', state.globalSummary, '')
 
   const writeGroup = (g: Group, level: string) => {
-    out.push(`${level} ${g.title}`, '', `*${countsLine(g.metrics)}*`, '', `*${describeMetrics(g.metrics)}*`, '')
+    out.push(`${level} ${g.title}`, '', `*${describeMetrics(g.metrics)}*`, '')
     if (g.summary) out.push(g.summary, '')
     for (const cat of ['positive', 'negative', 'suggestion', 'neutral'] as IdeaCategory[]) {
       const items = ideasOf(g, byId).filter((i) => i.category === cat)
@@ -65,7 +61,7 @@ export function reportToMarkdown(state: AnalysisState, corpus: Corpus, title: st
 
   if (state.themes.length) {
     for (const t of state.themes) {
-      out.push(`## ${t.title}`, '', `*${countsLine(t.metrics)}*`, '')
+      out.push(`## ${t.title}`, '', `*${describeMetrics(t.metrics)}*`, '')
       if (t.summary) out.push(t.summary, '')
       for (const gid of t.groupIds) writeGroup(groupById.get(gid)!, '###')
     }
@@ -93,16 +89,14 @@ export function reportToHtml(state: AnalysisState, corpus: Corpus, title: string
           .join('')}</ul></details>`
       })
       .join('')
-    return `<section class="group"><${h}>${e(g.title)}</${h}><p class="facts">${e(countsLine(g.metrics))}<br>${e(
-      describeMetrics(g.metrics),
-    )}</p>${g.summary ? para(g.summary) : ''}${blocks}</section>`
+    return `<section class="group"><${h}>${e(g.title)}</${h}><p class="facts">${e(describeMetrics(g.metrics))}</p>${g.summary ? para(g.summary) : ''}${blocks}</section>`
   }
 
   if (state.globalSummary) parts.push(`<h2>Résumé</h2>${para(state.globalSummary)}`)
   if (state.themes.length) {
     for (const t of state.themes) {
       parts.push(
-        `<section class="theme"><h2>${e(t.title)}</h2><p class="facts">${e(countsLine(t.metrics))}</p>${
+        `<section class="theme"><h2>${e(t.title)}</h2><p class="facts">${e(describeMetrics(t.metrics))}</p>${
           t.summary ? para(t.summary) : ''
         }${t.groupIds.map((id) => groupHtml(groupById.get(id)!, 'h3')).join('')}</section>`,
       )

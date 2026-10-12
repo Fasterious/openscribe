@@ -102,7 +102,9 @@ function suggestRole(
   if (TECHNICAL_HEADER.test(header)) return 'ignore'
   if (values.filter((v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)).length > values.length / 2) return 'ignore'
   if (IDENTITY_HEADER.test(header)) return 'identity'
+  // Valeurs courtes et presque toutes différentes : un identifiant ou un nom.
   const looksNumeric = values.every((v) => /^-?\d+([.,]\d+)?$/.test(v))
+  if (!looksNumeric && avgLength < 12 && values.length >= 3 && distinct >= values.length * 0.9) return 'identity'
   if (looksNumeric) return 'attribute'
   // Peu de valeurs différentes et courtes : un choix fermé.
   const fewValues = distinct <= Math.max(8, Math.ceil(rowCount * 0.3))

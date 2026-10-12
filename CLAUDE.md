@@ -42,6 +42,26 @@ Chaque livraison passe par :
 
 Rien n'est déclaré « fait » sans preuve : test vert, capture, ou rapport de test.
 
+## Amélioration continue du processus
+
+On se comporte comme une équipe produit qui améliore aussi sa façon de travailler.
+À la fin de chaque itération (une fonctionnalité, une passe de test) :
+1. Trois questions, en quelques lignes dans `docs/RETRO.md` : qu'est-ce qui a
+   bien marché ? qu'est-ce qui a coûté du temps ou des jetons pour rien ?
+   qu'est-ce qu'on change ?
+2. Si une leçon est durable, elle devient une règle ici, en une ligne. Une
+   règle qui ne sert plus est supprimée. Ce fichier reste court (une page) :
+   le détail va dans `docs/`.
+3. Alléger avant d'ajouter : on préfère retirer une étape inutile qu'en créer une nouvelle.
+
+Règles apprises :
+- Un sous-agent qui joue le modèle répond en une passe, sans script de
+  vérification : sinon il est plus fiable qu'un vrai modèle et le test perd sa valeur.
+  Tester aussi avec un modèle léger pour éprouver la robustesse.
+- Les données envoyées au modèle sont en JSON compact : l'indentation coûte des jetons pour rien.
+- Les vraies données révèlent ce que les données fictives cachent : chaque
+  fonctionnalité d'analyse est éprouvée sur un corpus réel (privé) avant d'être déclarée faite.
+
 ## Principes produit (non négociables)
 
 1. **L'IA ne décide jamais** : elle lit, découpe, nomme, rédige. Le code

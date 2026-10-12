@@ -415,12 +415,15 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
   if (m.participantsByCategory.suggestion) parts.push(`suggestions de ${m.participantsByCategory.suggestion} personne(s)`)
   if (m.participantsByCategory.neutral) parts.push(`constats neutres de ${m.participantsByCategory.neutral} personne(s)`)
   if (m.stance === 'thin') parts.push("trop peu d'avis pour parler de consensus")
-  else if (m.consensusRate !== null)
+  else if (m.consensusRate !== null) {
+    const polarised = m.positiveOnly.length + m.negativeOnly.length + m.mixed.length
+    const top = Math.max(m.positiveOnly.length, m.negativeOnly.length)
     parts.push(
       m.stance === 'consensus'
-        ? `consensus ${m.majority === 'positive' ? 'positif' : 'négatif'} (${pct(m.consensusRate)})`
-        : `avis partagés (le camp le plus nombreux réunit ${pct(m.consensusRate)})`,
+        ? `consensus ${m.majority === 'positive' ? 'positif' : 'négatif'} : ${top} des ${polarised} personnes ayant donné un avis (${pct(m.consensusRate)}) sont uniquement ${m.majority === 'positive' ? 'positives' : 'négatives'}`
+        : `avis partagés : le camp le plus nombreux réunit ${top} des ${polarised} personnes ayant donné un avis (${pct(m.consensusRate)})`,
     )
+  }
   if (m.minority)
     parts.push(
       `position minoritaire constante (${m.minority.side === 'positive' ? 'positive' : 'négative'}) : ${m.minority.participantIds.length} personnes`,
@@ -477,22 +480,29 @@ async function summarizeGroups(corpus: Corpus, state: AnalysisState, runner: Llm
   if (cur.length) batches.push(cur)
 
   const summaries = new Map<string, string>()
-  for (const batch of batches) {
-    let missing = batch
-    for (let attempt = 0; attempt < 2 && missing.length; attempt++) {
-      const res = await runner.json(groupSummaryPrompt({ groups: missing }, state.settings), groupSummarySchema)
-      for (const r of res.groups) {
-        if (missing.some((m) => m.id === r.id) && r.summary.trim()) summaries.set(r.id, r.summary)
-      }
-      missing = missing.filter((m) => !summaries.has(m.id))
-    }
+  const apply = () => {
     for (const g of state.groups) {
       const raw = summaries.get(g.id)
       if (raw !== undefined) g.summary = sanitizeCitations(raw, new Set(g.ideaIds))
     }
     s.done = summaries.size
-    await emit()
   }
+  // Les lots partent en parallèle : le débit reste borné par le fournisseur.
+  await Promise.all(
+    batches.map(async (batch) => {
+      let missing = batch
+      for (let attempt = 0; attempt < 2 && missing.length; attempt++) {
+        const res = await runner.json(groupSummaryPrompt({ groups: missing }, state.settings), groupSummarySchema)
+        for (const r of res.groups) {
+          if (missing.some((m) => m.id === r.id) && r.summary.trim()) summaries.set(r.id, r.summary)
+        }
+        missing = missing.filter((m) => !summaries.has(m.id))
+      }
+      apply()
+      await emit()
+    }),
+  )
+  apply()
   s.state = 'done'
   await emit()
 }
