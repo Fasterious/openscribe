@@ -73,6 +73,17 @@ function CitedText({ text, ctx, title }: { text: string; ctx: Ctx; title: string
   )
 }
 
+/** Nombres de la synthèse que le code n'a pas pu rattacher à un chiffre calculé ou cité. */
+function Unverified({ items }: { items?: string[] }) {
+  if (!items?.length) return null
+  return (
+    <p className="text-xs text-muted-foreground">
+      <span className="rounded bg-warning/30 px-1 font-medium">À vérifier</span> {items.map((x) => `« ${x} »`).join(', ')} ne correspond
+      {items.length > 1 ? 'ent' : ''} à aucun chiffre calculé ni cité.
+    </p>
+  )
+}
+
 function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; headingLevel: 'h3' | 'h4' }) {
   const ideas = group.ideaIds.map((id) => ctx.ideaById.get(id)!).filter((i) => !ctx.segment || ctx.segment.has(i.participantId))
   const m = ctx.segment ? computeMetrics(ideas) : group.metrics
@@ -99,7 +110,12 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
           <OpinionBar m={m} />
         </div>
         <p className="text-xs text-muted-foreground">{describeMetrics(m)}</p>
-        {group.summary && !ctx.segment && <CitedText text={group.summary} ctx={ctx} title={group.title} />}
+        {group.summary && !ctx.segment && (
+          <>
+            <CitedText text={group.summary} ctx={ctx} title={group.title} />
+            <Unverified items={group.unverified} />
+          </>
+        )}
         {m.minority && (
           <Alert tone="info" className="text-xs">
             Position minoritaire mais constante ({m.minority.side === 'positive' ? 'positive' : 'négative'}) :{' '}
@@ -205,7 +221,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
   }
   const groupById = new Map(analysis.groups.map((g) => [g.id, g]))
   const sections = analysis.themes.length
-    ? analysis.themes.map((t) => ({ id: t.id, title: t.title, summary: t.summary, metrics: t.metrics, groups: t.groupIds.map((id) => groupById.get(id)!) }))
+    ? analysis.themes.map((t) => ({ id: t.id, title: t.title, summary: t.summary, unverified: t.unverified, metrics: t.metrics, groups: t.groupIds.map((id) => groupById.get(id)!) }))
     : null
 
   const filteredMetrics = (ideaIds: string[], fallback: Metrics) =>
@@ -301,6 +317,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
           </h2>
           <div className="max-w-3xl text-[15px]">
             <CitedText text={analysis.globalSummary} ctx={ctx} title="Résumé" />
+            <Unverified items={analysis.globalUnverified} />
           </div>
         </section>
       )}
@@ -366,6 +383,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
                   {t.summary && !segment && (
                     <div className="max-w-3xl text-sm">
                       <CitedText text={t.summary} ctx={ctx} title={t.title} />
+                      <Unverified items={t.unverified} />
                     </div>
                   )}
                   <div className="space-y-2">
@@ -390,7 +408,8 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
         <CardContent className="space-y-2 text-sm text-muted-foreground">
           <p>
             Le modèle de langage ({analysis.engine.model}) a découpé les réponses en idées, proposé les regroupements et rédigé les synthèses.
-            Le code a vérifié chaque citation mot pour mot dans les réponses, rangé chaque idée exactement une fois, et calculé tous les chiffres.
+            Le code a vérifié chaque citation mot pour mot dans les réponses, rangé chaque idée exactement une fois, calculé tous les
+            chiffres, puis contrôlé que chaque nombre cité dans les synthèses correspond à un chiffre calculé ou à une citation.
             {analysis.polish &&
               ` Une relecture a ensuite amélioré la langue de ${plural(analysis.polish.changed, 'synthèse')} ; le code a vérifié qu'aucune citation ni aucun chiffre n'avait changé${analysis.polish.refused ? ` et a écarté ${plural(analysis.polish.refused, 'réécriture')} qui ne respectait pas cette règle` : ''}.`}
           </p>

@@ -2,6 +2,14 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-12 — Qualité de la langue (demande d'Arnaud)
+
+- **La langue fait partie de la qualité, sans jamais passer avant la fidélité.** Un rapport juste mais qui sonne « traduit de l'anglais » n'est pas fini.
+- **Trois niveaux** : (1) un guide de style par langue dans les consignes de rédaction ; (2) une étape « Relire la langue » (activée par défaut, désactivable) qui réécrit les synthèses ; (3) des garde-fous dans le code : une réécriture qui change une citation [I…] ou un nombre (en chiffres ou en lettres) est refusée, et tout nombre d'une synthèse qui ne correspond à aucun chiffre calculé ni cité est signalé « À vérifier » dans le rapport.
+- **Corriger à la source.** La première relecture a montré que la plupart des défauts venaient de nos propres textes recopiés par le modèle (formulation des chiffres, ponctuation abîmée par le nettoyage des citations). Ils sont corrigés dans le code, pas confiés à la relecture.
+- **Nouveau rôle `plume`** (langue et ton de l'interface et des rapports), intégré à la boucle de qualité.
+- Langues : français et anglais pour l'instant ; ajouter une langue = ajouter son guide de style.
+
 ## 2026-10-12 — Démarrage
 
 - **Branche vierge `next`** dans le dépôt existant, sans historique commun : la session ne peut pas créer de nouveau dépôt.

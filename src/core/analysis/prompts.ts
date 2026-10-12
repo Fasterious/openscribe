@@ -38,7 +38,10 @@ const STYLE: Record<AnalysisSettings['language'], string> = {
 - Pas de formules creuses : « il est important de noter que », « force est de constater », « au niveau de », « dans un premier temps ».
 - Mots simples et précis : « 6 personnes regrettent… » plutôt que « une partie significative des répondants exprime un sentiment de… ».
 - Les chiffres de "facts" sont déjà affichés au-dessus de chaque synthèse : ne les recopie pas en bloc et n'ouvre pas chaque synthèse par « N personnes (M mentions)… ». Glisse seulement le chiffre utile dans une phrase normale (« cinq personnes sur six »).
-- En début de phrase, les nombres s'écrivent en lettres (« Une personne », « Trois personnes »).
+- Nombres en chiffres (« 6 personnes »), sauf en début de phrase où ils s'écrivent en lettres (« Six personnes »).
+- Ce sont les avis qui sont positifs ou négatifs, pas les personnes : « 4 personnes en ont un avis positif », pas « 4 personnes sont positives ».
+- Attribue toujours un constat à qui l'exprime (« deux personnes estiment que… ») : un avis ne doit jamais se lire comme un fait.
+- Ne reprends pas les titres internes des groupes entre guillemets : désigne le sujet avec des mots ordinaires.
 - Varie les attaques de phrase d'une synthèse à l'autre ; pas de formule répétée partout.
 - Typographie française : guillemets « », espace avant : ; ? !`,
   en: `Style: write like a native English-speaking researcher briefing decision-makers.
@@ -46,7 +49,9 @@ const STYLE: Record<AnalysisSettings['language'], string> = {
 - No filler ("it is worth noting that", "in terms of", "at the level of"), no inflated vocabulary ("leverage", "utilize").
 - Concrete and precise: "6 people regret…" rather than "a significant portion of respondents expressed feelings of…".
 - The "facts" figures are already shown above each summary: don't paste them in bulk or open every summary with "N people (M mentions)…". Weave in only the figure that matters.
-- Spell out numbers that start a sentence. Vary sentence openings across summaries.`,
+- Spell out numbers that start a sentence. Vary sentence openings across summaries.
+- Always attribute a view to who holds it ("two people feel that…"): an opinion must never read as a fact.
+- Don't quote internal group titles; name the topic in ordinary words.`,
 }
 
 function context(settings: AnalysisSettings): string {
@@ -260,7 +265,7 @@ export function themePrompt(input: ThemeInput, settings: AnalysisSettings, targe
 Règles :
 1. Chaque groupe (G1, G2…) appartient à EXACTEMENT un thème.
 2. Titre de thème court (2 à 6 mots), qui décrit le sujet.
-3. Pour chaque thème, une synthèse de 2 à 4 phrases construite à partir des synthèses de ses groupes, sans rien ajouter. Garde les crochets [I…] qui s'y trouvent, n'en invente pas.
+3. Pour chaque thème, une synthèse de 2 à 4 phrases construite à partir des synthèses de ses groupes, sans rien ajouter. Elle croise les groupes (ce qui les relie, ce qui les oppose) : ne recopie pas la première phrase de l'un d'eux, le lecteur la lira juste après. Garde les crochets [I…] qui s'y trouvent, n'en invente pas.
 ${lang(settings)}
 ${STYLE[settings.language]}
 

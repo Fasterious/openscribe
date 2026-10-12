@@ -11,3 +11,5 @@ Pour chaque demande :
 - N'invente aucun identifiant ; n'en oublie aucun.
 
 Écris chaque réponse dans le fichier de réponse indiqué, puis confirme la liste des fichiers écrits.
+
+Une réponse écrite est définitive : ne la corrige pas après coup (l'application l'a peut-être déjà lue).

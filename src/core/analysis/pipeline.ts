@@ -25,6 +25,7 @@ import {
 } from './prompts'
 import { LlmRunner, type ResponseCache } from './runner'
 import { DEFAULT_SETTINGS } from './types'
+import { allowedNumbers, sameNumbers, unverifiedNumbers } from './numbers'
 import type {
   AnalysisSettings,
   AnalysisState,
@@ -138,6 +139,7 @@ export async function runAnalysis(corpus: Corpus, initial: AnalysisState, option
     step('report').state = 'done'
     current = 'polish'
     await polishTexts(state, runner, emit)
+    verifyNumbers(corpus, state)
     state.status = 'done'
     await emit()
     return state
@@ -438,12 +440,13 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
 
   const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
   const parts = [`${n(m.participants, 'personne')} (${n(m.mentions, 'mention')})`]
-  const opinions = [pos && n(pos, 'positive'), neg && n(neg, 'négative'), mix && n(mix, 'mitigée')].filter(Boolean)
+  // « avis » est masculin : 3 positifs, 1 négatif.
+  const opinions = [pos && n(pos, 'positif'), neg && n(neg, 'négatif'), mix && n(mix, 'mitigé')].filter(Boolean)
   if (opinions.length) parts.push(`avis : ${opinions.join(', ')}`)
   const sug = m.participantsByCategory.suggestion
   if (sug) parts.push(`${n(sug, 'personne')} ${sug > 1 ? 'font' : 'fait'} des suggestions`)
   const neu = m.participantsByCategory.neutral
-  if (neu) parts.push(`constats neutres de ${n(neu, 'personne')}`)
+  if (neu) parts.push(`${n(neu, 'personne')} ${neu > 1 ? 'font des constats neutres' : 'fait un constat neutre'}`)
   if (m.stance === 'thin') parts.push("peu d'avis")
   else if (m.stance === 'consensus') parts.push(`consensus ${m.majority === 'positive' ? 'positif' : 'négatif'} : ${share(top, polarised, 'sur')}`)
   else if (m.stance === 'divided') parts.push('avis partagés')
@@ -617,7 +620,6 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
 // ─── Étape 6 : relecture de la langue ────────────────────────────────────────
 
 const citationsOf = (t: string) => (t.match(/I\d{4,}/g) ?? []).sort().join(',')
-const numbersOf = (t: string) => (t.replace(/I\d{4,}/g, '').match(/\d+(?:[.,]\d+)?/g) ?? []).sort().join(',')
 
 /**
  * Une réécriture n'est acceptée que si elle garde exactement les mêmes citations
@@ -628,7 +630,7 @@ export function acceptRewrite(original: string, rewrite: string): boolean {
   const r = rewrite.trim()
   if (!r) return false
   if (citationsOf(original) !== citationsOf(r)) return false
-  if (numbersOf(original) !== numbersOf(r)) return false
+  if (!sameNumbers(original, r)) return false
   const ratio = r.length / Math.max(1, original.length)
   return ratio > 0.6 && ratio < 1.5
 }
@@ -677,6 +679,25 @@ async function polishTexts(state: AnalysisState, runner: LlmRunner, emit: () => 
   state.polish = stats
   s.state = 'done'
   await emit()
+}
+
+// ─── Contrôle final des chiffres ─────────────────────────────────────────────
+
+function verifyNumbers(corpus: Corpus, state: AnalysisState) {
+  const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
+  const groupById = new Map(state.groups.map((g) => [g.id, g]))
+  const quotes = (ids: string[]) => ids.map((id) => ideaById.get(id)!.verbatim)
+  for (const g of state.groups) g.unverified = unverifiedNumbers(g.summary, allowedNumbers([g.metrics], quotes(g.ideaIds)))
+  for (const t of state.themes) {
+    const groups = t.groupIds.map((id) => groupById.get(id)!)
+    t.unverified = unverifiedNumbers(t.summary, allowedNumbers([t.metrics, ...groups.map((g) => g.metrics)], quotes(groups.flatMap((g) => g.ideaIds))))
+  }
+  const all = computeMetrics(state.ideas)
+  const allowed = allowedNumbers([all, ...state.themes.map((t) => t.metrics), ...state.groups.map((g) => g.metrics)], quotes(state.ideas.map((i) => i.id)))
+  allowed.add(activeParticipants(corpus).length)
+  allowed.add(state.ideas.length)
+  allowed.add(state.themes.length || state.groups.length)
+  state.globalUnverified = unverifiedNumbers(state.globalSummary, allowed)
 }
 
 export { sortIds }

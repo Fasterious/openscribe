@@ -64,6 +64,8 @@ Règles apprises :
 - Les données envoyées au modèle sont en JSON compact : l'indentation coûte des jetons pour rien.
 - La qualité de la langue fait partie de la qualité : un rapport juste mais qui
   sonne traduit n'est pas fini. Elle ne passe jamais avant la fidélité aux données.
+- Un défaut de style qui revient partout vient presque toujours d'un texte que nous
+  injectons (chiffres, libellés) : on le corrige à la source, pas à la relecture.
 - Les vraies données révèlent ce que les données fictives cachent : chaque
   fonctionnalité d'analyse est éprouvée sur un corpus réel (privé) avant d'être déclarée faite.
 

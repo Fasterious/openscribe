@@ -15,5 +15,6 @@ Mis à jour à chaque étape. Légende : ✅ fait et vérifié · 🔄 en cours 
 
 - ✅ Moteur : idées atomiques, vérification des citations, regroupement validé, indicateurs par le code, synthèses citées, thèmes, résumé global
 - ✅ Reproductibilité (cache des réponses) et reprise après coupure
-- 🔄 Interface : import → réglages → analyse visible → rapport
-- ⏳ Test sur corpus réel avec un vrai modèle (via le pont de test)
+- 🔄 Interface : import → réglages → analyse visible → rapport (écrite, compile ; tests de parcours à venir)
+- ✅ Test sur corpus réel (ÉcoSol, 20 personnes) avec un modèle joué par un sous-agent : 286 idées, 0 citation écartée, 35 groupes, 8 thèmes
+- ✅ Qualité de la langue : guide de style, étape de relecture contrôlée, nombres vérifiés (relecture `plume` : 4/5, une passe de plus prévue)

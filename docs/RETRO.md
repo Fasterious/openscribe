@@ -2,6 +2,21 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-12 — Itération 2 : qualité de la langue des rapports
+
+**Ce qui a marché**
+- Faire relire un vrai rapport par un rôle dédié, avec une note avant/après : 2,5/5 → 3,5/5 → 4/5 en deux passes, défauts précis et chiffrés.
+- Le contrôle par le code (citations, nombres) : 0 réécriture refusée et 0 fausse alerte sur les 35 synthèses réelles, et les tests prouvent qu'il attrape « deux » devenu « trois ».
+
+**Ce qui a coûté pour rien**
+- La relecture modifiait 31 textes sur 44… pour réparer un défaut de ponctuation que notre propre code introduisait.
+- Un sous-agent « modèle » a corrigé ses réponses après que l'application les avait lues : le cache a divergé, il a fallu raccrocher les réponses à la main.
+
+**Ce qu'on change**
+- Règle : un défaut de style qui revient partout vient presque toujours d'un texte que nous injectons ; on le corrige à la source.
+- Consigne des sous-agents « modèle » : une réponse écrite est définitive.
+- Prochaine passe sur données réelles (modèle léger) : vérifier les dernières corrections de style (accords, thèmes qui recopient leur premier groupe).
+
 ## 2026-10-12 — Itération 1 : socle et moteur, premier essai sur données réelles
 
 **Ce qui a marché**

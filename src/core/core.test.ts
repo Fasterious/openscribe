@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { computeMetrics } from './analysis/metrics'
+import { allowedNumbers, unverifiedNumbers } from './analysis/numbers'
 import { acceptRewrite, describeMetrics, newAnalysis, runAnalysis, sanitizeCitations } from './analysis/pipeline'
 import { reportToHtml, reportToMarkdown } from './analysis/report'
 import { MemoryCache } from './analysis/runner'
@@ -144,8 +145,22 @@ describe('chiffres en toutes lettres', () => {
   it('accorde, omet les zéros, et ne met de pourcentage qu’à partir de dix personnes', () => {
     const ideas = ['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I000${k}`, p, k < 4 ? 'positive' : 'negative'))
     const text = describeMetrics(computeMetrics(ideas))
-    expect(text).toBe('5 personnes (5 mentions) ; avis : 4 positives, 1 négative ; consensus positif : 4 sur 5')
+    expect(text).toBe('5 personnes (5 mentions) ; avis : 4 positifs, 1 négatif ; consensus positif : 4 sur 5')
     expect(text).not.toMatch(/\(s\)|: 0|%/)
+  })
+})
+
+describe('contrôle des chiffres des synthèses', () => {
+  it('signale un nombre, en chiffres ou en lettres, qui ne vient ni du calcul ni des citations', () => {
+    const ideas = ['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I000${k}`, p, k < 4 ? 'positive' : 'negative'))
+    const ok = allowedNumbers([computeMetrics(ideas)], ['On était 12 bénévoles en 2020'])
+    expect(unverifiedNumbers('Quatre personnes sur cinq apprécient [I0001]. Une personne regrette [I0004].', ok)).toEqual([])
+    expect(unverifiedNumbers('Les 12 bénévoles de 2020 sont cités.', ok)).toEqual([])
+    expect(unverifiedNumbers('Sept personnes apprécient, soit 64 %.', ok)).toEqual(['64', 'Sept personnes'])
+  })
+  it('la relecture ne peut pas changer « deux » en « trois »', () => {
+    expect(acceptRewrite('Deux personnes regrettent [I0001].', 'Trois personnes regrettent [I0001].')).toBe(false)
+    expect(acceptRewrite('2 personnes regrettent [I0001].', 'Deux personnes le regrettent [I0001].')).toBe(true)
   })
 })
 

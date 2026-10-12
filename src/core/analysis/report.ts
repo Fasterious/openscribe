@@ -45,11 +45,16 @@ export function reportToMarkdown(state: AnalysisState, corpus: Corpus, title: st
   const byId = new Map(state.ideas.map((i) => [i.id, i]))
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
   const out: string[] = [`# ${title}`, '']
+  const warn = (items?: string[]) => {
+    if (items?.length) out.push(`> À vérifier : ${items.map((x) => `« ${x} »`).join(', ')} ne correspond à aucun chiffre calculé ni cité.`, '')
+  }
   if (state.globalSummary) out.push('## Résumé', '', state.globalSummary, '')
+  warn(state.globalUnverified)
 
   const writeGroup = (g: Group, level: string) => {
     out.push(`${level} ${g.title}`, '', `*${describeMetrics(g.metrics)}*`, '')
     if (g.summary) out.push(g.summary, '')
+    warn(g.unverified)
     for (const cat of ['positive', 'negative', 'suggestion', 'neutral'] as IdeaCategory[]) {
       const items = ideasOf(g, byId).filter((i) => i.category === cat)
       if (!items.length) continue
@@ -63,6 +68,7 @@ export function reportToMarkdown(state: AnalysisState, corpus: Corpus, title: st
     for (const t of state.themes) {
       out.push(`## ${t.title}`, '', `*${describeMetrics(t.metrics)}*`, '')
       if (t.summary) out.push(t.summary, '')
+      warn(t.unverified)
       for (const gid of t.groupIds) writeGroup(groupById.get(gid)!, '###')
     }
   } else {

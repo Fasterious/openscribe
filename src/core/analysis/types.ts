@@ -85,6 +85,8 @@ export interface Group {
   ideaIds: string[]
   summary: string
   metrics: Metrics
+  /** Nombres de la synthèse qui ne correspondent à aucun chiffre calculé ni cité. */
+  unverified?: string[]
 }
 
 export interface Theme {
@@ -93,6 +95,7 @@ export interface Theme {
   groupIds: string[]
   summary: string
   metrics: Metrics
+  unverified?: string[]
 }
 
 export interface AnalysisSettings {
@@ -147,6 +150,7 @@ export interface AnalysisState {
   groups: Group[]
   themes: Theme[]
   globalSummary: string
+  globalUnverified?: string[]
   /** Bilan de la relecture : textes relus, modifiés, et réécritures refusées par le contrôle. */
   polish?: { checked: number; changed: number; refused: number }
   steps: StepStatus[]
