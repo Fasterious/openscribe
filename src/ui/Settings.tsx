@@ -17,8 +17,8 @@ import { Alert, Badge, Button, Card, CardContent, Dialog, Input, Label, Select, 
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
   local: { label: 'Rien ne quitte votre ordinateur', tone: 'positive' },
-  'no-training': { label: "Pas d'entraînement sur vos données", tone: 'positive' },
-  'may-train-free': { label: 'Offre gratuite : données réutilisables', tone: 'warning' },
+  'no-training': { label: "Vos données n'entraînent pas les modèles", tone: 'positive' },
+  'may-train-free': { label: 'Offre gratuite : vos données peuvent être réutilisées', tone: 'warning' },
   check: { label: 'Politique de données à vérifier', tone: 'outline' },
 }
 
@@ -56,8 +56,8 @@ export function SettingsPage({ back }: { back?: string }) {
         )}
         <h1 className="text-3xl font-bold tracking-tight">Moteurs d'IA</h1>
         <p className="max-w-2xl text-muted-foreground">
-          Le moteur d'IA lit les verbatims et rédige ; OpenScribe vérifie les citations et fait les comptes. Pour commencer, une clé gratuite
-          Groq ou Mistral se crée en quelques minutes ; pour que rien ne sorte de votre ordinateur, choisissez Ollama.
+          Le moteur d'IA lit les verbatims et rédige ; OpenScribe vérifie les verbatims cités et fait les comptes. Pour commencer, créez une clé
+          gratuite Groq ou Mistral en quelques minutes. Pour que rien ne quitte votre ordinateur, choisissez Ollama.
         </p>
       </header>
 
@@ -213,7 +213,9 @@ function OllamaLine({ status }: { status: OllamaStatus | null }) {
   return (
     <p className="mt-2 text-xs text-positive">
       <Check className="mr-1 inline size-3" />
-      Ollama est ouvert{status.models.length ? ` · ${status.models.length > 1 ? 'modèles' : 'modèle'} : ${status.models.join(', ')}` : ', mais aucun modèle installé'}.
+      {status.models.length
+        ? `Ollama est ouvert · ${status.models.length > 1 ? 'modèles' : 'modèle'} : ${status.models.join(', ')}.`
+        : "Ollama est ouvert, mais aucun modèle n'est installé."}
     </p>
   )
 }
@@ -347,7 +349,7 @@ function SetupDialog({
 
           {origin && (
             <Alert tone="info" className="space-y-1 text-xs">
-              <p>Sur ce site, Ollama doit aussi autoriser cette adresse. Dans le Terminal, puis quittez et rouvrez Ollama :</p>
+              <p>Ollama doit aussi autoriser l'adresse de ce site. Sur Mac, lancez cette commande dans le Terminal, puis quittez et rouvrez Ollama :</p>
               <CopyCode code={`launchctl setenv OLLAMA_ORIGINS "${origin}"`} />
             </Alert>
           )}

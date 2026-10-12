@@ -28,7 +28,7 @@ async function projectCount(page: Page): Promise<number> {
 
 async function newStudy(page: Page, name: string) {
   await page.goto('/#/synthese')
-  await page.getByRole('button', { name: 'Nouvelle synthèse' }).click()
+  await page.getByRole('button', { name: 'Nouvelle étude' }).click()
   await page.getByLabel("Nom de l'étude").fill(name)
   await page.getByRole('button', { name: 'Créer' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toContainText(name)
@@ -40,7 +40,7 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   // La preuve : un constat de l'exemple dont on déplie les verbatims.
   await page.getByRole('button', { name: 'Voir les 3 verbatims' }).click()
   await expect(page.getByText('surtout sur mon vieux téléphone.').first()).toBeVisible()
-  for (const h of ['Comment ça marche', 'De A à Z, un outil à la fois', 'Vos données, vos règles', 'Questions fréquentes', 'Ce qui arrive'])
+  for (const h of ['Comment ça marche', 'Un outil par étape de votre recherche', 'Vos données, vos règles', 'Questions fréquentes', 'Ce qui arrive'])
     await expect(page.getByRole('heading', { name: h })).toBeVisible()
   // Pas encore de travail en cours : pas de bandeau « Reprendre ».
   await expect(page.getByText('Reprendre là où vous en étiez')).toHaveCount(0)
@@ -49,7 +49,7 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
 
   // Le module Synthèse est cliquable et mène à son espace.
   await page.getByRole('link', { name: /Ouvrir l'espace Synthèse/ }).click()
-  await expect(page.getByRole('heading', { name: 'Vos synthèses' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Vos études' })).toBeVisible()
 })
 
 test('exemple : de l’accueil au rapport, verbatims dépliés sur place et exports', async ({ page }) => {
@@ -57,7 +57,7 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   await page.getByRole('button', { name: 'Voir un exemple de rapport' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toContainText('médiathèque')
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
-  await expect(page.getByText('Exemple enregistré')).toBeVisible()
+  await expect(page.getByText("Rapport d'exemple")).toBeVisible()
   await expect(page.getByText('À vérifier')).toHaveCount(0)
   // Le second niveau existe : des thèmes rapprochent les groupes.
   expect(await page.locator('section h2').count()).toBeGreaterThan(3)
@@ -83,13 +83,13 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   expect(await page.locator('article details:not([open])').count()).toBe(0)
 })
 
-test('nouvelle synthèse : import CSV, puis l’utilisateur qui revient retrouve son étude', async ({ page }) => {
+test('nouvelle étude : import CSV, puis l’utilisateur qui revient retrouve son étude', async ({ page }) => {
   await newStudy(page, 'Étude test CSV')
   await page.getByLabel('Fichier à importer').setInputFiles('fixtures/mediatheque.csv')
-  await expect(page.getByRole('button', { name: /Importer \d+ questions?/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ })).toBeVisible()
   await noHorizontalScroll(page)
   await shot(page, '5-colonnes')
-  await page.getByRole('button', { name: /Importer \d+ questions?/ }).click()
+  await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
   await expect(page.getByText('Vos données', { exact: true }).first()).toBeVisible()
   await expect(page.getByText(/12 participants/).first()).toBeVisible()
   await shot(page, '6-donnees')
@@ -132,7 +132,7 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   await newStudy(page, 'Étude moteur')
   const studyUrl = page.url()
   await page.getByLabel('Fichier à importer').setInputFiles('fixtures/mediatheque.csv')
-  await page.getByRole('button', { name: /Importer \d+ questions?/ }).click()
+  await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
   await page.getByRole('tab', { name: /Analyse/ }).click()
   await page.getByRole('link', { name: 'Choisir un moteur' }).click()
 

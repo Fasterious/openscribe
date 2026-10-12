@@ -294,9 +294,9 @@ function normLabel(s: string): string {
  * à fusionner des sujets différents.
  */
 export function groupTarget(n: number): { min: number; max: number } {
-  const min = Math.max(3, Math.min(60, Math.round(n / 5)))
-  const max = Math.max(min + 3, Math.min(120, Math.round(n / 2.5)))
-  return { min, max }
+  // Plus le corpus grossit, plus les motifs se répètent : le nombre de groupes croît moins vite que les idées.
+  const max = Math.max(6, Math.min(60, Math.round(3 * Math.sqrt(n))))
+  return { min: Math.max(3, Math.round(max / 3)), max }
 }
 
 async function groupIdeas(state: AnalysisState, runner: LlmRunner, emit: () => Promise<void>) {
@@ -421,7 +421,9 @@ const pct = (x: number) => `${Math.round(x * 100)} %`
  * rapport ET recopié par le modèle dans ses synthèses : sa langue compte autant
  * que celle du modèle (un défaut ici se répète dans tout le rapport).
  */
-export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
+export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr', opts: { stance?: boolean } = {}): string {
+  // Un thème réunit des sujets différents : y calculer consensus ou désaccord additionnerait des avis sur des objets distincts.
+  const withStance = opts.stance !== false
   const pos = m.positiveOnly.length
   const neg = m.negativeOnly.length
   const mix = m.mixed.length
@@ -437,6 +439,7 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
     if (opinions.length) parts.push(`opinions: ${opinions.join(', ')}`)
     if (m.participantsByCategory.suggestion) parts.push(`${n(m.participantsByCategory.suggestion, 'person', 'people')} made suggestions`)
     if (m.participantsByCategory.neutral) parts.push(`neutral remarks from ${n(m.participantsByCategory.neutral, 'person', 'people')}`)
+    if (!withStance) return parts.join('; ')
     if (m.stance === 'thin') parts.push('few opinions')
     else if (m.stance === 'consensus') parts.push(`${m.majority} consensus: ${share(top, polarised, 'out of')}`)
     else if (m.stance === 'divided') parts.push('divided opinions')
@@ -445,7 +448,7 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
   }
 
   const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
-  const parts = [`${n(m.participants, 'participant')} (${n(m.mentions, 'idée')})`]
+  const parts = [`${n(m.participants, 'participant')} (${n(m.mentions, 'occurrence')})`]
   // « avis » est masculin : 3 positifs, 1 négatif.
   const opinions = [pos && n(pos, 'positif'), neg && n(neg, 'négatif'), mix && n(mix, 'mitigé')].filter(Boolean)
   if (opinions.length) parts.push(`avis : ${opinions.join(', ')}`)
@@ -453,12 +456,26 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
   if (sug) parts.push(`${n(sug, 'participant')} ${sug > 1 ? 'font' : 'fait'} des suggestions`)
   const neu = m.participantsByCategory.neutral
   if (neu) parts.push(`${n(neu, 'participant')} ${neu > 1 ? 'font des constats neutres' : 'fait un constat neutre'}`)
+  if (!withStance) return parts.join(' ; ')
   if (m.stance === 'thin') parts.push("peu d'avis")
   else if (m.stance === 'consensus') parts.push(`consensus ${m.majority === 'positive' ? 'positif' : 'négatif'} : ${share(top, polarised, 'sur')}`)
   else if (m.stance === 'divided') parts.push('avis partagés')
   if (m.minority)
     parts.push(`minorité constante ${m.minority.side === 'positive' ? 'positive' : 'négative'} : ${n(m.minority.participantIds.length, 'participant')}`)
   return parts.join(' ; ')
+}
+
+/**
+ * Les chiffres d'un thème : participants et avis, sans consensus ni désaccord
+ * (qui n'ont de sens que sur un même objet), plus le nombre de sujets et ceux
+ * dont les avis sont partagés.
+ */
+export function describeTheme(theme: { metrics: Metrics }, groups: { metrics: Metrics }[], lang: 'fr' | 'en' = 'fr'): string {
+  const base = describeMetrics(theme.metrics, lang, { stance: false })
+  const divided = groups.filter((g) => g.metrics.stance === 'divided').length
+  const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
+  if (lang === 'en') return `${base}; ${n(groups.length, 'topic')}${divided ? `, ${divided} with divided opinions` : ''}`
+  return `${base} ; ${n(groups.length, 'sujet')}${divided ? `, dont ${divided} aux avis partagés` : ''}`
 }
 
 /** Ne garde que les références [I…] qui appartiennent bien au périmètre. */
@@ -540,8 +557,8 @@ async function summarizeGroups(corpus: Corpus, state: AnalysisState, runner: Llm
 // ─── Étape 4 ─────────────────────────────────────────────────────────────────
 
 export function themeTarget(groupCount: number): { min: number; max: number } {
-  const min = Math.max(3, Math.min(8, Math.round(groupCount / 6)))
-  return { min, max: Math.max(min + 1, Math.min(10, Math.round(groupCount / 3))) }
+  const min = Math.max(3, Math.min(8, Math.round(Math.sqrt(groupCount))))
+  return { min, max: Math.max(min + 2, Math.min(12, Math.round(2 * Math.sqrt(groupCount)))) }
 }
 
 async function buildThemes(state: AnalysisState, runner: LlmRunner, emit: () => Promise<void>) {
@@ -557,10 +574,17 @@ async function buildThemes(state: AnalysisState, runner: LlmRunner, emit: () => 
   s.total = state.groups.length
   await emit()
 
+  const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
   const res = await runner.json(
     themePrompt(
       {
-        groups: state.groups.map((g) => ({ id: g.id, title: g.title, participants: g.metrics.participants, summary: g.summary })),
+        groups: state.groups.map((g) => ({
+          id: g.id,
+          title: g.title,
+          // Une même personne peut parler dans plusieurs groupes : le modèle doit le savoir pour ne pas la compter deux fois.
+          people: [...new Set(g.ideaIds.map((id) => ideaById.get(id)!.participantId))].sort(),
+          summary: g.summary,
+        })),
       },
       state.settings,
       themeTarget(state.groups.length),
@@ -579,7 +603,6 @@ async function buildThemes(state: AnalysisState, runner: LlmRunner, emit: () => 
   if (orphans.length) themes.push({ title: state.settings.language === 'en' ? 'Other topics' : 'Autres sujets', groupIds: orphans, summary: '' })
 
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
-  const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
   state.themes = themes
     .map((t) => {
       const ideaIds = t.groupIds.flatMap((id) => groupById.get(id)!.ideaIds)
@@ -606,15 +629,15 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
   const all = computeMetrics(state.ideas)
   const respondents = activeParticipants(corpus).length
   const lang = state.settings.language
+  const single = state.groups.filter((g) => g.metrics.participants === 1).length
   const facts =
     lang === 'en'
-      ? `${state.ideas.length} ideas from ${all.participants} people (out of ${respondents} who answered), ${state.themes.length || state.groups.length} topics.`
-      : `${state.ideas.length} idées exprimées par ${all.participants} participants (sur ${respondents} ayant répondu), ${state.themes.length || state.groups.length} sujets.`
-  const sections = (state.themes.length ? state.themes : state.groups.slice(0, 15)).map((x) => ({
-    title: x.title,
-    facts: describeMetrics(x.metrics, lang),
-    summary: x.summary,
-  }))
+      ? `${state.ideas.length} ideas from ${all.participants} people (out of ${respondents} who answered), ${state.groups.length} topics${state.themes.length ? ` grouped into ${state.themes.length} themes` : ''}; ${single} of these topics rest on a single person.`
+      : `${state.ideas.length} idées exprimées par ${all.participants} participants (sur ${respondents} ayant répondu), ${state.groups.length} sujets${state.themes.length ? ` regroupés en ${state.themes.length} thèmes` : ''} ; ${single} de ces sujets ne reposent que sur un participant.`
+  const groupById = new Map(state.groups.map((g) => [g.id, g]))
+  const sections = state.themes.length
+    ? state.themes.map((t) => ({ title: t.title, facts: describeTheme(t, t.groupIds.map((id) => groupById.get(id)!), lang), summary: t.summary }))
+    : state.groups.slice(0, 15).map((g) => ({ title: g.title, facts: describeMetrics(g.metrics, lang), summary: g.summary }))
   if (!sections.length) {
     state.globalSummary = ''
     return
@@ -715,6 +738,10 @@ function verifyNumbers(corpus: Corpus, state: AnalysisState) {
   allowed.add(state.ideas.length)
   allowed.add(state.themes.length)
   allowed.add(state.groups.length)
+  // Chiffres fournis au modèle pour le résumé global : motifs portés par un seul participant, et les autres.
+  const single = state.groups.filter((g) => g.metrics.participants === 1).length
+  allowed.add(single)
+  allowed.add(state.groups.length - single)
   state.globalUnverified = check(state.globalSummary, allowed)
 }
 

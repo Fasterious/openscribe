@@ -54,7 +54,7 @@ export function Home() {
               <div className="flex shrink-0 flex-wrap gap-2">
                 <a href={href({ name: 'synthesis' })}>
                   <Button variant="ghost" tabIndex={-1}>
-                    Toutes mes synthèses
+                    Toutes vos études
                   </Button>
                 </a>
                 <a href={projectHref(last)}>
@@ -78,14 +78,14 @@ export function Home() {
             </p>
             <div className="flex flex-wrap gap-2">
               <Button size="lg" onClick={actions.newStudy}>
-                Commencer une synthèse <ArrowRight />
+                Commencer une étude <ArrowRight />
               </Button>
               <Button size="lg" variant="outline" onClick={() => openExample(projects)}>
                 <Sparkles /> Voir un exemple de rapport
               </Button>
             </div>
             <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              {['Gratuit et libre', 'Sans compte', 'Vos études restent sur votre ordinateur'].map((t) => (
+              {['Gratuit et libre', 'Sans compte', 'Vos études restent dans votre navigateur'].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <Check className="size-4 text-positive" /> {t}
                 </li>
@@ -111,8 +111,8 @@ export function Home() {
             </a>
           </Step>
           <Step n={3} icon={<ScanSearch />} title="Lisez le rapport, vérifiez tout">
-            Vous suivez chaque étape de l'analyse, puis vous remontez de chaque thème jusqu'au verbatim. Export en Markdown, en page HTML ou en
-            PDF.
+            Vous suivez chaque étape de l'analyse, puis vous remontez de chaque thème jusqu'au verbatim. Téléchargez le rapport en Markdown, en page
+            HTML ou en PDF.
           </Step>
         </ol>
       </section>
@@ -120,7 +120,7 @@ export function Home() {
       <section aria-labelledby="outils" className="space-y-6">
         <SectionTitle
           id="outils"
-          title="De A à Z, un outil à la fois"
+          title="Un outil par étape de votre recherche"
           lead="Chaque outil s'utilise seul. Bientôt, ils s'enchaîneront : la transcription d'un entretien alimentera directement une synthèse."
         />
         <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
@@ -136,13 +136,13 @@ export function Home() {
               <Badge tone="positive">Disponible</Badge>
             </div>
             <p className="mt-3 text-muted-foreground">
-              Transformez des dizaines de réponses ouvertes en un rapport que vous pouvez défendre, citation par citation.
+              Transformez des dizaines de réponses ouvertes en un rapport que vous pouvez défendre, verbatim à l'appui.
             </p>
             <ul className="mt-4 space-y-2 text-sm">
               {[
                 'Motifs et thèmes, avec le nombre de participants derrière chacun',
-                'Positif, négatif, mitigé, suggestions ; consensus, avis partagés et minorités',
-                'Comparaison de segments (par exemple étudiants et retraités)',
+                'La tonalité de chaque avis (positif, négatif, mitigé), les suggestions, et où en sont les participants : consensus, avis partagés, minorités',
+                'Filtrer par segment (par exemple les étudiants, puis les retraités)',
               ].map((t) => (
                 <li key={t} className="flex gap-2">
                   <Check className="mt-0.5 size-4 shrink-0 text-primary" /> {t}
@@ -154,7 +154,7 @@ export function Home() {
             </span>
           </a>
           <div className="grid gap-4">
-            <SoonModule icon={<Video />} title="Entretiens & tests">
+            <SoonModule icon={<Video />} title="Entretiens et tests">
               Passez de l'enregistrement d'un entretien, d'un test utilisateur ou d'une observation de terrain à un texte exploitable : locuteurs
               identifiés, vidéo synchronisée avec le texte.
             </SoonModule>
@@ -169,12 +169,12 @@ export function Home() {
         <SectionTitle id="difference" title="Ce qui fait la différence" />
         <div className="grid gap-4 sm:grid-cols-2">
           <Feature icon={<Quote />} title="Chaque chiffre a une source">
-            Cliquez sur un constat du rapport : vous remontez jusqu'au verbatim exact du participant. Chaque citation est vérifiée mot pour mot
-            dans vos données.
+            Cliquez sur la pastille d'un constat du rapport : vous remontez jusqu'au verbatim exact du participant. Chaque verbatim est vérifié mot
+            pour mot dans vos données.
           </Feature>
           <Feature icon={<Users />} title="Des participants, pas seulement des occurrences">
-            « 12 participants sur 40 » dit plus que « 57 mentions ». OpenScribe compte les deux et les distingue, pour que la mesure ne trahisse
-            jamais le qualitatif.
+            « 12 participants sur 40 » dit plus que « 57 occurrences ». OpenScribe compte les deux et les distingue, pour qu'un participant bavard ne
+            pèse pas plus que les autres.
           </Feature>
           <Feature icon={<ListChecks />} title="Les voix minoritaires restent visibles">
             Consensus, avis partagés, minorités constantes : un avis porté par trois participants ne disparaît pas sous celui de la majorité.
@@ -189,7 +189,7 @@ export function Home() {
       <section aria-labelledby="donnees" className="space-y-6">
         <SectionTitle id="donnees" title="Vos données, vos règles" />
         <div className="grid gap-4 sm:grid-cols-2">
-          <Feature icon={<HardDrive />} title="Tout reste sur votre ordinateur">
+          <Feature icon={<HardDrive />} title="Tout reste dans votre navigateur">
             Vos études sont enregistrées dans votre navigateur. Il n'y a pas de compte, et aucun serveur OpenScribe ne voit vos données.
           </Feature>
           <Feature icon={<FileUp />} title="Pensez à sauvegarder">
@@ -197,8 +197,8 @@ export function Home() {
             navigateur ou sur un autre ordinateur.
           </Feature>
           <Feature icon={<KeyRound />} title="Vous choisissez votre moteur d'IA">
-            Dans le cloud, avec votre propre clé (Groq, Mistral, Google Gemini, OpenRouter), ou sur votre ordinateur avec Ollama : alors rien ne
-            sort. Les verbatims partent directement de votre navigateur vers le moteur choisi.
+            Dans le cloud, avec votre propre clé (Groq, Mistral, Google Gemini, OpenRouter), ou sur votre ordinateur avec Ollama, et rien ne
+            quitte votre machine. Les verbatims partent directement de votre navigateur vers le moteur choisi.
           </Feature>
           <Feature icon={<ShieldCheck />} title="Lisez les conditions des offres gratuites">
             Certaines offres gratuites peuvent réutiliser les données qu'on leur envoie. Pour des données sensibles, préférez une offre qui exclut
@@ -259,19 +259,19 @@ const FAQ: [string, string][] = [
   ['Faut-il créer un compte ?', 'Non, ni inscription ni adresse e-mail. Pour retrouver une étude ailleurs, sauvegardez-la dans un fichier et rouvrez-la.'],
   [
     'Où vont mes données ?',
-    "Nulle part chez nous. Elles restent dans votre navigateur. Pour l'analyse, les verbatims partent uniquement vers le moteur d'IA que vous avez choisi, accompagnés d'un pseudonyme (P1, P2…), jamais des noms ni des adresses. Avec Ollama, ils ne quittent pas votre ordinateur.",
+    "Nulle part chez nous. Elles restent dans votre navigateur. Pour l'analyse, les verbatims partent uniquement vers le moteur d'IA que vous avez choisi, accompagnés d'un pseudonyme (P1, P2…), jamais de noms ni d'adresses. Avec Ollama, ils ne quittent pas votre ordinateur.",
   ],
   [
     "Quel moteur d'IA choisir ?",
     "Pour démarrer, prenez Groq ou Mistral : c'est gratuit et la clé se crée en quelques minutes. Pour des données sensibles, prenez Ollama sur votre ordinateur, ou une offre qui ne réutilise pas vos données. Vous pouvez en changer à tout moment.",
   ],
-  ['Et après ?', 'Les modules Entretiens & tests et Personas sont en préparation. Voir « Ce qui arrive » ci-dessous.'],
+  ['Et après ?', 'Les modules « Entretiens et tests » et « Personas » sont en préparation. Voir « Ce qui arrive » ci-dessous.'],
 ]
 
 const ROADMAP = [
   { title: 'Synthèse', text: 'Des réponses ouvertes au rapport traçable.', status: 'Disponible' },
   {
-    title: 'Entretiens & tests',
+    title: 'Entretiens et tests',
     text: "Transcription, locuteurs, vidéo synchronisée avec le texte, puis analyse de l'écran que regardait le participant.",
     status: 'En préparation',
   },
@@ -281,7 +281,7 @@ const ROADMAP = [
     text: 'Vos études copiées sur votre propre Drive, pour les retrouver sur tous vos appareils.',
     status: 'Envisagé',
   },
-  { title: 'Tests à distance et ateliers en direct', text: 'Mener la collecte elle-même depuis OpenScribe.', status: 'Envisagé' },
+  { title: 'Tests à distance et ateliers en direct', text: 'Mener vos tests et vos ateliers directement dans OpenScribe.', status: 'Envisagé' },
 ]
 
 /** Montre la traçabilité plutôt que de l'affirmer : un constat de l'exemple, dont on déplie les verbatims. */
@@ -301,15 +301,15 @@ function ProofDemo() {
           <span className="text-xs text-muted-foreground">
             <Users className="mr-0.5 inline size-3" />3
           </span>
-          <Badge tone="negative">Consensus négatif</Badge>
+          <Badge tone="outline">Peu d'avis</Badge>
         </span>
       </div>
       <div className="mt-3 flex h-2 overflow-hidden rounded-full bg-muted" aria-hidden>
         <div className="w-full bg-negative" />
       </div>
       <p className="mt-3 text-sm leading-relaxed">
-        Trois personnes jugent l'application lente. L'une décrit une attente d'une dizaine de secondes au démarrage, une autre précise que la
-        lenteur se ressent surtout sur son vieux téléphone.
+        Trois personnes trouvent l'application lente. L'une attend parfois dix secondes au démarrage, une autre précise que c'est surtout vrai
+        sur son vieux téléphone.
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}

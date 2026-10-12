@@ -1,7 +1,7 @@
 import type { Corpus } from '../corpus'
 import { activeParticipants } from '../corpus'
 import { METRICS_VERSION } from './metrics'
-import { describeMetrics } from './pipeline'
+import { describeMetrics, describeTheme } from './pipeline'
 import type { AnalysisState, Group, Idea, IdeaCategory } from './types'
 
 /**
@@ -66,7 +66,7 @@ export function reportToMarkdown(state: AnalysisState, corpus: Corpus, title: st
 
   if (state.themes.length) {
     for (const t of state.themes) {
-      out.push(`## ${t.title}`, '', `*${describeMetrics(t.metrics)}*`, '')
+      out.push(`## ${t.title}`, '', `*${describeTheme(t, t.groupIds.map((id) => groupById.get(id)!))}*`, '')
       if (t.summary) out.push(t.summary, '')
       warn(t.unverified)
       for (const gid of t.groupIds) writeGroup(groupById.get(gid)!, '###')
@@ -102,7 +102,7 @@ export function reportToHtml(state: AnalysisState, corpus: Corpus, title: string
   if (state.themes.length) {
     for (const t of state.themes) {
       parts.push(
-        `<section class="theme"><h2>${e(t.title)}</h2><p class="facts">${e(describeMetrics(t.metrics))}</p>${
+        `<section class="theme"><h2>${e(t.title)}</h2><p class="facts">${e(describeTheme(t, t.groupIds.map((id) => groupById.get(id)!)))}</p>${
           t.summary ? para(t.summary) : ''
         }${t.groupIds.map((id) => groupHtml(groupById.get(id)!, 'h3')).join('')}</section>`,
       )

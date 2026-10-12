@@ -13,7 +13,7 @@ type Update = (change: (p: Project) => Project) => Promise<Project | undefined>
 const ROLE_LABEL: Record<ColumnRole, string> = {
   open: 'Réponse ouverte — à analyser',
   attribute: 'Profil — pour filtrer le rapport',
-  identity: 'Nom ou identifiant — non envoyé',
+  identity: "Nom ou identifiant — jamais envoyé au moteur d'IA",
   ignore: 'Ignorer',
 }
 
@@ -57,7 +57,7 @@ export function DataTab({ project, update }: { project: Project; update: Update 
         open={confirmClear}
         onOpenChange={setConfirmClear}
         title="Retirer toutes les données ?"
-        description="Les réponses importées seront retirées de cette étude. Les analyses déjà faites restent consultables mais deviendront obsolètes."
+        description="Les réponses importées seront retirées de cette étude. Les analyses déjà faites resteront consultables, mais ne correspondront plus aux données."
       >
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setConfirmClear(false)}>
@@ -153,7 +153,7 @@ function CorpusSummary({ project, update }: { project: Project; update: Update }
                     {Object.entries(p.attributes)
                       .slice(0, 2)
                       .map(([k, v]) => (
-                        <span key={k} className="text-xs text-muted-foreground" title={`Profil (${k}) : sert à comparer des segments dans le rapport`}>
+                        <span key={k} className="text-xs text-muted-foreground" title={`Profil (${k}) : sert à afficher un segment dans le rapport`}>
                           <span className="opacity-70">{k} :</span> {v}
                         </span>
                       ))}
@@ -320,8 +320,8 @@ function CsvMapping({
           <FileSpreadsheet className="size-5 text-primary" /> {csv.name}
         </CardTitle>
         <CardDescription>
-          {plural(csv.analysis.table.rows.length, 'ligne')} · {plural(csv.analysis.columns.length, 'colonne')}. Vérifiez le rôle de chaque colonne :
-          nous proposons un rôle pour chacune ; corrigez-le si besoin.
+          {plural(csv.analysis.table.rows.length, 'ligne')} · {plural(csv.analysis.columns.length, 'colonne')}. Nous avons proposé un rôle pour chaque
+          colonne : vérifiez-le et corrigez-le si besoin.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -352,7 +352,7 @@ function CsvMapping({
         {openCount === 0 && <Alert tone="warning">Choisissez au moins une colonne « Réponse ouverte » à analyser.</Alert>}
         <div className="flex flex-wrap gap-2">
           <Button disabled={openCount === 0} onClick={onImport}>
-            Importer {plural(openCount, 'question')}
+            Importer les réponses à {plural(openCount, 'question')}
           </Button>
           <Button variant="ghost" onClick={onBack}>
             Retour
@@ -391,7 +391,7 @@ function TextImport({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="nom-source">Nom de la source</Label>
-          <Input id="nom-source" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex. : Entretien n°3 — Julie" />
+          <Input id="nom-source" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex. : Entretien n° 3 — Julie" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="texte">Texte</Label>
@@ -424,7 +424,7 @@ function TextImport({
                 </label>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">Les questions des locuteurs décochés sont gardées comme contexte des réponses qui suivent.</p>
+            <p className="text-xs text-muted-foreground">Ce que disent les locuteurs décochés n'est pas analysé : leurs questions servent de contexte aux réponses qui suivent.</p>
           </fieldset>
         )}
         <div className="flex flex-wrap gap-2">

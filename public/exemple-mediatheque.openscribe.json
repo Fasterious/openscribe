@@ -1,22 +1,22 @@
 {
  "kind": "openscribe-project",
  "formatVersion": 1,
- "exportedAt": "2026-10-12T18:48:19.592Z",
+ "exportedAt": "2026-10-12T19:05:17.003Z",
  "project": {
   "formatVersion": 1,
-  "id": "prj_1k4z3c4s2g1t",
+  "id": "prj_054940623s48",
   "name": "Exemple — application de médiathèque",
   "description": "Questionnaire fictif de 12 personnes sur une application de médiathèque.",
-  "createdAt": "2026-10-12T18:48:19.592Z",
-  "updatedAt": "2026-10-12T18:48:19.592Z",
+  "createdAt": "2026-10-12T19:05:17.003Z",
+  "updatedAt": "2026-10-12T19:05:17.003Z",
   "corpus": {
    "formatVersion": 1,
    "sources": [
     {
-     "id": "src_401x6b3r3t60",
+     "id": "src_6n6f690c442b",
      "kind": "survey",
      "name": "exemple-mediatheque.csv",
-     "importedAt": "2026-10-12T18:46:31.448Z"
+     "importedAt": "2026-10-12T19:05:16.978Z"
     }
    ],
    "participants": [
@@ -109,238 +109,238 @@
     {
      "id": "P1-Q4",
      "participantId": "P1",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "La réservation en ligne est très pratique. J'aime aussi recevoir un rappel avant la date de retour."
     },
     {
      "id": "P1-Q5",
      "participantId": "P1",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "L'application est lente au démarrage, il faut parfois attendre dix secondes."
     },
     {
      "id": "P1-Q6",
      "participantId": "P1",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Il faudrait pouvoir prolonger un prêt en un seul clic."
     },
     {
      "id": "P2-Q4",
      "participantId": "P2",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "Le catalogue est clair et la recherche fonctionne bien."
     },
     {
      "id": "P2-Q5",
      "participantId": "P2",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "Je ne trouve pas comment voir l'historique de mes emprunts."
     },
     {
      "id": "P2-Q6",
      "participantId": "P2",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Ajouter un historique des livres empruntés."
     },
     {
      "id": "P3-Q4",
      "participantId": "P3",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "Les rappels de retour, vraiment utiles !"
     },
     {
      "id": "P3-Q5",
      "participantId": "P3",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "Trop de notifications, je reçois trois messages pour le même livre."
     },
     {
      "id": "P3-Q6",
      "participantId": "P3",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Laisser choisir quelles notifications on reçoit."
     },
     {
      "id": "P4-Q4",
      "participantId": "P4",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "Les usagers réservent davantage, ça désengorge l'accueil."
     },
     {
      "id": "P4-Q5",
      "participantId": "P4",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "Les réservations arrivent sans délai de préparation, c'est compliqué pour l'équipe."
     },
     {
      "id": "P4-Q6",
      "participantId": "P4",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Prévoir un délai minimum avant le retrait d'une réservation."
     },
     {
      "id": "P5-Q4",
      "participantId": "P5",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "RAS"
     },
     {
      "id": "P5-Q5",
      "participantId": "P5",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "L'application est lente, surtout sur mon vieux téléphone."
     },
     {
      "id": "P6-Q4",
      "participantId": "P6",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "La carte numérique : plus besoin de la carte plastique."
     },
     {
      "id": "P6-Q5",
      "participantId": "P6",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "La connexion me déconnecte tout le temps, je dois retaper mon mot de passe."
     },
     {
      "id": "P6-Q6",
      "participantId": "P6",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Rester connecté plus longtemps, ou se connecter avec un code reçu par SMS."
     },
     {
      "id": "P7-Q4",
      "participantId": "P7",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "Mes enfants adorent la section jeunesse, bien illustrée."
     },
     {
      "id": "P7-Q5",
      "participantId": "P7",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "Les horaires d'ouverture ne sont pas à jour dans l'application."
     },
     {
      "id": "P7-Q6",
      "participantId": "P7",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Afficher les animations pour enfants, avec inscription en ligne."
     },
     {
      "id": "P8-Q4",
      "participantId": "P8",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "La recherche est rapide et les résultats pertinents."
     },
     {
      "id": "P8-Q5",
      "participantId": "P8",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "Rien de particulier, mais l'accessibilité pour les malvoyants est faible : textes trop petits."
     },
     {
      "id": "P8-Q6",
      "participantId": "P8",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Proposer un mode gros caractères."
     },
     {
      "id": "P9-Q4",
      "participantId": "P9",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "L'outil statistique nous aide à voir ce qui est emprunté."
     },
     {
      "id": "P9-Q5",
      "participantId": "P9",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "Les usagers ne savent pas que l'application existe : peu de communication."
     },
     {
      "id": "P9-Q6",
      "participantId": "P9",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Faire une campagne d'affichage dans la médiathèque."
     },
     {
      "id": "P10-Q4",
      "participantId": "P10",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "C'est pratique de réserver depuis chez soi."
     },
     {
      "id": "P10-Q5",
      "participantId": "P10",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "Je trouve l'application lente et un peu confuse, les menus sont mal rangés."
     },
     {
      "id": "P10-Q6",
      "participantId": "P10",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Simplifier le menu principal."
     },
     {
      "id": "P11-Q4",
      "participantId": "P11",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "Rien, je préfère venir sur place."
     },
     {
      "id": "P11-Q5",
      "participantId": "P11",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "Je ne vois pas l'intérêt : tout se fait très bien au guichet."
     },
     {
      "id": "P12-Q4",
      "participantId": "P12",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous plaît dans la nouvelle application de la médiathèque ?",
      "text": "Les recommandations de lecture sont souvent justes, j'ai découvert plusieurs auteurs."
     },
     {
      "id": "P12-Q5",
      "participantId": "P12",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Qu'est-ce qui vous gêne ou vous manque ?",
      "text": "Le design est un peu daté, mais ce n'est pas grave."
     },
     {
      "id": "P12-Q6",
      "participantId": "P12",
-     "sourceId": "src_401x6b3r3t60",
+     "sourceId": "src_6n6f690c442b",
      "prompt": "Une idée pour l'améliorer ?",
      "text": "Pouvoir noter les livres et partager des avis avec les autres lecteurs."
     }
@@ -349,9 +349,9 @@
   "selectedPrompts": [],
   "analyses": [
    {
-    "id": "an_1e6f403v6b58",
-    "createdAt": "2026-10-12T18:46:31.448Z",
-    "updatedAt": "2026-10-12T18:48:19.588Z",
+    "id": "an_4y1r653q3q30",
+    "createdAt": "2026-10-12T19:05:16.978Z",
+    "updatedAt": "2026-10-12T19:05:17.001Z",
     "settings": {
      "language": "fr",
      "mode": "free",
@@ -873,7 +873,7 @@
        "I0015",
        "I0030"
       ],
-      "summary": "Trois personnes jugent l'application lente. L'une décrit une attente d'une dizaine de secondes au démarrage [I0003]. Une autre précise que la lenteur se ressent surtout sur son vieux téléphone [I0015]. La troisième le constate simplement, sans détail [I0030].",
+      "summary": "Trois personnes trouvent l'application lente. L'une attend parfois dix secondes au démarrage [I0003]. Une autre précise que c'est surtout vrai sur son vieux téléphone [I0015]. La troisième se contente de le constater [I0030].",
       "metrics": {
        "mentions": 3,
        "participants": 3,
@@ -910,16 +910,14 @@
       "unverified": []
      },
      {
-      "title": "Notifications de l'application",
+      "title": "Rappels de retour",
       "ideaIds": [
        "I0002",
-       "I0009",
-       "I0010",
-       "I0011"
+       "I0009"
       ],
-      "summary": "Les rappels de retour plaisent : deux personnes en soulignent l'utilité [I0002, I0009]. Les notifications posent pourtant problème à l'une d'elles, qui reçoit trois messages pour un même livre [I0010]. Cette personne propose de laisser chacun choisir les notifications qu'il reçoit [I0011].",
+      "summary": "Deux personnes apprécient les rappels envoyés avant la date de retour [I0002]. L'une les juge même vraiment utiles [I0009]. Aucun avis contraire n'apparaît ici.",
       "metrics": {
-       "mentions": 4,
+       "mentions": 2,
        "participants": 2,
        "participantIds": [
         "P1",
@@ -927,24 +925,23 @@
        ],
        "mentionsByCategory": {
         "positive": 2,
-        "negative": 1,
+        "negative": 0,
         "neutral": 0,
-        "suggestion": 1
+        "suggestion": 0
        },
        "participantsByCategory": {
         "positive": 2,
-        "negative": 1,
+        "negative": 0,
         "neutral": 0,
-        "suggestion": 1
+        "suggestion": 0
        },
        "positiveOnly": [
-        "P1"
-       ],
-       "negativeOnly": [],
-       "mixed": [
+        "P1",
         "P3"
        ],
-       "consensusRate": 0.5,
+       "negativeOnly": [],
+       "mixed": [],
+       "consensusRate": 1,
        "majority": "positive",
        "stance": "thin",
        "minority": null
@@ -953,12 +950,12 @@
       "unverified": []
      },
      {
-      "title": "Recherche dans le catalogue",
+      "title": "Recherche",
       "ideaIds": [
        "I0006",
        "I0023"
       ],
-      "summary": "Deux personnes sont satisfaites de la recherche dans le catalogue. L'une trouve qu'elle fonctionne bien [I0006]. L'autre la juge rapide, avec des résultats pertinents [I0023]. Aucun avis contraire n'apparaît.",
+      "summary": "Deux personnes sont satisfaites de la recherche. L'une dit qu'elle fonctionne bien [I0006]. L'autre la trouve rapide, avec des résultats pertinents [I0023].",
       "metrics": {
        "mentions": 2,
        "participants": 2,
@@ -998,7 +995,7 @@
        "I0001",
        "I0029"
       ],
-      "summary": "Réserver en ligne convient à deux personnes. L'une trouve ce service très pratique [I0001]. L'autre apprécie de pouvoir réserver depuis chez elle [I0029].",
+      "summary": "Deux personnes jugent la réservation en ligne pratique [I0001]. L'une apprécie surtout de pouvoir réserver depuis chez elle [I0029].",
       "metrics": {
        "mentions": 2,
        "participants": 2,
@@ -1033,24 +1030,23 @@
       "unverified": []
      },
      {
-      "title": "Connexion au compte",
+      "title": "Accessibilité",
       "ideaIds": [
-       "I0017",
-       "I0018",
-       "I0019"
+       "I0024",
+       "I0025"
       ],
-      "summary": "Une personne se plaint d'être déconnectée sans cesse et de devoir retaper son mot de passe [I0017]. Elle souhaite rester connectée plus longtemps [I0018]. Elle suggère aussi une connexion par code reçu par SMS [I0019].",
+      "summary": "Une personne juge l'accessibilité faible pour les malvoyants, car les textes sont trop petits [I0024]. Elle propose un mode gros caractères [I0025].",
       "metrics": {
-       "mentions": 3,
+       "mentions": 2,
        "participants": 1,
        "participantIds": [
-        "P6"
+        "P8"
        ],
        "mentionsByCategory": {
         "positive": 0,
         "negative": 1,
         "neutral": 0,
-        "suggestion": 2
+        "suggestion": 1
        },
        "participantsByCategory": {
         "positive": 0,
@@ -1060,7 +1056,7 @@
        },
        "positiveOnly": [],
        "negativeOnly": [
-        "P6"
+        "P8"
        ],
        "mixed": [],
        "consensusRate": 1,
@@ -1072,17 +1068,17 @@
       "unverified": []
      },
      {
-      "title": "Accessibilité",
+      "title": "Communication sur l'application",
       "ideaIds": [
-       "I0024",
-       "I0025"
+       "I0027",
+       "I0028"
       ],
-      "summary": "Une personne juge l'accessibilité faible pour les malvoyants, à cause de textes trop petits [I0024]. Elle suggère d'ajouter un mode gros caractères [I0025].",
+      "summary": "Une personne estime que les usagers ignorent l'existence de l'application, faute de communication [I0027]. Elle suggère une campagne d'affichage dans la médiathèque [I0028].",
       "metrics": {
        "mentions": 2,
        "participants": 1,
        "participantIds": [
-        "P8"
+        "P9"
        ],
        "mentionsByCategory": {
         "positive": 0,
@@ -1098,7 +1094,7 @@
        },
        "positiveOnly": [],
        "negativeOnly": [
-        "P8"
+        "P9"
        ],
        "mixed": [],
        "consensusRate": 1,
@@ -1110,17 +1106,17 @@
       "unverified": []
      },
      {
-      "title": "Communication sur l'application",
+      "title": "Délai de retrait des réservations",
       "ideaIds": [
-       "I0027",
-       "I0028"
+       "I0013",
+       "I0014"
       ],
-      "summary": "Une personne estime que les usagers ignorent l'existence de l'application, faute de communication [I0027]. Elle propose une campagne d'affichage dans la médiathèque [I0028].",
+      "summary": "Une personne de l'équipe trouve compliqué que des réservations arrivent sans délai de préparation [I0013]. Elle propose d'imposer un délai minimum avant le retrait [I0014].",
       "metrics": {
        "mentions": 2,
        "participants": 1,
        "participantIds": [
-        "P9"
+        "P4"
        ],
        "mentionsByCategory": {
         "positive": 0,
@@ -1136,7 +1132,7 @@
        },
        "positiveOnly": [],
        "negativeOnly": [
-        "P9"
+        "P4"
        ],
        "mixed": [],
        "consensusRate": 1,
@@ -1148,17 +1144,17 @@
       "unverified": []
      },
      {
-      "title": "Délai de retrait des réservations",
+      "title": "Durée de connexion",
       "ideaIds": [
-       "I0013",
-       "I0014"
+       "I0017",
+       "I0018"
       ],
-      "summary": "Pour une personne, les réservations arrivent sans délai de préparation, ce qui complique le travail de l'équipe [I0013]. Elle suggère de fixer un délai minimum avant le retrait [I0014].",
+      "summary": "Une personne se plaint d'être déconnectée tout le temps et de devoir retaper son mot de passe [I0017]. Elle souhaite rester connectée plus longtemps [I0018].",
       "metrics": {
        "mentions": 2,
        "participants": 1,
        "participantIds": [
-        "P4"
+        "P6"
        ],
        "mentionsByCategory": {
         "positive": 0,
@@ -1174,7 +1170,7 @@
        },
        "positiveOnly": [],
        "negativeOnly": [
-        "P4"
+        "P6"
        ],
        "mixed": [],
        "consensusRate": 1,
@@ -1191,7 +1187,7 @@
        "I0007",
        "I0008"
       ],
-      "summary": "Une personne ne trouve pas où consulter l'historique de ses emprunts [I0007]. Elle demande qu'on ajoute un historique des livres empruntés [I0008].",
+      "summary": "Une personne ne trouve pas comment consulter l'historique de ses emprunts [I0007]. Elle suggère d'ajouter un historique des livres empruntés [I0008].",
       "metrics": {
        "mentions": 2,
        "participants": 1,
@@ -1224,12 +1220,12 @@
       "unverified": []
      },
      {
-      "title": "Navigation dans les menus",
+      "title": "Menus de navigation",
       "ideaIds": [
        "I0031",
        "I0032"
       ],
-      "summary": "Une personne trouve la navigation un peu confuse, avec des menus mal rangés [I0031]. Elle suggère de simplifier le menu principal [I0032].",
+      "summary": "Une personne trouve l'application un peu confuse, avec des menus mal rangés [I0031]. Elle propose de simplifier le menu principal [I0032].",
       "metrics": {
        "mentions": 2,
        "participants": 1,
@@ -1262,33 +1258,33 @@
       "unverified": []
      },
      {
-      "title": "Utilité face à la venue sur place",
+      "title": "Notifications",
       "ideaIds": [
-       "I0033",
-       "I0034"
+       "I0010",
+       "I0011"
       ],
-      "summary": "Une personne ne voit pas l'intérêt de l'application : elle préfère venir sur place [I0033] et estime que tout se fait très bien au guichet [I0034].",
+      "summary": "Une personne reçoit trop de notifications, jusqu'à trois messages pour le même livre [I0010]. Elle voudrait pouvoir choisir celles qu'elle reçoit [I0011].",
       "metrics": {
        "mentions": 2,
        "participants": 1,
        "participantIds": [
-        "P11"
+        "P3"
        ],
        "mentionsByCategory": {
         "positive": 0,
         "negative": 1,
-        "neutral": 1,
-        "suggestion": 0
+        "neutral": 0,
+        "suggestion": 1
        },
        "participantsByCategory": {
         "positive": 0,
         "negative": 1,
-        "neutral": 1,
-        "suggestion": 0
+        "neutral": 0,
+        "suggestion": 1
        },
        "positiveOnly": [],
        "negativeOnly": [
-        "P11"
+        "P3"
        ],
        "mixed": [],
        "consensusRate": 1,
@@ -1300,11 +1296,48 @@
       "unverified": []
      },
      {
-      "title": "Animations de la médiathèque",
+      "title": "Affluence à l'accueil",
+      "ideaIds": [
+       "I0012"
+      ],
+      "summary": "Une personne de l'équipe observe que les usagers réservent davantage et que cela désengorge l'accueil [I0012].",
+      "metrics": {
+       "mentions": 1,
+       "participants": 1,
+       "participantIds": [
+        "P4"
+       ],
+       "mentionsByCategory": {
+        "positive": 1,
+        "negative": 0,
+        "neutral": 0,
+        "suggestion": 0
+       },
+       "participantsByCategory": {
+        "positive": 1,
+        "negative": 0,
+        "neutral": 0,
+        "suggestion": 0
+       },
+       "positiveOnly": [
+        "P4"
+       ],
+       "negativeOnly": [],
+       "mixed": [],
+       "consensusRate": 1,
+       "majority": "positive",
+       "stance": "thin",
+       "minority": null
+      },
+      "id": "G12",
+      "unverified": []
+     },
+     {
+      "title": "Animations et inscriptions",
       "ideaIds": [
        "I0022"
       ],
-      "summary": "Une personne voudrait voir apparaître dans l'application les animations pour enfants, avec une inscription en ligne [I0022].",
+      "summary": "Une personne voudrait voir les animations pour enfants affichées, avec une inscription en ligne [I0022].",
       "metrics": {
        "mentions": 1,
        "participants": 1,
@@ -1331,7 +1364,7 @@
        "stance": "none",
        "minority": null
       },
-      "id": "G12",
+      "id": "G13",
       "unverified": []
      },
      {
@@ -1339,7 +1372,7 @@
       "ideaIds": [
        "I0037"
       ],
-      "summary": "Une personne souhaiterait pouvoir noter les livres et partager des avis avec les autres lecteurs [I0037].",
+      "summary": "Une personne aimerait pouvoir noter les livres et partager des avis avec les autres lecteurs [I0037].",
       "metrics": {
        "mentions": 1,
        "participants": 1,
@@ -1366,7 +1399,7 @@
        "stance": "none",
        "minority": null
       },
-      "id": "G13",
+      "id": "G14",
       "unverified": []
      },
      {
@@ -1374,7 +1407,7 @@
       "ideaIds": [
        "I0016"
       ],
-      "summary": "Une personne apprécie la carte numérique, qui lui évite d'avoir à porter la carte plastique [I0016].",
+      "summary": "Une personne apprécie la carte numérique, qui lui évite d'avoir la carte plastique sur elle [I0016].",
       "metrics": {
        "mentions": 1,
        "participants": 1,
@@ -1403,7 +1436,7 @@
        "stance": "thin",
        "minority": null
       },
-      "id": "G14",
+      "id": "G15",
       "unverified": []
      },
      {
@@ -1440,94 +1473,55 @@
        "stance": "thin",
        "minority": null
       },
-      "id": "G15",
-      "unverified": []
-     },
-     {
-      "title": "Design visuel",
-      "ideaIds": [
-       "I0036"
-      ],
-      "summary": "Une personne juge le design un peu daté, tout en précisant que ce n'est pas grave [I0036].",
-      "metrics": {
-       "mentions": 1,
-       "participants": 1,
-       "participantIds": [
-        "P12"
-       ],
-       "mentionsByCategory": {
-        "positive": 0,
-        "negative": 1,
-        "neutral": 0,
-        "suggestion": 0
-       },
-       "participantsByCategory": {
-        "positive": 0,
-        "negative": 1,
-        "neutral": 0,
-        "suggestion": 0
-       },
-       "positiveOnly": [],
-       "negativeOnly": [
-        "P12"
-       ],
-       "mixed": [],
-       "consensusRate": 1,
-       "majority": "negative",
-       "stance": "thin",
-       "minority": null
-      },
       "id": "G16",
       "unverified": []
      },
      {
-      "title": "Fréquentation de l'accueil",
+      "title": "Connexion par SMS",
       "ideaIds": [
-       "I0012"
+       "I0019"
       ],
-      "summary": "Une personne constate que les usagers réservent davantage et que l'accueil est moins engorgé [I0012].",
+      "summary": "Une personne voudrait se connecter avec un code reçu par SMS [I0019].",
       "metrics": {
        "mentions": 1,
        "participants": 1,
        "participantIds": [
-        "P4"
+        "P6"
        ],
        "mentionsByCategory": {
-        "positive": 1,
+        "positive": 0,
         "negative": 0,
         "neutral": 0,
-        "suggestion": 0
+        "suggestion": 1
        },
        "participantsByCategory": {
-        "positive": 1,
+        "positive": 0,
         "negative": 0,
         "neutral": 0,
-        "suggestion": 0
+        "suggestion": 1
        },
-       "positiveOnly": [
-        "P4"
-       ],
+       "positiveOnly": [],
        "negativeOnly": [],
        "mixed": [],
-       "consensusRate": 1,
-       "majority": "positive",
-       "stance": "thin",
+       "consensusRate": null,
+       "majority": null,
+       "stance": "none",
        "minority": null
       },
       "id": "G17",
       "unverified": []
      },
      {
-      "title": "Horaires d'ouverture",
+      "title": "Design de l'application",
       "ideaIds": [
-       "I0021"
+       "I0036"
       ],
-      "summary": "Une personne signale que les horaires d'ouverture affichés dans l'application ne sont pas à jour [I0021].",
+      "summary": "Une personne trouve le design un peu daté, tout en jugeant que ce n'est pas grave [I0036].",
       "metrics": {
        "mentions": 1,
        "participants": 1,
        "participantIds": [
-        "P7"
+        "P12"
        ],
        "mentionsByCategory": {
         "positive": 0,
@@ -1543,7 +1537,7 @@
        },
        "positiveOnly": [],
        "negativeOnly": [
-        "P7"
+        "P12"
        ],
        "mixed": [],
        "consensusRate": 1,
@@ -1555,11 +1549,48 @@
       "unverified": []
      },
      {
+      "title": "Horaires affichés",
+      "ideaIds": [
+       "I0021"
+      ],
+      "summary": "Une personne signale que les horaires d'ouverture ne sont pas à jour dans l'application [I0021].",
+      "metrics": {
+       "mentions": 1,
+       "participants": 1,
+       "participantIds": [
+        "P7"
+       ],
+       "mentionsByCategory": {
+        "positive": 0,
+        "negative": 1,
+        "neutral": 0,
+        "suggestion": 0
+       },
+       "participantsByCategory": {
+        "positive": 0,
+        "negative": 1,
+        "neutral": 0,
+        "suggestion": 0
+       },
+       "positiveOnly": [],
+       "negativeOnly": [
+        "P7"
+       ],
+       "mixed": [],
+       "consensusRate": 1,
+       "majority": "negative",
+       "stance": "thin",
+       "minority": null
+      },
+      "id": "G19",
+      "unverified": []
+     },
+     {
       "title": "Outil statistique",
       "ideaIds": [
        "I0026"
       ],
-      "summary": "Une personne trouve l'outil statistique utile pour voir ce qui est emprunté [I0026].",
+      "summary": "Une personne de l'équipe estime que l'outil statistique aide à voir ce qui est emprunté [I0026].",
       "metrics": {
        "mentions": 1,
        "participants": 1,
@@ -1588,11 +1619,46 @@
        "stance": "thin",
        "minority": null
       },
-      "id": "G19",
+      "id": "G20",
       "unverified": []
      },
      {
-      "title": "Prolongation des prêts",
+      "title": "Préférence pour la venue sur place",
+      "ideaIds": [
+       "I0033"
+      ],
+      "summary": "Une personne n'attend rien de l'application et préfère venir sur place [I0033].",
+      "metrics": {
+       "mentions": 1,
+       "participants": 1,
+       "participantIds": [
+        "P11"
+       ],
+       "mentionsByCategory": {
+        "positive": 0,
+        "negative": 0,
+        "neutral": 1,
+        "suggestion": 0
+       },
+       "participantsByCategory": {
+        "positive": 0,
+        "negative": 0,
+        "neutral": 1,
+        "suggestion": 0
+       },
+       "positiveOnly": [],
+       "negativeOnly": [],
+       "mixed": [],
+       "consensusRate": null,
+       "majority": null,
+       "stance": "none",
+       "minority": null
+      },
+      "id": "G21",
+      "unverified": []
+     },
+     {
+      "title": "Prolongation de prêt",
       "ideaIds": [
        "I0004"
       ],
@@ -1623,7 +1689,7 @@
        "stance": "none",
        "minority": null
       },
-      "id": "G20",
+      "id": "G22",
       "unverified": []
      },
      {
@@ -1660,7 +1726,7 @@
        "stance": "thin",
        "minority": null
       },
-      "id": "G21",
+      "id": "G23",
       "unverified": []
      },
      {
@@ -1668,7 +1734,7 @@
       "ideaIds": [
        "I0020"
       ],
-      "summary": "Une personne rapporte que ses enfants adorent la section jeunesse, qu'elle trouve bien illustrée [I0020].",
+      "summary": "Une personne dit que ses enfants adorent la section jeunesse, qu'elle trouve bien illustrée [I0020].",
       "metrics": {
        "mentions": 1,
        "participants": 1,
@@ -1697,53 +1763,91 @@
        "stance": "thin",
        "minority": null
       },
-      "id": "G22",
+      "id": "G24",
+      "unverified": []
+     },
+     {
+      "title": "Utilité de l'application",
+      "ideaIds": [
+       "I0034"
+      ],
+      "summary": "Une personne ne voit pas l'intérêt de l'application, car tout se fait très bien au guichet selon elle [I0034].",
+      "metrics": {
+       "mentions": 1,
+       "participants": 1,
+       "participantIds": [
+        "P11"
+       ],
+       "mentionsByCategory": {
+        "positive": 0,
+        "negative": 1,
+        "neutral": 0,
+        "suggestion": 0
+       },
+       "participantsByCategory": {
+        "positive": 0,
+        "negative": 1,
+        "neutral": 0,
+        "suggestion": 0
+       },
+       "positiveOnly": [],
+       "negativeOnly": [
+        "P11"
+       ],
+       "mixed": [],
+       "consensusRate": 1,
+       "majority": "negative",
+       "stance": "thin",
+       "minority": null
+      },
+      "id": "G25",
       "unverified": []
      }
     ],
     "themes": [
      {
-      "title": "Information et notifications",
+      "title": "Réservations et suivi des prêts",
       "groupIds": [
-       "G2",
+       "G4",
        "G7",
-       "G18",
-       "G12"
+       "G12",
+       "G22",
+       "G9"
       ],
-      "summary": "Les rappels de retour sont jugés utiles par deux personnes [I0002, I0009], mais l'une d'elles reçoit trop de notifications et voudrait pouvoir les choisir [I0010, I0011]. Une personne estime que les usagers ne connaissent pas l'application et suggère un affichage dans la médiathèque [I0027, I0028]. Une autre signale des horaires périmés [I0021] et voudrait voir les animations pour enfants, avec inscription en ligne [I0022].",
+      "summary": "Quatre personnes parlent de la réservation et des prêts. Deux jugent la réservation en ligne pratique [I0001, I0029], et une personne de l'équipe constate que les usagers réservent davantage, ce qui désengorge l'accueil [I0012]. Cette dernière regrette pourtant que des réservations arrivent sans délai de préparation et propose un délai minimum avant le retrait [I0013, I0014]. Côté prêts, deux personnes formulent un souhait : l'une voudrait prolonger un prêt en un clic [I0004], l'autre ne trouve pas son historique d'emprunts et suggère d'en ajouter un [I0007, I0008].",
       "metrics": {
        "mentions": 8,
        "participants": 4,
        "participantIds": [
         "P1",
-        "P3",
-        "P7",
-        "P9"
+        "P2",
+        "P4",
+        "P10"
        ],
        "mentionsByCategory": {
-        "positive": 2,
-        "negative": 3,
+        "positive": 3,
+        "negative": 2,
         "neutral": 0,
         "suggestion": 3
        },
        "participantsByCategory": {
-        "positive": 2,
-        "negative": 3,
+        "positive": 3,
+        "negative": 2,
         "neutral": 0,
         "suggestion": 3
        },
        "positiveOnly": [
-        "P1"
+        "P1",
+        "P10"
        ],
        "negativeOnly": [
-        "P7",
-        "P9"
+        "P2"
        ],
        "mixed": [
-        "P3"
+        "P4"
        ],
        "consensusRate": 0.5,
-       "majority": "negative",
+       "majority": "positive",
        "stance": "divided",
        "minority": null
       },
@@ -1751,30 +1855,30 @@
       "unverified": []
      },
      {
-      "title": "Vitesse et accès au compte",
+      "title": "Rapidité et confort d'usage",
       "groupIds": [
        "G1",
-       "G5",
-       "G14"
+       "G10",
+       "G18"
       ],
-      "summary": "Trois personnes se plaignent de la lenteur de l'application, l'une d'elles sur un vieux téléphone [I0003, I0015, I0030]. Une personne se heurte à des déconnexions répétées et propose de rester connectée plus longtemps ou de se connecter par SMS [I0017, I0018, I0019]. À l'inverse, une personne apprécie la carte numérique, qui remplace la carte plastique [I0016].",
+      "summary": "Quatre personnes évoquent le confort d'usage de l'application. Trois la trouvent lente : l'une attend parfois dix secondes au démarrage [I0003], une autre cite son vieux téléphone [I0015], la troisième le constate simplement [I0030]. Une personne juge aussi les menus mal rangés et voudrait un menu principal plus simple [I0031, I0032]. Une dernière trouve le design un peu daté, sans que cela la gêne [I0036].",
       "metrics": {
-       "mentions": 7,
+       "mentions": 6,
        "participants": 4,
        "participantIds": [
         "P1",
         "P5",
-        "P6",
-        "P10"
+        "P10",
+        "P12"
        ],
        "mentionsByCategory": {
-        "positive": 1,
-        "negative": 4,
+        "positive": 0,
+        "negative": 5,
         "neutral": 0,
-        "suggestion": 2
+        "suggestion": 1
        },
        "participantsByCategory": {
-        "positive": 1,
+        "positive": 0,
         "negative": 4,
         "neutral": 0,
         "suggestion": 1
@@ -1783,12 +1887,11 @@
        "negativeOnly": [
         "P1",
         "P5",
-        "P10"
+        "P10",
+        "P12"
        ],
-       "mixed": [
-        "P6"
-       ],
-       "consensusRate": 0.75,
+       "mixed": [],
+       "consensusRate": 1,
        "majority": "negative",
        "stance": "consensus",
        "minority": null
@@ -1797,89 +1900,84 @@
       "unverified": []
      },
      {
-      "title": "Réservations et prêts",
+      "title": "Recherche, catalogue et lectures",
       "groupIds": [
-       "G4",
-       "G8",
-       "G9",
-       "G20"
+       "G3",
+       "G16",
+       "G23",
+       "G14"
       ],
-      "summary": "Deux personnes trouvent la réservation en ligne pratique [I0001, I0029]. Côté équipe, une personne juge que les réservations arrivent sans délai de préparation et demande un délai minimum avant le retrait [I0013, I0014]. Deux autres personnes demandent de pouvoir prolonger un prêt en un clic [I0004] et de retrouver l'historique de leurs emprunts [I0007, I0008].",
+      "summary": "Trois personnes parlent de la recherche de livres. Deux sont satisfaites de la recherche, jugée efficace, rapide et pertinente [I0006, I0023], et l'une d'elles trouve aussi le catalogue clair [I0005]. Une troisième estime que les recommandations de lecture sont souvent justes [I0035] et aimerait pouvoir noter les livres et partager des avis avec les autres lecteurs [I0037].",
       "metrics": {
-       "mentions": 7,
-       "participants": 4,
+       "mentions": 5,
+       "participants": 3,
        "participantIds": [
-        "P1",
         "P2",
-        "P4",
-        "P10"
+        "P8",
+        "P12"
        ],
        "mentionsByCategory": {
-        "positive": 2,
-        "negative": 2,
+        "positive": 4,
+        "negative": 0,
         "neutral": 0,
-        "suggestion": 3
+        "suggestion": 1
        },
        "participantsByCategory": {
-        "positive": 2,
-        "negative": 2,
+        "positive": 3,
+        "negative": 0,
         "neutral": 0,
-        "suggestion": 3
+        "suggestion": 1
        },
        "positiveOnly": [
-        "P1",
-        "P10"
-       ],
-       "negativeOnly": [
         "P2",
-        "P4"
+        "P8",
+        "P12"
        ],
+       "negativeOnly": [],
        "mixed": [],
-       "consensusRate": 0.5,
-       "majority": null,
-       "stance": "divided",
+       "consensusRate": 1,
+       "majority": "positive",
+       "stance": "thin",
        "minority": null
       },
       "id": "T3",
       "unverified": []
      },
      {
-      "title": "Lisibilité et ergonomie",
+      "title": "Rappels et notifications",
       "groupIds": [
-       "G10",
-       "G6",
-       "G16"
+       "G2",
+       "G11"
       ],
-      "summary": "Trois personnes évoquent la facilité de lecture et d'usage de l'interface. L'une trouve les menus mal rangés et voudrait un menu principal plus simple [I0031, I0032]. Une autre juge l'accessibilité faible pour les malvoyants et propose un mode gros caractères [I0024, I0025]. Une troisième trouve le design daté, sans que cela la gêne vraiment [I0036].",
+      "summary": "Deux personnes parlent des messages envoyés par l'application. L'une apprécie les rappels avant la date de retour, l'autre les juge vraiment utiles [I0002, I0009]. Cette dernière reçoit toutefois trop de notifications, jusqu'à trois messages pour le même livre, et voudrait choisir celles qu'elle reçoit [I0010, I0011].",
       "metrics": {
-       "mentions": 5,
-       "participants": 3,
+       "mentions": 4,
+       "participants": 2,
        "participantIds": [
-        "P8",
-        "P10",
-        "P12"
+        "P1",
+        "P3"
        ],
        "mentionsByCategory": {
-        "positive": 0,
-        "negative": 3,
+        "positive": 2,
+        "negative": 1,
         "neutral": 0,
-        "suggestion": 2
+        "suggestion": 1
        },
        "participantsByCategory": {
-        "positive": 0,
-        "negative": 3,
+        "positive": 2,
+        "negative": 1,
         "neutral": 0,
-        "suggestion": 2
+        "suggestion": 1
        },
-       "positiveOnly": [],
-       "negativeOnly": [
-        "P8",
-        "P10",
-        "P12"
+       "positiveOnly": [
+        "P1"
        ],
-       "mixed": [],
-       "consensusRate": 1,
-       "majority": "negative",
+       "negativeOnly": [],
+       "mixed": [
+        "P3"
+       ],
+       "consensusRate": 0.5,
+       "majority": "positive",
        "stance": "thin",
        "minority": null
       },
@@ -1887,43 +1985,40 @@
       "unverified": []
      },
      {
-      "title": "Intérêt de l'application",
+      "title": "Connaissance et utilité de l'application",
       "groupIds": [
-       "G11",
-       "G17",
-       "G19"
+       "G6",
+       "G21",
+       "G25"
       ],
-      "summary": "Une personne ne voit pas l'intérêt de l'application et préfère le guichet [I0033, I0034]. À l'inverse, une personne constate que les usagers réservent davantage, ce qui désengorge l'accueil [I0012], et une autre juge l'outil statistique utile pour suivre les emprunts [I0026].",
+      "summary": "Deux personnes s'interrogent sur la place de l'application. L'une, de l'équipe, estime que les usagers ignorent son existence faute de communication et suggère une campagne d'affichage dans la médiathèque [I0027, I0028]. L'autre n'en voit pas l'intérêt, car tout se fait très bien au guichet, et préfère venir sur place [I0034, I0033].",
       "metrics": {
        "mentions": 4,
-       "participants": 3,
+       "participants": 2,
        "participantIds": [
-        "P4",
         "P9",
         "P11"
        ],
        "mentionsByCategory": {
-        "positive": 2,
-        "negative": 1,
+        "positive": 0,
+        "negative": 2,
         "neutral": 1,
-        "suggestion": 0
+        "suggestion": 1
        },
        "participantsByCategory": {
-        "positive": 2,
-        "negative": 1,
+        "positive": 0,
+        "negative": 2,
         "neutral": 1,
-        "suggestion": 0
+        "suggestion": 1
        },
-       "positiveOnly": [
-        "P4",
-        "P9"
-       ],
+       "positiveOnly": [],
        "negativeOnly": [
+        "P9",
         "P11"
        ],
        "mixed": [],
-       "consensusRate": 0.6666666666666666,
-       "majority": "positive",
+       "consensusRate": 1,
+       "majority": "negative",
        "stance": "thin",
        "minority": null
       },
@@ -1931,39 +2026,38 @@
       "unverified": []
      },
      {
-      "title": "Recherche et catalogue",
+      "title": "Connexion et carte numérique",
       "groupIds": [
-       "G3",
-       "G15"
+       "G8",
+       "G15",
+       "G17"
       ],
-      "summary": "Les avis sont favorables : deux personnes sont satisfaites de la recherche, jugée efficace, rapide et pertinente [I0006, I0023]. Une personne trouve en outre le catalogue clair [I0005]. Aucun avis contraire n'apparaît.",
+      "summary": "Une personne aborde l'accès à son compte. Elle se plaint d'être déconnectée tout le temps et de devoir retaper son mot de passe [I0017]. Elle souhaite rester connectée plus longtemps ou se connecter avec un code reçu par SMS [I0018, I0019]. Elle apprécie en revanche la carte numérique, qui lui évite la carte plastique [I0016].",
       "metrics": {
-       "mentions": 3,
-       "participants": 2,
+       "mentions": 4,
+       "participants": 1,
        "participantIds": [
-        "P2",
-        "P8"
+        "P6"
        ],
        "mentionsByCategory": {
-        "positive": 3,
-        "negative": 0,
+        "positive": 1,
+        "negative": 1,
         "neutral": 0,
-        "suggestion": 0
+        "suggestion": 2
        },
        "participantsByCategory": {
-        "positive": 2,
-        "negative": 0,
+        "positive": 1,
+        "negative": 1,
         "neutral": 0,
-        "suggestion": 0
+        "suggestion": 1
        },
-       "positiveOnly": [
-        "P2",
-        "P8"
-       ],
+       "positiveOnly": [],
        "negativeOnly": [],
-       "mixed": [],
-       "consensusRate": 1,
-       "majority": "positive",
+       "mixed": [
+        "P6"
+       ],
+       "consensusRate": 0,
+       "majority": null,
        "stance": "thin",
        "minority": null
       },
@@ -1971,35 +2065,107 @@
       "unverified": []
      },
      {
-      "title": "Offre de lecture et jeunesse",
+      "title": "Horaires, animations et section jeunesse",
       "groupIds": [
-       "G21",
+       "G19",
        "G13",
-       "G22"
+       "G24"
       ],
-      "summary": "Une personne trouve les recommandations de lecture souvent justes [I0035] et souhaiterait pouvoir noter les livres et partager des avis [I0037]. Une autre rapporte que ses enfants adorent la section jeunesse, bien illustrée [I0020].",
+      "summary": "Une personne, parent de jeunes enfants, parle des informations pratiques de la médiathèque. Ses enfants adorent la section jeunesse, bien illustrée [I0020]. Elle voudrait voir les animations pour enfants affichées, avec inscription en ligne [I0022], et signale que les horaires d'ouverture ne sont pas à jour [I0021].",
       "metrics": {
        "mentions": 3,
-       "participants": 2,
+       "participants": 1,
        "participantIds": [
-        "P7",
-        "P12"
+        "P7"
        ],
        "mentionsByCategory": {
-        "positive": 2,
-        "negative": 0,
+        "positive": 1,
+        "negative": 1,
         "neutral": 0,
         "suggestion": 1
        },
        "participantsByCategory": {
-        "positive": 2,
-        "negative": 0,
+        "positive": 1,
+        "negative": 1,
         "neutral": 0,
         "suggestion": 1
        },
+       "positiveOnly": [],
+       "negativeOnly": [],
+       "mixed": [
+        "P7"
+       ],
+       "consensusRate": 0,
+       "majority": null,
+       "stance": "thin",
+       "minority": null
+      },
+      "id": "T7",
+      "unverified": []
+     },
+     {
+      "title": "Accessibilité",
+      "groupIds": [
+       "G5"
+      ],
+      "summary": "Une personne juge l'accessibilité faible pour les malvoyants, car les textes sont trop petits [I0024]. Elle propose un mode gros caractères [I0025].",
+      "metrics": {
+       "mentions": 2,
+       "participants": 1,
+       "participantIds": [
+        "P8"
+       ],
+       "mentionsByCategory": {
+        "positive": 0,
+        "negative": 1,
+        "neutral": 0,
+        "suggestion": 1
+       },
+       "participantsByCategory": {
+        "positive": 0,
+        "negative": 1,
+        "neutral": 0,
+        "suggestion": 1
+       },
+       "positiveOnly": [],
+       "negativeOnly": [
+        "P8"
+       ],
+       "mixed": [],
+       "consensusRate": 1,
+       "majority": "negative",
+       "stance": "thin",
+       "minority": null
+      },
+      "id": "T8",
+      "unverified": []
+     },
+     {
+      "title": "Suivi statistique",
+      "groupIds": [
+       "G20"
+      ],
+      "summary": "Une personne de l'équipe estime que l'outil statistique aide à voir ce qui est emprunté [I0026].",
+      "metrics": {
+       "mentions": 1,
+       "participants": 1,
+       "participantIds": [
+        "P9"
+       ],
+       "mentionsByCategory": {
+        "positive": 1,
+        "negative": 0,
+        "neutral": 0,
+        "suggestion": 0
+       },
+       "participantsByCategory": {
+        "positive": 1,
+        "negative": 0,
+        "neutral": 0,
+        "suggestion": 0
+       },
        "positiveOnly": [
-        "P7",
-        "P12"
+        "P9"
        ],
        "negativeOnly": [],
        "mixed": [],
@@ -2008,11 +2174,11 @@
        "stance": "thin",
        "minority": null
       },
-      "id": "T7",
+      "id": "T9",
       "unverified": []
      }
     ],
-    "globalSummary": "Douze personnes ont donné 37 idées, réparties en 7 sujets. Le point le plus net est négatif : trois des quatre personnes qui parlent de rapidité et de compte jugent l'application lente, et une autre se plaint de déconnexions répétées. La recherche et le catalogue font l'unanimité chez les deux personnes qui les évoquent, avec des avis favorables. Les avis se partagent sur les réservations et sur l'information : la réservation en ligne plaît à deux personnes, mais l'équipe voudrait un délai de préparation, et les rappels utiles côtoient des notifications jugées trop nombreuses. Trois personnes pointent des défauts de lisibilité : menus confus, accessibilité faible pour les malvoyants, design daté. Enfin, une personne ne voit aucun intérêt à l'application et préfère le guichet, alors qu'une autre constate que l'accueil est moins engorgé.",
+    "globalSummary": "Les 12 participants ont livré 37 idées, regroupées en 25 sujets et 9 thèmes. Dans 21 de ces sujets, une seule personne s'exprime : les constats restent donc des avis isolés, sans tendance établie. Le point le plus partagé est la lenteur de l'application, que trois personnes signalent. Côté éloges, deux personnes apprécient la réservation en ligne, deux la recherche et deux les rappels de retour. Aucun sujet ne ressort avec des avis contraires. Des participants décrivent aussi des blocages : déconnexions répétées, menus, accessibilité pour les malvoyants, faible connaissance de l'application. Une personne, elle, n'en voit pas l'utilité face au guichet.",
     "steps": [
      {
       "id": "extract",
@@ -2029,14 +2195,14 @@
      {
       "id": "summarize",
       "state": "done",
-      "done": 22,
-      "total": 22
+      "done": 25,
+      "total": 25
      },
      {
       "id": "themes",
       "state": "done",
-      "done": 22,
-      "total": 22
+      "done": 25,
+      "total": 25
      },
      {
       "id": "report",
@@ -2047,21 +2213,21 @@
      {
       "id": "polish",
       "state": "done",
-      "done": 30,
-      "total": 30
+      "done": 35,
+      "total": 35
      }
     ],
     "calls": {
-     "total": 20,
-     "cached": 13,
+     "total": 19,
+     "cached": 19,
      "inputTokens": 0,
      "outputTokens": 0
     },
     "cacheKeys": [
      "613f548bd3c746496fe681cd46fd59f2fe398b9443821c574115dcb0a2875e96",
      "4d4ab7680bf8ac597662464bf6e5391ad96845ebdd1e38fb048bd9bd1d9a1543",
-     "cf5324a1ded86bfc3fac2bf4754396b3d7985b5706709b873f32775fd2219660",
      "c28c9678704ab30ba2b6879877b809be9414052b04a72a3b9e21b4e9bb2bb901",
+     "cf5324a1ded86bfc3fac2bf4754396b3d7985b5706709b873f32775fd2219660",
      "e0ebcf2b69c21cb5634933b7cac274177cebe51113090b0eeedfaea430782ac8",
      "f53293961a42ae20ef4e332dec6f439f846cdef6446e045ece7ae9c37ef24b13",
      "33b0b074b45315da479c0bfaf92f34e5b5281ae4d98e3ec13c68a58c13b1c715",
@@ -2070,18 +2236,18 @@
      "e31f1dc6b4f8672034340c36fe8a3f904007ef8bf2a76055050838d25f51a314",
      "6d1246933519af06a86b926ff88809343f65784499642512c3aab138ea33afee",
      "0be84afea9db36ecdaf2405c9430c5e498c8c8643ab5b9e647c9f457adf8a10d",
-     "68fbc3644ab8a9365a4bd3409887d68b25fe8a322fc08db66a669121626641c6",
-     "825e22e8bd96caa54ad15cd20d1647420df13d6c2347afe5077826247fa03ceb",
-     "54a5ef80140791c806190f52954195309cc1e9b574f60074b88bfe7791e1ee14",
-     "72e89254da3fd1b0f3f8b633b2bc23182bc11f3d52609bd11b4192297d5b1fe8",
-     "43ca331e681f2f298b6a799b8c5033eb32e4564b673cd264dda088e3f0a73ac8",
-     "1625918cd861ffca6841c27ead367524198414e4747ae2495e4bbc5298bc9283",
-     "a7cd36e21812c1e3eb215aec0c7c46e3b5886da84d40334e07896517ab387e92"
+     "76573b12b84ed1c28bf2c76781eb4740d06d522f3912bf3c5699e4c52bff3d6b",
+     "c97a18f9077b2d41584c7563d7b5db21be56f31561e387bd86a8bdf651866656",
+     "e4c006111e63364cd9fc6c027b29123521d26f713e72c058ba1695da7f515239",
+     "ae12d79b172facc42ebf6a36c4f3076ac3d55e0ae503d87a776a3a9bdd2906df",
+     "f135d5c6cfe52757ebd941ac850d2cb5076524d2c7dfbc4142e944ffbb3acd9e",
+     "e20b621a44bcca9850036335e5dcedbec2c0ce1c16eb6027c1f05a5a29a189c2",
+     "77c77177eb529619cc60f06c8f9fd95d1e0e69470e1e5f7d45f63cca3b6f8f36"
     ],
     "status": "done",
     "polish": {
-     "checked": 30,
-     "changed": 2,
+     "checked": 35,
+     "changed": 1,
      "refused": 0
     },
     "globalUnverified": []
@@ -2091,8 +2257,8 @@
  "responses": {
   "613f548bd3c746496fe681cd46fd59f2fe398b9443821c574115dcb0a2875e96": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Réservation en ligne pratique\",\"verbatim\":\"La réservation en ligne est très pratique.\",\"category\":\"positive\"},{\"ref\":\"C1\",\"label\":\"Rappels de retour appréciés\",\"verbatim\":\"J'aime aussi recevoir un rappel avant la date de retour.\",\"category\":\"positive\"},{\"ref\":\"C2\",\"label\":\"Lenteur au démarrage\",\"verbatim\":\"L'application est lente au démarrage, il faut parfois attendre dix secondes.\",\"category\":\"negative\"},{\"ref\":\"C3\",\"label\":\"Prolongation de prêt en un clic\",\"verbatim\":\"Il faudrait pouvoir prolonger un prêt en un seul clic.\",\"category\":\"suggestion\"}]}",
   "4d4ab7680bf8ac597662464bf6e5391ad96845ebdd1e38fb048bd9bd1d9a1543": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Catalogue clair\",\"verbatim\":\"Le catalogue est clair\",\"category\":\"positive\"},{\"ref\":\"C1\",\"label\":\"Recherche efficace\",\"verbatim\":\"la recherche fonctionne bien\",\"category\":\"positive\"},{\"ref\":\"C2\",\"label\":\"Historique des emprunts introuvable\",\"verbatim\":\"Je ne trouve pas comment voir l'historique de mes emprunts.\",\"category\":\"negative\"},{\"ref\":\"C3\",\"label\":\"Historique des emprunts\",\"verbatim\":\"Ajouter un historique des livres empruntés.\",\"category\":\"suggestion\"}]}",
-  "cf5324a1ded86bfc3fac2bf4754396b3d7985b5706709b873f32775fd2219660": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Accueil désengorgé\",\"verbatim\":\"Les usagers réservent davantage, ça désengorge l'accueil.\",\"category\":\"positive\"},{\"ref\":\"C2\",\"label\":\"Réservations sans délai de préparation\",\"verbatim\":\"Les réservations arrivent sans délai de préparation, c'est compliqué pour l'équipe.\",\"category\":\"negative\"},{\"ref\":\"C3\",\"label\":\"Délai minimum de retrait\",\"verbatim\":\"Prévoir un délai minimum avant le retrait d'une réservation.\",\"category\":\"suggestion\"}]}",
   "c28c9678704ab30ba2b6879877b809be9414052b04a72a3b9e21b4e9bb2bb901": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Rappels de retour utiles\",\"verbatim\":\"Les rappels de retour, vraiment utiles !\",\"category\":\"positive\"},{\"ref\":\"C2\",\"label\":\"Trop de notifications\",\"verbatim\":\"Trop de notifications, je reçois trois messages pour le même livre.\",\"category\":\"negative\"},{\"ref\":\"C3\",\"label\":\"Choix des notifications\",\"verbatim\":\"Laisser choisir quelles notifications on reçoit.\",\"category\":\"suggestion\"}]}",
+  "cf5324a1ded86bfc3fac2bf4754396b3d7985b5706709b873f32775fd2219660": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Accueil désengorgé\",\"verbatim\":\"Les usagers réservent davantage, ça désengorge l'accueil.\",\"category\":\"positive\"},{\"ref\":\"C2\",\"label\":\"Réservations sans délai de préparation\",\"verbatim\":\"Les réservations arrivent sans délai de préparation, c'est compliqué pour l'équipe.\",\"category\":\"negative\"},{\"ref\":\"C3\",\"label\":\"Délai minimum de retrait\",\"verbatim\":\"Prévoir un délai minimum avant le retrait d'une réservation.\",\"category\":\"suggestion\"}]}",
   "e0ebcf2b69c21cb5634933b7cac274177cebe51113090b0eeedfaea430782ac8": "{\"ideas\":[{\"ref\":\"C2\",\"label\":\"Lenteur de l'application\",\"verbatim\":\"L'application est lente, surtout sur mon vieux téléphone.\",\"category\":\"negative\"}]}",
   "f53293961a42ae20ef4e332dec6f439f846cdef6446e045ece7ae9c37ef24b13": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Carte numérique pratique\",\"verbatim\":\"La carte numérique : plus besoin de la carte plastique.\",\"category\":\"positive\"},{\"ref\":\"C2\",\"label\":\"Déconnexions fréquentes\",\"verbatim\":\"La connexion me déconnecte tout le temps, je dois retaper mon mot de passe.\",\"category\":\"negative\"},{\"ref\":\"C3\",\"label\":\"Rester connecté plus longtemps\",\"verbatim\":\"Rester connecté plus longtemps\",\"category\":\"suggestion\"},{\"ref\":\"C3\",\"label\":\"Connexion par code SMS\",\"verbatim\":\"se connecter avec un code reçu par SMS\",\"category\":\"suggestion\"}]}",
   "33b0b074b45315da479c0bfaf92f34e5b5281ae4d98e3ec13c68a58c13b1c715": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Section jeunesse appréciée\",\"verbatim\":\"Mes enfants adorent la section jeunesse, bien illustrée.\",\"category\":\"positive\"},{\"ref\":\"C2\",\"label\":\"Horaires non à jour\",\"verbatim\":\"Les horaires d'ouverture ne sont pas à jour dans l'application.\",\"category\":\"negative\"},{\"ref\":\"C3\",\"label\":\"Animations avec inscription en ligne\",\"verbatim\":\"Afficher les animations pour enfants, avec inscription en ligne.\",\"category\":\"suggestion\"}]}",
@@ -2101,12 +2267,12 @@
   "e31f1dc6b4f8672034340c36fe8a3f904007ef8bf2a76055050838d25f51a314": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Réservation depuis chez soi\",\"verbatim\":\"C'est pratique de réserver depuis chez soi.\",\"category\":\"positive\"},{\"ref\":\"C2\",\"label\":\"Lenteur de l'application\",\"verbatim\":\"Je trouve l'application lente\",\"category\":\"negative\"},{\"ref\":\"C2\",\"label\":\"Menus confus\",\"verbatim\":\"un peu confuse, les menus sont mal rangés\",\"category\":\"negative\"},{\"ref\":\"C3\",\"label\":\"Simplifier le menu principal\",\"verbatim\":\"Simplifier le menu principal.\",\"category\":\"suggestion\"}]}",
   "6d1246933519af06a86b926ff88809343f65784499642512c3aab138ea33afee": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Préférence pour la venue sur place\",\"verbatim\":\"Rien, je préfère venir sur place.\",\"category\":\"neutral\"},{\"ref\":\"C2\",\"label\":\"Application jugée inutile\",\"verbatim\":\"Je ne vois pas l'intérêt : tout se fait très bien au guichet.\",\"category\":\"negative\"}]}",
   "0be84afea9db36ecdaf2405c9430c5e498c8c8643ab5b9e647c9f457adf8a10d": "{\"ideas\":[{\"ref\":\"C1\",\"label\":\"Recommandations de lecture pertinentes\",\"verbatim\":\"Les recommandations de lecture sont souvent justes, j'ai découvert plusieurs auteurs.\",\"category\":\"positive\"},{\"ref\":\"C2\",\"label\":\"Design daté\",\"verbatim\":\"Le design est un peu daté, mais ce n'est pas grave.\",\"category\":\"negative\"},{\"ref\":\"C3\",\"label\":\"Notes et avis entre lecteurs\",\"verbatim\":\"Pouvoir noter les livres et partager des avis avec les autres lecteurs.\",\"category\":\"suggestion\"}]}",
-  "68fbc3644ab8a9365a4bd3409887d68b25fe8a322fc08db66a669121626641c6": "{\"groups\":[{\"title\":\"Réservation en ligne\",\"items\":[\"L1\",\"L29\"]},{\"title\":\"Délai de retrait des réservations\",\"items\":[\"L13\",\"L14\"]},{\"title\":\"Notifications de l'application\",\"items\":[\"L2\",\"L9\",\"L10\",\"L11\"]},{\"title\":\"Vitesse de l'application\",\"items\":[\"L3\",\"L15\"]},{\"title\":\"Prolongation des prêts\",\"items\":[\"L4\"]},{\"title\":\"Clarté du catalogue\",\"items\":[\"L5\"]},{\"title\":\"Recherche dans le catalogue\",\"items\":[\"L6\",\"L23\"]},{\"title\":\"Historique des emprunts\",\"items\":[\"L7\",\"L8\"]},{\"title\":\"Connexion au compte\",\"items\":[\"L17\",\"L18\",\"L19\"]},{\"title\":\"Carte numérique\",\"items\":[\"L16\"]},{\"title\":\"Navigation dans les menus\",\"items\":[\"L30\",\"L31\"]},{\"title\":\"Accessibilité\",\"items\":[\"L24\",\"L25\"]},{\"title\":\"Fréquentation de l'accueil\",\"items\":[\"L12\"]},{\"title\":\"Section jeunesse\",\"items\":[\"L20\"]},{\"title\":\"Horaires d'ouverture\",\"items\":[\"L21\"]},{\"title\":\"Animations de la médiathèque\",\"items\":[\"L22\"]},{\"title\":\"Outil statistique\",\"items\":[\"L26\"]},{\"title\":\"Communication sur l'application\",\"items\":[\"L27\",\"L28\"]},{\"title\":\"Utilité face à la venue sur place\",\"items\":[\"L32\",\"L33\"]},{\"title\":\"Recommandations de lecture\",\"items\":[\"L34\"]},{\"title\":\"Design visuel\",\"items\":[\"L35\"]},{\"title\":\"Avis entre lecteurs\",\"items\":[\"L36\"]}]}",
-  "825e22e8bd96caa54ad15cd20d1647420df13d6c2347afe5077826247fa03ceb": "{\"groups\":[\n{\"id\":\"G1\",\"summary\":\"Trois personnes jugent l'application lente. L'une décrit une attente d'une dizaine de secondes au démarrage [I0003]. Une autre précise que la lenteur se ressent surtout sur son vieux téléphone [I0015]. La troisième le constate simplement, sans détail [I0030].\"},\n{\"id\":\"G2\",\"summary\":\"Les rappels de retour plaisent : deux personnes en soulignent l'utilité [I0002, I0009]. Les notifications posent pourtant problème à l'une d'elles, qui reçoit trois messages pour un même livre [I0010]. Cette personne propose de laisser chacun choisir les notifications qu'il reçoit [I0011].\"},\n{\"id\":\"G3\",\"summary\":\"Deux personnes sont satisfaites de la recherche dans le catalogue. L'une trouve qu'elle fonctionne bien [I0006]. L'autre la juge rapide, avec des résultats pertinents [I0023]. Aucun avis contraire n'apparaît dans ce groupe.\"},\n{\"id\":\"G4\",\"summary\":\"Réserver en ligne convient à deux personnes. L'une trouve ce service très pratique [I0001]. L'autre apprécie de pouvoir réserver depuis chez elle [I0029].\"},\n{\"id\":\"G5\",\"summary\":\"Une personne se plaint d'être déconnectée sans cesse et de devoir retaper son mot de passe [I0017]. Elle souhaite rester connectée plus longtemps [I0018]. Elle suggère aussi une connexion par code reçu par SMS [I0019].\"},\n{\"id\":\"G6\",\"summary\":\"Une personne juge l'accessibilité faible pour les malvoyants, à cause de textes trop petits [I0024]. Elle suggère d'ajouter un mode gros caractères [I0025].\"},\n{\"id\":\"G7\",\"summary\":\"Une personne estime que les usagers ignorent l'existence de l'application, faute de communication [I0027]. Elle propose une campagne d'affichage dans la médiathèque [I0028].\"},\n{\"id\":\"G8\",\"summary\":\"Pour une personne, les réservations arrivent sans délai de préparation, ce qui complique le travail de l'équipe [I0013]. Elle suggère de fixer un délai minimum avant le retrait [I0014].\"},\n{\"id\":\"G9\",\"summary\":\"Une personne ne trouve pas où consulter l'historique de ses emprunts [I0007]. Elle demande qu'on ajoute un historique des livres empruntés [I0008].\"},\n{\"id\":\"G10\",\"summary\":\"Une personne trouve la navigation un peu confuse, avec des menus mal rangés [I0031]. Elle suggère de simplifier le menu principal [I0032].\"},\n{\"id\":\"G11\",\"summary\":\"Une personne ne voit pas l'intérêt de l'application : elle préfère venir sur place [I0033] et estime que tout se fait très bien au guichet [I0034]. C'est le seul avis de ce type dans le groupe.\"},\n{\"id\":\"G12\",\"summary\":\"Une personne voudrait voir apparaître dans l'application les animations pour enfants, avec une inscription en ligne [I0022].\"},\n{\"id\":\"G13\",\"summary\":\"Une personne souhaiterait pouvoir noter les livres et partager des avis avec les autres lecteurs [I0037].\"},\n{\"id\":\"G14\",\"summary\":\"Une personne apprécie la carte numérique, qui lui évite d'avoir à porter la carte plastique [I0016].\"},\n{\"id\":\"G15\",\"summary\":\"Une personne trouve le catalogue clair [I0005].\"},\n{\"id\":\"G16\",\"summary\":\"Une personne juge le design un peu daté, tout en précisant que ce n'est pas grave [I0036].\"},\n{\"id\":\"G17\",\"summary\":\"Une personne constate que les usagers réservent davantage et que l'accueil est moins engorgé [I0012].\"},\n{\"id\":\"G18\",\"summary\":\"Une personne signale que les horaires d'ouverture affichés dans l'application ne sont pas à jour [I0021].\"},\n{\"id\":\"G19\",\"summary\":\"Une personne trouve l'outil statistique utile pour voir ce qui est emprunté [I0026].\"},\n{\"id\":\"G20\",\"summary\":\"Une personne voudrait pouvoir prolonger un prêt en un seul clic [I0004].\"},\n{\"id\":\"G21\",\"summary\":\"Une personne juge les recommandations de lecture souvent justes et dit avoir découvert plusieurs auteurs grâce à elles [I0035].\"},\n{\"id\":\"G22\",\"summary\":\"Une personne rapporte que ses enfants adorent la section jeunesse, qu'elle trouve bien illustrée [I0020].\"}\n]}",
-  "54a5ef80140791c806190f52954195309cc1e9b574f60074b88bfe7791e1ee14": "{\"themes\":[\n{\"title\":\"Vitesse et accès au compte\",\"groups\":[\"G1\",\"G5\",\"G14\"],\"summary\":\"Trois personnes se plaignent de la lenteur de l'application, l'une d'elles sur un vieux téléphone [I0003, I0015, I0030]. Une personne se heurte à des déconnexions répétées et propose de rester connectée plus longtemps ou de se connecter par SMS [I0017, I0018, I0019]. À l'inverse, une personne apprécie la carte numérique, qui remplace la carte plastique [I0016].\"},\n{\"title\":\"Réservations et prêts\",\"groups\":[\"G4\",\"G8\",\"G9\",\"G20\"],\"summary\":\"Deux personnes trouvent la réservation en ligne pratique [I0001, I0029]. Côté équipe, une personne juge que les réservations arrivent sans délai de préparation et demande un délai minimum avant le retrait [I0013, I0014]. Deux autres personnes demandent de pouvoir prolonger un prêt en un clic [I0004] et de retrouver l'historique de leurs emprunts [I0007, I0008].\"},\n{\"title\":\"Recherche et catalogue\",\"groups\":[\"G3\",\"G15\"],\"summary\":\"Les avis sont favorables : deux personnes sont satisfaites de la recherche, jugée efficace, rapide et pertinente [I0006, I0023]. Une personne trouve en outre le catalogue clair [I0005]. Aucun avis contraire n'apparaît.\"},\n{\"title\":\"Lisibilité et ergonomie\",\"groups\":[\"G10\",\"G6\",\"G16\"],\"summary\":\"Trois personnes évoquent la facilité de lecture et d'usage de l'interface. L'une trouve les menus mal rangés et voudrait un menu principal plus simple [I0031, I0032]. Une autre juge l'accessibilité faible pour les malvoyants et propose un mode gros caractères [I0024, I0025]. Une troisième trouve le design daté, sans que cela la gêne vraiment [I0036].\"},\n{\"title\":\"Information et notifications\",\"groups\":[\"G2\",\"G7\",\"G18\",\"G12\"],\"summary\":\"Les rappels de retour sont jugés utiles par deux personnes [I0002, I0009], mais l'une d'elles reçoit trop de notifications et voudrait pouvoir les choisir [I0010, I0011]. Une personne estime que les usagers ne connaissent pas l'application et suggère un affichage dans la médiathèque [I0027, I0028]. Une autre signale des horaires périmés [I0021] et voudrait voir les animations pour enfants, avec inscription en ligne [I0022].\"},\n{\"title\":\"Offre de lecture et jeunesse\",\"groups\":[\"G21\",\"G13\",\"G22\"],\"summary\":\"Une personne trouve les recommandations de lecture souvent justes [I0035] et souhaiterait pouvoir noter les livres et partager des avis [I0037]. Une autre rapporte que ses enfants adorent la section jeunesse, bien illustrée [I0020].\"},\n{\"title\":\"Intérêt de l'application\",\"groups\":[\"G11\",\"G17\",\"G19\"],\"summary\":\"Une personne ne voit pas l'intérêt de l'application et préfère le guichet [I0033, I0034]. À l'inverse, une personne constate que les usagers réservent davantage, ce qui désengorge l'accueil [I0012], et une autre juge l'outil statistique utile pour suivre les emprunts [I0026].\"}\n]}",
-  "72e89254da3fd1b0f3f8b633b2bc23182bc11f3d52609bd11b4192297d5b1fe8": "{\"summary\":\"Douze personnes ont donné 37 idées, réparties en 7 sujets. Le point le plus net est négatif : trois des quatre personnes qui parlent de rapidité et de compte jugent l'application lente, et une autre se plaint de déconnexions répétées. La recherche et le catalogue font l'unanimité chez les deux personnes qui les évoquent, avec des avis favorables. Les avis se partagent sur les réservations et sur l'information : la réservation en ligne plaît à deux personnes, mais l'équipe voudrait un délai de préparation, et les rappels utiles côtoient des notifications jugées trop nombreuses. Trois personnes pointent des défauts de lisibilité : menus confus, accessibilité faible pour les malvoyants, design daté. Enfin, une personne ne voit aucun intérêt à l'application et préfère le guichet, alors qu'une autre constate que l'accueil est moins engorgé.\"}",
-  "43ca331e681f2f298b6a799b8c5033eb32e4564b673cd264dda088e3f0a73ac8": "{\"texts\":[\n{\"id\":\"G:G1\",\"text\":\"Trois personnes jugent l'application lente. L'une décrit une attente d'une dizaine de secondes au démarrage [I0003]. Une autre précise que la lenteur se ressent surtout sur son vieux téléphone [I0015]. La troisième le constate simplement, sans détail [I0030].\"},\n{\"id\":\"G:G2\",\"text\":\"Les rappels de retour plaisent : deux personnes en soulignent l'utilité [I0002, I0009]. Les notifications posent pourtant problème à l'une d'elles, qui reçoit trois messages pour un même livre [I0010]. Cette personne propose de laisser chacun choisir les notifications qu'il reçoit [I0011].\"},\n{\"id\":\"G:G3\",\"text\":\"Deux personnes sont satisfaites de la recherche dans le catalogue. L'une trouve qu'elle fonctionne bien [I0006]. L'autre la juge rapide, avec des résultats pertinents [I0023]. Aucun avis contraire n'apparaît.\"},\n{\"id\":\"G:G4\",\"text\":\"Réserver en ligne convient à deux personnes. L'une trouve ce service très pratique [I0001]. L'autre apprécie de pouvoir réserver depuis chez elle [I0029].\"},\n{\"id\":\"G:G5\",\"text\":\"Une personne se plaint d'être déconnectée sans cesse et de devoir retaper son mot de passe [I0017]. Elle souhaite rester connectée plus longtemps [I0018]. Elle suggère aussi une connexion par code reçu par SMS [I0019].\"},\n{\"id\":\"G:G6\",\"text\":\"Une personne juge l'accessibilité faible pour les malvoyants, à cause de textes trop petits [I0024]. Elle suggère d'ajouter un mode gros caractères [I0025].\"},\n{\"id\":\"G:G7\",\"text\":\"Une personne estime que les usagers ignorent l'existence de l'application, faute de communication [I0027]. Elle propose une campagne d'affichage dans la médiathèque [I0028].\"},\n{\"id\":\"G:G8\",\"text\":\"Pour une personne, les réservations arrivent sans délai de préparation, ce qui complique le travail de l'équipe [I0013]. Elle suggère de fixer un délai minimum avant le retrait [I0014].\"},\n{\"id\":\"G:G9\",\"text\":\"Une personne ne trouve pas où consulter l'historique de ses emprunts [I0007]. Elle demande qu'on ajoute un historique des livres empruntés [I0008].\"},\n{\"id\":\"G:G10\",\"text\":\"Une personne trouve la navigation un peu confuse, avec des menus mal rangés [I0031]. Elle suggère de simplifier le menu principal [I0032].\"},\n{\"id\":\"G:G11\",\"text\":\"Une personne ne voit pas l'intérêt de l'application : elle préfère venir sur place [I0033] et estime que tout se fait très bien au guichet [I0034].\"},\n{\"id\":\"G:G12\",\"text\":\"Une personne voudrait voir apparaître dans l'application les animations pour enfants, avec une inscription en ligne [I0022].\"}\n]}",
-  "1625918cd861ffca6841c27ead367524198414e4747ae2495e4bbc5298bc9283": "{\"texts\":[\n{\"id\":\"G:G13\",\"text\":\"Une personne souhaiterait pouvoir noter les livres et partager des avis avec les autres lecteurs [I0037].\"},\n{\"id\":\"G:G14\",\"text\":\"Une personne apprécie la carte numérique, qui lui évite d'avoir à porter la carte plastique [I0016].\"},\n{\"id\":\"G:G15\",\"text\":\"Une personne trouve le catalogue clair [I0005].\"},\n{\"id\":\"G:G16\",\"text\":\"Une personne juge le design un peu daté, tout en précisant que ce n'est pas grave [I0036].\"},\n{\"id\":\"G:G17\",\"text\":\"Une personne constate que les usagers réservent davantage et que l'accueil est moins engorgé [I0012].\"},\n{\"id\":\"G:G18\",\"text\":\"Une personne signale que les horaires d'ouverture affichés dans l'application ne sont pas à jour [I0021].\"},\n{\"id\":\"G:G19\",\"text\":\"Une personne trouve l'outil statistique utile pour voir ce qui est emprunté [I0026].\"},\n{\"id\":\"G:G20\",\"text\":\"Une personne voudrait pouvoir prolonger un prêt en un seul clic [I0004].\"},\n{\"id\":\"G:G21\",\"text\":\"Une personne juge les recommandations de lecture souvent justes et dit avoir découvert plusieurs auteurs grâce à elles [I0035].\"},\n{\"id\":\"G:G22\",\"text\":\"Une personne rapporte que ses enfants adorent la section jeunesse, qu'elle trouve bien illustrée [I0020].\"},\n{\"id\":\"T:T1\",\"text\":\"Les rappels de retour sont jugés utiles par deux personnes [I0002, I0009], mais l'une d'elles reçoit trop de notifications et voudrait pouvoir les choisir [I0010, I0011]. Une personne estime que les usagers ne connaissent pas l'application et suggère un affichage dans la médiathèque [I0027, I0028]. Une autre signale des horaires périmés [I0021] et voudrait voir les animations pour enfants, avec inscription en ligne [I0022].\"},\n{\"id\":\"T:T2\",\"text\":\"Trois personnes se plaignent de la lenteur de l'application, l'une d'elles sur un vieux téléphone [I0003, I0015, I0030]. Une personne se heurte à des déconnexions répétées et propose de rester connectée plus longtemps ou de se connecter par SMS [I0017, I0018, I0019]. À l'inverse, une personne apprécie la carte numérique, qui remplace la carte plastique [I0016].\"}\n]}",
-  "a7cd36e21812c1e3eb215aec0c7c46e3b5886da84d40334e07896517ab387e92": "{\"texts\":[\n{\"id\":\"T:T3\",\"text\":\"Deux personnes trouvent la réservation en ligne pratique [I0001, I0029]. Côté équipe, une personne juge que les réservations arrivent sans délai de préparation et demande un délai minimum avant le retrait [I0013, I0014]. Deux autres personnes demandent de pouvoir prolonger un prêt en un clic [I0004] et de retrouver l'historique de leurs emprunts [I0007, I0008].\"},\n{\"id\":\"T:T4\",\"text\":\"Trois personnes évoquent la facilité de lecture et d'usage de l'interface. L'une trouve les menus mal rangés et voudrait un menu principal plus simple [I0031, I0032]. Une autre juge l'accessibilité faible pour les malvoyants et propose un mode gros caractères [I0024, I0025]. Une troisième trouve le design daté, sans que cela la gêne vraiment [I0036].\"},\n{\"id\":\"T:T5\",\"text\":\"Une personne ne voit pas l'intérêt de l'application et préfère le guichet [I0033, I0034]. À l'inverse, une personne constate que les usagers réservent davantage, ce qui désengorge l'accueil [I0012], et une autre juge l'outil statistique utile pour suivre les emprunts [I0026].\"},\n{\"id\":\"T:T6\",\"text\":\"Les avis sont favorables : deux personnes sont satisfaites de la recherche, jugée efficace, rapide et pertinente [I0006, I0023]. Une personne trouve en outre le catalogue clair [I0005]. Aucun avis contraire n'apparaît.\"},\n{\"id\":\"T:T7\",\"text\":\"Une personne trouve les recommandations de lecture souvent justes [I0035] et souhaiterait pouvoir noter les livres et partager des avis [I0037]. Une autre rapporte que ses enfants adorent la section jeunesse, bien illustrée [I0020].\"},\n{\"id\":\"R\",\"text\":\"Douze personnes ont donné 37 idées, réparties en 7 sujets. Le point le plus net est négatif : trois des quatre personnes qui parlent de rapidité et de compte jugent l'application lente, et une autre se plaint de déconnexions répétées. La recherche et le catalogue font l'unanimité chez les deux personnes qui les évoquent, avec des avis favorables. Les avis se partagent sur les réservations et sur l'information : la réservation en ligne plaît à deux personnes, mais l'équipe voudrait un délai de préparation, et les rappels utiles côtoient des notifications jugées trop nombreuses. Trois personnes pointent des défauts de lisibilité : menus confus, accessibilité faible pour les malvoyants, design daté. Enfin, une personne ne voit aucun intérêt à l'application et préfère le guichet, alors qu'une autre constate que l'accueil est moins engorgé.\"}\n]}"
+  "76573b12b84ed1c28bf2c76781eb4740d06d522f3912bf3c5699e4c52bff3d6b": "{\"groups\":[{\"title\":\"Réservation en ligne\",\"items\":[\"L1\",\"L29\"]},{\"title\":\"Délai de retrait des réservations\",\"items\":[\"L13\",\"L14\"]},{\"title\":\"Rappels de retour\",\"items\":[\"L2\",\"L9\"]},{\"title\":\"Notifications\",\"items\":[\"L10\",\"L11\"]},{\"title\":\"Prolongation de prêt\",\"items\":[\"L4\"]},{\"title\":\"Vitesse de l'application\",\"items\":[\"L3\",\"L15\"]},{\"title\":\"Clarté du catalogue\",\"items\":[\"L5\"]},{\"title\":\"Recherche\",\"items\":[\"L6\",\"L23\"]},{\"title\":\"Historique des emprunts\",\"items\":[\"L7\",\"L8\"]},{\"title\":\"Affluence à l'accueil\",\"items\":[\"L12\"]},{\"title\":\"Carte numérique\",\"items\":[\"L16\"]},{\"title\":\"Durée de connexion\",\"items\":[\"L17\",\"L18\"]},{\"title\":\"Connexion par SMS\",\"items\":[\"L19\"]},{\"title\":\"Section jeunesse\",\"items\":[\"L20\"]},{\"title\":\"Horaires affichés\",\"items\":[\"L21\"]},{\"title\":\"Animations et inscriptions\",\"items\":[\"L22\"]},{\"title\":\"Accessibilité\",\"items\":[\"L24\",\"L25\"]},{\"title\":\"Outil statistique\",\"items\":[\"L26\"]},{\"title\":\"Communication sur l'application\",\"items\":[\"L27\",\"L28\"]},{\"title\":\"Menus de navigation\",\"items\":[\"L30\",\"L31\"]},{\"title\":\"Préférence pour la venue sur place\",\"items\":[\"L32\"]},{\"title\":\"Utilité de l'application\",\"items\":[\"L33\"]},{\"title\":\"Recommandations de lecture\",\"items\":[\"L34\"]},{\"title\":\"Design de l'application\",\"items\":[\"L35\"]},{\"title\":\"Avis entre lecteurs\",\"items\":[\"L36\"]}]}",
+  "c97a18f9077b2d41584c7563d7b5db21be56f31561e387bd86a8bdf651866656": "{\"groups\":[\n{\"id\":\"G1\",\"summary\":\"Trois personnes trouvent l'application lente. L'une attend parfois dix secondes au démarrage [I0003]. Une autre précise que c'est surtout vrai sur son vieux téléphone [I0015]. La troisième se contente de le constater [I0030].\"},\n{\"id\":\"G2\",\"summary\":\"Deux personnes apprécient les rappels envoyés avant la date de retour [I0002]. L'une les juge même vraiment utiles [I0009]. Aucun avis contraire n'apparaît ici.\"},\n{\"id\":\"G3\",\"summary\":\"Deux personnes sont satisfaites de la recherche. L'une dit qu'elle fonctionne bien [I0006]. L'autre la trouve rapide, avec des résultats pertinents [I0023].\"},\n{\"id\":\"G4\",\"summary\":\"Deux personnes jugent la réservation en ligne pratique [I0001]. L'une apprécie surtout de pouvoir réserver depuis chez elle [I0029].\"},\n{\"id\":\"G5\",\"summary\":\"Une personne juge l'accessibilité faible pour les malvoyants, car les textes sont trop petits [I0024]. Elle propose un mode gros caractères [I0025].\"},\n{\"id\":\"G6\",\"summary\":\"Une personne estime que les usagers ignorent l'existence de l'application, faute de communication [I0027]. Elle suggère une campagne d'affichage dans la médiathèque [I0028].\"},\n{\"id\":\"G7\",\"summary\":\"Une personne de l'équipe trouve compliqué que des réservations arrivent sans délai de préparation [I0013]. Elle propose d'imposer un délai minimum avant le retrait [I0014].\"},\n{\"id\":\"G8\",\"summary\":\"Une personne se plaint d'être déconnectée tout le temps et de devoir retaper son mot de passe [I0017]. Elle souhaite rester connectée plus longtemps [I0018].\"},\n{\"id\":\"G9\",\"summary\":\"Une personne ne trouve pas comment consulter l'historique de ses emprunts [I0007]. Elle suggère d'ajouter un historique des livres empruntés [I0008].\"},\n{\"id\":\"G10\",\"summary\":\"Une personne trouve l'application un peu confuse, avec des menus mal rangés [I0031]. Elle propose de simplifier le menu principal [I0032].\"},\n{\"id\":\"G11\",\"summary\":\"Une personne reçoit trop de notifications, jusqu'à trois messages pour le même livre [I0010]. Elle voudrait pouvoir choisir celles qu'elle reçoit [I0011].\"},\n{\"id\":\"G12\",\"summary\":\"Une personne de l'équipe observe que les usagers réservent davantage et que cela désengorge l'accueil [I0012].\"},\n{\"id\":\"G13\",\"summary\":\"Une personne voudrait voir les animations pour enfants affichées, avec une inscription en ligne [I0022].\"},\n{\"id\":\"G14\",\"summary\":\"Une personne aimerait pouvoir noter les livres et partager des avis avec les autres lecteurs [I0037].\"},\n{\"id\":\"G15\",\"summary\":\"Une personne apprécie la carte numérique, qui lui évite d'avoir la carte plastique sur elle [I0016].\"},\n{\"id\":\"G16\",\"summary\":\"Une personne trouve le catalogue clair [I0005].\"},\n{\"id\":\"G17\",\"summary\":\"Une personne voudrait se connecter avec un code reçu par SMS [I0019].\"},\n{\"id\":\"G18\",\"summary\":\"Une personne trouve le design un peu daté, tout en jugeant que ce n'est pas grave [I0036].\"},\n{\"id\":\"G19\",\"summary\":\"Une personne signale que les horaires d'ouverture ne sont pas à jour dans l'application [I0021].\"},\n{\"id\":\"G20\",\"summary\":\"Une personne de l'équipe estime que l'outil statistique aide à voir ce qui est emprunté [I0026].\"},\n{\"id\":\"G21\",\"summary\":\"Une personne n'attend rien de l'application et préfère venir sur place [I0033].\"},\n{\"id\":\"G22\",\"summary\":\"Une personne voudrait pouvoir prolonger un prêt en un seul clic [I0004].\"},\n{\"id\":\"G23\",\"summary\":\"Une personne juge les recommandations de lecture souvent justes et dit avoir découvert plusieurs auteurs grâce à elles [I0035].\"},\n{\"id\":\"G24\",\"summary\":\"Une personne dit que ses enfants adorent la section jeunesse, qu'elle trouve bien illustrée [I0020].\"},\n{\"id\":\"G25\",\"summary\":\"Une personne ne voit pas l'intérêt de l'application, car tout se fait très bien au guichet selon elle [I0034].\"}\n]}",
+  "e4c006111e63364cd9fc6c027b29123521d26f713e72c058ba1695da7f515239": "{\"themes\":[\n{\"title\":\"Rapidité et confort d'usage\",\"groups\":[\"G1\",\"G10\",\"G18\"],\"summary\":\"Quatre personnes évoquent le confort d'usage de l'application. Trois la trouvent lente : l'une attend parfois dix secondes au démarrage [I0003], une autre cite son vieux téléphone [I0015], la troisième le constate simplement [I0030]. Une personne juge aussi les menus mal rangés et voudrait un menu principal plus simple [I0031, I0032]. Une dernière trouve le design un peu daté, sans que cela la gêne [I0036].\"},\n{\"title\":\"Réservations et suivi des prêts\",\"groups\":[\"G4\",\"G7\",\"G12\",\"G22\",\"G9\"],\"summary\":\"Quatre personnes parlent de la réservation et des prêts. Deux jugent la réservation en ligne pratique [I0001, I0029], et une personne de l'équipe constate que les usagers réservent davantage, ce qui désengorge l'accueil [I0012]. Cette dernière regrette pourtant que des réservations arrivent sans délai de préparation et propose un délai minimum avant le retrait [I0013, I0014]. Côté prêts, deux personnes formulent un souhait : l'une voudrait prolonger un prêt en un clic [I0004], l'autre ne trouve pas son historique d'emprunts et suggère d'en ajouter un [I0007, I0008].\"},\n{\"title\":\"Rappels et notifications\",\"groups\":[\"G2\",\"G11\"],\"summary\":\"Deux personnes parlent des messages envoyés par l'application. L'une apprécie les rappels avant la date de retour, l'autre les juge vraiment utiles [I0002, I0009]. Cette dernière reçoit toutefois trop de notifications, jusqu'à trois messages pour le même livre, et voudrait choisir celles qu'elle reçoit [I0010, I0011].\"},\n{\"title\":\"Connexion et carte numérique\",\"groups\":[\"G8\",\"G15\",\"G17\"],\"summary\":\"Une personne aborde l'accès à son compte. Elle se plaint d'être déconnectée tout le temps et de devoir retaper son mot de passe [I0017]. Elle souhaite rester connectée plus longtemps ou se connecter avec un code reçu par SMS [I0018, I0019]. Elle apprécie en revanche la carte numérique, qui lui évite la carte plastique [I0016].\"},\n{\"title\":\"Recherche, catalogue et lectures\",\"groups\":[\"G3\",\"G16\",\"G23\",\"G14\"],\"summary\":\"Trois personnes parlent de la recherche de livres. Deux sont satisfaites de la recherche, jugée efficace, rapide et pertinente [I0006, I0023], et l'une d'elles trouve aussi le catalogue clair [I0005]. Une troisième estime que les recommandations de lecture sont souvent justes [I0035] et aimerait pouvoir noter les livres et partager des avis avec les autres lecteurs [I0037].\"},\n{\"title\":\"Accessibilité\",\"groups\":[\"G5\"],\"summary\":\"Une personne juge l'accessibilité faible pour les malvoyants, car les textes sont trop petits [I0024]. Elle propose un mode gros caractères [I0025].\"},\n{\"title\":\"Horaires, animations et section jeunesse\",\"groups\":[\"G19\",\"G13\",\"G24\"],\"summary\":\"Une personne, parent de jeunes enfants, parle des informations pratiques de la médiathèque. Ses enfants adorent la section jeunesse, bien illustrée [I0020]. Elle voudrait voir les animations pour enfants affichées, avec inscription en ligne [I0022], et signale que les horaires d'ouverture ne sont pas à jour [I0021].\"},\n{\"title\":\"Connaissance et utilité de l'application\",\"groups\":[\"G6\",\"G21\",\"G25\"],\"summary\":\"Deux personnes s'interrogent sur la place de l'application. L'une, de l'équipe, estime que les usagers ignorent son existence faute de communication et suggère une campagne d'affichage dans la médiathèque [I0027, I0028]. L'autre n'en voit pas l'intérêt, car tout se fait très bien au guichet, et préfère venir sur place [I0034, I0033].\"},\n{\"title\":\"Suivi statistique\",\"groups\":[\"G20\"],\"summary\":\"Une personne de l'équipe estime que l'outil statistique aide à voir ce qui est emprunté [I0026].\"}\n]}",
+  "ae12d79b172facc42ebf6a36c4f3076ac3d55e0ae503d87a776a3a9bdd2906df": "{\"summary\":\"Les 12 participants ont livré 37 idées, regroupées en 25 sujets et 9 thèmes. Dans 21 de ces sujets, une seule personne s'exprime : les constats restent donc des avis isolés, sans tendance établie. Le point le plus partagé est la lenteur de l'application, que trois personnes signalent. Les autres éloges portent sur la réservation en ligne (deux personnes), la recherche (deux personnes) et les rappels de retour (deux personnes). Aucun sujet ne fait l'objet d'avis contraires. Les blocages décrits touchent l'accès au compte (déconnexions répétées), les menus, l'accessibilité pour les malvoyants et la faible connaissance de l'application, tandis qu'une personne n'en voit pas l'utilité face au guichet.\"}",
+  "f135d5c6cfe52757ebd941ac850d2cb5076524d2c7dfbc4142e944ffbb3acd9e": "{\"texts\":[\n{\"id\":\"G:G1\",\"text\":\"Trois personnes trouvent l'application lente. L'une attend parfois dix secondes au démarrage [I0003]. Une autre précise que c'est surtout vrai sur son vieux téléphone [I0015]. La troisième se contente de le constater [I0030].\"},\n{\"id\":\"G:G2\",\"text\":\"Deux personnes apprécient les rappels envoyés avant la date de retour [I0002]. L'une les juge même vraiment utiles [I0009]. Aucun avis contraire n'apparaît ici.\"},\n{\"id\":\"G:G3\",\"text\":\"Deux personnes sont satisfaites de la recherche. L'une dit qu'elle fonctionne bien [I0006]. L'autre la trouve rapide, avec des résultats pertinents [I0023].\"},\n{\"id\":\"G:G4\",\"text\":\"Deux personnes jugent la réservation en ligne pratique [I0001]. L'une apprécie surtout de pouvoir réserver depuis chez elle [I0029].\"},\n{\"id\":\"G:G5\",\"text\":\"Une personne juge l'accessibilité faible pour les malvoyants, car les textes sont trop petits [I0024]. Elle propose un mode gros caractères [I0025].\"},\n{\"id\":\"G:G6\",\"text\":\"Une personne estime que les usagers ignorent l'existence de l'application, faute de communication [I0027]. Elle suggère une campagne d'affichage dans la médiathèque [I0028].\"},\n{\"id\":\"G:G7\",\"text\":\"Une personne de l'équipe trouve compliqué que des réservations arrivent sans délai de préparation [I0013]. Elle propose d'imposer un délai minimum avant le retrait [I0014].\"},\n{\"id\":\"G:G8\",\"text\":\"Une personne se plaint d'être déconnectée tout le temps et de devoir retaper son mot de passe [I0017]. Elle souhaite rester connectée plus longtemps [I0018].\"},\n{\"id\":\"G:G9\",\"text\":\"Une personne ne trouve pas comment consulter l'historique de ses emprunts [I0007]. Elle suggère d'ajouter un historique des livres empruntés [I0008].\"},\n{\"id\":\"G:G10\",\"text\":\"Une personne trouve l'application un peu confuse, avec des menus mal rangés [I0031]. Elle propose de simplifier le menu principal [I0032].\"},\n{\"id\":\"G:G11\",\"text\":\"Une personne reçoit trop de notifications, jusqu'à trois messages pour le même livre [I0010]. Elle voudrait pouvoir choisir celles qu'elle reçoit [I0011].\"},\n{\"id\":\"G:G12\",\"text\":\"Une personne de l'équipe observe que les usagers réservent davantage et que cela désengorge l'accueil [I0012].\"}\n]}",
+  "e20b621a44bcca9850036335e5dcedbec2c0ce1c16eb6027c1f05a5a29a189c2": "{\"texts\":[\n{\"id\":\"G:G13\",\"text\":\"Une personne voudrait voir les animations pour enfants affichées, avec une inscription en ligne [I0022].\"},\n{\"id\":\"G:G14\",\"text\":\"Une personne aimerait pouvoir noter les livres et partager des avis avec les autres lecteurs [I0037].\"},\n{\"id\":\"G:G15\",\"text\":\"Une personne apprécie la carte numérique, qui lui évite d'avoir la carte plastique sur elle [I0016].\"},\n{\"id\":\"G:G16\",\"text\":\"Une personne trouve le catalogue clair [I0005].\"},\n{\"id\":\"G:G17\",\"text\":\"Une personne voudrait se connecter avec un code reçu par SMS [I0019].\"},\n{\"id\":\"G:G18\",\"text\":\"Une personne trouve le design un peu daté, tout en jugeant que ce n'est pas grave [I0036].\"},\n{\"id\":\"G:G19\",\"text\":\"Une personne signale que les horaires d'ouverture ne sont pas à jour dans l'application [I0021].\"},\n{\"id\":\"G:G20\",\"text\":\"Une personne de l'équipe estime que l'outil statistique aide à voir ce qui est emprunté [I0026].\"},\n{\"id\":\"G:G21\",\"text\":\"Une personne n'attend rien de l'application et préfère venir sur place [I0033].\"},\n{\"id\":\"G:G22\",\"text\":\"Une personne voudrait pouvoir prolonger un prêt en un seul clic [I0004].\"},\n{\"id\":\"G:G23\",\"text\":\"Une personne juge les recommandations de lecture souvent justes et dit avoir découvert plusieurs auteurs grâce à elles [I0035].\"},\n{\"id\":\"G:G24\",\"text\":\"Une personne dit que ses enfants adorent la section jeunesse, qu'elle trouve bien illustrée [I0020].\"}\n]}",
+  "77c77177eb529619cc60f06c8f9fd95d1e0e69470e1e5f7d45f63cca3b6f8f36": "{\"texts\":[\n{\"id\":\"G:G25\",\"text\":\"Une personne ne voit pas l'intérêt de l'application, car tout se fait très bien au guichet selon elle [I0034].\"},\n{\"id\":\"T:T1\",\"text\":\"Quatre personnes parlent de la réservation et des prêts. Deux jugent la réservation en ligne pratique [I0001, I0029], et une personne de l'équipe constate que les usagers réservent davantage, ce qui désengorge l'accueil [I0012]. Cette dernière regrette pourtant que des réservations arrivent sans délai de préparation et propose un délai minimum avant le retrait [I0013, I0014]. Côté prêts, deux personnes formulent un souhait : l'une voudrait prolonger un prêt en un clic [I0004], l'autre ne trouve pas son historique d'emprunts et suggère d'en ajouter un [I0007, I0008].\"},\n{\"id\":\"T:T2\",\"text\":\"Quatre personnes évoquent le confort d'usage de l'application. Trois la trouvent lente : l'une attend parfois dix secondes au démarrage [I0003], une autre cite son vieux téléphone [I0015], la troisième le constate simplement [I0030]. Une personne juge aussi les menus mal rangés et voudrait un menu principal plus simple [I0031, I0032]. Une dernière trouve le design un peu daté, sans que cela la gêne [I0036].\"},\n{\"id\":\"T:T3\",\"text\":\"Trois personnes parlent de la recherche de livres. Deux sont satisfaites de la recherche, jugée efficace, rapide et pertinente [I0006, I0023], et l'une d'elles trouve aussi le catalogue clair [I0005]. Une troisième estime que les recommandations de lecture sont souvent justes [I0035] et aimerait pouvoir noter les livres et partager des avis avec les autres lecteurs [I0037].\"},\n{\"id\":\"T:T4\",\"text\":\"Deux personnes parlent des messages envoyés par l'application. L'une apprécie les rappels avant la date de retour, l'autre les juge vraiment utiles [I0002, I0009]. Cette dernière reçoit toutefois trop de notifications, jusqu'à trois messages pour le même livre, et voudrait choisir celles qu'elle reçoit [I0010, I0011].\"},\n{\"id\":\"T:T5\",\"text\":\"Deux personnes s'interrogent sur la place de l'application. L'une, de l'équipe, estime que les usagers ignorent son existence faute de communication et suggère une campagne d'affichage dans la médiathèque [I0027, I0028]. L'autre n'en voit pas l'intérêt, car tout se fait très bien au guichet, et préfère venir sur place [I0034, I0033].\"},\n{\"id\":\"T:T6\",\"text\":\"Une personne aborde l'accès à son compte. Elle se plaint d'être déconnectée tout le temps et de devoir retaper son mot de passe [I0017]. Elle souhaite rester connectée plus longtemps ou se connecter avec un code reçu par SMS [I0018, I0019]. Elle apprécie en revanche la carte numérique, qui lui évite la carte plastique [I0016].\"},\n{\"id\":\"T:T7\",\"text\":\"Une personne, parent de jeunes enfants, parle des informations pratiques de la médiathèque. Ses enfants adorent la section jeunesse, bien illustrée [I0020]. Elle voudrait voir les animations pour enfants affichées, avec inscription en ligne [I0022], et signale que les horaires d'ouverture ne sont pas à jour [I0021].\"},\n{\"id\":\"T:T8\",\"text\":\"Une personne juge l'accessibilité faible pour les malvoyants, car les textes sont trop petits [I0024]. Elle propose un mode gros caractères [I0025].\"},\n{\"id\":\"T:T9\",\"text\":\"Une personne de l'équipe estime que l'outil statistique aide à voir ce qui est emprunté [I0026].\"},\n{\"id\":\"R\",\"text\":\"Les 12 participants ont livré 37 idées, regroupées en 25 sujets et 9 thèmes. Dans 21 de ces sujets, une seule personne s'exprime : les constats restent donc des avis isolés, sans tendance établie. Le point le plus partagé est la lenteur de l'application, que trois personnes signalent. Côté éloges, deux personnes apprécient la réservation en ligne, deux la recherche et deux les rappels de retour. Aucun sujet ne ressort avec des avis contraires. Des participants décrivent aussi des blocages : déconnexions répétées, menus, accessibilité pour les malvoyants, faible connaissance de l'application. Une personne, elle, n'en voit pas l'utilité face au guichet.\"}\n]}"
  }
 }

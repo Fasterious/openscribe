@@ -169,9 +169,9 @@ export function groupingPrompt(input: GroupingInput, settings: AnalysisSettings,
   const rules = input.grid?.length
     ? `2. Utilise UNIQUEMENT ces titres de groupe, tels quels : ${input.grid.map((g) => `« ${g} »`).join(', ')}, plus « Hors grille » pour ce qui n'entre dans aucun.
 3. Dans un groupe, mêle les avis positifs et négatifs : c'est ce qui permet de voir les désaccords.`
-    : `2. Un groupe = UN seul sujet précis. Toutes ses idées parlent de la même chose : lues côte à côte, leurs citations montrent le même motif. Ne fusionne pas deux sujets voisins (par exemple la lenteur et la clarté des menus, ou la réservation et l'historique des prêts) : ils seront rapprochés plus tard, à l'étape des thèmes.
-3. Dans un groupe, mêle les avis positifs et négatifs sur ce même sujet : c'est ce qui permet de voir les désaccords.
-4. Vise entre ${target.min} et ${target.max} groupes : mieux vaut un groupe de plus qu'un groupe qui mélange deux sujets. Une idée isolée peut former un groupe à elle seule.
+    : `2. Un groupe = UN seul motif : toutes ses idées parlent du même objet précis. Juge-le sur les libellés : lus côte à côte, ils doivent décrire la même chose. Ne fusionne pas deux sujets voisins (par exemple la lenteur et la clarté des menus, ou la réservation et l'historique des prêts) : ils seront rapprochés plus tard, à l'étape des thèmes.
+3. À l'inverse, ne sépare pas un même motif. Vont dans le même groupe : des libellés formulés différemment ; des avis de tons opposés sur le même objet (« Rappels de retour utiles » / « Trop de rappels ») ; un problème et la solution proposée pour ce problème (« Déconnexions fréquentes » / « Rester connecté plus longtemps »). C'est ce qui fait apparaître les désaccords.
+4. Une idée sans équivalent forme un groupe à elle seule : ne la range pas dans un groupe voisin pour l'y faire entrer. Le nombre de groupes découle des données ; à titre indicatif, on en attend entre ${target.min} et ${target.max}. Ne découpe ni ne fusionne pour atteindre ce nombre.
 5. Donne à chaque groupe un titre court (2 à 6 mots) qui nomme ce sujet précis, pas le jugement (« Vitesse de l'application », pas « Application trop lente »). Un titre qui a besoin de « et » pour relier deux sujets signale deux groupes.`
   return {
     task: 'group',
@@ -204,7 +204,7 @@ export function assignPrompt(input: AssignInput, settings: AnalysisSettings) {
   return {
     task: 'assign',
     system: SYSTEM,
-    user: `${context(settings)}Range chaque idée dans le groupe existant qui parle exactement du même sujet.${input.allowNew ? " Si aucun ne traite ce sujet précis, crée un nouveau groupe avec un titre court (2 à 6 mots) plutôt que de la ranger dans un groupe voisin." : ' Si aucun ne convient, utilise « Hors grille ».'}
+    user: `${context(settings)}Range chaque idée dans le groupe existant qui traite le même motif : même objet, quel que soit le ton ; un problème et la solution proposée pour ce problème vont ensemble.${input.allowNew ? " Si aucun ne traite ce sujet précis, crée un nouveau groupe avec un titre court (2 à 6 mots) plutôt que de la ranger dans un groupe voisin." : ' Si aucun ne convient, utilise « Hors grille ».'}
 Chaque identifiant doit recevoir exactement un groupe. Recopie les titres existants à l'identique.
 ${lang(settings)}
 
@@ -254,7 +254,7 @@ ${dataBlock(input)}`,
 // ─── Étape 4 : thèmes (regroupement des groupes) ─────────────────────────────
 
 export interface ThemeInput {
-  groups: { id: string; title: string; participants: number; summary: string }[]
+  groups: { id: string; title: string; people: string[]; summary: string }[]
 }
 
 export const themeSchema = z.object({
@@ -265,12 +265,12 @@ export function themePrompt(input: ThemeInput, settings: AnalysisSettings, targe
   return {
     task: 'themes',
     system: SYSTEM,
-    user: `${context(settings)}Tu reçois des groupes d'idées, chacun avec sa synthèse. Rassemble-les en ${target.min} à ${target.max} grands thèmes.
+    user: `${context(settings)}Tu reçois des groupes d'idées, chacun avec sa synthèse et les personnes qui s'y expriment. Rassemble-les en ${target.min} à ${target.max} grands thèmes.
 
 Règles :
 1. Chaque groupe (G1, G2…) appartient à EXACTEMENT un thème.
-2. Un thème rapproche des groupes aux sujets voisins (par exemple la réservation, la prolongation et l'historique des prêts). Titre court (2 à 6 mots), qui décrit ce qu'ils ont en commun.
-3. Pour chaque thème, une synthèse de 2 à 4 phrases construite à partir des synthèses de ses groupes, sans rien ajouter. Elle croise les groupes (ce qui les relie, ce qui les oppose) : ne recopie pas la première phrase de l'un d'eux, le lecteur la lira juste après. Garde les crochets [I…] qui s'y trouvent, n'en invente pas.
+2. Un thème rapproche des groupes dont les sujets sont voisins : ils concernent la même partie du service ou la même expérience (par exemple la réservation, la prolongation et l'historique des prêts). Ne réunis pas des groupes parce qu'ils sont petits ou de même ton. Un groupe qui n'a pas de voisin peut former un thème à lui seul. Si le titre a besoin de « et » pour relier deux sujets sans rapport, fais deux thèmes. Titre court (2 à 6 mots) qui nomme ce que les groupes ont en commun.
+3. Pour chaque thème, une synthèse de 2 à 4 phrases construite à partir des synthèses de ses groupes, sans rien ajouter. Elle dit ce qui relie les groupes ; n'oppose deux groupes (« à l'inverse », « en revanche ») que s'ils jugent le même objet de façon contraire. Une même personne peut figurer dans plusieurs groupes (champ "people") : ne la compte pas deux fois et n'écris « une autre personne » que si elle est différente. Ne recopie pas la première phrase d'un groupe. Garde les crochets [I…] qui s'y trouvent, n'en invente pas.
 ${lang(settings)}
 ${STYLE[settings.language]}
 
@@ -294,7 +294,7 @@ export function globalPrompt(input: GlobalInput, settings: AnalysisSettings) {
   return {
     task: 'global',
     system: SYSTEM,
-    user: `${context(settings)}Rédige un résumé exécutif de 4 à 6 phrases à partir des synthèses ci-dessous. Fais ressortir ce qui fait consensus, ce qui divise et les points de blocage principaux. Reprends les chiffres fournis sans en calculer d'autres. N'ajoute rien qui ne figure pas dans les synthèses. Résume-les, ne recopie pas leurs phrases : le lecteur les lira ensuite.
+    user: `${context(settings)}Rédige un résumé exécutif de 4 à 6 phrases à partir des synthèses ci-dessous. Fais ressortir ce qui fait consensus, ce qui divise et les points de blocage principaux. Reprends les chiffres fournis sans en calculer d'autres. Prudence : quand un sujet ne repose que sur une ou deux personnes, dis-le ainsi (« une personne », « deux personnes »), sans parler d'unanimité, de majorité ni de tendance. N'écris « avis partagés » que si des personnes jugent le même objet de façon contraire : des sujets différents jugés différemment ne forment pas un désaccord. Si la plupart des sujets ne sont portés que par une personne, signale-le en une phrase. N'ajoute rien qui ne figure pas dans les synthèses. Résume-les, ne recopie pas leurs phrases : le lecteur les lira ensuite.
 ${lang(settings)}
 ${STYLE[settings.language]}
 

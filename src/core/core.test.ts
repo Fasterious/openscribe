@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { computeMetrics } from './analysis/metrics'
 import { allowedNumbers, unverifiedNumbers } from './analysis/numbers'
-import { acceptRewrite, describeMetrics, groupTarget, newAnalysis, runAnalysis, sanitizeCitations } from './analysis/pipeline'
+import { acceptRewrite, describeMetrics, describeTheme, groupTarget, newAnalysis, runAnalysis, sanitizeCitations } from './analysis/pipeline'
 import { reportToHtml, reportToMarkdown } from './analysis/report'
 import { MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Idea } from './analysis/types'
@@ -98,14 +98,23 @@ describe('vérification des citations', () => {
 })
 
 describe('regroupement', () => {
-  it('vise des groupes fins (un sujet par groupe), y compris sur un petit corpus', () => {
-    // 37 idées : l'ancienne cible (2 à 6 groupes) forçait le mélange de sujets.
-    expect(groupTarget(37).min).toBeGreaterThanOrEqual(7)
-    expect(groupTarget(37).max).toBeGreaterThanOrEqual(14)
-    expect(groupTarget(5)).toEqual({ min: 3, max: 6 })
-    const big = groupTarget(300)
-    expect(big.min).toBe(60)
-    expect(big.max).toBe(120)
+  it('vise des groupes fins, sans émietter les gros corpus', () => {
+    // 36 libellés : l'ancienne cible (2 à 6 groupes) forçait le mélange de sujets.
+    expect(groupTarget(36)).toEqual({ min: 6, max: 18 })
+    expect(groupTarget(5)).toEqual({ min: 3, max: 7 })
+    // Le nombre de groupes croît moins vite que les idées (saturation des motifs).
+    expect(groupTarget(300)).toEqual({ min: 17, max: 52 })
+  })
+
+  it("ne calcule ni consensus ni désaccord sur un thème, qui réunit des objets différents", () => {
+    const a = computeMetrics(['P1', 'P2'].map((p, k) => idea(`I000${k}`, p, 'positive')))
+    const b = computeMetrics(['P3', 'P4', 'P5'].map((p, k) => idea(`I001${k}`, p, 'negative')))
+    const theme = computeMetrics(
+      [...['P1', 'P2'].map((p, k) => idea(`I000${k}`, p, 'positive')), ...['P3', 'P4', 'P5'].map((p, k) => idea(`I001${k}`, p, 'negative'))],
+    )
+    const text = describeTheme({ metrics: theme }, [{ metrics: a }, { metrics: b }])
+    expect(text).not.toMatch(/consensus|partagés|peu d'avis/)
+    expect(text).toContain('2 sujets')
   })
 })
 
@@ -157,7 +166,7 @@ describe('chiffres en toutes lettres', () => {
   it('accorde, omet les zéros, et ne met de pourcentage qu’à partir de dix participants', () => {
     const ideas = ['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I000${k}`, p, k < 4 ? 'positive' : 'negative'))
     const text = describeMetrics(computeMetrics(ideas))
-    expect(text).toBe('5 participants (5 idées) ; avis : 4 positifs, 1 négatif ; consensus positif : 4 sur 5')
+    expect(text).toBe('5 participants (5 occurrences) ; avis : 4 positifs, 1 négatif ; consensus positif : 4 sur 5')
     expect(text).not.toMatch(/\(s\)|: 0|%/)
   })
 })

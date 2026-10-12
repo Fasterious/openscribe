@@ -8,12 +8,12 @@ Vous importez les réponses ouvertes de vos participants (questionnaire, transcr
 
 ## Ce qui le rend différent
 
-- **L'IA lit et rédige, OpenScribe vérifie.** Chaque citation est retrouvée mot pour mot dans les réponses, sinon elle est écartée et vous voyez laquelle. Chaque idée est rangée une seule fois. Tous les chiffres sont calculés par le programme, jamais par l'IA. Un nombre cité dans une synthèse qui ne correspond à rien est signalé « À vérifier ».
+- **L'IA lit et rédige, OpenScribe vérifie.** Chaque verbatim cité est retrouvé mot pour mot dans les réponses, sinon il est écarté et vous voyez lequel. Chaque idée est rangée une seule fois. Tous les chiffres sont calculés par le programme, jamais par l'IA. Un nombre cité dans une synthèse qui ne correspond à rien est signalé « À vérifier ».
 - **Des participants, pas seulement des occurrences.** Huit critiques du même participant comptent pour un participant. Les avis partagés et les minorités constantes sont mis en évidence, pas noyés dans une moyenne.
 - **Reproductible.** La même analyse, relancée sur les mêmes données avec les mêmes réglages, donne le même rapport, mot pour mot.
 - **Vos données restent chez vous.** Pas de serveur ni de compte : tout reste dans votre navigateur. Seuls des pseudonymes (P1, P2…) et le texte des réponses partent vers le moteur d'IA que vous choisissez.
 - **Votre moteur, votre clé.** Mistral, Groq, Gemini, OpenRouter, ou Ollama sur votre propre ordinateur. Plusieurs fournisseurs ont une offre gratuite. Vous ne payez que ce que vous consommez chez eux.
-- **Des rapports qui se lisent bien.** Une étape de relecture rend les synthèses fluides et naturelles. Le programme refuse toute réécriture qui toucherait à une citation ou à un chiffre.
+- **Des rapports qui se lisent bien.** Une étape de relecture rend les synthèses fluides et naturelles. Le programme refuse toute réécriture qui toucherait à un verbatim ou à un chiffre.
 
 ## Essayer
 
@@ -46,8 +46,8 @@ Puis ouvrez l'adresse affichée (en général http://localhost:5173).
 
 | Module | État |
 |---|---|
-| **Synthèse** : questionnaires et transcriptions → idées, sujets, rapport vérifiable | Disponible |
-| **Observation** : transcription d'entretiens, vidéo synchronisée avec le texte, étiquetage | Bientôt |
+| **Synthèse** : questionnaires et transcriptions → idées, motifs, thèmes, rapport vérifiable | Disponible |
+| **Entretiens et tests** : transcription d'entretiens, vidéo synchronisée avec le texte, étiquetage | Bientôt |
 | **Personas** : profils construits à partir des données | Bientôt |
 | **Atelier en direct**, **tests à distance** | Plus tard |
 

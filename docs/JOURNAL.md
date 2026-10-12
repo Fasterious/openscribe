@@ -2,6 +2,17 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-12 — Retour d'Arnaud (test pensé à voix haute) : accueil, moteurs, méthode
+
+- **Accueil = page produit, puis reprise du travail.** Sans compte, c'est le navigateur qui « se souvient » : s'il contient des études, un bandeau « Reprendre » passe en premier et le héros se réduit. Une seule page sert le visiteur et l'habitué ; pas de page de présentation séparée.
+- **Accroche « Des verbatims au rapport, preuves à l'appui. »** (proposée par `conteur`) plutôt que « de A à Z » : elle dit une valeur vraie aujourd'hui. La boîte à outils montre honnêtement ce qui est disponible et ce qui arrive. La preuve est montrée (un constat de l'exemple dont on déplie les verbatims), pas affirmée.
+- **Les modules sont des espaces.** « Synthèse » mène à ses études (`#/synthese`) ; l'exemple y est une carte à part, sans doublon de bouton. « Observation » devient « Entretiens et tests » (un entretien n'est pas une observation), icône vidéo.
+- **Moteurs d'IA : le catalogue est visible d'emblée**, rangé par usage (essayer gratuitement, rien ne sort de l'ordinateur, autres), avec un guide pas à pas et des liens directs vers la page des clés. Ollama est détecté automatiquement (ouvert ? modèles installés ?). « Enregistrer et tester » d'un seul geste. Toute page qui quitte une étude offre le retour (`#/moteurs?retour=…`).
+- **Méthode : un groupe = un motif.** Cause du regroupement grossier : la cible imposait 2 à 6 groupes pour 37 idées et les thèmes ne venaient qu'au-delà de 8 groupes. Nouvelle cible en racine carrée (le nombre de motifs croît moins vite que les idées), consignes réécrites avec le `methodologue` (ne pas fusionner deux sujets voisins, ne pas séparer un même motif : problème et solution, avis opposés sur un même objet), thèmes dès 5 groupes.
+- **Pas de consensus ni de désaccord calculé sur un thème** : il réunit des objets différents, additionner leurs avis inventait de faux « avis partagés ». Un thème affiche ses participants, ses avis et le nombre de motifs dont les avis sont partagés. Le modèle reçoit les participants de chaque groupe pour ne pas compter deux fois une même personne.
+- **Vocabulaire de la recherche utilisateur, un concept = un mot** (avec `plume`) : étude, participant, verbatim, idée, motif, thème, segment, occurrences ; moteur d'IA ; sauvegarder (fichier) / télécharger (rapport) / enregistrer (automatique).
+- **Verbatims dépliés sur place** dans le rapport, plus de fenêtre qui casse la lecture.
+
 ## 2026-10-12 — Qualité de la langue (demande d'Arnaud)
 
 - **La langue fait partie de la qualité, sans jamais passer avant la fidélité.** Un rapport juste mais qui sonne « traduit de l'anglais » n'est pas fini.

@@ -1,7 +1,7 @@
 import { Download, FileCode2, Printer, Quote, Users } from 'lucide-react'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { computeMetrics, METRICS_VERSION } from '@/core/analysis/metrics'
-import { describeMetrics } from '@/core/analysis/pipeline'
+import { describeMetrics, describeTheme } from '@/core/analysis/pipeline'
 import { reportToHtml, reportToMarkdown } from '@/core/analysis/report'
 import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from '@/core/analysis/types'
 import type { Contribution } from '@/core/corpus'
@@ -12,7 +12,7 @@ import { Alert, Badge, Button, Card, CardContent, CardHeader, CardTitle, Disclos
 interface Ctx {
   ideaById: Map<string, Idea>
   contributionById: Map<string, Contribution>
-  /** Personnes retenues par le filtre de segment (toutes si null). */
+  /** Participants retenus par le filtre de segment (tous si null). */
   segment: Set<string> | null
 }
 
@@ -36,7 +36,7 @@ function OpinionBar({ m }: { m: Metrics }) {
     <div
       className="flex h-2 overflow-hidden rounded-full bg-muted"
       role="img"
-      aria-label={`${pos} positives, ${mix} mitigées, ${neg} négatives`}
+      aria-label={`Participants : ${plural(pos, 'positif')}, ${plural(mix, 'mitigé')}, ${plural(neg, 'négatif')}`}
     >
       <div className="bg-positive" style={{ width: w(pos) }} />
       <div className="bg-warning" style={{ width: w(mix) }} />
@@ -217,9 +217,23 @@ function MinorityNote({ minority, ctx }: { minority: NonNullable<Metrics['minori
   )
 }
 
+/**
+ * Un thème réunit des motifs différents : on n'y affiche ni consensus ni
+ * désaccord global, seulement le nombre de motifs et ceux aux avis partagés.
+ */
+function ThemeBadges({ groups }: { groups: { metrics: Metrics }[] }) {
+  const divided = groups.filter((g) => g.metrics.stance === 'divided').length
+  return (
+    <>
+      <Badge tone="outline">{plural(groups.length, 'motif')}</Badge>
+      {divided > 0 && <Badge tone="warning">{divided} aux avis partagés</Badge>}
+    </>
+  )
+}
+
 export function ReportTab({ project, analysis }: { project: Project; analysis: AnalysisState }) {
   const corpus = corpusForAnalysis(project)
-  // À l'impression, tout est déplié : sinon les citations des groupes fermés disparaîtraient du PDF.
+  // À l'impression, tout est déplié : sinon les verbatims des motifs fermés disparaîtraient du PDF.
   useEffect(() => {
     let closed: HTMLDetailsElement[] = []
     const before = () => {
@@ -259,8 +273,12 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
 
   const filteredMetrics = (ideaIds: string[], fallback: Metrics) =>
     segment ? computeMetrics(ideaIds.map((id) => ctx.ideaById.get(id)!).filter((i) => segment.has(i.participantId))) : fallback
+  /** Les motifs d'un thème, avec leurs chiffres recalculés pour le segment choisi. */
+  const shownGroups = (groups: Group[]) =>
+    groups.map((g) => ({ metrics: filteredMetrics(g.ideaIds, g.metrics) })).filter((g) => g.metrics.participants > 0)
   const overview = (sections ?? analysis.groups.map((g) => ({ id: g.id, title: g.title, summary: g.summary, metrics: g.metrics, groups: [g] }))).map((s) => ({
     ...s,
+    subGroups: shownGroups(s.groups),
     shown: filteredMetrics(
       s.groups.flatMap((g) => g.ideaIds),
       s.metrics,
@@ -275,7 +293,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm text-muted-foreground">
-            Rapport du {formatDate(analysis.updatedAt)} · {plural(all.participants, 'participant')} · {plural(all.mentions, 'idée')}
+            Rapport du {formatDate(analysis.updatedAt)} · {plural(all.participants, 'participant')} · {plural(all.mentions, 'occurrence')}
           </p>
         </div>
         <div className="no-print flex flex-wrap items-center gap-2">
@@ -300,8 +318,8 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
 
       {analysis.engine.presetId === 'bridge' && (
         <Alert tone="info">
-          Exemple enregistré : ce rapport a été produit une fois par un vrai moteur d'IA ({analysis.engine.model}), sur un questionnaire
-          fictif, puis enregistré pour la démonstration. Pour vos propres données, ajoutez votre moteur dans « Moteurs d'IA ».
+          Rapport d'exemple : produit une fois par un vrai moteur d'IA ({analysis.engine.model}) à partir d'un questionnaire fictif, puis
+          conservé tel quel. Pour vos propres données, choisissez un moteur dans « Moteurs d'IA ».
         </Alert>
       )}
       {simulated && (
@@ -313,15 +331,15 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
 
       {attributes.length === 0 && (
         <p className="no-print text-xs text-muted-foreground">
-          Pour comparer des segments de participants (par exemple usagers réguliers et occasionnels), marquez une colonne « Profil » lors de
-          l'import de vos données.
+          Pour afficher un segment de participants (par exemple les usagers réguliers, puis les occasionnels), marquez une colonne « Profil »
+          lors de l'import de vos données.
         </p>
       )}
       {attributes.length > 0 && (
         <Card className="no-print">
           <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-end">
             <div className="flex-1 space-y-1">
-              <Label htmlFor="segment-key">Comparer un segment de participants</Label>
+              <Label htmlFor="segment-key">Afficher un segment</Label>
               <p className="text-xs text-muted-foreground">Les segments viennent des colonnes marquées « Profil » à l'import.</p>
               <Select
                 id="segment-key"
@@ -331,7 +349,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
                   setSegmentValue('')
                 }}
               >
-                <option value="">Tout le monde</option>
+                <option value="">Tous les participants</option>
                 {attributes.map((a) => (
                   <option key={a.key} value={a.key}>
                     {a.key}
@@ -356,7 +374,8 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
             )}
             {segment && (
               <p className="text-xs text-muted-foreground sm:max-w-56">
-                Chiffres recalculés pour {plural(segment.size, 'participant')}. Les synthèses rédigées portent sur l'ensemble.
+                Chiffres recalculés pour {plural(segment.size, 'participant')}. Les synthèses rédigées, qui portent sur l'ensemble des participants, sont
+                masquées.
               </p>
             )}
           </CardContent>
@@ -381,13 +400,13 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
         </h2>
         <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
-            <span className="inline-block size-2.5 rounded-full bg-positive" /> positives
+            <span className="inline-block size-2.5 rounded-full bg-positive" /> positifs
           </span>
           <span className="flex items-center gap-1">
-            <span className="inline-block size-2.5 rounded-full bg-warning" /> mitigées
+            <span className="inline-block size-2.5 rounded-full bg-warning" /> mitigés
           </span>
           <span className="flex items-center gap-1">
-            <span className="inline-block size-2.5 rounded-full bg-negative" /> négatives
+            <span className="inline-block size-2.5 rounded-full bg-negative" /> négatifs
           </span>
           <span>(en participants)</span>
         </div>
@@ -408,7 +427,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
                     <OpinionBar m={s.shown} />
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {stanceBadge(s.shown)}
+                    {sections ? <ThemeBadges groups={s.subGroups} /> : stanceBadge(s.shown)}
                     {s.shown.participantsByCategory.suggestion > 0 && (
                       <Badge tone="suggestion">{plural(s.shown.participantsByCategory.suggestion, 'suggestion')}</Badge>
                     )}
@@ -431,7 +450,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
                 <div key={t.id} id={`sec-${t.id}`} className="scroll-mt-20 space-y-3">
                   <div className="space-y-1">
                     <h2 className="text-xl font-semibold">{t.title}</h2>
-                    <p className="text-xs text-muted-foreground">{describeMetrics(m)}</p>
+                    <p className="text-xs text-muted-foreground">{describeTheme({ metrics: m }, shownGroups(t.groups))}</p>
                   </div>
                   {t.summary && !segment && (
                     <div className="max-w-3xl text-sm">
@@ -460,21 +479,21 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
           <p>
-            Le modèle de langage ({analysis.engine.model}) a découpé les réponses en idées, proposé les regroupements et rédigé les synthèses.
-            Le code a vérifié chaque citation mot pour mot dans les réponses, rangé chaque idée exactement une fois, calculé tous les
-            chiffres, puis contrôlé que chaque nombre cité dans les synthèses correspond à un chiffre calculé ou à une citation.
+            Le moteur d'IA ({analysis.engine.model}) a découpé les réponses en idées, proposé les motifs et rédigé les synthèses. Le code a
+            vérifié chaque verbatim mot pour mot dans les réponses, rangé chaque idée exactement une fois, calculé tous les chiffres, puis
+            contrôlé que chaque nombre cité dans les synthèses correspond à un chiffre calculé ou à un verbatim.
             {analysis.polish && analysis.polish.changed > 0 &&
-              ` Une relecture a ensuite amélioré la langue de ${plural(analysis.polish.changed, 'synthèse')} ; le code a vérifié qu'aucune citation ni aucun chiffre n'avait changé${analysis.polish.refused ? ` et a écarté ${plural(analysis.polish.refused, 'réécriture')} qui ne respectait pas cette règle` : ''}.`}
+              ` Une relecture a ensuite amélioré la langue de ${plural(analysis.polish.changed, 'synthèse')} ; le code a vérifié qu'aucun verbatim ni aucun chiffre n'avait changé${analysis.polish.refused ? ` et a écarté ${plural(analysis.polish.refused, 'réécriture')} qui ne respectait pas cette règle` : ''}.`}
           </p>
           <p>
-            On compte des participants. Sur un sujet, un participant est « positif » si tout ce qu'il en dit est positif, « négatif » si
+            On compte des participants. Sur un motif, un participant est « positif » si tout ce qu'il en dit est positif, « négatif » si
             tout est négatif, « mitigé » s'il dit les deux. « Consensus » : au moins 70 % de ces participants sont du même côté ; les
             mitigés comptent dans le total mais dans aucun camp. Suggestions et constats neutres n'entrent pas dans ce calcul. En dessous
             de 4 participants, on parle de « peu d'avis ». (Indicateurs v{METRICS_VERSION})
           </p>
           <p>
-            {plural(analysis.ideas.length, 'idée retenue', 'idées retenues')} ; {plural(analysis.rejected.length, 'citation écartée', 'citations écartées')} car
-            introuvable telle quelle. Température {analysis.settings.temperature}, graine {analysis.settings.seed} : relancer la même analyse redonne le
+            {plural(analysis.ideas.length, 'idée retenue', 'idées retenues')} ; {plural(analysis.rejected.length, 'verbatim écarté', 'verbatims écartés')} car
+            introuvable{analysis.rejected.length > 1 ? 's' : ''} tel{analysis.rejected.length > 1 ? 's' : ''} quel{analysis.rejected.length > 1 ? 's' : ''} dans les réponses. Température {analysis.settings.temperature}, graine {analysis.settings.seed} : relancer la même analyse redonne le
             même résultat.
           </p>
         </CardContent>

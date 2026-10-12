@@ -14,7 +14,7 @@ function statusOf(p: Project): { label: string; tone: 'default' | 'positive' | '
   if (!a) return { label: 'Données prêtes', tone: 'default' }
   if (a.status === 'done') return { label: 'Rapport prêt', tone: 'positive' }
   if (a.status === 'running') return { label: 'Analyse en cours', tone: 'default' }
-  return { label: 'Analyse interrompue', tone: 'warning' }
+  return { label: 'Analyse à reprendre', tone: 'warning' }
 }
 
 const EXAMPLE_FILE = '/exemple-mediatheque.openscribe.json'
@@ -92,7 +92,7 @@ export function useStudyActions() {
 function NewStudyDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const [name, setName] = useState('')
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} title="Nouvelle synthèse" description="Donnez un nom à votre étude ; vous pourrez le changer plus tard.">
+    <Dialog open={open} onOpenChange={onOpenChange} title="Nouvelle étude" description="Donnez un nom à votre étude ; vous pourrez le changer plus tard.">
       <form
         className="space-y-4"
         onSubmit={async (e) => {
@@ -132,18 +132,15 @@ export function SynthesisPage() {
         <p className="flex items-center gap-2 text-sm font-medium text-primary">
           <FlaskConical className="size-4" /> Module Synthèse
         </p>
-        <h1 className="text-3xl font-bold tracking-tight">Vos synthèses</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Vos études</h1>
         <p className="max-w-2xl text-muted-foreground">
           Importez des réponses de questionnaire, des transcriptions d'entretiens ou des notes : OpenScribe en tire les motifs récurrents, compte
-          qui pense quoi et rédige un rapport où chaque constat renvoie aux verbatims.
+          qui dit quoi et rédige un rapport où chaque constat renvoie aux verbatims.
         </p>
       </header>
 
-      <section aria-labelledby="mes-etudes" className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="mes-etudes" className="text-lg font-semibold">
-            Mes études
-          </h2>
+      <section aria-label="Liste de vos études" className="space-y-3">
+        <div className="flex flex-wrap items-center justify-end gap-3">
           <div className="flex flex-wrap gap-2">
             <Tooltip content="Rouvrir une étude sauvegardée depuis OpenScribe (fichier .openscribe.json), par exemple sur un autre ordinateur.">
               <Button variant="outline" onClick={actions.openFile}>
@@ -151,7 +148,7 @@ export function SynthesisPage() {
               </Button>
             </Tooltip>
             <Button onClick={actions.newStudy}>
-              <Plus /> Nouvelle synthèse
+              <Plus /> Nouvelle étude
             </Button>
           </div>
         </div>
@@ -173,7 +170,7 @@ export function SynthesisPage() {
                   className="flex h-full min-h-32 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-4 text-sm text-muted-foreground hover:border-primary hover:text-primary"
                 >
                   <Plus className="size-5" />
-                  Créer votre première synthèse
+                  Créer votre première étude
                 </button>
               </li>
             )}

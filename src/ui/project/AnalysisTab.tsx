@@ -12,14 +12,17 @@ import { CATEGORY, formatDuration, plural } from '../format'
 import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Disclosure, Input, Label, Progress, Select, Textarea } from '../primitives'
 
 const STEP_LABEL: Record<StepId, { title: string; help: string }> = {
-  extract: { title: 'Découper en idées', help: "Chaque réponse est découpée en idées ; chaque citation est vérifiée mot pour mot dans le texte d'origine." },
-  group: { title: 'Regrouper par sujet', help: 'Les idées qui parlent du même sujet sont rassemblées. Le code vérifie que chaque idée est rangée une seule fois.' },
-  summarize: { title: 'Synthétiser chaque groupe', help: 'Le code compte les participants et les avis ; le modèle rédige une synthèse qui cite ses sources.' },
-  themes: { title: 'Dégager les grands thèmes', help: 'Quand il y a beaucoup de groupes, ils sont rassemblés en quelques grands thèmes.' },
-  report: { title: 'Écrire le résumé', help: 'Un résumé de l’ensemble, construit à partir des synthèses.' },
+  extract: {
+    title: 'Découper en idées',
+    help: "Le moteur d'IA découpe chaque réponse en idées, chacune appuyée sur un verbatim ; le code vérifie que ce verbatim figure mot pour mot dans la réponse.",
+  },
+  group: { title: 'Regrouper en motifs', help: "Le moteur d'IA rassemble les idées en motifs ; le code vérifie que chaque idée n'est rangée qu'une fois." },
+  summarize: { title: 'Synthétiser chaque motif', help: "Le code compte les participants et les avis ; le moteur d'IA rédige une synthèse qui cite ses verbatims." },
+  themes: { title: 'Dégager les grands thèmes', help: "S'il y a beaucoup de motifs, le moteur d'IA les réunit en quelques grands thèmes." },
+  report: { title: 'Écrire le résumé', help: "Le moteur d'IA rédige un résumé de l'ensemble à partir des synthèses." },
   polish: {
     title: 'Relire la langue',
-    help: 'Les synthèses sont relues pour se lire naturellement. Le code refuse toute réécriture qui perd une citation ou change un chiffre.',
+    help: "Le moteur d'IA relit les synthèses pour qu'elles se lisent naturellement ; le code refuse toute réécriture qui perd un verbatim ou change un chiffre.",
   },
 }
 
@@ -83,7 +86,7 @@ export function AnalysisTab({ project }: { project: Project }) {
                 onChange={(e) => setSettings({ ...settings, researchQuestion: e.target.value })}
                 placeholder="Ex. : comprendre ce qui freine l'usage de l'application"
               />
-              <p className="text-xs text-muted-foreground">Facultatif. Donné au modèle comme contexte.</p>
+              <p className="text-xs text-muted-foreground">Facultatif. Donné au moteur d'IA comme contexte.</p>
             </div>
 
             <fieldset className="space-y-2">
@@ -91,13 +94,13 @@ export function AnalysisTab({ project }: { project: Project }) {
               <label className="flex cursor-pointer items-start gap-2 text-sm">
                 <input type="radio" name="mode" className="mt-1 accent-[var(--primary)]" disabled={running} checked={settings.mode === 'free'} onChange={() => setSettings({ ...settings, mode: 'free' })} />
                 <span>
-                  <strong>Libre</strong> — les sujets émergent des réponses. Recommandé pour explorer.
+                  <strong>Libre</strong> — les motifs émergent des réponses. Recommandé pour explorer.
                 </span>
               </label>
               <label className="flex cursor-pointer items-start gap-2 text-sm">
                 <input type="radio" name="mode" className="mt-1 accent-[var(--primary)]" disabled={running} checked={settings.mode === 'grid'} onChange={() => setSettings({ ...settings, mode: 'grid' })} />
                 <span>
-                  <strong>Grille</strong> — vous imposez les catégories (audit, critères). Ce qui n'y entre pas est rangé « Hors grille ».
+                  <strong>Grille</strong> — vous imposez les catégories (par exemple pour un audit sur critères). Ce qui n'y entre pas est rangé « Hors grille ».
                 </span>
               </label>
               {settings.mode === 'grid' && (
@@ -140,7 +143,7 @@ export function AnalysisTab({ project }: { project: Project }) {
               )}
               {missingKey && (
                 <Alert tone="error">
-                  Ce moteur n'a pas de clé.{' '}
+                  Il manque la clé d'accès de ce moteur.{' '}
                   <a className="font-medium underline" href={href({ name: 'settings', back: project.id })}>
                     Ajouter la clé
                   </a>
@@ -174,19 +177,19 @@ export function AnalysisTab({ project }: { project: Project }) {
                 <span>
                   Relire la langue des synthèses
                   <span className="block text-xs text-muted-foreground">
-                    Une passe de plus pour un texte fluide et naturel. Citations et chiffres sont contrôlés : une réécriture qui les modifie est
+                    Une passe de plus pour un texte fluide et naturel. Verbatims et chiffres sont contrôlés : une réécriture qui les modifie est
                     écartée.
                   </span>
                 </span>
               </label>
               <p className="mt-2 text-xs text-muted-foreground">
-                Température fixée à 0 et réponses mémorisées : relancer la même analyse redonne exactement le même résultat, sans nouvel appel.
+                Température fixée à 0 et réponses mémorisées : relancer la même analyse redonne exactement le même résultat, sans nouvelle demande.
               </p>
             </details>
 
             <p className="text-xs text-muted-foreground">
-              Environ {est.calls} demandes au modèle
-              {engine && engine.presetId !== 'simulation' ? `, soit ${formatDuration(est.seconds)} au débit de ce moteur` : ''}. Les demandes
+              Environ {est.calls} demandes au moteur d'IA
+              {engine && engine.presetId !== 'simulation' ? `, soit ${formatDuration(est.seconds)} à la vitesse autorisée par ce moteur` : ''}. Les demandes
               déjà faites ne sont jamais refaites.
             </p>
 
@@ -263,7 +266,7 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
         <Alert tone="error">
           L'analyse s'est arrêtée : {analysis.error}
           <br />
-          Ce qui a été fait est conservé : corrigez le problème (clé, débit, connexion) puis cliquez sur « Reprendre ».
+          Ce qui a été fait est conservé.
         </Alert>
       )}
       {analysis.status === 'cancelled' && !running && (
@@ -273,7 +276,7 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
         <Alert tone="success" className="flex flex-wrap items-center justify-between gap-2">
           <span>
             <CheckCircle2 className="mr-1 inline size-4" /> Analyse terminée : {plural(analysis.ideas.length, 'idée')},{' '}
-            {plural(analysis.groups.length, 'groupe')}
+            {plural(analysis.groups.length, 'motif')}
             {analysis.themes.length ? `, ${plural(analysis.themes.length, 'thème')}` : ''}.
           </span>
           <Button size="sm" onClick={() => navigate({ name: 'project', id: project.id, tab: 'report' })}>
@@ -326,7 +329,7 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
                   {CATEGORY[k].plural} : {byCat[k]}
                 </Badge>
               ))}
-              {analysis.rejected.length > 0 && <Badge tone="warning">Citations écartées : {analysis.rejected.length}</Badge>}
+              {analysis.rejected.length > 0 && <Badge tone="warning">Verbatims écartés : {analysis.rejected.length}</Badge>}
             </div>
             <Disclosure summary={`Idées extraites (${analysis.ideas.length})`}>
               <ul className="max-h-96 space-y-2 overflow-y-auto text-sm">
@@ -343,8 +346,8 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
               </ul>
             </Disclosure>
             {analysis.rejected.length > 0 && (
-              <Disclosure summary={`Citations écartées (${analysis.rejected.length})`}>
-                <p className="mb-2 text-xs text-muted-foreground">Le modèle a proposé ces citations, mais elles ne figurent pas telles quelles dans les réponses : elles ne sont pas retenues.</p>
+              <Disclosure summary={`Verbatims écartés (${analysis.rejected.length})`}>
+                <p className="mb-2 text-xs text-muted-foreground">Le moteur d'IA a proposé ces verbatims, mais ils ne figurent pas tels quels dans les réponses : ils ne sont pas retenus.</p>
                 <ul className="space-y-1 text-sm">
                   {analysis.rejected.map((r, i) => (
                     <li key={i}>
@@ -355,11 +358,11 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
               </Disclosure>
             )}
             {analysis.groups.length > 0 && (
-              <Disclosure summary={`Groupes (${analysis.groups.length})`}>
+              <Disclosure summary={`Motifs (${analysis.groups.length})`}>
                 <ul className="space-y-1 text-sm">
                   {analysis.groups.map((g) => (
                     <li key={g.id}>
-                      <strong>{g.title}</strong> — {plural(g.metrics.participants, 'participant')}, {plural(g.metrics.mentions, 'idée')}
+                      <strong>{g.title}</strong> — {plural(g.metrics.participants, 'participant')}, {plural(g.metrics.mentions, 'occurrence')}
                     </li>
                   ))}
                 </ul>

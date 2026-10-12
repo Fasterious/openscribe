@@ -125,7 +125,7 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
     } catch (e) {
       if (limit.timedOut()) {
         throw new ProviderError(
-          "Le fournisseur ne répond pas (délai dépassé). Vérifiez votre connexion ; un réseau d'entreprise peut bloquer ce service.",
+          `${config.label} ne répond pas (délai dépassé). Vérifiez votre connexion ; un réseau d'entreprise peut bloquer ce service.`,
           { status: 0 },
         )
       }
@@ -134,7 +134,7 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
       throw new ProviderError(
         local
           ? `${config.label} ne répond pas sur cet ordinateur. Vérifiez qu'il est installé et ouvert.`
-          : `Impossible de joindre ${config.label}. Vérifiez votre connexion à Internet. Si elle fonctionne, ce fournisseur refuse peut-être les appels venant d'un navigateur : choisissez-en un autre en attendant.`,
+          : `Impossible de joindre ${config.label}. Vérifiez votre connexion à Internet. Si elle fonctionne, ${config.label} refuse peut-être les demandes venant d'un navigateur : choisissez un autre moteur.`,
         { status: 0 },
       )
     } finally {
@@ -167,8 +167,8 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
             : status === 404
               ? `${config.label} ne trouve pas le modèle « ${config.model} » (erreur 404). Vérifiez le nom du modèle dans « Moteurs d'IA ».`
               : status === 429
-                ? "Le fournisseur refuse pour l'instant de nouvelles demandes (erreur 429). Attendez une minute puis cliquez sur « Reprendre », ou baissez le nombre de demandes par minute dans « Moteurs d'IA »."
-                : `${config.label} a répondu par une erreur ${status}. Cliquez sur « Reprendre » ; si cela se répète, vérifiez le moteur dans « Moteurs d'IA ». ${detail}`
+                ? `${config.label} reçoit trop de demandes et les refuse pour l'instant (erreur 429). Réessayez dans une minute, ou baissez le nombre de demandes par minute dans « Moteurs d'IA ».`
+                : `${config.label} a répondu par une erreur ${status}. Réessayez dans un instant ; si cela se répète, vérifiez le moteur dans « Moteurs d'IA ».${detail ? ` Détail technique : ${detail}` : ''}`
         throw new ProviderError(message, {
           status,
           fatal,
@@ -181,7 +181,7 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
       }
       const text = extractContent(data.choices?.[0]?.message?.content)
       if (!text)
-        throw new ProviderError("Le fournisseur n'a rien renvoyé. Cliquez sur « Reprendre » ; si cela se répète, essayez un autre modèle.", {
+        throw new ProviderError(`${config.label} n'a rien renvoyé. Réessayez dans un instant ; si cela se répète, essayez un autre modèle.`, {
           status: response.status,
         })
       return {

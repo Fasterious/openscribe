@@ -29,7 +29,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
       <p>
         Cette étude n'existe pas dans ce navigateur.{' '}
         <a className="text-primary underline" href={href({ name: 'synthesis' })}>
-          Voir vos synthèses
+          Voir vos études
         </a>
       </p>
     )
@@ -48,7 +48,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
     <div className="space-y-6">
       <div className="no-print space-y-3">
         <a href={href({ name: 'synthesis' })} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-4" /> Vos synthèses
+          <ArrowLeft className="size-4" /> Vos études
         </a>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           {renaming ? (
@@ -61,7 +61,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
               }}
             >
               <Input aria-label="Nom de l'étude" autoFocus value={name} onChange={(e) => setName(e.target.value)} />
-              <Button type="submit">Enregistrer</Button>
+              <Button type="submit">Valider</Button>
             </form>
           ) : (
             <div className="min-w-0">
@@ -94,8 +94,8 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
             side="left"
             content={
               <>
-                <strong>L'étude complète</strong> dans un fichier .openscribe.json : données, réglages, analyse et rapport. Pour la garder à
-                l'abri si vous videz votre navigateur, ou la rouvrir sur un autre ordinateur (« Ouvrir une sauvegarde »).
+                Vos modifications sont déjà enregistrées dans ce navigateur. Ce bouton en fait une copie complète dans un fichier (données,
+                réglages, analyse, rapport), pour la garder à l'abri ou la rouvrir sur un autre ordinateur avec « Ouvrir une sauvegarde ».
               </>
             }
           >
