@@ -130,8 +130,11 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
         )
       }
       if (req.signal?.aborted) throw e
+      const local = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(base)
       throw new ProviderError(
-        `Impossible de joindre ${config.label}. Vérifiez votre connexion, l'adresse du service, ou que le fournisseur accepte les demandes venant d'un navigateur.`,
+        local
+          ? `${config.label} ne répond pas sur cet ordinateur. Vérifiez qu'il est installé et ouvert.`
+          : `Impossible de joindre ${config.label}. Vérifiez votre connexion à Internet. Si elle fonctionne, ce fournisseur refuse peut-être les appels venant d'un navigateur : choisissez-en un autre en attendant.`,
         { status: 0 },
       )
     } finally {

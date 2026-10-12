@@ -9,6 +9,17 @@
 
 export type DataPolicy = 'local' | 'no-training' | 'may-train-free' | 'check'
 
+/** Une étape du guide de configuration, affichée telle quelle à l'utilisateur. */
+export interface SetupStep {
+  text: string
+  link?: { label: string; url: string }
+  /** Commande à copier (dans le Terminal). */
+  code?: string
+}
+
+/** Où le fournisseur est présenté : pour essayer, pour garder tout chez soi, ou parmi les autres. */
+export type PresetFamily = 'free' | 'local' | 'other'
+
 export interface ProviderPreset {
   id: string
   label: string
@@ -26,6 +37,11 @@ export interface ProviderPreset {
   freeTier: string
   dataPolicy: DataPolicy
   dataNote: string
+  family: PresetFamily
+  /** Pour quel usage le recommander, en une phrase. */
+  bestFor: string
+  /** Guide pas à pas, du compte à la clé. */
+  steps: SetupStep[]
 }
 
 export const PROVIDER_PRESETS: ProviderPreset[] = [
@@ -44,6 +60,13 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     dataPolicy: 'may-train-free',
     dataNote:
       "Sur l'offre gratuite, vos données peuvent servir à améliorer les modèles, sauf si vous le refusez dans votre espace client chez Mistral. Hébergement en Europe.",
+    family: 'free',
+    bestFor: 'Essayer gratuitement, avec un hébergement en Europe.',
+    steps: [
+      { text: "Créez un compte gratuit chez Mistral et choisissez l'offre « Experiment » (un numéro de téléphone est demandé, pas de carte bancaire).", link: { label: 'Ouvrir la console Mistral', url: 'https://console.mistral.ai/' } },
+      { text: 'Dans « API Keys », créez une nouvelle clé et copiez-la.', link: { label: 'Aller aux clés Mistral', url: 'https://console.mistral.ai/api-keys' } },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
   },
   {
     id: 'groq',
@@ -59,6 +82,13 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     freeTier: 'Offre gratuite sans carte bancaire, limitée en nombre de demandes par jour.',
     dataPolicy: 'check',
     dataNote: "Vérifiez la politique de données de l'offre gratuite avant d'y envoyer des données de participants.",
+    family: 'free',
+    bestFor: 'Essayer gratuitement, avec des réponses très rapides.',
+    steps: [
+      { text: 'Créez un compte gratuit chez Groq (adresse e-mail ou compte Google, pas de carte bancaire).', link: { label: 'Ouvrir la console Groq', url: 'https://console.groq.com/' } },
+      { text: 'Dans « API Keys », cliquez sur « Create API Key » et copiez la clé.', link: { label: 'Aller aux clés Groq', url: 'https://console.groq.com/keys' } },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
   },
   {
     id: 'gemini',
@@ -75,6 +105,12 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     dataPolicy: 'may-train-free',
     dataNote:
       "Sur l'offre gratuite, vos contenus peuvent être utilisés par Google et relus par des humains. À éviter pour des données de participants sans leur accord.",
+    family: 'other',
+    bestFor: 'Un essai gratuit si vous avez déjà un compte Google, pour des données non sensibles.',
+    steps: [
+      { text: 'Connectez-vous à Google AI Studio avec votre compte Google, puis cliquez sur « Create API key ».', link: { label: 'Ouvrir Google AI Studio', url: 'https://aistudio.google.com/apikey' } },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
   },
   {
     id: 'openrouter',
@@ -90,6 +126,12 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     freeTier: 'Accès à de nombreux modèles ; certains sont gratuits avec des limites.',
     dataPolicy: 'check',
     dataNote: 'La politique de données dépend du modèle et de son hébergeur : vérifiez-la pour le modèle choisi.',
+    family: 'other',
+    bestFor: 'Accéder à de nombreux modèles avec une seule clé.',
+    steps: [
+      { text: 'Créez un compte chez OpenRouter, puis une clé dans « Keys ».', link: { label: 'Aller aux clés OpenRouter', url: 'https://openrouter.ai/keys' } },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
   },
   {
     id: 'ollama',
@@ -103,7 +145,14 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     freeRequestsPerMinute: 60,
     freeTier: "Gratuit : le moteur d'IA tourne sur votre ordinateur. Plus lent sur un ordinateur modeste.",
     dataPolicy: 'local',
-    dataNote: "Rien ne quitte votre ordinateur. Ollama doit autoriser l'origine de cette page (variable OLLAMA_ORIGINS).",
+    dataNote: "Vos verbatims sont traités sur cet ordinateur. Comptez au moins 8 Go de mémoire ; l'analyse est plus lente qu'avec un service en ligne.",
+    family: 'local',
+    bestFor: 'Des données sensibles : le moteur tourne sur votre ordinateur et rien ne sort.',
+    steps: [
+      { text: "Téléchargez et installez Ollama, puis ouvrez-le (une petite icône apparaît dans la barre des menus).", link: { label: 'Télécharger Ollama', url: 'https://ollama.com/download' } },
+      { text: 'Ouvrez le Terminal et téléchargez un modèle (environ 5 Go, une seule fois) :', code: 'ollama pull qwen3:8b' },
+      { text: 'Revenez ici : OpenScribe détecte Ollama et ses modèles tout seul. Cliquez sur « Enregistrer et tester ».' },
+    ],
   },
   {
     id: 'custom',
@@ -118,6 +167,9 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     freeTier: 'Tout service exposant une API compatible OpenAI (LM Studio, vLLM, un relais personnel…).',
     dataPolicy: 'check',
     dataNote: 'Vérifiez la politique de données du service choisi.',
+    family: 'other',
+    bestFor: 'Un service compatible OpenAI que vous connaissez déjà (LM Studio, vLLM, un relais…).',
+    steps: [{ text: "Renseignez l'adresse du service et, si besoin, sa clé d'accès, dans les réglages avancés." }],
   },
 ]
 

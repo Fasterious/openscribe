@@ -1,239 +1,385 @@
-import { FileUp, FlaskConical, Mic, Plus, Sparkles, Trash2, Users } from 'lucide-react'
-import { useRef, useState } from 'react'
-import { deleteProject, putResponses } from '@/app/db'
-import { href, navigate } from '@/app/router'
-import { createProject, notifyProjectsChanged, useProjects } from '@/app/store'
-import { importProject, newProject, ProjectFileError, type Project } from '@/core/project'
-import { activeParticipants } from '@/core/corpus'
-import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Dialog, Input, Label } from './primitives'
-import { formatDate, plural } from './format'
+import {
+  ArrowRight,
+  Check,
+  ChevronDown,
+  FileUp,
+  FlaskConical,
+  HardDrive,
+  KeyRound,
+  ListChecks,
+  Quote,
+  Repeat,
+  ScanSearch,
+  ShieldCheck,
+  Sparkles,
+  Upload,
+  UserRoundSearch,
+  Users,
+  Video,
+} from 'lucide-react'
+import { useState } from 'react'
+import { href } from '@/app/router'
+import { useProjects } from '@/app/store'
+import { formatDate } from './format'
+import { Alert, Badge, Button, Card, cn } from './primitives'
+import { isExample, openExample, projectHref, useStudyActions } from './Synthesis'
 
-function statusOf(p: Project): { label: string; tone: 'default' | 'positive' | 'warning' | 'outline' } {
-  const a = p.analyses[0]
-  if (!p.corpus.contributions.length) return { label: 'Aucune donnée', tone: 'outline' }
-  if (!a) return { label: 'Données prêtes', tone: 'default' }
-  if (a.status === 'done') return { label: 'Rapport prêt', tone: 'positive' }
-  if (a.status === 'running') return { label: 'Analyse en cours', tone: 'default' }
-  return { label: 'Analyse interrompue', tone: 'warning' }
-}
-
-/** Crée l'étude d'exemple et l'ouvre. */
 /**
- * L'exemple est livré avec son analyse : un rapport produit une fois par un vrai
- * moteur d'IA et enregistré. On découvre ainsi un rapport réaliste sans clé.
+ * Page d'accueil : elle présente le produit au visiteur et ramène au travail
+ * celui qui revient. Sans compte, c'est ce navigateur qui « se souvient » :
+ * s'il contient des études, le bandeau « Reprendre » passe en premier et le
+ * héros se réduit à l'essentiel.
  */
-let openingExample: Promise<void> | null = null
-
-async function openExample() {
-  // Un double clic ne doit pas créer deux exemples.
-  openingExample ??= loadExample().finally(() => (openingExample = null))
-  return openingExample
-}
-
-async function loadExample() {
-  const { project, responses } = importProject(await (await fetch('/exemple-mediatheque.openscribe.json')).text())
-  await putResponses(responses)
-  await createProject(project)
-  navigate({ name: 'project', id: project.id, tab: 'report' })
-}
-
 export function Home() {
   const projects = useProjects()
-  const [creating, setCreating] = useState(false)
-  const [name, setName] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [toDelete, setToDelete] = useState<Project | null>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
-
-  async function create() {
-    const p = newProject(name)
-    await createProject(p)
-    setCreating(false)
-    setName('')
-    navigate({ name: 'project', id: p.id, tab: 'data' })
-  }
-
-  async function tryExample() {
-    // Si l'exemple a déjà été ouvert, on y retourne plutôt que d'en créer un doublon.
-    const existing = projects?.find((p) => p.description.startsWith('Questionnaire fictif'))
-    if (existing) {
-      navigate({ name: 'project', id: existing.id, tab: existing.analyses[0]?.status === 'done' ? 'report' : 'analysis' })
-      return
-    }
-    await openExample()
-  }
-
-  async function openFile(file: File) {
-    setError(null)
-    try {
-      const { project, responses } = importProject(await file.text())
-      await putResponses(responses)
-      await createProject(project)
-      navigate({ name: 'project', id: project.id, tab: project.analyses.some((x) => x.status === 'done') ? 'report' : 'data' })
-    } catch (e) {
-      setError(e instanceof ProjectFileError ? e.message : "Impossible de lire ce fichier. Vérifiez qu'il s'agit d'une étude exportée depuis OpenScribe.")
-    }
-  }
+  const actions = useStudyActions()
+  const mine = projects?.filter((p) => !isExample(p)) ?? []
+  const last = mine[0]
+  const returning = !!last
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-x-6">
-      {/* Ordre du DOM : présentation, mes études, boîte à outils (mobile) ; la grille replace la boîte à outils à droite sur grand écran. */}
-      <section className="space-y-4 lg:col-start-1 lg:row-start-1 lg:self-center">
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Comprendre ce que les gens disent,
-            <br className="hidden sm:block" /> sans perdre le fil de leurs mots.
-          </h1>
-          <p className="max-w-xl text-base text-muted-foreground">
-            OpenScribe découpe les réponses de vos questionnaires, entretiens ou ateliers en idées, les regroupe par sujet et
-            compte qui pense quoi. Chaque chiffre du rapport mène à la phrase exacte d'une personne.
-          </p>
-          <ul className="grid gap-1 text-sm text-muted-foreground">
-            <li>• Gratuit et libre. Vos données restent dans ce navigateur.</li>
-            <li>• Vous choisissez votre moteur d'IA, y compris sur votre propre ordinateur.</li>
-            <li>• Le moteur d'IA lit et rédige ; OpenScribe vérifie les citations et calcule les chiffres.</li>
-          </ul>
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Button onClick={() => setCreating(true)}>
-              <Plus /> Nouvelle étude
-            </Button>
-            <Button variant="outline" onClick={tryExample}>
-              <Sparkles /> Essayer avec un exemple
-            </Button>
-            <Button variant="ghost" onClick={() => fileRef.current?.click()}>
-              <FileUp /> Ouvrir une étude enregistrée
-            </Button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".json,application/json"
-              className="hidden"
-              aria-label="Fichier d'étude OpenScribe"
-              onChange={(e) => {
-                const f = e.target.files?.[0]
-                if (f) openFile(f)
-                e.target.value = ''
-              }}
-            />
-          </div>
-          {error && <Alert tone="error">{error}</Alert>}
-        </div>
-      </section>
-
-      <section aria-labelledby="mes-etudes" className="space-y-3 lg:col-span-2 lg:row-start-2">
-        <h2 id="mes-etudes" className="text-lg font-semibold">
-          Mes études
-        </h2>
-        {projects === null ? (
-          <p className="text-sm text-muted-foreground">Chargement…</p>
-        ) : projects.length === 0 ? (
-          <Card>
-            <CardContent className="p-6 text-sm text-muted-foreground">
-              Aucune étude pour l'instant. Créez-en une, ou essayez l'exemple pour voir le résultat en une minute.
-            </CardContent>
-          </Card>
-        ) : (
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((p) => {
-              const st = statusOf(p)
-              return (
-                <li key={p.id}>
-                  <Card className="h-full transition-shadow hover:shadow-md">
-                    <a href={href({ name: 'project', id: p.id, tab: p.analyses[0]?.status === 'done' ? 'report' : 'data' })} className="block p-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-medium leading-snug">{p.name}</h3>
-                        <Badge tone={st.tone}>{st.label}</Badge>
-                      </div>
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        {plural(activeParticipants(p.corpus).length, 'personne')} · {plural(p.corpus.contributions.length, 'réponse')} · modifiée le{' '}
-                        {formatDate(p.updatedAt)}
-                      </p>
-                    </a>
-                    <div className="flex justify-end px-2 pb-2">
-                      <Button variant="ghost" size="sm" onClick={() => setToDelete(p)} aria-label={`Supprimer ${p.name}`}>
-                        <Trash2 /> Supprimer
-                      </Button>
-                    </div>
-                  </Card>
-                </li>
-              )
-            })}
-          </ul>
+    <div className="space-y-20 sm:space-y-24">
+      <div className="space-y-8">
+        {returning && (
+          <section aria-labelledby="reprendre" className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <h2 id="reprendre" className="font-semibold">
+                  Reprendre là où vous en étiez
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Votre dernière étude, « {last.name} », a été modifiée le {formatDate(last.updatedAt)}.
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <a href={href({ name: 'synthesis' })}>
+                  <Button variant="ghost" tabIndex={-1}>
+                    Toutes mes synthèses
+                  </Button>
+                </a>
+                <a href={projectHref(last)}>
+                  <Button tabIndex={-1}>
+                    Ouvrir l'étude <ArrowRight />
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </section>
         )}
+
+        <section className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr]">
+          <div className="space-y-5">
+            <h1 className={cn('font-bold tracking-tight', returning ? 'text-3xl sm:text-4xl' : 'text-4xl sm:text-5xl')}>
+              Des verbatims au rapport, preuves à l'appui.
+            </h1>
+            <p className="max-w-xl text-lg text-muted-foreground">
+              Importez les réponses ouvertes de vos participants : OpenScribe en tire les motifs et les thèmes, compte qui dit quoi, et relie
+              chaque chiffre au verbatim exact.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button size="lg" onClick={actions.newStudy}>
+                Commencer une synthèse <ArrowRight />
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => openExample(projects)}>
+                <Sparkles /> Voir un exemple de rapport
+              </Button>
+            </div>
+            <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+              {['Gratuit et libre', 'Sans compte', 'Vos études restent sur votre ordinateur'].map((t) => (
+                <li key={t} className="flex items-center gap-1.5">
+                  <Check className="size-4 text-positive" /> {t}
+                </li>
+              ))}
+            </ul>
+            {actions.error && <Alert tone="error">{actions.error}</Alert>}
+          </div>
+          <ProofDemo />
+        </section>
+      </div>
+
+      <section aria-labelledby="comment" className="space-y-6">
+        <SectionTitle id="comment" title="Comment ça marche" />
+        <ol className="grid gap-4 md:grid-cols-3">
+          <Step n={1} icon={<Upload />} title="Importez vos réponses">
+            Un export de questionnaire (CSV), des transcriptions d'entretiens ou vos notes. Vous vérifiez l'aperçu avant de lancer quoi que ce
+            soit.
+          </Step>
+          <Step n={2} icon={<KeyRound />} title="Branchez un moteur d'IA">
+            Une clé gratuite Groq ou Mistral se crée en quelques minutes. Vous pouvez aussi faire tourner Ollama sur votre ordinateur.{' '}
+            <a className="text-primary underline-offset-4 hover:underline" href={href({ name: 'settings' })}>
+              Choisir un moteur
+            </a>
+          </Step>
+          <Step n={3} icon={<ScanSearch />} title="Lisez le rapport, vérifiez tout">
+            Vous suivez chaque étape de l'analyse, puis vous remontez de chaque thème jusqu'au verbatim. Export en Markdown, en page HTML ou en
+            PDF.
+          </Step>
+        </ol>
       </section>
 
-      <section aria-label="La boîte à outils" className="lg:col-start-2 lg:row-start-1 lg:self-center">
-        <Card className="bg-accent/40">
-          <CardHeader>
-            <CardTitle>La boîte à outils</CardTitle>
-            <CardDescription>Des modules indépendants, qui parlent le même langage.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Module icon={<FlaskConical />} title="Synthèse" text="Des réponses ouvertes au rapport : idées, groupes, consensus et désaccords." ready />
-            <Module icon={<Mic />} title="Observation" text="Entretiens et tests : transcription, locuteurs, vidéo synchronisée avec le texte." />
-            <Module icon={<Users />} title="Personas" text="Des profils à partir de questionnaires à échelles." />
-          </CardContent>
-        </Card>
-      </section>
-
-      <Dialog open={creating} onOpenChange={setCreating} title="Nouvelle étude" description="Donnez-lui un nom ; vous pourrez le changer plus tard.">
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault()
-            create()
-          }}
-        >
-          <div className="space-y-2">
-            <Label htmlFor="nom-etude">Nom de l'étude</Label>
-            <Input id="nom-etude" autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex. : Bilan de la consultation 2026" />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="ghost" onClick={() => setCreating(false)}>
-              Annuler
-            </Button>
-            <Button type="submit">Créer</Button>
-          </div>
-        </form>
-      </Dialog>
-
-      <Dialog
-        open={toDelete !== null}
-        onOpenChange={(o) => !o && setToDelete(null)}
-        title="Supprimer cette étude ?"
-        description={`« ${toDelete?.name ?? ''} » et ses analyses seront effacées de ce navigateur. Exportez-la d'abord si vous voulez la garder.`}
-      >
-        <div className="flex justify-end gap-2">
-          <Button variant="ghost" onClick={() => setToDelete(null)}>
-            Annuler
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={async () => {
-              if (toDelete) await deleteProject(toDelete.id)
-              setToDelete(null)
-              notifyProjectsChanged()
-            }}
+      <section aria-labelledby="outils" className="space-y-6">
+        <SectionTitle
+          id="outils"
+          title="De A à Z, un outil à la fois"
+          lead="Chaque outil s'utilise seul. Bientôt, ils s'enchaîneront : la transcription d'un entretien alimentera directement une synthèse."
+        />
+        <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+          <a
+            href={href({ name: 'synthesis' })}
+            className="group block rounded-xl border-2 border-primary/40 bg-card p-5 shadow-sm transition-colors hover:border-primary sm:p-6"
           >
-            Supprimer
-          </Button>
+            <div className="flex items-center gap-3">
+              <span className="rounded-lg bg-primary p-2 text-primary-foreground [&_svg]:size-5">
+                <FlaskConical />
+              </span>
+              <span className="text-xl font-semibold">Synthèse</span>
+              <Badge tone="positive">Disponible</Badge>
+            </div>
+            <p className="mt-3 text-muted-foreground">
+              Transformez des dizaines de réponses ouvertes en un rapport que vous pouvez défendre, citation par citation.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm">
+              {[
+                'Motifs et thèmes, avec le nombre de participants derrière chacun',
+                'Positif, négatif, mitigé, suggestions ; consensus, avis partagés et minorités',
+                'Comparaison de segments (par exemple étudiants et retraités)',
+              ].map((t) => (
+                <li key={t} className="flex gap-2">
+                  <Check className="mt-0.5 size-4 shrink-0 text-primary" /> {t}
+                </li>
+              ))}
+            </ul>
+            <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-primary">
+              Ouvrir l'espace Synthèse <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </a>
+          <div className="grid gap-4">
+            <SoonModule icon={<Video />} title="Entretiens & tests">
+              Passez de l'enregistrement d'un entretien, d'un test utilisateur ou d'une observation de terrain à un texte exploitable : locuteurs
+              identifiés, vidéo synchronisée avec le texte.
+            </SoonModule>
+            <SoonModule icon={<UserRoundSearch />} title="Personas">
+              Construisez des profils de participants à partir de vos questionnaires à échelles.
+            </SoonModule>
+          </div>
         </div>
-      </Dialog>
+      </section>
+
+      <section aria-labelledby="difference" className="space-y-6">
+        <SectionTitle id="difference" title="Ce qui fait la différence" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Feature icon={<Quote />} title="Chaque chiffre a une source">
+            Cliquez sur un constat du rapport : vous remontez jusqu'au verbatim exact du participant. Chaque citation est vérifiée mot pour mot
+            dans vos données.
+          </Feature>
+          <Feature icon={<Users />} title="Des participants, pas seulement des occurrences">
+            « 12 participants sur 40 » dit plus que « 57 mentions ». OpenScribe compte les deux et les distingue, pour que la mesure ne trahisse
+            jamais le qualitatif.
+          </Feature>
+          <Feature icon={<ListChecks />} title="Les voix minoritaires restent visibles">
+            Consensus, avis partagés, minorités constantes : un avis porté par trois participants ne disparaît pas sous celui de la majorité.
+          </Feature>
+          <Feature icon={<Repeat />} title="Le même résultat, à chaque fois">
+            Mêmes données, mêmes réglages, même rapport. L'IA lit et rédige, le code compte et vérifie, et vous voyez chaque étape avec ses
+            résultats intermédiaires.
+          </Feature>
+        </div>
+      </section>
+
+      <section aria-labelledby="donnees" className="space-y-6">
+        <SectionTitle id="donnees" title="Vos données, vos règles" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Feature icon={<HardDrive />} title="Tout reste sur votre ordinateur">
+            Vos études sont enregistrées dans votre navigateur. Il n'y a pas de compte, et aucun serveur OpenScribe ne voit vos données.
+          </Feature>
+          <Feature icon={<FileUp />} title="Pensez à sauvegarder">
+            Vider les données de votre navigateur efface vos études. Sauvegardez chaque étude dans un fichier : vous la rouvrirez sur ce
+            navigateur ou sur un autre ordinateur.
+          </Feature>
+          <Feature icon={<KeyRound />} title="Vous choisissez votre moteur d'IA">
+            Dans le cloud, avec votre propre clé (Groq, Mistral, Google Gemini, OpenRouter), ou sur votre ordinateur avec Ollama : alors rien ne
+            sort. Les verbatims partent directement de votre navigateur vers le moteur choisi.
+          </Feature>
+          <Feature icon={<ShieldCheck />} title="Lisez les conditions des offres gratuites">
+            Certaines offres gratuites peuvent réutiliser les données qu'on leur envoie. Pour des données sensibles, préférez une offre qui exclut
+            cette réutilisation, ou Ollama.
+          </Feature>
+        </div>
+      </section>
+
+      <section aria-labelledby="faq" className="space-y-6">
+        <SectionTitle id="faq" title="Questions fréquentes" />
+        <div className="divide-y rounded-xl border bg-card">
+          {FAQ.map(([q, a]) => (
+            <details key={q} className="group">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 font-medium [&::-webkit-details-marker]:hidden">
+                {q}
+                <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
+              </summary>
+              <p className="px-4 pb-4 text-sm text-muted-foreground">{a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="feuille-de-route" className="space-y-6">
+        <SectionTitle id="feuille-de-route" title="Ce qui arrive" lead="OpenScribe grandit avec ses utilisateurs. Voici où nous en sommes." />
+        <ol className="space-y-3">
+          {ROADMAP.map((r) => (
+            <li key={r.title} className="flex flex-col gap-2 rounded-xl border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-medium">{r.title}</p>
+                <p className="text-sm text-muted-foreground">{r.text}</p>
+              </div>
+              <Badge tone={r.status === 'Disponible' ? 'positive' : r.status === 'En préparation' ? 'default' : 'outline'} className="w-fit shrink-0">
+                {r.status}
+              </Badge>
+            </li>
+          ))}
+        </ol>
+        <p className="text-sm text-muted-foreground">
+          Nous réfléchissons aussi à une offre hébergée clé en main, pour ceux qui ne veulent rien configurer.
+        </p>
+      </section>
+
+      {actions.dialogs}
     </div>
   )
 }
 
-function Module({ icon, title, text, ready }: { icon: React.ReactNode; title: string; text: string; ready?: boolean }) {
+const FAQ: [string, string][] = [
+  [
+    'Faut-il installer quelque chose ?',
+    "Non, OpenScribe s'ouvre dans votre navigateur. Seule exception, facultative : Ollama, si vous voulez que l'IA tourne sur votre ordinateur.",
+  ],
+  [
+    'Combien ça coûte ?',
+    "OpenScribe est gratuit et son code est libre (AGPL-3.0). Groq et Mistral proposent des offres gratuites sans carte bancaire. Sur une offre payante, une étude de quelques dizaines de participants coûte en général quelques centimes, payés directement au fournisseur. OpenScribe ne prend rien au passage.",
+  ],
+  ['Faut-il créer un compte ?', 'Non, ni inscription ni adresse e-mail. Pour retrouver une étude ailleurs, sauvegardez-la dans un fichier et rouvrez-la.'],
+  [
+    'Où vont mes données ?',
+    "Nulle part chez nous. Elles restent dans votre navigateur. Pour l'analyse, les verbatims partent uniquement vers le moteur d'IA que vous avez choisi, accompagnés d'un pseudonyme (P1, P2…), jamais des noms ni des adresses. Avec Ollama, ils ne quittent pas votre ordinateur.",
+  ],
+  [
+    "Quel moteur d'IA choisir ?",
+    "Pour démarrer, prenez Groq ou Mistral : c'est gratuit et la clé se crée en quelques minutes. Pour des données sensibles, prenez Ollama sur votre ordinateur, ou une offre qui ne réutilise pas vos données. Vous pouvez en changer à tout moment.",
+  ],
+  ['Et après ?', 'Les modules Entretiens & tests et Personas sont en préparation. Voir « Ce qui arrive » ci-dessous.'],
+]
+
+const ROADMAP = [
+  { title: 'Synthèse', text: 'Des réponses ouvertes au rapport traçable.', status: 'Disponible' },
+  {
+    title: 'Entretiens & tests',
+    text: "Transcription, locuteurs, vidéo synchronisée avec le texte, puis analyse de l'écran que regardait le participant.",
+    status: 'En préparation',
+  },
+  { title: 'Personas', text: 'Des profils à partir de questionnaires à échelles.', status: 'En préparation' },
+  {
+    title: 'Synchronisation chiffrée',
+    text: 'Vos études copiées sur votre propre Drive, pour les retrouver sur tous vos appareils.',
+    status: 'Envisagé',
+  },
+  { title: 'Tests à distance et ateliers en direct', text: 'Mener la collecte elle-même depuis OpenScribe.', status: 'Envisagé' },
+]
+
+/** Montre la traçabilité plutôt que de l'affirmer : un constat de l'exemple, dont on déplie les verbatims. */
+function ProofDemo() {
+  const [open, setOpen] = useState(false)
+  const quotes = [
+    ['P1', "L'application est lente au démarrage, il faut parfois attendre dix secondes."],
+    ['P5', "L'application est lente, surtout sur mon vieux téléphone."],
+    ['P10', "Je trouve l'application lente"],
+  ]
   return (
-    <div className="flex gap-3 rounded-lg border bg-card p-3">
-      <div className="mt-0.5 text-primary [&_svg]:size-5">{icon}</div>
-      <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="font-medium">{title}</span>
-          {ready ? <Badge tone="positive">Disponible</Badge> : <Badge tone="outline">Bientôt</Badge>}
-        </div>
-        <p className="text-sm text-muted-foreground">{text}</p>
+    <Card className="p-5 shadow-md">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Extrait du rapport d'exemple</p>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+        <p className="font-semibold">Vitesse de l'application</p>
+        <span className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">
+            <Users className="mr-0.5 inline size-3" />3
+          </span>
+          <Badge tone="negative">Consensus négatif</Badge>
+        </span>
       </div>
+      <div className="mt-3 flex h-2 overflow-hidden rounded-full bg-muted" aria-hidden>
+        <div className="w-full bg-negative" />
+      </div>
+      <p className="mt-3 text-sm leading-relaxed">
+        Trois personnes jugent l'application lente. L'une décrit une attente d'une dizaine de secondes au démarrage, une autre précise que la
+        lenteur se ressent surtout sur son vieux téléphone.
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-label={open ? 'Masquer les 3 verbatims' : 'Voir les 3 verbatims'}
+          className="mx-1 inline-flex cursor-pointer items-center gap-0.5 rounded-full bg-accent px-1.5 align-baseline text-xs font-medium text-accent-foreground hover:bg-primary hover:text-primary-foreground"
+        >
+          <Quote className="size-3" />3
+        </button>
+      </p>
+      {open ? (
+        <ul className="mt-3 space-y-2 border-l-2 border-negative pl-3 text-sm">
+          {quotes.map(([who, text]) => (
+            <li key={who}>
+              « {text} » <span className="text-xs text-muted-foreground">— {who}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-xs text-muted-foreground">Cliquez sur la pastille pour voir les verbatims.</p>
+      )}
+    </Card>
+  )
+}
+
+function SectionTitle({ id, title, lead }: { id: string; title: string; lead?: string }) {
+  return (
+    <div className="max-w-2xl space-y-2">
+      <h2 id={id} className="text-2xl font-bold tracking-tight sm:text-3xl">
+        {title}
+      </h2>
+      {lead && <p className="text-muted-foreground">{lead}</p>}
+    </div>
+  )
+}
+
+function Step({ n, icon, title, children }: { n: number; icon: React.ReactNode; title: string; children: React.ReactNode }) {
+  return (
+    <li className="space-y-2 rounded-xl border bg-card p-5">
+      <div className="flex items-center gap-3">
+        <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">{n}</span>
+        <span className="text-primary [&_svg]:size-5">{icon}</span>
+      </div>
+      <h3 className="font-semibold">{title}</h3>
+      <p className="text-sm text-muted-foreground">{children}</p>
+    </li>
+  )
+}
+
+function Feature({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+  return (
+    <div className="flex gap-3 rounded-xl border bg-card p-5">
+      <span className="mt-0.5 text-primary [&_svg]:size-5">{icon}</span>
+      <div className="space-y-1">
+        <h3 className="font-semibold">{title}</h3>
+        <p className="text-sm text-muted-foreground">{children}</p>
+      </div>
+    </div>
+  )
+}
+
+function SoonModule({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border bg-card p-5">
+      <div className="flex items-center gap-3">
+        <span className="rounded-lg bg-muted p-2 text-muted-foreground [&_svg]:size-5">{icon}</span>
+        <span className="font-semibold">{title}</span>
+        <Badge tone="outline">Bientôt</Badge>
+      </div>
+      <p className="mt-3 text-sm text-muted-foreground">{children}</p>
     </div>
   )
 }

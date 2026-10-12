@@ -11,3 +11,6 @@ playwright-report/
 e2e/screenshots/
 bridge/
 .DS_Store
+
+# Notes locales : jamais dans le dépôt
+.private/

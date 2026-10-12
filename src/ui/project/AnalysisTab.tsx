@@ -14,7 +14,7 @@ import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, C
 const STEP_LABEL: Record<StepId, { title: string; help: string }> = {
   extract: { title: 'Découper en idées', help: "Chaque réponse est découpée en idées ; chaque citation est vérifiée mot pour mot dans le texte d'origine." },
   group: { title: 'Regrouper par sujet', help: 'Les idées qui parlent du même sujet sont rassemblées. Le code vérifie que chaque idée est rangée une seule fois.' },
-  summarize: { title: 'Synthétiser chaque groupe', help: 'Le code compte les personnes et les avis ; le modèle rédige une synthèse qui cite ses sources.' },
+  summarize: { title: 'Synthétiser chaque groupe', help: 'Le code compte les participants et les avis ; le modèle rédige une synthèse qui cite ses sources.' },
   themes: { title: 'Dégager les grands thèmes', help: 'Quand il y a beaucoup de groupes, ils sont rassemblés en quelques grands thèmes.' },
   report: { title: 'Écrire le résumé', help: 'Un résumé de l’ensemble, construit à partir des synthèses.' },
   polish: {
@@ -70,7 +70,7 @@ export function AnalysisTab({ project }: { project: Project }) {
         <Card>
           <CardHeader>
             <CardTitle>Réglages</CardTitle>
-            <CardDescription>{plural(est.people, 'personne')} à analyser.</CardDescription>
+            <CardDescription>{plural(est.people, 'participant')} à analyser.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -123,12 +123,14 @@ export function AnalysisTab({ project }: { project: Project }) {
                 ))}
               </Select>
               {engines.length === 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Aucun moteur configuré : la simulation permet de découvrir l'outil.{' '}
-                  <a href={href({ name: 'settings' })} className="text-primary underline">
-                    Ajouter un moteur
+                <Alert tone="info" className="space-y-2">
+                  <p>Pour analyser vos données, branchez un moteur d'IA : une clé gratuite se crée en quelques minutes.</p>
+                  <a href={href({ name: 'settings', back: project.id })}>
+                    <Button size="sm" tabIndex={-1}>
+                      Choisir un moteur
+                    </Button>
                   </a>
-                </p>
+                </Alert>
               )}
               {engine?.presetId === 'simulation' && (
                 <Alert tone="warning">
@@ -136,7 +138,14 @@ export function AnalysisTab({ project }: { project: Project }) {
                   analyser.
                 </Alert>
               )}
-              {missingKey && <Alert tone="error">Ce moteur n'a pas de clé. Ajoutez-la dans « Moteurs d'IA ».</Alert>}
+              {missingKey && (
+                <Alert tone="error">
+                  Ce moteur n'a pas de clé.{' '}
+                  <a className="font-medium underline" href={href({ name: 'settings', back: project.id })}>
+                    Ajouter la clé
+                  </a>
+                </Alert>
+              )}
             </div>
 
             <details className="text-sm">
@@ -291,7 +300,7 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
                     <span className="text-sm font-medium">{STEP_LABEL[s.id].title}</span>
                     {s.total > 0 && s.id === 'extract' && (
                       <span className="text-xs text-muted-foreground">
-                        {s.done} / {plural(s.total, 'personne')}
+                        {s.done} / {plural(s.total, 'participant')}
                       </span>
                     )}
                   </div>
@@ -350,7 +359,7 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
                 <ul className="space-y-1 text-sm">
                   {analysis.groups.map((g) => (
                     <li key={g.id}>
-                      <strong>{g.title}</strong> — {plural(g.metrics.participants, 'personne')}, {plural(g.metrics.mentions, 'idée')}
+                      <strong>{g.title}</strong> — {plural(g.metrics.participants, 'participant')}, {plural(g.metrics.mentions, 'idée')}
                     </li>
                   ))}
                 </ul>

@@ -44,8 +44,8 @@ export const GROUPING_BATCH = 350
 export const ASSIGN_BATCH = 200
 /** Nombre maximal d'idées envoyées dans une même demande de synthèse. */
 export const SUMMARY_BATCH_IDEAS = 90
-/** Au-delà de ce nombre de groupes, on ajoute un niveau de thèmes. */
-export const THEME_LEVEL_FROM = 8
+/** Au-delà de ce nombre de groupes, on ajoute un niveau de thèmes (le rapprochement des sujets voisins). */
+export const THEME_LEVEL_FROM = 4
 
 export interface PipelineOptions {
   provider: LlmProvider
@@ -287,9 +287,15 @@ function normLabel(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[.!?;:]+$/, '')
 }
 
+/**
+ * Nombre de groupes visé pour n libellés distincts. Un groupe est un motif
+ * précis (un seul sujet) : on vise large, le rapprochement des sujets voisins
+ * se fait à l'étape des thèmes. Une fourchette trop basse obligeait le modèle
+ * à fusionner des sujets différents.
+ */
 export function groupTarget(n: number): { min: number; max: number } {
-  const min = Math.max(2, Math.min(25, Math.round(n / 15)))
-  const max = Math.max(min + 2, Math.min(40, Math.round(n / 6)))
+  const min = Math.max(3, Math.min(60, Math.round(n / 5)))
+  const max = Math.max(min + 3, Math.min(120, Math.round(n / 2.5)))
   return { min, max }
 }
 
@@ -421,7 +427,7 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
   const mix = m.mixed.length
   const polarised = pos + neg + mix
   const top = Math.max(pos, neg)
-  // Un pourcentage n'a de sens qu'à partir d'une dizaine de personnes.
+  // Un pourcentage n'a de sens qu'à partir d'une dizaine de participants.
   const share = (n: number, of: number, sep: string) => `${n} ${sep} ${of}${of >= 10 ? ` (${pct(n / of)})` : ''}`
 
   if (lang === 'en') {
@@ -439,19 +445,19 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
   }
 
   const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
-  const parts = [`${n(m.participants, 'personne')} (${n(m.mentions, 'idée')})`]
+  const parts = [`${n(m.participants, 'participant')} (${n(m.mentions, 'idée')})`]
   // « avis » est masculin : 3 positifs, 1 négatif.
   const opinions = [pos && n(pos, 'positif'), neg && n(neg, 'négatif'), mix && n(mix, 'mitigé')].filter(Boolean)
   if (opinions.length) parts.push(`avis : ${opinions.join(', ')}`)
   const sug = m.participantsByCategory.suggestion
-  if (sug) parts.push(`${n(sug, 'personne')} ${sug > 1 ? 'font' : 'fait'} des suggestions`)
+  if (sug) parts.push(`${n(sug, 'participant')} ${sug > 1 ? 'font' : 'fait'} des suggestions`)
   const neu = m.participantsByCategory.neutral
-  if (neu) parts.push(`${n(neu, 'personne')} ${neu > 1 ? 'font des constats neutres' : 'fait un constat neutre'}`)
+  if (neu) parts.push(`${n(neu, 'participant')} ${neu > 1 ? 'font des constats neutres' : 'fait un constat neutre'}`)
   if (m.stance === 'thin') parts.push("peu d'avis")
   else if (m.stance === 'consensus') parts.push(`consensus ${m.majority === 'positive' ? 'positif' : 'négatif'} : ${share(top, polarised, 'sur')}`)
   else if (m.stance === 'divided') parts.push('avis partagés')
   if (m.minority)
-    parts.push(`minorité constante ${m.minority.side === 'positive' ? 'positive' : 'négative'} : ${n(m.minority.participantIds.length, 'personne')}`)
+    parts.push(`minorité constante ${m.minority.side === 'positive' ? 'positive' : 'négative'} : ${n(m.minority.participantIds.length, 'participant')}`)
   return parts.join(' ; ')
 }
 
@@ -603,7 +609,7 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
   const facts =
     lang === 'en'
       ? `${state.ideas.length} ideas from ${all.participants} people (out of ${respondents} who answered), ${state.themes.length || state.groups.length} topics.`
-      : `${state.ideas.length} idées exprimées par ${all.participants} personnes (sur ${respondents} ayant répondu), ${state.themes.length || state.groups.length} sujets.`
+      : `${state.ideas.length} idées exprimées par ${all.participants} participants (sur ${respondents} ayant répondu), ${state.themes.length || state.groups.length} sujets.`
   const sections = (state.themes.length ? state.themes : state.groups.slice(0, 15)).map((x) => ({
     title: x.title,
     facts: describeMetrics(x.metrics, lang),

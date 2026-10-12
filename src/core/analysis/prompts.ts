@@ -166,18 +166,21 @@ export const groupingSchema = z.object({
 })
 
 export function groupingPrompt(input: GroupingInput, settings: AnalysisSettings, target: { min: number; max: number }) {
-  const grid = input.grid?.length
-    ? `Utilise UNIQUEMENT ces titres de groupe, tels quels : ${input.grid.map((g) => `« ${g} »`).join(', ')}, plus « Hors grille » pour ce qui n'entre dans aucun.`
-    : `Vise entre ${target.min} et ${target.max} groupes. Donne à chaque groupe un titre court (2 à 6 mots) qui décrit le sujet, pas le jugement (« Performance de l'outil », pas « Outil trop lent »).`
+  const rules = input.grid?.length
+    ? `2. Utilise UNIQUEMENT ces titres de groupe, tels quels : ${input.grid.map((g) => `« ${g} »`).join(', ')}, plus « Hors grille » pour ce qui n'entre dans aucun.
+3. Dans un groupe, mêle les avis positifs et négatifs : c'est ce qui permet de voir les désaccords.`
+    : `2. Un groupe = UN seul sujet précis. Toutes ses idées parlent de la même chose : lues côte à côte, leurs citations montrent le même motif. Ne fusionne pas deux sujets voisins (par exemple la lenteur et la clarté des menus, ou la réservation et l'historique des prêts) : ils seront rapprochés plus tard, à l'étape des thèmes.
+3. Dans un groupe, mêle les avis positifs et négatifs sur ce même sujet : c'est ce qui permet de voir les désaccords.
+4. Vise entre ${target.min} et ${target.max} groupes : mieux vaut un groupe de plus qu'un groupe qui mélange deux sujets. Une idée isolée peut former un groupe à elle seule.
+5. Donne à chaque groupe un titre court (2 à 6 mots) qui nomme ce sujet précis, pas le jugement (« Vitesse de l'application », pas « Application trop lente »). Un titre qui a besoin de « et » pour relier deux sujets signale deux groupes.`
   return {
     task: 'group',
     system: SYSTEM,
-    user: `${context(settings)}Tu reçois des idées extraites de retours de participants (libellé et nombre de mentions). Regroupe celles qui parlent du même sujet.
+    user: `${context(settings)}Tu reçois des idées extraites de retours de participants (libellé et nombre de mentions). Regroupe celles qui parlent exactement du même sujet, pour faire apparaître des motifs récurrents.
 
 Règles :
 1. Chaque identifiant (L1, L2…) doit apparaître dans EXACTEMENT un groupe. N'en oublie aucun, n'en invente aucun.
-2. Regroupe par sujet, en mêlant avis positifs et négatifs sur ce sujet : c'est ce qui permet de voir les désaccords.
-3. ${grid}
+${rules}
 ${lang(settings)}
 
 Réponds avec : {"groups":[{"title":"…","items":["L1","L7"]}]}
@@ -201,7 +204,7 @@ export function assignPrompt(input: AssignInput, settings: AnalysisSettings) {
   return {
     task: 'assign',
     system: SYSTEM,
-    user: `${context(settings)}Range chaque idée dans le groupe existant qui lui correspond le mieux.${input.allowNew ? ' Si aucun ne convient, crée un nouveau titre court (2 à 6 mots).' : ' Si aucun ne convient, utilise « Hors grille ».'}
+    user: `${context(settings)}Range chaque idée dans le groupe existant qui parle exactement du même sujet.${input.allowNew ? " Si aucun ne traite ce sujet précis, crée un nouveau groupe avec un titre court (2 à 6 mots) plutôt que de la ranger dans un groupe voisin." : ' Si aucun ne convient, utilise « Hors grille ».'}
 Chaque identifiant doit recevoir exactement un groupe. Recopie les titres existants à l'identique.
 ${lang(settings)}
 
@@ -266,7 +269,7 @@ export function themePrompt(input: ThemeInput, settings: AnalysisSettings, targe
 
 Règles :
 1. Chaque groupe (G1, G2…) appartient à EXACTEMENT un thème.
-2. Titre de thème court (2 à 6 mots), qui décrit le sujet.
+2. Un thème rapproche des groupes aux sujets voisins (par exemple la réservation, la prolongation et l'historique des prêts). Titre court (2 à 6 mots), qui décrit ce qu'ils ont en commun.
 3. Pour chaque thème, une synthèse de 2 à 4 phrases construite à partir des synthèses de ses groupes, sans rien ajouter. Elle croise les groupes (ce qui les relie, ce qui les oppose) : ne recopie pas la première phrase de l'un d'eux, le lecteur la lira juste après. Garde les crochets [I…] qui s'y trouvent, n'en invente pas.
 ${lang(settings)}
 ${STYLE[settings.language]}

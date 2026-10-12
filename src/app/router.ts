@@ -6,14 +6,18 @@ import { useEffect, useState } from 'react'
  */
 export type Route =
   | { name: 'home' }
-  | { name: 'settings' }
+  | { name: 'synthesis' }
+  /** `back` : l'étude d'où l'on vient, pour y revenir après avoir configuré un moteur. */
+  | { name: 'settings'; back?: string }
   | { name: 'project'; id: string; tab: 'data' | 'analysis' | 'report' }
   | { name: 'not-found' }
 
 export function parseRoute(hash: string): Route {
-  const path = hash.replace(/^#/, '') || '/'
+  const [path = '/', query = ''] = (hash.replace(/^#/, '') || '/').split('?')
+  const params = new URLSearchParams(query)
   if (path === '/' || path === '') return { name: 'home' }
-  if (path === '/reglages') return { name: 'settings' }
+  if (path === '/synthese') return { name: 'synthesis' }
+  if (path === '/moteurs' || path === '/reglages') return { name: 'settings', back: params.get('retour') ?? undefined }
   const m = path.match(/^\/etude\/([^/]+)(?:\/(donnees|analyse|rapport))?$/)
   if (m) {
     const tab = m[2] === 'analyse' ? 'analysis' : m[2] === 'rapport' ? 'report' : 'data'
@@ -26,8 +30,10 @@ export function href(route: Route): string {
   switch (route.name) {
     case 'home':
       return '#/'
+    case 'synthesis':
+      return '#/synthese'
     case 'settings':
-      return '#/reglages'
+      return route.back ? `#/moteurs?retour=${encodeURIComponent(route.back)}` : '#/moteurs'
     case 'project':
       return `#/etude/${encodeURIComponent(route.id)}/${route.tab === 'analysis' ? 'analyse' : route.tab === 'report' ? 'rapport' : 'donnees'}`
     default:

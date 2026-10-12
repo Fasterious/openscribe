@@ -5,6 +5,7 @@
  */
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import * as TabsPrimitive from '@radix-ui/react-tabs'
+import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { clsx, type ClassValue } from 'clsx'
 import { X } from 'lucide-react'
@@ -249,5 +250,29 @@ export function Disclosure({
       </summary>
       <div className="border-t p-3">{children}</div>
     </details>
+  )
+}
+
+/**
+ * Infobulle : s'ouvre au survol et au focus clavier. Elle complète un libellé,
+ * elle ne le remplace jamais (sur écran tactile, elle ne s'affiche pas).
+ */
+export function Tooltip({ content, children, side = 'bottom' }: { content: React.ReactNode; children: React.ReactElement; side?: 'top' | 'bottom' | 'left' | 'right' }) {
+  return (
+    <TooltipPrimitive.Provider delayDuration={250}>
+      <TooltipPrimitive.Root>
+        <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Portal>
+          <TooltipPrimitive.Content
+            side={side}
+            sideOffset={6}
+            collisionPadding={12}
+            className="z-50 max-w-72 rounded-md border bg-card px-3 py-2 text-xs leading-relaxed text-foreground shadow-lg"
+          >
+            {content}
+          </TooltipPrimitive.Content>
+        </TooltipPrimitive.Portal>
+      </TooltipPrimitive.Root>
+    </TooltipPrimitive.Provider>
   )
 }

@@ -61,7 +61,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
  */
 function requestId(task: string, system: string, user: string): string {
   const m = user.match(/<donnees>\n([\s\S]*)\n<\/donnees>/)
-  const instructions = m ? user.slice(0, m.index) : user
+  // Ce qui suit le bloc de données (ex. demande de correction après une réponse invalide) fait partie de la demande.
+  const instructions = m ? user.slice(0, m.index) + user.slice(m.index! + m[0].length) : user
   const data = m ? stableStringify(JSON.parse(m[1])) : ''
   return createHash('sha256').update(`${task}\n${system}\n${instructions}\n${data}`).digest('hex').slice(0, 16)
 }

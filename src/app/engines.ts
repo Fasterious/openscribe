@@ -134,3 +134,29 @@ export function useEngines() {
   }, [])
   return { engines, defaultId, loaded }
 }
+
+export interface OllamaStatus {
+  running: boolean
+  models: string[]
+}
+
+/**
+ * Ollama tourne-t-il sur cet ordinateur, et avec quels modèles ? Répond en
+ * moins de deux secondes, sans erreur : c'est ce qui permet de dire à
+ * l'utilisateur où il en est plutôt que de lui afficher un échec.
+ */
+export async function detectOllama(baseUrl = 'http://localhost:11434/v1'): Promise<OllamaStatus> {
+  const root = baseUrl.replace(/\/+$/, '').replace(/\/v1$/, '')
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 1500)
+  try {
+    const res = await fetch(`${root}/api/tags`, { signal: ctrl.signal })
+    if (!res.ok) return { running: true, models: [] }
+    const data = (await res.json()) as { models?: { name?: string }[] }
+    return { running: true, models: (data.models ?? []).map((m) => m.name ?? '').filter(Boolean) }
+  } catch {
+    return { running: false, models: [] }
+  } finally {
+    clearTimeout(timer)
+  }
+}

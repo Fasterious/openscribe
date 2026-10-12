@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { computeMetrics } from './analysis/metrics'
 import { allowedNumbers, unverifiedNumbers } from './analysis/numbers'
-import { acceptRewrite, describeMetrics, newAnalysis, runAnalysis, sanitizeCitations } from './analysis/pipeline'
+import { acceptRewrite, describeMetrics, groupTarget, newAnalysis, runAnalysis, sanitizeCitations } from './analysis/pipeline'
 import { reportToHtml, reportToMarkdown } from './analysis/report'
 import { MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Idea } from './analysis/types'
@@ -97,6 +97,18 @@ describe('vérification des citations', () => {
   })
 })
 
+describe('regroupement', () => {
+  it('vise des groupes fins (un sujet par groupe), y compris sur un petit corpus', () => {
+    // 37 idées : l'ancienne cible (2 à 6 groupes) forçait le mélange de sujets.
+    expect(groupTarget(37).min).toBeGreaterThanOrEqual(7)
+    expect(groupTarget(37).max).toBeGreaterThanOrEqual(14)
+    expect(groupTarget(5)).toEqual({ min: 3, max: 6 })
+    const big = groupTarget(300)
+    expect(big.min).toBe(60)
+    expect(big.max).toBe(120)
+  })
+})
+
 describe('indicateurs', () => {
   it('compte une personne une seule fois, même avec huit critiques', () => {
     const ideas = Array.from({ length: 8 }, (_, i) => idea(`I${i}`, 'P1', 'negative'))
@@ -142,10 +154,10 @@ describe('indicateurs', () => {
 })
 
 describe('chiffres en toutes lettres', () => {
-  it('accorde, omet les zéros, et ne met de pourcentage qu’à partir de dix personnes', () => {
+  it('accorde, omet les zéros, et ne met de pourcentage qu’à partir de dix participants', () => {
     const ideas = ['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I000${k}`, p, k < 4 ? 'positive' : 'negative'))
     const text = describeMetrics(computeMetrics(ideas))
-    expect(text).toBe('5 personnes (5 idées) ; avis : 4 positifs, 1 négatif ; consensus positif : 4 sur 5')
+    expect(text).toBe('5 participants (5 idées) ; avis : 4 positifs, 1 négatif ; consensus positif : 4 sur 5')
     expect(text).not.toMatch(/\(s\)|: 0|%/)
   })
 })

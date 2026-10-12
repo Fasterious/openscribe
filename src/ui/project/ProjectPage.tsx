@@ -1,4 +1,4 @@
-import { ArrowLeft, Download, FileText, FlaskConical, Pencil, Table2 } from 'lucide-react'
+import { ArrowLeft, FileText, FlaskConical, Pencil, Save, Table2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getResponses } from '@/app/db'
 import { href, navigate } from '@/app/router'
@@ -6,7 +6,7 @@ import { markInterrupted, useIsRunning, useProject } from '@/app/store'
 import { activeParticipants } from '@/core/corpus'
 import { exportProject } from '@/core/project'
 import { download, plural, slug } from '../format'
-import { Badge, Button, Input, Tabs, TabsList, TabsTrigger } from '../primitives'
+import { Badge, Button, Input, Tabs, TabsList, TabsTrigger, Tooltip } from '../primitives'
 import { AnalysisTab } from './AnalysisTab'
 import { DataTab } from './DataTab'
 import { ReportTab } from './ReportTab'
@@ -27,7 +27,10 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
   if (project === null)
     return (
       <p>
-        Cette étude n'existe pas dans ce navigateur. <a className="text-primary underline" href="#/">Retour à l'accueil</a>
+        Cette étude n'existe pas dans ce navigateur.{' '}
+        <a className="text-primary underline" href={href({ name: 'synthesis' })}>
+          Voir vos synthèses
+        </a>
       </p>
     )
 
@@ -44,8 +47,8 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
   return (
     <div className="space-y-6">
       <div className="no-print space-y-3">
-        <a href="#/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-4" /> Mes études
+        <a href={href({ name: 'synthesis' })} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="size-4" /> Vos synthèses
         </a>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           {renaming ? (
@@ -77,7 +80,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
                 </Button>
               </h1>
               <p className="text-sm text-muted-foreground">
-                {plural(activeParticipants(project.corpus).length, 'personne')} · {plural(project.corpus.contributions.length, 'réponse')}
+                {plural(activeParticipants(project.corpus).length, 'participant')} · {plural(project.corpus.contributions.length, 'réponse')}
                 {running && (
                   <>
                     {' '}
@@ -87,9 +90,19 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
               </p>
             </div>
           )}
-          <Button variant="outline" size="sm" onClick={exportFile} disabled={!hasData}>
-            <Download /> Exporter l'étude
-          </Button>
+          <Tooltip
+            side="left"
+            content={
+              <>
+                <strong>L'étude complète</strong> dans un fichier .openscribe.json : données, réglages, analyse et rapport. Pour la garder à
+                l'abri si vous videz votre navigateur, ou la rouvrir sur un autre ordinateur (« Ouvrir une sauvegarde »).
+              </>
+            }
+          >
+            <Button variant="outline" size="sm" onClick={exportFile} disabled={!hasData}>
+              <Save /> Sauvegarder l'étude
+            </Button>
+          </Tooltip>
         </div>
         <Tabs value={tab} onValueChange={(v) => navigate({ name: 'project', id, tab: v as typeof tab })}>
           <TabsList className="w-full sm:w-auto">

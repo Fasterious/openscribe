@@ -101,7 +101,7 @@ function CorpusSummary({ project, update }: { project: Project; update: Update }
         <CardHeader>
           <CardTitle>Vos données</CardTitle>
           <CardDescription>
-            {plural(people.length, 'personne')} · {plural(corpus.contributions.length, 'réponse')} ·{' '}
+            {plural(people.length, 'participant')} · {plural(corpus.contributions.length, 'réponse')} ·{' '}
             {plural(corpus.sources.length, 'source')}
           </CardDescription>
         </CardHeader>
@@ -134,8 +134,11 @@ function CorpusSummary({ project, update }: { project: Project; update: Update }
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Les personnes</CardTitle>
-          <CardDescription>Identifiées par un pseudonyme : seul lui est envoyé au moteur d'IA, avec le texte des réponses.</CardDescription>
+          <CardTitle>Les participants</CardTitle>
+          <CardDescription>
+            Chaque participant reçoit un pseudonyme (P1, P2…). Pour l'analyse, seuls ce pseudonyme et ses verbatims partent vers le moteur d'IA :
+            jamais son nom ni son adresse.
+          </CardDescription>
         </CardHeader>
         <CardContent className="max-h-[28rem] space-y-2 overflow-y-auto">
           {people.map((p) => {
@@ -147,11 +150,13 @@ function CorpusSummary({ project, update }: { project: Project; update: Update }
                   <span className="flex flex-wrap items-center gap-2">
                     <strong>{p.label}</strong>
                     {p.label !== p.id && <span className="text-xs text-muted-foreground">{p.id}</span>}
-                    {Object.values(p.attributes).slice(0, 2).map((v) => (
-                      <Badge key={v} tone="outline">
-                        {v}
-                      </Badge>
-                    ))}
+                    {Object.entries(p.attributes)
+                      .slice(0, 2)
+                      .map(([k, v]) => (
+                        <span key={k} className="text-xs text-muted-foreground" title={`Profil (${k}) : sert à comparer des segments dans le rapport`}>
+                          <span className="opacity-70">{k} :</span> {v}
+                        </span>
+                      ))}
                     <span className="text-xs text-muted-foreground">{plural(items.length, 'réponse')}</span>
                   </span>
                 }
@@ -379,7 +384,7 @@ function TextImport({
       <CardHeader>
         <CardTitle>Importer du texte</CardTitle>
         <CardDescription>
-          Une ligne par prise de parole, sous la forme « Prénom : texte », pour reconnaître les personnes. Sans locuteurs, chaque
+          Une ligne par prise de parole, sous la forme « Prénom : texte », pour reconnaître les locuteurs. Sans locuteurs, chaque
           paragraphe devient une réponse.
         </CardDescription>
       </CardHeader>
@@ -400,7 +405,7 @@ function TextImport({
         </div>
         {detected.hasSpeakers && (
           <fieldset className="space-y-2">
-            <legend className="text-sm font-medium">Personnes reconnues — décochez l'animateur ou l'intervieweur</legend>
+            <legend className="text-sm font-medium">Locuteurs reconnus — décochez l'animateur ou l'intervieweur</legend>
             <div className="flex flex-wrap gap-2">
               {detected.speakers.map((s) => (
                 <label key={s.name} className="flex cursor-pointer items-center gap-2 rounded-md border px-2 py-1 text-sm">
@@ -419,7 +424,7 @@ function TextImport({
                 </label>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">Les questions des personnes décochées sont gardées comme contexte des réponses qui suivent.</p>
+            <p className="text-xs text-muted-foreground">Les questions des locuteurs décochés sont gardées comme contexte des réponses qui suivent.</p>
           </fieldset>
         )}
         <div className="flex flex-wrap gap-2">
