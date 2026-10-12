@@ -40,7 +40,9 @@ const STYLE: Record<AnalysisSettings['language'], string> = {
 - Les chiffres de "facts" sont déjà affichés au-dessus de chaque synthèse : ne les recopie pas en bloc et n'ouvre pas chaque synthèse par « N personnes (M mentions)… ». Glisse seulement le chiffre utile dans une phrase normale (« cinq personnes sur six »).
 - Nombres en chiffres (« 6 personnes »), sauf en début de phrase où ils s'écrivent en lettres (« Six personnes »).
 - Ce sont les avis qui sont positifs ou négatifs, pas les personnes : « 4 personnes en ont un avis positif », pas « 4 personnes sont positives ».
-- Attribue toujours un constat à qui l'exprime (« deux personnes estiment que… ») : un avis ne doit jamais se lire comme un fait.
+- Chaque constat a un sujet humain : « deux personnes estiment que… », jamais « l'information circule mal » tout court. Un avis ne doit jamais se lire comme un fait.
+- Une seule personne ne « divise » pas et ne fait pas une « tendance » : dites « une personne ».
+- Évite de répéter « la même personne » : « elle », « cette personne », ou reformule.
 - Ne reprends pas les titres internes des groupes entre guillemets : désigne le sujet avec des mots ordinaires.
 - Varie les attaques de phrase d'une synthèse à l'autre ; pas de formule répétée partout.
 - Typographie française : guillemets « », espace avant : ; ? !`,
@@ -289,7 +291,7 @@ export function globalPrompt(input: GlobalInput, settings: AnalysisSettings) {
   return {
     task: 'global',
     system: SYSTEM,
-    user: `${context(settings)}Rédige un résumé exécutif de 4 à 6 phrases à partir des synthèses ci-dessous. Fais ressortir ce qui fait consensus, ce qui divise et les points de blocage principaux. Reprends les chiffres fournis sans en calculer d'autres. N'ajoute rien qui ne figure pas dans les synthèses.
+    user: `${context(settings)}Rédige un résumé exécutif de 4 à 6 phrases à partir des synthèses ci-dessous. Fais ressortir ce qui fait consensus, ce qui divise et les points de blocage principaux. Reprends les chiffres fournis sans en calculer d'autres. N'ajoute rien qui ne figure pas dans les synthèses. Résume-les, ne recopie pas leurs phrases : le lecteur les lira ensuite.
 ${lang(settings)}
 ${STYLE[settings.language]}
 
@@ -321,7 +323,7 @@ Règles absolues :
 2. Garde TOUS les chiffres tels quels.
 3. Garde TOUS les crochets [I…] avec exactement les mêmes identifiants, accrochés à la même affirmation.
 4. N'utilise aucune information absente du texte relu, même si un autre texte du lot la contient.
-5. Ne change pas qui fait l'action (le collectif, l'équipe, les participants…), même pour corriger un accord.
+5. Un constat présenté comme un fait doit être attribué (« des personnes estiment que… ») sans ajouter de chiffre. Ne change pas qui fait l'action (le collectif, l'équipe, les participants…), même pour corriger un accord.
 6. Si un texte est déjà bon, renvoie-le tel quel. Ne réécris pas pour le plaisir.
 ${lang(settings)}
 ${STYLE[settings.language]}

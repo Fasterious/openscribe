@@ -145,7 +145,7 @@ describe('chiffres en toutes lettres', () => {
   it('accorde, omet les zéros, et ne met de pourcentage qu’à partir de dix personnes', () => {
     const ideas = ['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I000${k}`, p, k < 4 ? 'positive' : 'negative'))
     const text = describeMetrics(computeMetrics(ideas))
-    expect(text).toBe('5 personnes (5 mentions) ; avis : 4 positifs, 1 négatif ; consensus positif : 4 sur 5')
+    expect(text).toBe('5 personnes (5 idées) ; avis : 4 positifs, 1 négatif ; consensus positif : 4 sur 5')
     expect(text).not.toMatch(/\(s\)|: 0|%/)
   })
 })

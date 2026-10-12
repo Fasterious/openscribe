@@ -350,7 +350,7 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
                 <ul className="space-y-1 text-sm">
                   {analysis.groups.map((g) => (
                     <li key={g.id}>
-                      <strong>{g.title}</strong> — {plural(g.metrics.participants, 'personne')}, {plural(g.metrics.mentions, 'mention')}
+                      <strong>{g.title}</strong> — {plural(g.metrics.participants, 'personne')}, {plural(g.metrics.mentions, 'idée')}
                     </li>
                   ))}
                 </ul>

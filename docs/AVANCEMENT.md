@@ -17,7 +17,16 @@ Mis à jour à chaque étape. Légende : ✅ fait et vérifié · 🔄 en cours 
 - ✅ Reproductibilité (cache des réponses) et reprise après coupure
 - ✅ Interface : import → réglages → analyse visible → rapport, sur ordinateur et mobile
 - ✅ Exemple livré avec un rapport réaliste enregistré (questionnaire fictif)
+- ✅ Robustesse avec un modèle léger (Haiku) sur ÉcoSol : 307 idées (référence v1 : 304), 0 citation écartée, 1 réécriture refusée à bon droit, 0 fausse alerte
 - ✅ Tests de parcours automatiques (Playwright) : 12/12 sur ordinateur et mobile
 - ✅ Test utilisateur : passe 1 (persona Camille, 5 défauts gênants), corrections, passe 2 : certifiée après correction du dernier point
 - ✅ Test sur corpus réel (ÉcoSol, 20 personnes) avec un modèle joué par un sous-agent : 286 idées, 0 citation écartée, 35 groupes, 8 thèmes
-- ✅ Qualité de la langue : guide de style, étape de relecture contrôlée, nombres vérifiés (relecture `plume` : 4/5, une passe de plus prévue)
+- ✅ Qualité de la langue : guide de style, étape de relecture contrôlée, nombres vérifiés (relecture `plume` : 4/5 avec un modèle puissant, 3,5/5 avec un modèle léger ; dernières consignes ajoutées, à confirmer sur un vrai moteur)
+
+## Prochaines étapes
+
+- ⏳ Validation par Arnaud avec une clé gratuite (`docs/VALIDATION.md`), dont l'accès direct aux fournisseurs depuis le navigateur
+- ⏳ Langue : confirmer les dernières consignes de style sur un vrai moteur
+- ⏳ Mise en ligne (hébergement statique)
+- ⏳ Module Observation (transcription, vidéo synchronisée), puis Personas
+- ⏳ Stratégie d'acquisition (une fois l'expérience validée)

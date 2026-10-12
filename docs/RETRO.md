@@ -2,6 +2,11 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-12 — Itération 4 : épreuve du modèle léger
+
+- Le contrôle des chiffres a d'abord produit de fausses alertes sur des sous-comptes vrais (« deux personnes » citées dans deux crochets) : on les vérifie maintenant par phrase. Une alerte doit être juste, sinon on cesse d'y croire.
+- Un modèle léger suit moins bien le guide de style : constats non attribués, recopie d'un niveau à l'autre. Les consignes sont renforcées, et la relecture attribue les constats laissés sans sujet.
+
 ## 2026-10-12 — Itération 3 : interface et test utilisateur
 
 **Ce qui a marché**

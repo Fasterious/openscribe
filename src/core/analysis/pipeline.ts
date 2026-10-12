@@ -426,7 +426,7 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
 
   if (lang === 'en') {
     const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
-    const parts = [`${n(m.participants, 'person', 'people')} (${n(m.mentions, 'mention')})`]
+    const parts = [`${n(m.participants, 'person', 'people')} (${n(m.mentions, 'idea')})`]
     const opinions = [pos && `${pos} positive`, neg && `${neg} negative`, mix && `${mix} mixed`].filter(Boolean)
     if (opinions.length) parts.push(`opinions: ${opinions.join(', ')}`)
     if (m.participantsByCategory.suggestion) parts.push(`${n(m.participantsByCategory.suggestion, 'person', 'people')} made suggestions`)
@@ -439,7 +439,7 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
   }
 
   const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
-  const parts = [`${n(m.participants, 'personne')} (${n(m.mentions, 'mention')})`]
+  const parts = [`${n(m.participants, 'personne')} (${n(m.mentions, 'idée')})`]
   // « avis » est masculin : 3 positifs, 1 négatif.
   const opinions = [pos && n(pos, 'positif'), neg && n(neg, 'négatif'), mix && n(mix, 'mitigé')].filter(Boolean)
   if (opinions.length) parts.push(`avis : ${opinions.join(', ')}`)
@@ -690,10 +690,10 @@ function verifyNumbers(corpus: Corpus, state: AnalysisState) {
   // « Trois personnes jugent l'application lente [I3, I15, I30] » : le nombre de personnes
   // derrière les références citées se vérifie aussi.
   const check = (text: string, allowed: Set<number>) => {
-    for (const m of text.matchAll(/\[([^\]]*)\]/g)) {
-      const ideas = m[1].split(/\s*,\s*/).map((id) => ideaById.get(id)).filter((i) => i !== undefined)
-      if (ideas.length) allowed.add(new Set(ideas.map((i) => i.participantId)).size)
-    }
+    const people = (part: string) => new Set((part.match(/I\d{4,}/g) ?? []).map((id) => ideaById.get(id)?.participantId).filter(Boolean)).size
+    // Par référence et par phrase (« Deux personnes pointent X [I1] et Y [I2]. »).
+    const counts = [...[...text.matchAll(/\[[^\]]*\]/g)].map((m) => people(m[0])), ...text.split(/(?<=[.!?])\s+/).map(people)]
+    for (const n of counts) if (n > 0) allowed.add(n)
     return unverifiedNumbers(text, allowed)
   }
   for (const g of state.groups) g.unverified = check(g.summary, allowedNumbers([g.metrics], quotes(g.ideaIds)))
