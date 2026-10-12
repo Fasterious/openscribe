@@ -2,6 +2,18 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-12 — Itération 3 : interface et test utilisateur
+
+**Ce qui a marché**
+- Lancer en parallèle le test utilisateur et la relecture des textes, puis déléguer la rédaction à un agent pendant que je corrige le fond : deux passes complètes en peu de temps.
+- Les tests de parcours automatiques transforment chaque défaut corrigé en garantie (le double clic sur l'exemple est désormais testé).
+
+**Ce qui a coûté pour rien**
+- La passe 1 a révélé que la première impression dépendait d'un rapport de simulation peu crédible : on aurait pu y penser dès la conception de l'accueil.
+
+**Ce qu'on change**
+- Règle : la première impression se teste comme une fonctionnalité (l'exemple doit montrer le vrai niveau de l'outil).
+
 ## 2026-10-12 — Itération 2 : qualité de la langue des rapports
 
 **Ce qui a marché**

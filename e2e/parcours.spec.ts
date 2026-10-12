@@ -114,3 +114,13 @@ test('projet : exporter puis rouvrir avec son rapport', async ({ page }) => {
   await page.getByLabel("Fichier d'étude OpenScribe").setInputFiles({ name: 'projet.openscribe.json', mimeType: 'application/json', buffer: readFileSync(path) })
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
 })
+
+test('un double clic sur l’exemple ne crée qu’une seule étude', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Essayer avec un exemple' }).dblclick()
+  await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
+  await page.goto('/#/')
+  await page.getByRole('button', { name: 'Essayer avec un exemple' }).click()
+  await page.goto('/#/')
+  await expect(page.getByRole('link', { name: /Exemple — application de médiathèque/ })).toHaveCount(1)
+})

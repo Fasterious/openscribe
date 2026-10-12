@@ -203,7 +203,8 @@ export function AnalysisTab({ project }: { project: Project }) {
         </Card>
       </div>
 
-      <div className="min-w-0 space-y-4">
+      {/* Sur mobile, une analyse en cours ou terminée passe avant les réglages. */}
+      <div className={`min-w-0 space-y-4 ${latest ? 'order-first lg:order-none' : ''}`}>
         {!latest ? (
           <Card>
             <CardContent className="space-y-2 p-6 text-sm text-muted-foreground">

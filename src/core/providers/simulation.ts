@@ -67,9 +67,12 @@ export function sentences(text: string): string[] {
   return parts.map((p) => p.trim()).filter((p) => keywords(p).length > 0)
 }
 
+/** Libellé lisible : les mots-clés retrouvés avec leurs accents dans le texte d'origine. */
 function labelFor(s: string): string {
-  const kw = keywords(s)
-  return cap(kw.slice(0, 2).join(' ') || 'Remarque')
+  const kw = new Set(keywords(s).slice(0, 2))
+  const words = s.split(/[^\p{L}\p{N}]+/u).filter((w) => kw.has(keywords(w)[0] ?? ''))
+  const unique = [...new Map(words.map((w) => [w.toLowerCase(), w.toLowerCase()])).values()].slice(0, 2)
+  return cap(unique.join(' ') || 'Remarque')
 }
 
 export function createSimulationProvider(faults: SimulationFaults = {}): LlmProvider {

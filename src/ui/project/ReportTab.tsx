@@ -22,7 +22,7 @@ function stanceBadge(m: Metrics) {
     return <Badge tone={m.majority === 'positive' ? 'positive' : 'negative'}>Consensus {m.majority === 'positive' ? 'positif' : 'négatif'}</Badge>
   if (m.stance === 'divided') return <Badge tone="warning">Avis partagés</Badge>
   if (m.stance === 'thin') return <Badge tone="outline">Peu d'avis</Badge>
-  return <Badge tone="outline">Sans polarité</Badge>
+  return <Badge tone="outline">Ni pour ni contre</Badge>
 }
 
 /** Barre empilée en personnes : avis positifs, mitigés, négatifs. */

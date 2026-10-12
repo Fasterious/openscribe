@@ -22,7 +22,15 @@ function statusOf(p: Project): { label: string; tone: 'default' | 'positive' | '
  * L'exemple est livré avec son analyse : un rapport produit une fois par un vrai
  * moteur d'IA et enregistré. On découvre ainsi un rapport réaliste sans clé.
  */
+let openingExample: Promise<void> | null = null
+
 async function openExample() {
+  // Un double clic ne doit pas créer deux exemples.
+  openingExample ??= loadExample().finally(() => (openingExample = null))
+  return openingExample
+}
+
+async function loadExample() {
   const { project, responses } = importProject(await (await fetch('/exemple-mediatheque.openscribe.json')).text())
   await putResponses(responses)
   await createProject(project)
