@@ -24,7 +24,7 @@ les règles du projet. Les documents de référence sont dans `docs/`.
 | `testeur` | Joue l'utilisateur dans un vrai navigateur (ordinateur et mobile), cherche ce qui casse, rédige des rapports de test reproductibles. |
 | `modele-simule` | Joue le rôle d'un fournisseur d'IA distant : répond aux demandes de l'application au format exact attendu, pour tester toute la boucle sans clé. |
 | `relecteur-code` | Relit le code comme un mainteneur exigeant : sécurité, simplicité, tests, dette. |
-| `conteur` | Récit du projet : README, page d'accueil, annonces. Plus tard, l'acquisition. |
+| `conteur` | Marketing produit et storytelling : promesse, page d'accueil, README, annonces ; plus tard l'acquisition. Rend simple ce qui est complexe. |
 
 L'orchestrateur choisit la casquette utile, donne au sous-agent tout le
 contexte nécessaire, et vérifie lui-même ce qui revient.
@@ -68,6 +68,10 @@ Règles apprises :
   injectons (chiffres, libellés) : on le corrige à la source, pas à la relecture.
 - Les vraies données révèlent ce que les données fictives cachent : chaque
   fonctionnalité d'analyse est éprouvée sur un corpus réel (privé) avant d'être déclarée faite.
+- Une passe de certification se fait sur un commit figé : on ne touche pas au dépôt pendant qu'elle tourne.
+- Une cible chiffrée dans une consigne (nombre de groupes, de thèmes) est un choix de méthode : le `methodologue` la valide.
+- Un concept, un mot, un acteur nommé : étude, participant, verbatim, idée, motif, thème, segment, occurrences ; « le moteur d'IA propose, le code vérifie ».
+- Tout écran qui quitte une étude offre le retour, et ce retour est couvert par un test de parcours.
 
 ## Principes produit (non négociables)
 
@@ -112,5 +116,7 @@ npm install
 npm run dev        # http://localhost:5173
 npm test           # tests unitaires
 npm run e2e        # parcours utilisateur dans Chromium (ordinateur + mobile)
+# Sur le Mac d'Arnaud (Chromium de Playwright absent) :
+# PW_CHROMIUM="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm run e2e
 npm run build      # vérification des types + build de production
 ```

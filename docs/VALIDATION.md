@@ -1,41 +1,36 @@
 # Validation par Arnaud — 15 minutes
 
-Tout a déjà été testé : 29 tests de règles d'analyse, 12 parcours automatiques (ordinateur et mobile), deux passes de test utilisateur et deux relectures de la langue. Il reste ce que seul un humain avec une vraie clé peut vérifier.
+Déjà vérifié : 32 tests des règles d'analyse, 22 parcours automatiques (ordinateur et mobile), trois passes de test utilisateur (certifiées sur un commit figé), relectures `plume` et `methodologue`. Il reste ce que seul un humain avec un vrai moteur d'IA peut vérifier.
 
-## 1. Lancer (3 min)
+## 1. Lancer
 
-```bash
-git clone https://github.com/Fasterious/openscribe.git openscribe-next
-cd openscribe-next && git checkout next
-npm install && npm run dev
-```
+Pour lancer l'application : `npm run dev`, puis http://localhost:5173.
 
-Ouvrez http://localhost:5173.
+## 2. Première impression (3 min)
 
-## 2. Première impression (2 min)
+- [ ] L'accueil dit en cinq secondes ce que fait l'outil, pour qui, et ce qui est disponible aujourd'hui.
+- [ ] La pastille de l'extrait (« Vitesse de l'application ») déplie les verbatims.
+- [ ] « Voir un exemple de rapport » : les motifs sont fins (un sujet par motif), les thèmes les rapprochent, les avis isolés sont mis à part.
+- [ ] Une pastille de verbatim dans une synthèse déplie les phrases exactes sur place, surlignées dans leur réponse.
 
-- [ ] L'accueil dit clairement ce que fait l'outil.
-- [ ] « Essayer avec un exemple » ouvre directement un rapport crédible.
-- [ ] Ouvrez un groupe, puis cliquez une pastille de citation : la phrase exacte s'affiche, surlignée dans sa réponse.
+## 3. Un vrai moteur (5 min)
 
-## 3. Un vrai moteur gratuit (5 min)
+1. Dans « Moteurs d'IA », choisis **Groq** ou **Mistral** et suis le guide (lien direct vers la page des clés), ou **Ollama** si tu l'installes.
+2. « Enregistrer et tester ».
 
-1. Créez une clé gratuite chez **Mistral** (console.mistral.ai) ou **Groq** (console.groq.com). Vérifiez sur leur site les conditions de l'offre gratuite du moment.
-2. Dans « Moteurs d'IA », ajoutez le moteur, collez la clé, puis cliquez sur « Tester la connexion ».
-3. Ouvrez l'exemple, onglet Analyse, choisissez ce moteur et cliquez sur « Relancer une analyse ».
+> Point non vérifiable d'ici : l'appel direct d'un fournisseur depuis le navigateur. Si le test répond « … refuse peut-être les demandes venant d'un navigateur » alors que la clé est bonne, dis-moi lequel : la solution est connue (un petit relais).
 
-> Point que je n'ai pas pu vérifier d'ici : l'environnement de test n'a pas accès aux fournisseurs d'IA. Si « Tester la connexion » répond « Impossible de joindre… » alors que la clé est bonne, le fournisseur refuse peut-être les appels directs depuis un navigateur. Dites-moi lequel : la solution est connue (un petit relais), je l'ajouterai.
+- [ ] Le test répond, l'en-tête passe au vert, « Revenir à votre étude » ramène à l'étude.
+- [ ] Ouvre l'exemple, onglet Analyse, choisis ce moteur, « Relancer une analyse » : l'ancien rapport reste consultable pendant la relance, les étapes avancent.
+- [ ] Le nouveau rapport : un motif = un sujet ? Les synthèses se lisent comme du bon français ?
+- [ ] Relance avec les mêmes réglages : le rapport ressort identique, instantanément.
 
-- [ ] L'analyse avance étape par étape. Si le fournisseur limite le débit, un message « Nouvel essai dans N s… » s'affiche et l'analyse continue.
-- [ ] Le rapport est cohérent, et le nombre de « citations écartées » reste faible.
-- [ ] Les synthèses se lisent comme du bon français.
-- [ ] Relancez l'analyse avec les mêmes réglages : le rapport doit sortir identique et instantanément (réponses gardées en mémoire).
+## 4. Tes données (5 min)
 
-## 4. Vos données (5 min)
-
-- [ ] Importez un de vos CSV réels. Les rôles de colonnes proposés sont-ils justes ?
-- [ ] Le rapport vous apprend-il quelque chose, et pourriez-vous le montrer à un client ?
+- [ ] Importe le CSV ÉcoSol (ou un autre corpus réel). Les rôles de colonnes proposés sont-ils justes ? Marque les colonnes de profil pour pouvoir afficher des segments.
+- [ ] Sur un vrai corpus, le nombre de motifs te paraît-il juste (ni fourre-tout, ni émiettement) ? C'est le réglage le plus important à confirmer.
+- [ ] Pourrais-tu montrer ce rapport à un client ?
 
 ## Ce qui m'aide le plus en retour
 
-Une capture et une phrase par point qui accroche. Le reste, je m'en occupe.
+Comme aujourd'hui : un test pensé à voix haute, ou une capture et une phrase par point qui accroche.

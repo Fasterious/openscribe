@@ -2,6 +2,22 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-12 — Itération 5 : retour d'Arnaud (accueil, moteurs, méthode)
+
+**Ce qui a marché**
+- Chercher la cause racine avant d'écrire une consigne : le regroupement grossier venait d'une cible numérique (2 à 6 groupes pour 37 idées), pas du modèle.
+- Les relectures croisées en parallèle (`testeur`, `plume`, `methodologue`) : chacune a trouvé ce que les autres ne voyaient pas (faux désaccords sur les thèmes, lexique instable, rapport perdu à la relance, reprise avec le mauvais moteur).
+- Amorcer le pont de test avec les réponses déjà obtenues : regénérer l'exemple ne coûte que les étapes modifiées.
+
+**Ce qui a coûté pour rien**
+- Une première passe `testeur` lancée pendant que le code changeait encore : résultats partiellement périmés. La certification doit se faire sur un commit figé.
+- Un test de parcours dont le sélecteur dépendait d'un libellé qui change au clic ; un autre qui supposait une relance lente alors que le cache la rend instantanée.
+
+**Ce qu'on change**
+- Règle : une passe de certification se fait sur un commit figé, et rien n'est modifié dans le dépôt pendant qu'elle tourne.
+- Règle : une cible chiffrée dans une consigne est un réglage de méthode, à faire valider par le `methodologue`.
+- Règle : tout parcours qui quitte un écran de travail doit offrir le retour, et ce retour est testé.
+
 ## 2026-10-12 — Itération 4 : épreuve du modèle léger
 
 - Le contrôle des chiffres a d'abord produit de fausses alertes sur des sous-comptes vrais (« deux personnes » citées dans deux crochets) : on les vérifie maintenant par phrase. Une alerte doit être juste, sinon on cesse d'y croire.

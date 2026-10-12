@@ -20,7 +20,7 @@ export function App() {
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
           <a href={href({ name: 'home' })} className="flex items-center gap-2 font-semibold">
             <img src="/logo.svg" alt="" className="h-7 w-7" />
-            <span>OpenScribe</span>
+            <span className="hidden min-[400px]:inline">OpenScribe</span>
           </a>
           <nav aria-label="Navigation principale" className="flex items-center gap-1">
             <NavLink href={href({ name: 'synthesis' })} active={inSynthesis}>

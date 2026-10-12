@@ -25,9 +25,10 @@ export function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 }
 
-function engineName(presetId: string): string {
+/** Nom lisible du moteur d'une analyse, pour la Méthode (écran et exports). */
+export function engineName(presetId: string, model?: string): string {
   if (presetId === 'simulation') return 'Simulation (démonstration, contenu fictif)'
-  if (presetId === 'bridge') return 'moteur de test'
+  if (presetId === 'bridge') return `Claude${model ? ` (${model.replace(/^claude-/, '')})` : ''}, via le pont de test`
   return presetById(presetId)?.label ?? presetId
 }
 
@@ -37,7 +38,7 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   return [
     `Participants ayant répondu : ${respondents} ; participants dont au moins une idée a été retenue : ${withIdeas}.`,
     `Idées retenues : ${state.ideas.length} (verbatims vérifiés mot pour mot dans les réponses). Verbatims écartés car introuvables tels quels : ${state.rejected.length}.`,
-    `Moteur d'IA : ${engineName(state.engine.presetId)} · modèle ${state.engine.model} · température ${state.settings.temperature} · graine ${state.settings.seed}.`,
+    `Moteur d'IA : ${engineName(state.engine.presetId, state.engine.model)} · modèle ${state.engine.model} · température ${state.settings.temperature} · graine ${state.settings.seed}.`,
     "Partage des rôles : le moteur d'IA découpe les réponses en idées, propose les motifs et les thèmes, et rédige les synthèses ; le code vérifie chaque verbatim, range chaque idée exactement une fois et calcule tous les chiffres.",
     `Indicateurs v${METRICS_VERSION} : on compte des participants. Consensus = part du plus grand camp parmi les participants ayant exprimé un avis positif ou négatif sur un même motif ; les participants mitigés comptent au dénominateur mais dans aucun camp ; les suggestions et constats neutres sont exclus du calcul. En dessous de 4 participants, on parle de « peu d'avis ». Un thème réunit des motifs différents : on n'y calcule ni consensus ni désaccord.`,
   ]

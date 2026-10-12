@@ -2,7 +2,7 @@ import { Download, FileCode2, Printer, Quote, Users } from 'lucide-react'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { computeMetrics, METRICS_VERSION } from '@/core/analysis/metrics'
 import { describeMetrics, describeTheme } from '@/core/analysis/pipeline'
-import { reportToHtml, reportToMarkdown } from '@/core/analysis/report'
+import { engineName, reportToHtml, reportToMarkdown } from '@/core/analysis/report'
 import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from '@/core/analysis/types'
 import type { Contribution } from '@/core/corpus'
 import { corpusForAnalysis, type Project } from '@/core/project'
@@ -503,7 +503,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
           <p>
-            Le moteur d'IA ({analysis.engine.model}) a découpé les réponses en idées, proposé les motifs et rédigé les synthèses. Le code a
+            Le moteur d'IA ({engineName(analysis.engine.presetId, analysis.engine.model)} · {analysis.engine.model}) a découpé les réponses en idées, proposé les motifs et rédigé les synthèses. Le code a
             vérifié chaque verbatim mot pour mot dans les réponses, rangé chaque idée exactement une fois, calculé tous les chiffres, puis
             contrôlé que chaque nombre cité dans les synthèses correspond à un chiffre calculé ou à un verbatim.
             {analysis.polish && analysis.polish.changed > 0 &&
