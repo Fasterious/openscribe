@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { randomId } from '@/core/ids'
-import { withLimits } from '@/core/providers/limits'
+import { withLimits, type LimitOptions } from '@/core/providers/limits'
 import { createOpenAiCompatibleProvider } from '@/core/providers/openai-compatible'
 import { presetById } from '@/core/providers/presets'
 import { createSimulationProvider } from '@/core/providers/simulation'
@@ -78,7 +78,7 @@ export function newEngineFromPreset(presetId: string): EngineConfig {
   }
 }
 
-export function providerFor(engine: EngineConfig): LlmProvider {
+export function providerFor(engine: EngineConfig, retries = 4, onRetry?: LimitOptions['onRetry']): LlmProvider {
   if (engine.presetId === 'simulation') return createSimulationProvider()
   const preset = presetById(engine.presetId)
   const base = createOpenAiCompatibleProvider({
@@ -90,13 +90,14 @@ export function providerFor(engine: EngineConfig): LlmProvider {
     seedParam: preset?.seedParam ?? 'seed',
     supportsJsonMode: preset?.supportsJsonMode ?? true,
   })
-  return withLimits(base, { requestsPerMinute: engine.requestsPerMinute, concurrency: engine.concurrency, retries: 4 })
+  return withLimits(base, { requestsPerMinute: engine.requestsPerMinute, concurrency: engine.concurrency, retries, onRetry })
 }
 
 /** Vérifie qu'un moteur répond, avec une demande minuscule. */
 export async function testEngine(engine: EngineConfig): Promise<{ ok: boolean; message: string }> {
   try {
-    const provider = providerFor({ ...engine, requestsPerMinute: 600 })
+    // Un test doit répondre vite : pas de nouvelle tentative.
+    const provider = providerFor({ ...engine, requestsPerMinute: 600 }, 0)
     const res = await provider.complete({
       task: 'ping',
       system: 'Réponds uniquement en JSON.',

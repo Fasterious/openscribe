@@ -14,7 +14,7 @@ import { Alert, Badge, Button, Card, CardContent, CardHeader, CardTitle, Dialog,
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
   local: { label: 'Reste sur votre ordinateur', tone: 'positive' },
-  'no-training': { label: 'Pas d’entraînement sur vos données', tone: 'positive' },
+  'no-training': { label: "Pas d'entraînement sur vos données", tone: 'positive' },
   'may-train-free': { label: 'Offre gratuite : données réutilisables', tone: 'warning' },
   check: { label: 'Politique de données à vérifier', tone: 'outline' },
 }
@@ -30,14 +30,41 @@ export function SettingsPage() {
         <h1 className="text-2xl font-bold">Moteurs d'IA</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
           OpenScribe n'a pas de serveur : c'est votre navigateur qui s'adresse directement au fournisseur que vous
-          choisissez, avec votre propre clé. Vous ne payez que ce que vous consommez chez lui, et plusieurs fournisseurs
-          proposent une offre gratuite sans carte bancaire. Vos clés restent enregistrées dans ce navigateur uniquement.
+          choisissez, avec votre propre clé d'accès. Vous ne payez que ce que vous consommez chez lui, et plusieurs fournisseurs
+          proposent une offre gratuite sans carte bancaire. Vos clés d'accès restent enregistrées dans ce navigateur uniquement.
         </p>
       </div>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>Quel moteur choisir ?</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="grid gap-3 text-sm sm:grid-cols-3">
+            <li className="space-y-1">
+              <p className="font-medium">Pour essayer gratuitement</p>
+              <p className="text-muted-foreground">
+                Groq ou Mistral AI : offre gratuite, sans carte bancaire, avec un débit limité.
+              </p>
+            </li>
+            <li className="space-y-1">
+              <p className="font-medium">Pour des données sensibles</p>
+              <p className="text-muted-foreground">Ollama, qui tourne sur votre ordinateur : rien ne sort.</p>
+            </li>
+            <li className="space-y-1">
+              <p className="font-medium">Pour un usage régulier</p>
+              <p className="text-muted-foreground">
+                Une offre payante chez le fournisseur de votre choix ; une étude de quelques dizaines de personnes coûte en général
+                quelques centimes. Consultez sa page de tarifs.
+              </p>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+
       {loaded && engines.length === 0 && (
         <Alert>
-          Aucun moteur configuré. Pour commencer gratuitement : une clé <strong>Groq</strong> ou <strong>Mistral</strong> se crée en quelques
+          Aucun moteur configuré. Pour commencer gratuitement : une clé d'accès <strong>Groq</strong> ou <strong>Mistral</strong> se crée en quelques
           minutes. Pour que rien ne quitte votre ordinateur : <strong>Ollama</strong>.
         </Alert>
       )}
@@ -57,8 +84,8 @@ export function SettingsPage() {
                       <Badge tone={policy.tone}>{policy.label}</Badge>
                     </div>
                     <p className="truncate text-xs text-muted-foreground">
-                      Modèle : {e.model} · {e.requestsPerMinute} requêtes/min
-                      {preset?.needsKey && !e.apiKey ? ' · clé manquante' : ''}
+                      Modèle : {e.model} · {e.requestsPerMinute} demandes/min
+                      {preset?.needsKey && !e.apiKey ? " · clé d'accès manquante" : ''}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -95,10 +122,10 @@ export function SettingsPage() {
             recueilli. Sur certaines offres gratuites, les contenus peuvent servir à entraîner des modèles.
           </p>
           <p>
-            Pour limiter les dépenses : commencez par une offre gratuite, puis fixez un plafond de budget dans la console du
+            Pour limiter les dépenses : commencez par une offre gratuite, puis fixez un plafond de budget dans l'espace client du
             fournisseur avant d'y ajouter une carte.
           </p>
-          <p>Seuls des pseudonymes (P1, P2…) et le texte des réponses sont envoyés au modèle, jamais les noms ni les adresses.</p>
+          <p>Seuls des pseudonymes (P1, P2…) et le texte des réponses sont envoyés au moteur d'IA, jamais les noms ni les adresses.</p>
         </CardContent>
       </Card>
 
@@ -115,7 +142,7 @@ export function SettingsPage() {
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium">{p.label}</span>
-                  <Badge tone={POLICY[p.dataPolicy].tone}>{p.dataPolicy === 'local' ? 'Local' : p.needsKey ? 'Clé' : 'Sans clé'}</Badge>
+                  <Badge tone={POLICY[p.dataPolicy].tone}>{p.dataPolicy === 'local' ? 'Local' : p.needsKey ? 'Clé requise' : 'Sans clé'}</Badge>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">{p.freeTier}</p>
               </button>
@@ -165,7 +192,7 @@ function EngineDialog({ engine, onClose }: { engine: EngineConfig; onClose: () =
 
         {preset?.needsKey !== false && (
           <div className="space-y-2">
-            <Label htmlFor="cle">Clé API</Label>
+            <Label htmlFor="cle">Clé d'accès</Label>
             <Input
               id="cle"
               type="password"
@@ -176,7 +203,7 @@ function EngineDialog({ engine, onClose }: { engine: EngineConfig; onClose: () =
             />
             {preset?.keyUrl && (
               <a href={preset.keyUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
-                <KeyRound className="size-3" /> Créer une clé chez {preset.label} <ExternalLink className="size-3" />
+                <KeyRound className="size-3" /> Créer une clé d'accès chez {preset.label} <ExternalLink className="size-3" />
               </a>
             )}
           </div>
@@ -191,7 +218,7 @@ function EngineDialog({ engine, onClose }: { engine: EngineConfig; onClose: () =
             </datalist>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="debit">Requêtes par minute</Label>
+            <Label htmlFor="debit">Demandes par minute</Label>
             <Input
               id="debit"
               type="number"
@@ -211,11 +238,11 @@ function EngineDialog({ engine, onClose }: { engine: EngineConfig; onClose: () =
               <Input id="nom" value={draft.name} onChange={(e) => set({ name: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="adresse">Adresse de l'API</Label>
+              <Label htmlFor="adresse">Adresse du service</Label>
               <Input id="adresse" value={draft.baseUrl} onChange={(e) => set({ baseUrl: e.target.value.trim() })} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="parallele">Requêtes simultanées</Label>
+              <Label htmlFor="parallele">Demandes simultanées</Label>
               <Input
                 id="parallele"
                 type="number"
@@ -227,7 +254,7 @@ function EngineDialog({ engine, onClose }: { engine: EngineConfig; onClose: () =
             </div>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            Pour des résultats reproductibles, préférez un nom de modèle avec une version datée plutôt qu'un alias « latest ».
+            Pour des résultats reproductibles, préférez un nom de modèle qui finit par une date plutôt que par « latest ».
           </p>
         </details>
 

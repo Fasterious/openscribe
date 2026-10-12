@@ -94,6 +94,15 @@ export function isRunning(projectId: string): boolean {
   return running.has(projectId)
 }
 
+// Message passager pendant une analyse (fournisseur saturé ou injoignable).
+const notices = new Map<string, string>()
+
+export function useRunNotice(projectId: string): string | undefined {
+  const [value, setValue] = useState(notices.get(projectId))
+  useEffect(() => subscribe(`run:${projectId}`, () => setValue(notices.get(projectId))), [projectId])
+  return value
+}
+
 export function useIsRunning(projectId: string): boolean {
   const [value, setValue] = useState(isRunning(projectId))
   useEffect(() => subscribe(`run:${projectId}`, () => setValue(isRunning(projectId))), [projectId])
@@ -114,17 +123,22 @@ export async function startAnalysis(
   const project = await getProject(projectId)
   if (!project) return
   const corpus = corpusForAnalysis(project)
-  const provider = providerFor(engine)
+  const provider = providerFor(engine, 4, ({ waitMs, error }) => {
+    notices.set(projectId, `${error.message} Nouvel essai dans ${Math.round(waitMs / 1000)} s…`)
+    emit(`run:${projectId}`)
+  })
   const initial = resume ?? (await newAnalysis(corpus, settings, provider))
   const controller = new AbortController()
   running.set(projectId, controller)
   emit(`run:${projectId}`)
 
-  const store = (state: AnalysisState) =>
-    updateProject(projectId, (p) => {
+  const store = (state: AnalysisState) => {
+    if (notices.delete(projectId)) emit(`run:${projectId}`)
+    return updateProject(projectId, (p) => {
       const others = p.analyses.filter((a) => a.id !== state.id)
       return { ...p, analyses: [state, ...others].slice(0, 5) }
     })
+  }
 
   try {
     await store({ ...initial, status: 'running' })
@@ -137,6 +151,7 @@ export async function startAnalysis(
     })
   } finally {
     running.delete(projectId)
+    notices.delete(projectId)
     emit(`run:${projectId}`)
   }
 }

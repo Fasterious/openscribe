@@ -5,7 +5,7 @@ import { href, navigate } from '@/app/router'
 import { markInterrupted, useIsRunning, useProject } from '@/app/store'
 import { activeParticipants } from '@/core/corpus'
 import { exportProject } from '@/core/project'
-import { download, slug } from '../format'
+import { download, plural, slug } from '../format'
 import { Badge, Button, Input, Tabs, TabsList, TabsTrigger } from '../primitives'
 import { AnalysisTab } from './AnalysisTab'
 import { DataTab } from './DataTab'
@@ -58,7 +58,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
               }}
             >
               <Input aria-label="Nom de l'étude" autoFocus value={name} onChange={(e) => setName(e.target.value)} />
-              <Button type="submit">OK</Button>
+              <Button type="submit">Enregistrer</Button>
             </form>
           ) : (
             <div className="min-w-0">
@@ -77,7 +77,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
                 </Button>
               </h1>
               <p className="text-sm text-muted-foreground">
-                {activeParticipants(project.corpus).length} personnes · {project.corpus.contributions.length} réponses
+                {plural(activeParticipants(project.corpus).length, 'personne')} · {plural(project.corpus.contributions.length, 'réponse')}
                 {running && (
                   <>
                     {' '}
@@ -88,7 +88,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
             </div>
           )}
           <Button variant="outline" size="sm" onClick={exportFile} disabled={!hasData}>
-            <Download /> Exporter le projet
+            <Download /> Exporter l'étude
           </Button>
         </div>
         <Tabs value={tab} onValueChange={(v) => navigate({ name: 'project', id, tab: v as typeof tab })}>

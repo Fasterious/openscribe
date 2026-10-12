@@ -1,5 +1,5 @@
 import { Download, FileCode2, Printer, Quote, Users } from 'lucide-react'
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { computeMetrics, METRICS_VERSION } from '@/core/analysis/metrics'
 import { describeMetrics } from '@/core/analysis/pipeline'
 import { reportToHtml, reportToMarkdown } from '@/core/analysis/report'
@@ -200,6 +200,21 @@ function QuotesDialog({ title, ids, ctx, onClose }: { title: string; ids: string
 export function ReportTab({ project, analysis }: { project: Project; analysis: AnalysisState }) {
   const corpus = corpusForAnalysis(project)
   const [quotes, setQuotes] = useState<{ title: string; ids: string[] } | null>(null)
+  // À l'impression, tout est déplié : sinon les citations des groupes fermés disparaîtraient du PDF.
+  useEffect(() => {
+    let closed: HTMLDetailsElement[] = []
+    const before = () => {
+      closed = [...document.querySelectorAll<HTMLDetailsElement>('article details:not([open])')]
+      closed.forEach((d) => (d.open = true))
+    }
+    const after = () => closed.forEach((d) => (d.open = false))
+    window.addEventListener('beforeprint', before)
+    window.addEventListener('afterprint', after)
+    return () => {
+      window.removeEventListener('beforeprint', before)
+      window.removeEventListener('afterprint', after)
+    }
+  }, [])
   const attributes = useMemo(() => {
     const map = new Map<string, Set<string>>()
     for (const p of corpus.participants) for (const [k, v] of Object.entries(p.attributes)) map.set(k, (map.get(k) ?? new Set()).add(v))
@@ -258,6 +273,12 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
         </div>
       </div>
 
+      {analysis.engine.presetId === 'bridge' && (
+        <Alert tone="info">
+          Exemple enregistré : ce rapport a été produit une fois par un vrai moteur d'IA ({analysis.engine.model}), sur un questionnaire
+          fictif, puis enregistré pour la démonstration. Pour vos propres données, ajoutez votre moteur dans « Moteurs d'IA ».
+        </Alert>
+      )}
       {simulated && (
         <Alert tone="warning">
           Rapport de démonstration : produit par le moteur de simulation, son contenu est fictif. Configurez un vrai moteur d'IA pour
@@ -410,7 +431,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
             Le modèle de langage ({analysis.engine.model}) a découpé les réponses en idées, proposé les regroupements et rédigé les synthèses.
             Le code a vérifié chaque citation mot pour mot dans les réponses, rangé chaque idée exactement une fois, calculé tous les
             chiffres, puis contrôlé que chaque nombre cité dans les synthèses correspond à un chiffre calculé ou à une citation.
-            {analysis.polish &&
+            {analysis.polish && analysis.polish.changed > 0 &&
               ` Une relecture a ensuite amélioré la langue de ${plural(analysis.polish.changed, 'synthèse')} ; le code a vérifié qu'aucune citation ni aucun chiffre n'avait changé${analysis.polish.refused ? ` et a écarté ${plural(analysis.polish.refused, 'réécriture')} qui ne respectait pas cette règle` : ''}.`}
           </p>
           <p>

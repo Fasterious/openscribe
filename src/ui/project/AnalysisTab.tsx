@@ -2,7 +2,7 @@ import { AlertTriangle, CheckCircle2, Circle, Loader2, Play, RotateCcw, Square, 
 import { useEffect, useMemo, useState } from 'react'
 import { SIMULATION_ENGINE, SIMULATION_ENGINE_ID, useEngines, type EngineConfig } from '@/app/engines'
 import { href, navigate } from '@/app/router'
-import { cancelAnalysis, startAnalysis, useIsRunning } from '@/app/store'
+import { cancelAnalysis, startAnalysis, useIsRunning, useRunNotice } from '@/app/store'
 import { corpusHash } from '@/core/analysis/pipeline'
 import { DEFAULT_SETTINGS, type AnalysisSettings, type AnalysisState, type StepId } from '@/core/analysis/types'
 import { activeParticipants } from '@/core/corpus'
@@ -188,8 +188,8 @@ export function AnalysisTab({ project }: { project: Project }) {
                 </Button>
               ) : (
                 <>
-                  <Button onClick={() => launch()} disabled={!engine || Boolean(missingKey) || (settings.mode === 'grid' && !gridText.trim())}>
-                    <Play /> {latest ? 'Nouvelle analyse' : "Lancer l'analyse"}
+                  <Button variant={latest?.status === 'done' ? 'outline' : 'default'} onClick={() => launch()} disabled={!engine || Boolean(missingKey) || (settings.mode === 'grid' && !gridText.trim())}>
+                    <Play /> {latest ? 'Relancer une analyse' : "Lancer l'analyse"}
                   </Button>
                   {canResume && (
                     <Button variant="outline" onClick={() => launch(latest)}>
@@ -238,9 +238,11 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
     analysis.ideas.forEach((i) => c[i.category]++)
     return c
   }, [analysis.ideas])
+  const notice = useRunNotice(project.id)
 
   return (
     <div className="space-y-4">
+      {running && notice && <Alert tone="warning">{notice}</Alert>}
       {outdated && (
         <Alert tone="warning">
           <AlertTriangle className="mr-1 inline size-4" /> Les données ont changé depuis cette analyse. Lancez une nouvelle analyse pour en

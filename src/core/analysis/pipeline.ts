@@ -687,17 +687,29 @@ function verifyNumbers(corpus: Corpus, state: AnalysisState) {
   const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
   const quotes = (ids: string[]) => ids.map((id) => ideaById.get(id)!.verbatim)
-  for (const g of state.groups) g.unverified = unverifiedNumbers(g.summary, allowedNumbers([g.metrics], quotes(g.ideaIds)))
+  // « Trois personnes jugent l'application lente [I3, I15, I30] » : le nombre de personnes
+  // derrière les références citées se vérifie aussi.
+  const check = (text: string, allowed: Set<number>) => {
+    for (const m of text.matchAll(/\[([^\]]*)\]/g)) {
+      const ideas = m[1].split(/\s*,\s*/).map((id) => ideaById.get(id)).filter((i) => i !== undefined)
+      if (ideas.length) allowed.add(new Set(ideas.map((i) => i.participantId)).size)
+    }
+    return unverifiedNumbers(text, allowed)
+  }
+  for (const g of state.groups) g.unverified = check(g.summary, allowedNumbers([g.metrics], quotes(g.ideaIds)))
   for (const t of state.themes) {
     const groups = t.groupIds.map((id) => groupById.get(id)!)
-    t.unverified = unverifiedNumbers(t.summary, allowedNumbers([t.metrics, ...groups.map((g) => g.metrics)], quotes(groups.flatMap((g) => g.ideaIds))))
+    const allowed = allowedNumbers([t.metrics, ...groups.map((g) => g.metrics)], quotes(groups.flatMap((g) => g.ideaIds)))
+    allowed.add(groups.length) // « ce thème réunit 7 sujets »
+    t.unverified = check(t.summary, allowed)
   }
   const all = computeMetrics(state.ideas)
   const allowed = allowedNumbers([all, ...state.themes.map((t) => t.metrics), ...state.groups.map((g) => g.metrics)], quotes(state.ideas.map((i) => i.id)))
   allowed.add(activeParticipants(corpus).length)
   allowed.add(state.ideas.length)
-  allowed.add(state.themes.length || state.groups.length)
-  state.globalUnverified = unverifiedNumbers(state.globalSummary, allowed)
+  allowed.add(state.themes.length)
+  allowed.add(state.groups.length)
+  state.globalUnverified = check(state.globalSummary, allowed)
 }
 
 export { sortIds }

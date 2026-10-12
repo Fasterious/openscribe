@@ -3,11 +3,10 @@ import { useRef, useState } from 'react'
 import { deleteProject, putResponses } from '@/app/db'
 import { href, navigate } from '@/app/router'
 import { createProject, notifyProjectsChanged, useProjects } from '@/app/store'
-import { analyzeCsv, csvToCorpus, type ColumnRole } from '@/core/import/csv'
 import { importProject, newProject, ProjectFileError, type Project } from '@/core/project'
 import { activeParticipants } from '@/core/corpus'
 import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Dialog, Input, Label } from './primitives'
-import { formatDate } from './format'
+import { formatDate, plural } from './format'
 
 function statusOf(p: Project): { label: string; tone: 'default' | 'positive' | 'warning' | 'outline' } {
   const a = p.analyses[0]
@@ -16,6 +15,18 @@ function statusOf(p: Project): { label: string; tone: 'default' | 'positive' | '
   if (a.status === 'done') return { label: 'Rapport prêt', tone: 'positive' }
   if (a.status === 'running') return { label: 'Analyse en cours', tone: 'default' }
   return { label: 'Analyse interrompue', tone: 'warning' }
+}
+
+/** Crée l'étude d'exemple et l'ouvre. */
+/**
+ * L'exemple est livré avec son analyse : un rapport produit une fois par un vrai
+ * moteur d'IA et enregistré. On découvre ainsi un rapport réaliste sans clé.
+ */
+async function openExample() {
+  const { project, responses } = importProject(await (await fetch('/exemple-mediatheque.openscribe.json')).text())
+  await putResponses(responses)
+  await createProject(project)
+  navigate({ name: 'project', id: project.id, tab: 'report' })
 }
 
 export function Home() {
@@ -34,15 +45,14 @@ export function Home() {
     navigate({ name: 'project', id: p.id, tab: 'data' })
   }
 
-  async function openExample() {
-    const text = await (await fetch('/exemple-mediatheque.csv')).text()
-    const a = analyzeCsv(text)
-    const roles: Record<number, ColumnRole> = Object.fromEntries(a.columns.map((c) => [c.index, c.suggestedRole]))
-    const p = newProject('Exemple — application de médiathèque')
-    p.description = 'Questionnaire fictif de 12 personnes sur une application de médiathèque.'
-    p.corpus = csvToCorpus(a.table, { roles, sourceName: 'exemple-mediatheque.csv' })
-    await createProject(p)
-    navigate({ name: 'project', id: p.id, tab: 'analysis' })
+  async function tryExample() {
+    // Si l'exemple a déjà été ouvert, on y retourne plutôt que d'en créer un doublon.
+    const existing = projects?.find((p) => p.description.startsWith('Questionnaire fictif'))
+    if (existing) {
+      navigate({ name: 'project', id: existing.id, tab: existing.analyses[0]?.status === 'done' ? 'report' : 'analysis' })
+      return
+    }
+    await openExample()
   }
 
   async function openFile(file: File) {
@@ -53,13 +63,14 @@ export function Home() {
       await createProject(project)
       navigate({ name: 'project', id: project.id, tab: project.analyses.some((x) => x.status === 'done') ? 'report' : 'data' })
     } catch (e) {
-      setError(e instanceof ProjectFileError ? e.message : "Impossible de lire ce fichier.")
+      setError(e instanceof ProjectFileError ? e.message : "Impossible de lire ce fichier. Vérifiez qu'il s'agit d'une étude exportée depuis OpenScribe.")
     }
   }
 
   return (
-    <div className="space-y-10">
-      <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-center">
+    <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-x-6">
+      {/* Ordre du DOM : présentation, mes études, boîte à outils (mobile) ; la grille replace la boîte à outils à droite sur grand écran. */}
+      <section className="space-y-4 lg:col-start-1 lg:row-start-1 lg:self-center">
         <div className="space-y-4">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Comprendre ce que les gens disent,
@@ -72,24 +83,24 @@ export function Home() {
           <ul className="grid gap-1 text-sm text-muted-foreground">
             <li>• Gratuit et libre. Vos données restent dans ce navigateur.</li>
             <li>• Vous choisissez votre moteur d'IA, y compris sur votre propre ordinateur.</li>
-            <li>• L'IA lit et rédige ; c'est le code qui vérifie les citations et calcule les chiffres.</li>
+            <li>• Le moteur d'IA lit et rédige ; OpenScribe vérifie les citations et calcule les chiffres.</li>
           </ul>
           <div className="flex flex-wrap gap-2 pt-1">
             <Button onClick={() => setCreating(true)}>
               <Plus /> Nouvelle étude
             </Button>
-            <Button variant="outline" onClick={openExample}>
+            <Button variant="outline" onClick={tryExample}>
               <Sparkles /> Essayer avec un exemple
             </Button>
             <Button variant="ghost" onClick={() => fileRef.current?.click()}>
-              <FileUp /> Ouvrir un fichier de projet
+              <FileUp /> Ouvrir une étude enregistrée
             </Button>
             <input
               ref={fileRef}
               type="file"
               accept=".json,application/json"
               className="hidden"
-              aria-label="Fichier de projet OpenScribe"
+              aria-label="Fichier d'étude OpenScribe"
               onChange={(e) => {
                 const f = e.target.files?.[0]
                 if (f) openFile(f)
@@ -99,20 +110,9 @@ export function Home() {
           </div>
           {error && <Alert tone="error">{error}</Alert>}
         </div>
-        <Card className="bg-accent/40">
-          <CardHeader>
-            <CardTitle>La boîte à outils</CardTitle>
-            <CardDescription>Des modules indépendants, qui parlent le même langage.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Module icon={<FlaskConical />} title="Synthèse" text="Des réponses ouvertes au rapport : idées, groupes, consensus et désaccords." ready />
-            <Module icon={<Mic />} title="Observation" text="Entretiens et tests : transcription, locuteurs, vidéo ancrée." />
-            <Module icon={<Users />} title="Personas" text="Des profils à partir de questionnaires à échelles." />
-          </CardContent>
-        </Card>
       </section>
 
-      <section aria-labelledby="mes-etudes" className="space-y-3">
+      <section aria-labelledby="mes-etudes" className="space-y-3 lg:col-span-2 lg:row-start-2">
         <h2 id="mes-etudes" className="text-lg font-semibold">
           Mes études
         </h2>
@@ -137,7 +137,7 @@ export function Home() {
                         <Badge tone={st.tone}>{st.label}</Badge>
                       </div>
                       <p className="mt-2 text-xs text-muted-foreground">
-                        {activeParticipants(p.corpus).length} personnes · {p.corpus.contributions.length} réponses · modifiée le{' '}
+                        {plural(activeParticipants(p.corpus).length, 'personne')} · {plural(p.corpus.contributions.length, 'réponse')} · modifiée le{' '}
                         {formatDate(p.updatedAt)}
                       </p>
                     </a>
@@ -152,6 +152,20 @@ export function Home() {
             })}
           </ul>
         )}
+      </section>
+
+      <section aria-label="La boîte à outils" className="lg:col-start-2 lg:row-start-1 lg:self-center">
+        <Card className="bg-accent/40">
+          <CardHeader>
+            <CardTitle>La boîte à outils</CardTitle>
+            <CardDescription>Des modules indépendants, qui parlent le même langage.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Module icon={<FlaskConical />} title="Synthèse" text="Des réponses ouvertes au rapport : idées, groupes, consensus et désaccords." ready />
+            <Module icon={<Mic />} title="Observation" text="Entretiens et tests : transcription, locuteurs, vidéo synchronisée avec le texte." />
+            <Module icon={<Users />} title="Personas" text="Des profils à partir de questionnaires à échelles." />
+          </CardContent>
+        </Card>
       </section>
 
       <Dialog open={creating} onOpenChange={setCreating} title="Nouvelle étude" description="Donnez-lui un nom ; vous pourrez le changer plus tard.">

@@ -11,6 +11,7 @@
  *
  * Usage :
  *   npx tsx scripts/bridge.ts <fichier.csv> <dossier> [--question "objectif"] [--concurrency 10]
+ *     [--export etude.openscribe.json --name "Nom de l'étude" --description "…"]
  *
  * Le script écrit `<dossier>/state.json` à chaque étape, puis
  * `<dossier>/rapport.md` et `<dossier>/rapport.html` à la fin.
@@ -18,6 +19,7 @@
 import { createHash } from 'node:crypto'
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
+import { exportProject, newProject } from '../src/core/project'
 import { newAnalysis, runAnalysis } from '../src/core/analysis/pipeline'
 import { reportToHtml, reportToMarkdown } from '../src/core/analysis/report'
 import type { ResponseCache } from '../src/core/analysis/runner'
@@ -120,3 +122,15 @@ writeFileSync(join(dir, 'rapport.html'), reportToHtml(state, corpus, title))
 console.log('Terminé :', state.status, state.error ?? '', `${state.ideas.length} idées, ${state.groups.length} groupes, ${state.themes.length} thèmes, ${state.rejected.length} citations écartées`)
 const pending = readdirSync(join(dir, 'requests')).filter((f) => !existsSync(join(dir, 'responses', f)))
 console.log('Demandes sans réponse :', pending.length)
+
+// Export d'une étude complète (corpus, analyse, réponses), ouvrable dans l'application.
+const exportPath = opt('export')
+if (exportPath && state.status === 'done') {
+  const project = newProject(opt('name') ?? title)
+  project.description = opt('description') ?? ''
+  project.corpus = corpus
+  project.analyses = [state]
+  const responses = Object.fromEntries(state.cacheKeys.filter((k) => k in cacheData).map((k) => [k, cacheData[k]]))
+  writeFileSync(exportPath, exportProject(project, responses))
+  console.log('Étude exportée :', exportPath)
+}

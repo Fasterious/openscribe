@@ -12,7 +12,7 @@ type Update = (change: (p: Project) => Project) => Promise<Project | undefined>
 
 const ROLE_LABEL: Record<ColumnRole, string> = {
   open: 'Réponse ouverte — à analyser',
-  attribute: 'Profil — pour comparer des groupes',
+  attribute: 'Profil — pour filtrer le rapport',
   identity: 'Nom ou identifiant — non envoyé',
   ignore: 'Ignorer',
 }
@@ -191,10 +191,16 @@ function ImportPanel({
   async function readFile(file: File) {
     setError(null)
     if (/\.(xlsx|xls|ods|numbers)$/i.test(file.name)) {
-      setError('Ce format de tableur n’est pas encore lu directement. Exportez la feuille en CSV (Fichier › Télécharger › CSV) puis importez-la.')
+      setError(
+        "Ce format de tableur n'est pas encore lu directement. Exportez la feuille en CSV (Google Sheets : Fichier › Télécharger › CSV ; Excel : Enregistrer sous › CSV) puis importez-la.",
+      )
       return
     }
     const text = await file.text()
+    if (!text.trim()) {
+      setError('Ce fichier est vide.')
+      return
+    }
     if (/\.(txt|md|srt|vtt)$/i.test(file.name)) {
       setMode('text')
       setTextInitial({ name: file.name, text })
@@ -310,7 +316,7 @@ function CsvMapping({
         </CardTitle>
         <CardDescription>
           {plural(csv.analysis.table.rows.length, 'ligne')} · {plural(csv.analysis.columns.length, 'colonne')}. Vérifiez le rôle de chaque colonne :
-          nous l'avons deviné, à vous de corriger.
+          nous proposons un rôle pour chacune ; corrigez-le si besoin.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -321,7 +327,7 @@ function CsvMapping({
               <div className="min-w-0">
                 <p className="text-sm font-medium">{c.header}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {c.filled} réponses · ex. : {c.samples.join(' · ') || '—'}
+                  {plural(c.filled, 'réponse')} · ex. : {c.samples.join(' · ') || '—'}
                 </p>
               </div>
               <Select
@@ -389,7 +395,7 @@ function TextImport({
             rows={10}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder={'Animatrice : Comment s’est passée votre inscription ?\nJulie : Plutôt simplement, mais le mot de passe…'}
+            placeholder={"Animatrice : Comment s'est passée votre inscription ?\nJulie : Plutôt simplement, mais le mot de passe…"}
           />
         </div>
         {detected.hasSpeakers && (

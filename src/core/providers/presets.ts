@@ -1,5 +1,5 @@
 /**
- * Registre des fournisseurs de modèles de langage.
+ * Registre des fournisseurs de moteurs d'IA.
  *
  * Ces informations changent souvent (offres gratuites, modèles, politiques de
  * données). Elles sont regroupées ici pour être mises à jour sans toucher au
@@ -21,7 +21,7 @@ export interface ProviderPreset {
   /** Nom du paramètre de graine, si le fournisseur en accepte un. */
   seedParam?: 'seed' | 'random_seed'
   supportsJsonMode: boolean
-  /** Requêtes par minute conseillées sur l'offre gratuite. */
+  /** Demandes par minute conseillées sur l'offre gratuite. */
   freeRequestsPerMinute: number
   freeTier: string
   dataPolicy: DataPolicy
@@ -43,7 +43,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     freeTier: 'Offre « Experiment » gratuite, sans carte bancaire (vérification par téléphone), débit très limité.',
     dataPolicy: 'may-train-free',
     dataNote:
-      "Sur l'offre gratuite, vos données peuvent servir à améliorer les modèles, sauf si vous le refusez dans la console. Hébergement en Europe.",
+      "Sur l'offre gratuite, vos données peuvent servir à améliorer les modèles, sauf si vous le refusez dans votre espace client chez Mistral. Hébergement en Europe.",
   },
   {
     id: 'groq',
@@ -56,7 +56,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     seedParam: 'seed',
     supportsJsonMode: true,
     freeRequestsPerMinute: 20,
-    freeTier: 'Offre gratuite sans carte bancaire, limitée en requêtes par jour.',
+    freeTier: 'Offre gratuite sans carte bancaire, limitée en nombre de demandes par jour.',
     dataPolicy: 'check',
     dataNote: "Vérifiez la politique de données de l'offre gratuite avant d'y envoyer des données de participants.",
   },
@@ -101,7 +101,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     seedParam: 'seed',
     supportsJsonMode: true,
     freeRequestsPerMinute: 60,
-    freeTier: 'Gratuit : le modèle tourne sur votre machine. Plus lent sur un ordinateur modeste.',
+    freeTier: "Gratuit : le moteur d'IA tourne sur votre ordinateur. Plus lent sur un ordinateur modeste.",
     dataPolicy: 'local',
     dataNote: "Rien ne quitte votre ordinateur. Ollama doit autoriser l'origine de cette page (variable OLLAMA_ORIGINS).",
   },

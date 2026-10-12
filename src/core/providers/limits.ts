@@ -7,6 +7,8 @@ export interface LimitOptions {
   concurrency: number
   /** Nouvelles tentatives sur erreur temporaire (429, 5xx, réseau). */
   retries: number
+  /** Prévenu avant chaque nouvelle tentative, pour l'afficher à l'utilisateur. */
+  onRetry?: (info: { attempt: number; waitMs: number; error: Error }) => void
   /** Pour les tests : attente simulée. */
   sleep?: (ms: number, signal?: AbortSignal) => Promise<void>
   now?: () => number
@@ -75,6 +77,7 @@ export function withLimits(provider: LlmProvider, options: LimitOptions): LlmPro
             if (!retryable || attempt >= options.retries || req.signal?.aborted) throw e
             const backoff = err.retryAfterMs ?? Math.min(60_000, 2_000 * 2 ** attempt)
             attempt++
+            options.onRetry?.({ attempt, waitMs: backoff, error: err })
             await sleep(backoff, req.signal)
           }
         }

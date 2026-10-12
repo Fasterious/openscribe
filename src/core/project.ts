@@ -93,6 +93,9 @@ const fileSchema = z.object({
 
 export class ProjectFileError extends Error {}
 
+const NOT_A_STUDY =
+  "Ce fichier n'est pas une étude OpenScribe, ou il est abîmé. Choisissez le fichier .openscribe.json exporté depuis OpenScribe."
+
 /**
  * Lit un fichier de projet. Un projet importé reçoit un nouvel identifiant
  * pour ne jamais écraser un projet existant.
@@ -102,12 +105,12 @@ export function importProject(text: string): { project: Project; responses: Reco
   try {
     raw = JSON.parse(text)
   } catch {
-    throw new ProjectFileError("Ce fichier n'est pas un projet OpenScribe lisible.")
+    throw new ProjectFileError(NOT_A_STUDY)
   }
   const parsed = fileSchema.safeParse(raw)
-  if (!parsed.success) throw new ProjectFileError("Ce fichier n'est pas un projet OpenScribe valide.")
+  if (!parsed.success) throw new ProjectFileError(NOT_A_STUDY)
   if (parsed.data.formatVersion > PROJECT_FORMAT_VERSION || parsed.data.project.corpus.formatVersion > CORPUS_FORMAT_VERSION) {
-    throw new ProjectFileError('Ce projet a été créé avec une version plus récente d’OpenScribe. Mettez l’application à jour.')
+    throw new ProjectFileError("Cette étude a été créée avec une version plus récente d'OpenScribe. Mettez l'application à jour.")
   }
   const p = parsed.data.project as unknown as Project
   const now = new Date().toISOString()
