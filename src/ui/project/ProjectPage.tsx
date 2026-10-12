@@ -6,7 +6,7 @@ import { markInterrupted, useIsRunning, useProject } from '@/app/store'
 import { activeParticipants } from '@/core/corpus'
 import { exportProject } from '@/core/project'
 import { download, plural, slug } from '../format'
-import { Badge, Button, Input, Tabs, TabsList, TabsTrigger, Tooltip } from '../primitives'
+import { Alert, Badge, Button, Input, Tabs, TabsList, TabsTrigger, Tooltip } from '../primitives'
 import { AnalysisTab } from './AnalysisTab'
 import { DataTab } from './DataTab'
 import { ReportTab } from './ReportTab'
@@ -35,8 +35,10 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
     )
 
   const hasData = project.corpus.contributions.length > 0
-  const latest = project.analyses[0]
-  const hasReport = latest?.status === 'done'
+  // Le rapport affiché est celui de la dernière analyse terminée : une relance qui échoue ne le fait pas disparaître.
+  const report = project.analyses.find((a) => a.status === 'done')
+  const hasReport = Boolean(report)
+  const newerThanReport = report && project.analyses[0] !== report ? project.analyses[0] : undefined
 
   async function exportFile() {
     const keys = [...new Set(project!.analyses.flatMap((a) => a.cacheKeys ?? []))]
@@ -66,7 +68,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
           ) : (
             <div className="min-w-0">
               <h1 className="flex items-center gap-2 text-2xl font-bold">
-                <span className="truncate">{project.name}</span>
+                <span className="break-words">{project.name}</span>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -121,7 +123,17 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
 
       {tab === 'data' && <DataTab project={project} update={update} />}
       {tab === 'analysis' && hasData && <AnalysisTab project={project} />}
-      {tab === 'report' && hasReport && <ReportTab project={project} analysis={latest} />}
+      {tab === 'report' && report && newerThanReport && (
+        <Alert tone={newerThanReport.status === 'running' ? 'info' : 'warning'} className="no-print">
+          {newerThanReport.status === 'running'
+            ? "Une nouvelle analyse est en cours. Ce rapport, issu de l'analyse précédente, reste affiché jusqu'à ce qu'elle se termine."
+            : "La dernière analyse ne s'est pas terminée. Ce rapport est celui de l'analyse précédente, toujours valable."}{' '}
+          <a className="font-medium underline" href={href({ name: 'project', id, tab: 'analysis' })}>
+            Voir l'analyse
+          </a>
+        </Alert>
+      )}
+      {tab === 'report' && report && <ReportTab project={project} analysis={report} />}
       {tab !== 'data' && !hasData && (
         <p className="text-sm text-muted-foreground">
           Importez d'abord des données. <a className="text-primary underline" href={href({ name: 'project', id, tab: 'data' })}>Aller aux données</a>

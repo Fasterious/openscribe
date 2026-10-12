@@ -412,7 +412,7 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
         </div>
         <ul className="grid gap-2 sm:grid-cols-2">
           {overview
-            .filter((s) => s.shown.participants > 0)
+            .filter((s) => s.shown.participants > 1)
             .map((s) => (
               <li key={s.id}>
                 <a href={`#sec-${s.id}`} className="block rounded-lg border bg-card p-3 hover:border-primary" onClick={(e) => {
@@ -436,6 +436,30 @@ export function ReportTab({ project, analysis }: { project: Project; analysis: A
               </li>
             ))}
         </ul>
+        {overview.some((s) => s.shown.participants === 1) && (
+          <div className="rounded-lg border border-dashed bg-card p-3 text-sm">
+            <p className="font-medium">Avis isolés</p>
+            <p className="text-xs text-muted-foreground">Portés chacun par un seul participant : à lire comme des signaux, pas comme des tendances.</p>
+            <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+              {overview
+                .filter((s) => s.shown.participants === 1)
+                .map((s) => (
+                  <li key={s.id}>
+                    <a
+                      href={`#sec-${s.id}`}
+                      className="text-primary underline-offset-4 hover:underline"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        document.getElementById(`sec-${s.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }}
+                    >
+                      {s.title}
+                    </a>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       <section className="space-y-6">

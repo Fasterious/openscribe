@@ -23,6 +23,8 @@ import type { ChatRequest, ChatResult, LlmProvider } from './types'
  */
 
 export interface SimulationFaults {
+  /** Délai par demande, en millisecondes : pour voir les étapes avancer comme avec un vrai moteur. */
+  delayMs?: number
   /** Une citation sur N est légèrement reformulée. */
   paraphraseEvery?: number
   /** Le regroupement oublie un élément sur N. */
@@ -189,7 +191,7 @@ export function createSimulationProvider(faults: SimulationFaults = {}): LlmProv
     fingerprint: { presetId: 'simulation', model: 'simulation-v1', baseUrl: 'local' },
     async complete(req: ChatRequest): Promise<ChatResult> {
       if (req.signal?.aborted) throw new DOMException('Aborted', 'AbortError')
-      await new Promise((r) => setTimeout(r, 0))
+      await new Promise((r) => setTimeout(r, faults.delayMs ?? 0))
       if (brokenOnce.has(req.task) && !req.user.includes('ATTENTION')) {
         brokenOnce.delete(req.task)
         return { text: '{"oups": ' }

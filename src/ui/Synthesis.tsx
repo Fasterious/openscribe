@@ -25,7 +25,7 @@ export function isExample(p: Project): boolean {
 }
 
 export function projectHref(p: Project): string {
-  return href({ name: 'project', id: p.id, tab: p.analyses[0]?.status === 'done' ? 'report' : 'data' })
+  return href({ name: 'project', id: p.id, tab: p.analyses.some((a) => a.status === 'done') ? 'report' : 'data' })
 }
 
 let openingExample: Promise<void> | null = null
@@ -91,16 +91,21 @@ export function useStudyActions() {
 
 function NewStudyDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const [name, setName] = useState('')
+  const [creating, setCreating] = useState(false)
   return (
     <Dialog open={open} onOpenChange={onOpenChange} title="Nouvelle étude" description="Donnez un nom à votre étude ; vous pourrez le changer plus tard.">
       <form
         className="space-y-4"
         onSubmit={async (e) => {
           e.preventDefault()
-          const p = newProject(name)
+          // Un double clic ou un double Entrée ne doit pas créer deux études.
+          if (creating) return
+          setCreating(true)
+          const p = newProject(name || `Étude du ${formatDate(new Date().toISOString())}`)
           await createProject(p)
           onOpenChange(false)
           setName('')
+          setCreating(false)
           navigate({ name: 'project', id: p.id, tab: 'data' })
         }}
       >
@@ -112,7 +117,9 @@ function NewStudyDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (
           <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
-          <Button type="submit">Créer</Button>
+          <Button type="submit" disabled={creating}>
+            Créer
+          </Button>
         </div>
       </form>
     </Dialog>

@@ -114,7 +114,7 @@ describe('regroupement', () => {
     )
     const text = describeTheme({ metrics: theme }, [{ metrics: a }, { metrics: b }])
     expect(text).not.toMatch(/consensus|partagés|peu d'avis/)
-    expect(text).toContain('2 sujets')
+    expect(text).toContain('2 motifs')
   })
 })
 

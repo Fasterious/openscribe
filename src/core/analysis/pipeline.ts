@@ -474,8 +474,8 @@ export function describeTheme(theme: { metrics: Metrics }, groups: { metrics: Me
   const base = describeMetrics(theme.metrics, lang, { stance: false })
   const divided = groups.filter((g) => g.metrics.stance === 'divided').length
   const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
-  if (lang === 'en') return `${base}; ${n(groups.length, 'topic')}${divided ? `, ${divided} with divided opinions` : ''}`
-  return `${base} ; ${n(groups.length, 'sujet')}${divided ? `, dont ${divided} aux avis partagés` : ''}`
+  if (lang === 'en') return `${base}; ${n(groups.length, 'pattern')}${divided ? `, ${divided} with divided opinions` : ''}`
+  return `${base} ; ${n(groups.length, 'motif')}${divided ? `, dont ${divided} aux avis partagés` : ''}`
 }
 
 /** Ne garde que les références [I…] qui appartiennent bien au périmètre. */
@@ -632,8 +632,8 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
   const single = state.groups.filter((g) => g.metrics.participants === 1).length
   const facts =
     lang === 'en'
-      ? `${state.ideas.length} ideas from ${all.participants} people (out of ${respondents} who answered), ${state.groups.length} topics${state.themes.length ? ` grouped into ${state.themes.length} themes` : ''}; ${single} of these topics rest on a single person.`
-      : `${state.ideas.length} idées exprimées par ${all.participants} participants (sur ${respondents} ayant répondu), ${state.groups.length} sujets${state.themes.length ? ` regroupés en ${state.themes.length} thèmes` : ''} ; ${single} de ces sujets ne reposent que sur un participant.`
+      ? `${state.ideas.length} ideas from ${all.participants} people (out of ${respondents} who answered), ${state.groups.length} patterns${state.themes.length ? ` grouped into ${state.themes.length} themes` : ''}; ${single} of these patterns rest on a single person.`
+      : `${state.ideas.length} idées exprimées par ${all.participants} participants (sur ${respondents} ayant répondu), ${state.groups.length} motifs${state.themes.length ? ` regroupés en ${state.themes.length} thèmes` : ''} ; ${single} de ces motifs ne reposent que sur un participant.`
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
   const sections = state.themes.length
     ? state.themes.map((t) => ({ title: t.title, facts: describeTheme(t, t.groupIds.map((id) => groupById.get(id)!), lang), summary: t.summary }))

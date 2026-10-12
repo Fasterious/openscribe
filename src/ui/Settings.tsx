@@ -62,10 +62,17 @@ export function SettingsPage({ back }: { back?: string }) {
       </header>
 
       {backHref && loaded && engines.length > 0 && (
-        <Alert tone="success" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <span>
-            <CheckCircle2 className="mr-1 inline size-4" /> Votre moteur est prêt : vous pouvez lancer l'analyse.
-          </span>
+        <Alert
+          tone={engines.some((e) => e.verified !== false) ? 'success' : 'warning'}
+          className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+          {engines.some((e) => e.verified !== false) ? (
+            <span>
+              <CheckCircle2 className="mr-1 inline size-4" /> Votre moteur est prêt : vous pouvez lancer l'analyse.
+            </span>
+          ) : (
+            <span>Votre moteur est enregistré, mais il n'a pas répondu au test. Vérifiez sa configuration avant de lancer l'analyse.</span>
+          )}
           <a href={backHref}>
             <Button size="sm" tabIndex={-1}>
               <ArrowLeft /> Revenir à votre étude
@@ -91,6 +98,7 @@ export function SettingsPage({ back }: { back?: string }) {
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-medium">{e.name}</span>
                           {defaultId === e.id && <Badge tone="positive">Utilisé par défaut</Badge>}
+                          {e.verified === false && <Badge tone="warning">N'a pas répondu au test</Badge>}
                           <Badge tone={policy.tone}>{policy.label}</Badge>
                         </div>
                         <p className="truncate text-xs text-muted-foreground">
@@ -134,7 +142,7 @@ export function SettingsPage({ back }: { back?: string }) {
                 <li key={p.id}>
                   <ProviderCard
                     preset={p}
-                    configured={engines.some((e) => e.presetId === p.id)}
+                    configured={engines.some((e) => e.presetId === p.id && e.verified !== false)}
                     ollama={p.id === 'ollama' ? ollama.status : undefined}
                     compact={f.id === 'other'}
                     onSetup={() => setEditing(engines.find((e) => e.presetId === p.id) ?? newEngineFromPreset(p.id))}
@@ -283,7 +291,7 @@ function SetupDialog({
     setState({ phase: 'testing' })
     const res = await testEngine(draft)
     if (res.ok) {
-      await saveEngine(draft)
+      await saveEngine({ ...draft, verified: true })
       setState({ phase: 'ok' })
     } else setState({ phase: 'error', message: res.message })
   }
@@ -451,7 +459,7 @@ function SetupDialog({
                 type="button"
                 variant="ghost"
                 onClick={async () => {
-                  await saveEngine(draft)
+                  await saveEngine({ ...draft, verified: false })
                   onClose()
                 }}
               >

@@ -48,7 +48,9 @@ export function AnalysisTab({ project }: { project: Project }) {
   const allEngines = useMemo(() => [...engines, SIMULATION_ENGINE], [engines])
   useEffect(() => {
     if (!loaded || engineId) return
-    setEngineId(defaultId && engines.some((e) => e.id === defaultId) ? defaultId : engines[0]?.id ?? SIMULATION_ENGINE_ID)
+    // Un moteur qui n'a pas répondu au test n'est jamais choisi d'office.
+    const usable = engines.filter((e) => e.verified !== false)
+    setEngineId(defaultId && usable.some((e) => e.id === defaultId) ? defaultId : usable[0]?.id ?? SIMULATION_ENGINE_ID)
   }, [loaded, defaultId, engines, engineId])
   useEffect(() => {
     corpusHash(corpusForAnalysis(project)).then(setHash)
@@ -135,6 +137,14 @@ export function AnalysisTab({ project }: { project: Project }) {
                   </a>
                 </Alert>
               )}
+              {engine?.verified === false && (
+                <Alert tone="warning">
+                  Ce moteur n'a pas répondu au dernier test de connexion.{' '}
+                  <a className="font-medium underline" href={href({ name: 'settings', back: project.id })}>
+                    Vérifier le moteur
+                  </a>
+                </Alert>
+              )}
               {engine?.presetId === 'simulation' && (
                 <Alert tone="warning">
                   La simulation fonctionne sans clé ni connexion, mais son contenu est fictif : elle sert à découvrir le parcours, pas à
@@ -203,6 +213,9 @@ export function AnalysisTab({ project }: { project: Project }) {
                   <Button variant={latest?.status === 'done' ? 'outline' : 'default'} onClick={() => launch()} disabled={!engine || Boolean(missingKey) || (settings.mode === 'grid' && !gridText.trim())}>
                     <Play /> {latest ? 'Relancer une analyse' : "Lancer l'analyse"}
                   </Button>
+                  {project.analyses.some((a) => a.status === 'done') && (
+                    <p className="w-full text-xs text-muted-foreground">Le rapport actuel reste consultable jusqu'à la fin de la nouvelle analyse.</p>
+                  )}
                   {canResume && (
                     <Button variant="outline" onClick={() => launch(latest)}>
                       <RotateCcw /> Reprendre

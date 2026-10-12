@@ -17,6 +17,8 @@ export interface EngineConfig {
   model: string
   requestsPerMinute: number
   concurrency: number
+  /** false : enregistré alors que le test de connexion a échoué. On ne le choisit pas d'office. */
+  verified?: boolean
 }
 
 export const SIMULATION_ENGINE_ID = 'simulation'
@@ -49,7 +51,7 @@ export async function saveEngine(engine: EngineConfig): Promise<void> {
   if (i >= 0) all[i] = engine
   else all.push(engine)
   await setSetting(KEY, all)
-  if (!(await getSetting<string>(DEFAULT_KEY))) await setSetting(DEFAULT_KEY, engine.id)
+  if (engine.verified !== false && !(await getSetting<string>(DEFAULT_KEY))) await setSetting(DEFAULT_KEY, engine.id)
   notify()
 }
 
@@ -79,7 +81,8 @@ export function newEngineFromPreset(presetId: string): EngineConfig {
 }
 
 export function providerFor(engine: EngineConfig, retries = 4, onRetry?: LimitOptions['onRetry']): LlmProvider {
-  if (engine.presetId === 'simulation') return createSimulationProvider()
+  // La simulation prend un peu de temps, pour que la découverte montre les étapes avancer.
+  if (engine.presetId === 'simulation') return createSimulationProvider({ delayMs: 400 })
   const preset = presetById(engine.presetId)
   const base = createOpenAiCompatibleProvider({
     presetId: engine.presetId,

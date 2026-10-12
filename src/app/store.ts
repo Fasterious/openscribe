@@ -135,8 +135,12 @@ export async function startAnalysis(
   const store = (state: AnalysisState) => {
     if (notices.delete(projectId)) emit(`run:${projectId}`)
     return updateProject(projectId, (p) => {
-      const others = p.analyses.filter((a) => a.id !== state.id)
-      return { ...p, analyses: [state, ...others].slice(0, 5) }
+      const all = [state, ...p.analyses.filter((a) => a.id !== state.id)]
+      const kept = all.slice(0, 5)
+      // On ne perd jamais le dernier rapport terminé, même après plusieurs relances ratées.
+      const lastDone = all.find((a) => a.status === 'done')
+      if (lastDone && !kept.includes(lastDone)) kept[kept.length - 1] = lastDone
+      return { ...p, analyses: kept }
     })
   }
 

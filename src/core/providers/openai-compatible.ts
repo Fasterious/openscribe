@@ -163,12 +163,12 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
         const fatal = status === 401 || status === 403 || status === 404
         const message =
           status === 401 || status === 403
-            ? `${config.label} refuse la clé d'accès (erreur ${status}). Vérifiez-la dans « Moteurs d'IA ».`
+            ? `${config.label} refuse la clé d'accès (erreur ${status}) : vérifiez qu'elle a été copiée en entier, sans espace, et qu'elle est toujours active.`
             : status === 404
-              ? `${config.label} ne trouve pas le modèle « ${config.model} » (erreur 404). Vérifiez le nom du modèle dans « Moteurs d'IA ».`
+              ? `${config.label} ne trouve pas le modèle « ${config.model} » (erreur 404) : vérifiez le nom du modèle dans la configuration du moteur.`
               : status === 429
-                ? `${config.label} reçoit trop de demandes et les refuse pour l'instant (erreur 429). Réessayez dans une minute, ou baissez le nombre de demandes par minute dans « Moteurs d'IA ».`
-                : `${config.label} a répondu par une erreur ${status}. Réessayez dans un instant ; si cela se répète, vérifiez le moteur dans « Moteurs d'IA ».${detail ? ` Détail technique : ${detail}` : ''}`
+                ? `${config.label} reçoit trop de demandes et les refuse pour l'instant (erreur 429). Réessayez dans une minute, ou baissez le nombre de demandes par minute (réglages avancés du moteur).`
+                : `${config.label} a répondu par une erreur ${status}. Réessayez dans un instant ; si cela se répète, vérifiez la configuration du moteur.${detail ? ` Détail technique : ${detail}` : ''}`
         throw new ProviderError(message, {
           status,
           fatal,

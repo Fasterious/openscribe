@@ -10,7 +10,7 @@ import { SynthesisPage } from './Synthesis'
 export function App() {
   const route = useRoute()
   const { engines, defaultId, loaded } = useEngines()
-  const engine = engines.find((e) => e.id === defaultId) ?? engines[0]
+  const engine = engines.find((e) => e.id === defaultId) ?? engines.find((e) => e.verified !== false)
   const inSynthesis = route.name === 'synthesis' || route.name === 'project'
 
   return (
@@ -27,7 +27,7 @@ export function App() {
             </NavLink>
             <NavLink href={href({ name: 'settings' })} active={route.name === 'settings'}>
               <KeyRound className="size-4" />
-              <span className="hidden sm:inline">Moteurs d'IA</span>
+              <span>Moteurs d'IA</span>
               {loaded && (
                 <span
                   className={cn(
@@ -36,7 +36,8 @@ export function App() {
                   )}
                 >
                   <span className={cn('size-1.5 rounded-full', engine ? 'bg-positive' : 'bg-warning')} aria-hidden />
-                  {engine ? engine.name.replace(/ \(.*\)$/, '') : 'à choisir'}
+                  <span className="hidden whitespace-nowrap sm:inline">{engine ? engine.name.replace(/ \(.*\)$/, '') : 'à choisir'}</span>
+                  <span className="sr-only sm:hidden">{engine ? `Moteur : ${engine.name}` : 'Moteur à choisir'}</span>
                 </span>
               )}
             </NavLink>

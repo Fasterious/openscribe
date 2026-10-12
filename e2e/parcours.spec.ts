@@ -152,14 +152,16 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   // Le test échoue (fausse clé, pas de réseau) : on peut quand même enregistrer.
   await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()
   await dialog.getByRole('button', { name: 'Enregistrer quand même' }).click()
-  await expect(page.getByText('Utilisé par défaut')).toBeVisible()
+  // Non vérifié : enregistré, mais ni annoncé prêt ni choisi par défaut.
+  await expect(page.getByText("N'a pas répondu au test", { exact: true })).toBeVisible()
 
   // Retour à l'étude en un clic.
   await page.getByRole('link', { name: 'Revenir à votre étude' }).first().click()
   expect(page.url()).toContain(studyUrl.split('#')[1].split('/').slice(0, 3).join('/'))
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Étude moteur')
-  await page.reload()
-  await expect(page.getByRole('navigation').getByText('Groq')).toBeVisible()
+  await page.goto('/#/moteurs')
+  await expect(page.getByRole('heading', { name: 'Vos moteurs' })).toBeVisible()
+  await expect(page.getByText(/Modèle : openai\/gpt-oss-120b/)).toBeVisible()
 })
 
 test('Ollama absent : l’erreur dit quoi faire', async ({ page }) => {
@@ -193,4 +195,49 @@ test('un double clic sur l’exemple ne crée qu’une seule étude', async ({ p
   await page.getByRole('button', { name: /Application de médiathèque/ }).click()
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
   expect(await projectCount(page)).toBe(1)
+})
+
+test('relancer une analyse ne fait jamais disparaître le rapport précédent', async ({ page }) => {
+  await newStudy(page, 'Étude relance')
+  await page.getByLabel('Fichier à importer').setInputFiles('fixtures/mediatheque.csv')
+  await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
+  await page.getByRole('tab', { name: /Analyse/ }).click()
+  await page.getByRole('button', { name: "Lancer l'analyse" }).click()
+  await page.getByRole('button', { name: 'Voir le rapport' }).click()
+  await expect(page.getByText('Rapport de démonstration')).toBeVisible()
+
+  // Nouvelle analyse : pendant qu'elle tourne, l'ancien rapport reste consultable.
+  await page.getByRole('tab', { name: /Analyse/ }).click()
+  await expect(page.getByText('Le rapport actuel reste consultable')).toBeVisible()
+  // Un réglage différent : sinon les réponses gardées en mémoire rendent la relance instantanée.
+  await page.getByLabel('Ce que vous cherchez à comprendre').fill('Ce qui freine les usagers')
+  await page.getByRole('button', { name: 'Relancer une analyse' }).click()
+  await page.getByRole('tab', { name: /Rapport/ }).click()
+  await expect(page.getByText('Une nouvelle analyse est en cours')).toBeVisible()
+  await expect(page.getByRole('heading', { name: "Vue d'ensemble" })).toBeVisible()
+})
+
+test('un double clic sur « Créer » ne crée qu’une étude, nommée par sa date', async ({ page }) => {
+  await page.goto('/#/synthese')
+  await page.getByRole('button', { name: 'Nouvelle étude' }).click()
+  await page.getByRole('button', { name: 'Créer' }).dblclick()
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Étude du')
+  expect(await projectCount(page)).toBe(1)
+})
+
+test('un moteur qui n’a pas répondu au test n’est ni annoncé prêt ni choisi d’office', async ({ page }) => {
+  await newStudy(page, 'Étude moteur muet')
+  await page.getByLabel('Fichier à importer').setInputFiles('fixtures/mediatheque.csv')
+  await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
+  await page.getByRole('tab', { name: /Analyse/ }).click()
+  await page.getByRole('link', { name: 'Choisir un moteur' }).click()
+  await page.getByRole('listitem').filter({ hasText: 'Ollama' }).getByRole('button', { name: 'Configurer' }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()
+  await dialog.getByRole('button', { name: 'Enregistrer quand même' }).click()
+  await expect(page.getByText("N'a pas répondu au test", { exact: true })).toBeVisible()
+  await expect(page.getByText(/enregistré, mais il n'a pas répondu au test/)).toBeVisible()
+  await expect(page.getByText('Votre moteur est prêt')).toHaveCount(0)
+  await page.getByRole('link', { name: 'Revenir à votre étude' }).first().click()
+  await expect(page.getByLabel("Moteur d'IA")).toHaveValue('simulation')
 })
