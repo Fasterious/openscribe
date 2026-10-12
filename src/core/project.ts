@@ -94,7 +94,7 @@ const fileSchema = z.object({
 export class ProjectFileError extends Error {}
 
 const NOT_A_STUDY =
-  "Ce fichier n'est pas une étude OpenScribe, ou il est abîmé. Choisissez le fichier .openscribe.json exporté depuis OpenScribe."
+  "Ce fichier n'est pas une étude OpenScribe, ou il est abîmé. Choisissez le fichier .openscribe.json sauvegardé avec « Sauvegarder l'étude »."
 
 /**
  * Lit un fichier de projet. Un projet importé reçoit un nouvel identifiant

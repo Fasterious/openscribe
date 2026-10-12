@@ -65,7 +65,7 @@ export function useStudyActions() {
       await createProject(project)
       window.location.hash = projectHref(project)
     } catch (e) {
-      setError(e instanceof ProjectFileError ? e.message : "Impossible de lire ce fichier. Vérifiez qu'il s'agit d'une étude sauvegardée depuis OpenScribe.")
+      setError(e instanceof ProjectFileError ? e.message : "Impossible de lire ce fichier. Vérifiez qu'il s'agit d'une étude sauvegardée avec « Sauvegarder l'étude ».")
     }
   }
 

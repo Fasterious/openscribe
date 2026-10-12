@@ -2,7 +2,7 @@ import { ClipboardPaste, FileSpreadsheet, Plus, Trash2, Upload } from 'lucide-re
 import { useMemo, useRef, useState } from 'react'
 import { navigate } from '@/app/router'
 import { activeParticipants, contributionsOf, mergeCorpus, promptsOf, type Corpus } from '@/core/corpus'
-import { analyzeCsv, csvToCorpus, type ColumnRole, type CsvAnalysis } from '@/core/import/csv'
+import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole, type CsvAnalysis } from '@/core/import/csv'
 import { detectSpeakers, textToCorpus } from '@/core/import/text'
 import type { Project } from '@/core/project'
 import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Dialog, Disclosure, Input, Label, Select, Textarea } from '../primitives'
@@ -201,7 +201,11 @@ function ImportPanel({
       )
       return
     }
-    const text = await file.text()
+    if (file.type.startsWith('image/') || file.type.startsWith('video/') || file.type.startsWith('audio/') || /\.(pdf|docx?|pptx?|png|jpe?g|gif|zip)$/i.test(file.name)) {
+      setError('Ce fichier ne contient pas de texte lisible. Importez un CSV (questionnaire) ou un fichier texte (transcription, notes).')
+      return
+    }
+    const text = decodeText(await file.arrayBuffer())
     if (!text.trim()) {
       setError('Ce fichier est vide.')
       return

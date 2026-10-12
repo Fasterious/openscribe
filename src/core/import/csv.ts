@@ -49,13 +49,34 @@ export interface CsvAnalysis {
 const TECHNICAL_HEADER = /horodat|timestamp|date de soumission|submitted|submission|^id$|response id|adresse e-?mail|e-?mail address|^e-?mail$|ip address|user agent/i
 const IDENTITY_HEADER = /^(nom|prénom|prenom|name|first name|last name|pseudo|nom complet|full name|votre nom|votre prénom)\b/i
 
+/** Messages de lecture CSV, en français (la bibliothèque les donne en anglais). */
+const CSV_ERROR_FR: Record<string, string> = {
+  MissingQuotes: 'guillemet ouvert jamais refermé',
+  UndetectableDelimiter: 'séparateur de colonnes introuvable',
+  TooFewFields: 'moins de colonnes que dans l\'en-tête',
+  TooManyFields: 'plus de colonnes que dans l\'en-tête',
+  InvalidQuotes: 'guillemets mal placés',
+}
+
+/**
+ * Décode un fichier texte : UTF-8 s'il est valide, sinon Windows-1252 (l'encodage
+ * des CSV enregistrés par Excel en français), pour que les accents restent lisibles.
+ */
+export function decodeText(buffer: ArrayBuffer): string {
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(buffer)
+  } catch {
+    return new TextDecoder('windows-1252').decode(buffer)
+  }
+}
+
 export function parseCsvText(text: string): { table: ParsedTable; warnings: string[] } {
   const clean = text.replace(/^﻿/, '')
   const result = Papa.parse<string[]>(clean, { skipEmptyLines: 'greedy' })
   const warnings = result.errors
     .filter((e) => e.type !== 'Delimiter')
     .slice(0, 5)
-    .map((e) => `Ligne ${(e.row ?? 0) + 1} : ${e.message}`)
+    .map((e) => `Ligne ${(e.row ?? 0) + 1} : ${CSV_ERROR_FR[e.code] ?? 'ligne mal formée'}.`)
   const data = result.data.filter((r) => r.some((cell) => String(cell ?? '').trim() !== ''))
   if (data.length === 0) return { table: { headers: [], rows: [] }, warnings: ['Le fichier est vide.'] }
   const width = Math.max(...data.map((r) => r.length))

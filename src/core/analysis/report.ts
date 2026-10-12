@@ -1,5 +1,6 @@
 import type { Corpus } from '../corpus'
 import { activeParticipants } from '../corpus'
+import { presetById } from '../providers/presets'
 import { METRICS_VERSION } from './metrics'
 import { describeMetrics, describeTheme } from './pipeline'
 import type { AnalysisState, Group, Idea, IdeaCategory } from './types'
@@ -24,15 +25,21 @@ export function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 }
 
+function engineName(presetId: string): string {
+  if (presetId === 'simulation') return 'Simulation (démonstration, contenu fictif)'
+  if (presetId === 'bridge') return 'moteur de test'
+  return presetById(presetId)?.label ?? presetId
+}
+
 function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   const respondents = activeParticipants(corpus).length
   const withIdeas = new Set(state.ideas.map((i) => i.participantId)).size
   return [
-    `Personnes ayant répondu : ${respondents} ; personnes dont au moins une idée a été retenue : ${withIdeas}.`,
-    `Idées retenues : ${state.ideas.length} (citations vérifiées mot pour mot dans les réponses). Citations écartées car introuvables : ${state.rejected.length}.`,
-    `Moteur : ${state.engine.presetId} · ${state.engine.model} · température ${state.settings.temperature} · graine ${state.settings.seed}.`,
-    "Partage des rôles : le modèle de langage découpe les réponses en idées, propose les regroupements et rédige les synthèses ; le code vérifie chaque citation, range chaque idée exactement une fois et calcule tous les chiffres.",
-    `Indicateurs v${METRICS_VERSION} : on compte des personnes. Consensus = part du plus grand camp parmi les personnes ayant exprimé un avis positif ou négatif ; les personnes mitigées comptent au dénominateur mais dans aucun camp ; les suggestions et constats neutres sont exclus du calcul. En dessous de 4 personnes, on parle de « peu d'avis ».`,
+    `Participants ayant répondu : ${respondents} ; participants dont au moins une idée a été retenue : ${withIdeas}.`,
+    `Idées retenues : ${state.ideas.length} (verbatims vérifiés mot pour mot dans les réponses). Verbatims écartés car introuvables tels quels : ${state.rejected.length}.`,
+    `Moteur d'IA : ${engineName(state.engine.presetId)} · modèle ${state.engine.model} · température ${state.settings.temperature} · graine ${state.settings.seed}.`,
+    "Partage des rôles : le moteur d'IA découpe les réponses en idées, propose les motifs et les thèmes, et rédige les synthèses ; le code vérifie chaque verbatim, range chaque idée exactement une fois et calcule tous les chiffres.",
+    `Indicateurs v${METRICS_VERSION} : on compte des participants. Consensus = part du plus grand camp parmi les participants ayant exprimé un avis positif ou négatif sur un même motif ; les participants mitigés comptent au dénominateur mais dans aucun camp ; les suggestions et constats neutres sont exclus du calcul. En dessous de 4 participants, on parle de « peu d'avis ». Un thème réunit des motifs différents : on n'y calcule ni consensus ni désaccord.`,
   ]
 }
 

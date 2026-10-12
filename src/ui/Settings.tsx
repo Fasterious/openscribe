@@ -461,6 +461,8 @@ function SetupDialog({
                 onClick={async () => {
                   await saveEngine({ ...draft, verified: false })
                   onClose()
+                  // Sur mobile, le bandeau d'état et « Vos moteurs » sont en haut de page.
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
                 }}
               >
                 Enregistrer quand même

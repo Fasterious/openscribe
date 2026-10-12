@@ -49,7 +49,7 @@ export function AnalysisTab({ project }: { project: Project }) {
   useEffect(() => {
     if (!loaded || engineId) return
     // Un moteur qui n'a pas répondu au test n'est jamais choisi d'office.
-    const usable = engines.filter((e) => e.verified !== false)
+    const usable = engines.filter((e) => e.verified !== false || e.id === defaultId)
     setEngineId(defaultId && usable.some((e) => e.id === defaultId) ? defaultId : usable[0]?.id ?? SIMULATION_ENGINE_ID)
   }, [loaded, defaultId, engines, engineId])
   useEffect(() => {
@@ -63,10 +63,14 @@ export function AnalysisTab({ project }: { project: Project }) {
   const preset = engine ? presetById(engine.presetId) : undefined
   const missingKey = engine && preset?.needsKey && preset.id !== 'custom' && !engine.apiKey
 
+  // Une analyse interrompue se reprend avec SON moteur : sinon le rapport mélangerait deux moteurs sous un seul nom.
+  const resumeEngine = latest ? allEngines.find((e) => e.presetId === latest.engine.presetId && e.model === latest.engine.model) : undefined
+
   const launch = (resume?: AnalysisState) => {
-    if (!engine) return
+    const chosen = resume ? resumeEngine : engine
+    if (!chosen) return
     const s: AnalysisSettings = { ...settings, grid: gridText.split('\n').map((g) => g.trim()).filter(Boolean) }
-    startAnalysis(project.id, engine, s, resume)
+    startAnalysis(project.id, chosen, s, resume)
   }
 
   return (
@@ -216,10 +220,15 @@ export function AnalysisTab({ project }: { project: Project }) {
                   {project.analyses.some((a) => a.status === 'done') && (
                     <p className="w-full text-xs text-muted-foreground">Le rapport actuel reste consultable jusqu'à la fin de la nouvelle analyse.</p>
                   )}
-                  {canResume && (
+                  {canResume && resumeEngine && (
                     <Button variant="outline" onClick={() => launch(latest)}>
-                      <RotateCcw /> Reprendre
+                      <RotateCcw /> Reprendre{resumeEngine.id !== engine?.id ? ` avec ${resumeEngine.name.replace(/ \(.*\)$/, '')}` : ''}
                     </Button>
+                  )}
+                  {canResume && !resumeEngine && (
+                    <p className="w-full text-xs text-muted-foreground">
+                      Le moteur de l'analyse interrompue ({latest!.engine.model}) n'est plus configuré : relancez une analyse.
+                    </p>
                   )}
                 </>
               )}

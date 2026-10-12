@@ -127,7 +127,9 @@ export async function startAnalysis(
     notices.set(projectId, `${error.message} Nouvel essai dans ${Math.round(waitMs / 1000)} s…`)
     emit(`run:${projectId}`)
   })
-  const initial = resume ?? (await newAnalysis(corpus, settings, provider))
+  // Garde-fou : on ne reprend jamais une analyse avec un autre moteur que le sien.
+  const sameEngine = resume && resume.engine.presetId === provider.fingerprint.presetId && resume.engine.model === provider.fingerprint.model
+  const initial = sameEngine ? resume : await newAnalysis(corpus, settings, provider)
   const controller = new AbortController()
   running.set(projectId, controller)
   emit(`run:${projectId}`)

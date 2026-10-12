@@ -8,7 +8,7 @@ import { MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Idea } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
 import { activeParticipants, type Corpus } from './corpus'
-import { analyzeCsv, csvToCorpus, type ColumnRole } from './import/csv'
+import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole } from './import/csv'
 import { detectSpeakers, textToCorpus } from './import/text'
 import { exportProject, importProject, newProject } from './project'
 import { withLimits } from './providers/limits'
@@ -47,6 +47,14 @@ describe('import CSV', () => {
     const a = analyzeCsv('﻿Nom,Avis\nAnne,"Bien, mais ""lent"""\n')
     expect(a.table.headers).toEqual(['Nom', 'Avis'])
     expect(a.table.rows[0][1]).toBe('Bien, mais "lent"')
+  })
+})
+
+describe('encodage des fichiers', () => {
+  it('lit un CSV enregistré par Excel en français (Windows-1252) sans abîmer les accents', () => {
+    const bytes = new Uint8Array([0x54, 0x72, 0xe8, 0x73, 0x20, 0x70, 0x72, 0x61, 0x74, 0x69, 0x71, 0x75, 0x65]) // « Très pratique » en Windows-1252
+    expect(decodeText(bytes.buffer)).toBe('Très pratique')
+    expect(decodeText(new TextEncoder().encode('Très pratique').buffer as ArrayBuffer)).toBe('Très pratique')
   })
 })
 

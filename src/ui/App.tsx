@@ -11,6 +11,7 @@ export function App() {
   const route = useRoute()
   const { engines, defaultId, loaded } = useEngines()
   const engine = engines.find((e) => e.id === defaultId) ?? engines.find((e) => e.verified !== false)
+  const engineOk = engine?.verified !== false
   const inSynthesis = route.name === 'synthesis' || route.name === 'project'
 
   return (
@@ -27,17 +28,17 @@ export function App() {
             </NavLink>
             <NavLink href={href({ name: 'settings' })} active={route.name === 'settings'}>
               <KeyRound className="size-4" />
-              <span>Moteurs d'IA</span>
+              <span className="whitespace-nowrap">Moteurs d'IA</span>
               {loaded && (
                 <span
                   className={cn(
                     'flex items-center gap-1 rounded-full px-2 py-0.5 text-xs',
-                    engine ? 'bg-positive/15 text-positive' : 'bg-warning/25 text-foreground',
+                    engine && engineOk ? 'bg-positive/15 text-positive' : 'bg-warning/25 text-foreground',
                   )}
                 >
-                  <span className={cn('size-1.5 rounded-full', engine ? 'bg-positive' : 'bg-warning')} aria-hidden />
-                  <span className="hidden whitespace-nowrap sm:inline">{engine ? engine.name.replace(/ \(.*\)$/, '') : 'à choisir'}</span>
-                  <span className="sr-only sm:hidden">{engine ? `Moteur : ${engine.name}` : 'Moteur à choisir'}</span>
+                  <span className={cn('size-1.5 rounded-full', engine && engineOk ? 'bg-positive' : 'bg-warning')} aria-hidden />
+                  <span className="hidden whitespace-nowrap sm:inline">{engine ? `${engine.name.replace(/ \(.*\)$/, '')}${engineOk ? '' : ' · à vérifier'}` : 'à choisir'}</span>
+                  <span className="sr-only sm:hidden">{engine ? `Moteur : ${engine.name}${engineOk ? '' : ', à vérifier'}` : 'Moteur à choisir'}</span>
                 </span>
               )}
             </NavLink>
