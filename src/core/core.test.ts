@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { computeMetrics } from './analysis/metrics'
-import { newAnalysis, runAnalysis, sanitizeCitations } from './analysis/pipeline'
+import { acceptRewrite, describeMetrics, newAnalysis, runAnalysis, sanitizeCitations } from './analysis/pipeline'
 import { reportToHtml, reportToMarkdown } from './analysis/report'
 import { MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Idea } from './analysis/types'
@@ -140,6 +140,15 @@ describe('indicateurs', () => {
   })
 })
 
+describe('chiffres en toutes lettres', () => {
+  it('accorde, omet les zéros, et ne met de pourcentage qu’à partir de dix personnes', () => {
+    const ideas = ['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I000${k}`, p, k < 4 ? 'positive' : 'negative'))
+    const text = describeMetrics(computeMetrics(ideas))
+    expect(text).toBe('5 personnes (5 mentions) ; avis : 4 positives, 1 négative ; consensus positif : 4 sur 5')
+    expect(text).not.toMatch(/\(s\)|: 0|%/)
+  })
+})
+
 describe('citations dans les synthèses', () => {
   it('ne garde que les références du périmètre', () => {
     const s = sanitizeCitations('Lent [I0001, I0099]. Bien [I0050] ! Texte [voir annexe].', new Set(['I0001']))
@@ -205,6 +214,22 @@ describe('chaîne complète (simulation)', () => {
     expect(state.status).toBe('done')
     checkInvariants(state, corpus)
     expect(state.ideas.length).toBeGreaterThan(20)
+  })
+
+  it('relecture : refuse toute réécriture qui perd une citation ou change un chiffre', async () => {
+    expect(acceptRewrite('6 personnes trouvent ça lent [I0001, I0002].', '6 personnes jugent l’outil lent [I0001, I0002].')).toBe(true)
+    expect(acceptRewrite('6 personnes trouvent ça lent [I0001, I0002].', '6 personnes trouvent ça lent [I0001].')).toBe(false)
+    expect(acceptRewrite('6 personnes trouvent ça lent [I0001].', 'Sept personnes trouvent ça lent [I0001].')).toBe(false)
+    const corpus = surveyCorpus()
+    const good = await runSim(corpus)
+    expect(good.state.polish?.checked).toBeGreaterThan(0)
+    expect(good.state.polish?.refused).toBe(0)
+    const bad = await runSim(corpus, { badPolish: true })
+    expect(bad.state.status).toBe('done')
+    expect(bad.state.polish?.changed).toBe(0)
+    expect(bad.state.polish?.refused).toBeGreaterThan(0)
+    // Les synthèses d'origine, avec leurs citations, sont conservées.
+    expect(bad.state.groups.map((g) => g.summary)).toEqual(good.state.groups.map((g) => g.summary))
   })
 
   it('est reproductible mot pour mot, et la relance passe entièrement par le cache', async () => {

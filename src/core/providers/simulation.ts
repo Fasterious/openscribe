@@ -5,6 +5,7 @@ import {
   type FixInput,
   type GlobalInput,
   type GroupingInput,
+  type PolishInput,
   type SummaryGroupInput,
   type ThemeInput,
 } from '../analysis/prompts'
@@ -28,6 +29,8 @@ export interface SimulationFaults {
   forgetEvery?: number
   /** La première réponse de chaque tâche listée est un JSON invalide. */
   brokenJsonTasks?: string[]
+  /** La relecture supprime les citations : le code doit refuser ces réécritures. */
+  badPolish?: boolean
 }
 
 const STOP = new Set(
@@ -160,6 +163,17 @@ export function createSimulationProvider(faults: SimulationFaults = {}): LlmProv
             .slice(0, 3)
             .map((s) => s.title)
             .join(', ')}.`,
+        }
+      }
+      case 'polish': {
+        // Relecture simulée : remplace « au niveau de » par « pour » ; avec la panne
+        // `badPolish`, supprime aussi les citations (la réécriture doit être refusée).
+        const input = readDataBlock<PolishInput>(req.user)
+        return {
+          texts: input.texts.map((t) => ({
+            id: t.id,
+            text: faults.badPolish ? t.text.replace(/\s*\[I[^\]]*\]/g, '') : t.text.replace(/au niveau de/g, 'pour'),
+          })),
         }
       }
       default:

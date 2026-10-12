@@ -13,7 +13,7 @@ import type { AnalysisSettings, IdeaCategory } from './types'
  * oublie aucun.
  */
 
-export const PROMPT_VERSION = 1
+export const PROMPT_VERSION = 2
 
 const CATEGORY_RULES_FR = `Catégories :
 - "positive" : satisfaction, force, réussite, ce qui a bien marché ;
@@ -24,6 +24,29 @@ La catégorie se juge sur ce que dit la citation, pas sur la question posée : o
 
 function lang(settings: AnalysisSettings): string {
   return settings.language === 'en' ? 'Write labels and summaries in English.' : 'Rédige les libellés et les synthèses en français.'
+}
+
+/**
+ * Guide d'écriture par langue. Les modèles écrivent souvent un français (ou un
+ * espagnol…) « traduit de l'anglais » : calques, tournures passives, jargon.
+ * On l'indique dès la rédaction, puis l'étape de relecture repasse derrière.
+ */
+const STYLE: Record<AnalysisSettings['language'], string> = {
+  fr: `Style : écris comme un chercheur francophone qui rédige pour des décideurs, pas comme une traduction de l'anglais.
+- Phrases courtes, sujet-verbe-complément, voix active. Le fait d'abord, la nuance ensuite.
+- Pas de calques de l'anglais : « adresser un problème » → « traiter » ; « faire du sens » → « avoir du sens » ; « en termes de » → « pour », « côté » ; « impacter » → « toucher », « peser sur » ; « supporter » (au sens d'aider) → « soutenir » ; « opportunité » (au sens d'occasion) → « occasion » ; « digital » → « numérique » ; « être en charge de » → « s'occuper de ».
+- Pas de formules creuses : « il est important de noter que », « force est de constater », « au niveau de », « dans un premier temps ».
+- Mots simples et précis : « 6 personnes regrettent… » plutôt que « une partie significative des répondants exprime un sentiment de… ».
+- Les chiffres de "facts" sont déjà affichés au-dessus de chaque synthèse : ne les recopie pas en bloc et n'ouvre pas chaque synthèse par « N personnes (M mentions)… ». Glisse seulement le chiffre utile dans une phrase normale (« cinq personnes sur six »).
+- En début de phrase, les nombres s'écrivent en lettres (« Une personne », « Trois personnes »).
+- Varie les attaques de phrase d'une synthèse à l'autre ; pas de formule répétée partout.
+- Typographie française : guillemets « », espace avant : ; ? !`,
+  en: `Style: write like a native English-speaking researcher briefing decision-makers.
+- Short sentences, active voice, plain words. Lead with the finding, then the nuance.
+- No filler ("it is worth noting that", "in terms of", "at the level of"), no inflated vocabulary ("leverage", "utilize").
+- Concrete and precise: "6 people regret…" rather than "a significant portion of respondents expressed feelings of…".
+- The "facts" figures are already shown above each summary: don't paste them in bulk or open every summary with "N people (M mentions)…". Weave in only the figure that matters.
+- Spell out numbers that start a sentence. Vary sentence openings across summaries.`,
 }
 
 function context(settings: AnalysisSettings): string {
@@ -209,6 +232,7 @@ Règles :
 4. Fais apparaître les désaccords et les avis minoritaires quand il y en a.
 5. Après chaque affirmation, cite entre crochets les identifiants des idées qui la fondent, par exemple [I0004, I0017].
 ${lang(settings)}
+${STYLE[settings.language]}
 
 Réponds avec : {"groups":[{"id":"G1","summary":"…"}]}
 
@@ -238,6 +262,7 @@ Règles :
 2. Titre de thème court (2 à 6 mots), qui décrit le sujet.
 3. Pour chaque thème, une synthèse de 2 à 4 phrases construite à partir des synthèses de ses groupes, sans rien ajouter. Garde les crochets [I…] qui s'y trouvent, n'en invente pas.
 ${lang(settings)}
+${STYLE[settings.language]}
 
 Réponds avec : {"themes":[{"title":"…","groups":["G1","G4"],"summary":"…"}]}
 
@@ -261,8 +286,42 @@ export function globalPrompt(input: GlobalInput, settings: AnalysisSettings) {
     system: SYSTEM,
     user: `${context(settings)}Rédige un résumé exécutif de 4 à 6 phrases à partir des synthèses ci-dessous. Fais ressortir ce qui fait consensus, ce qui divise et les points de blocage principaux. Reprends les chiffres fournis sans en calculer d'autres. N'ajoute rien qui ne figure pas dans les synthèses.
 ${lang(settings)}
+${STYLE[settings.language]}
 
 Réponds avec : {"summary":"…"}
+
+${dataBlock(input)}`,
+    json: true,
+  }
+}
+
+// ─── Étape 6 : relecture de la langue ────────────────────────────────────────
+
+export interface PolishInput {
+  texts: { id: string; text: string }[]
+}
+
+export const polishSchema = z.object({
+  texts: z.array(z.object({ id: z.string(), text: z.string() })),
+})
+
+export function polishPrompt(input: PolishInput, settings: AnalysisSettings) {
+  return {
+    task: 'polish',
+    system: SYSTEM,
+    user: `Tu es relecteur-correcteur. Ces textes sont des synthèses d'une étude qualitative, rédigées par une IA. Relis-les pour qu'ils se lisent comme s'ils avaient été écrits directement dans la langue, par un professionnel : naturels, fluides, précis, efficaces.
+
+Règles absolues :
+1. Ne change PAS le sens. N'ajoute aucune information, n'en retire aucune, ne renforce ni n'atténue aucun constat.
+2. Garde TOUS les chiffres tels quels.
+3. Garde TOUS les crochets [I…] avec exactement les mêmes identifiants, accrochés à la même affirmation.
+4. N'utilise aucune information absente du texte relu, même si un autre texte du lot la contient.
+5. Ne change pas qui fait l'action (le collectif, l'équipe, les participants…), même pour corriger un accord.
+6. Si un texte est déjà bon, renvoie-le tel quel. Ne réécris pas pour le plaisir.
+${lang(settings)}
+${STYLE[settings.language]}
+
+Réponds avec : {"texts":[{"id":"S1","text":"…"}]}, un élément par texte reçu.
 
 ${dataBlock(input)}`,
     json: true,

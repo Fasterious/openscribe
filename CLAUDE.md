@@ -19,7 +19,8 @@ les règles du projet. Les documents de référence sont dans `docs/`.
 | Casquette | Responsabilité |
 |---|---|
 | `methodologue` | Rigueur de la recherche qualitative : idées atomiques, citations exactes, indicateurs, biais. Garant de la méthode. |
-| `ux-designer` | Parcours, ergonomie, accessibilité, responsive, clarté des mots. Juge chaque écran avec les yeux d'un chercheur pressé. |
+| `ux-designer` | Parcours, ergonomie, accessibilité, responsive. Juge chaque écran avec les yeux d'un chercheur pressé. |
+| `plume` | Langue et ton : textes de l'interface et rapports produits, dans chaque langue. Traque les tournures traduites de l'anglais, le flou, les incohérences de vocabulaire. |
 | `testeur` | Joue l'utilisateur dans un vrai navigateur (ordinateur et mobile), cherche ce qui casse, rédige des rapports de test reproductibles. |
 | `modele-simule` | Joue le rôle d'un fournisseur d'IA distant : répond aux demandes de l'application au format exact attendu, pour tester toute la boucle sans clé. |
 | `relecteur-code` | Relit le code comme un mainteneur exigeant : sécurité, simplicité, tests, dette. |
@@ -34,10 +35,12 @@ Chaque livraison passe par :
 1. **Construire** avec des tests automatiques (`npm test`) sur chaque règle métier.
 2. **Essayer comme un utilisateur** (`npm run e2e`, plus une passe manuelle
    guidée par le `testeur`) sur ordinateur et mobile.
-3. **Corriger**, puis **certifier** par une deuxième passe complète.
+3. **Relire les mots** (`plume`) : tout texte nouveau de l'interface, et un
+   rapport réel produit par l'analyse, dans chaque langue proposée.
+4. **Corriger**, puis **certifier** par une deuxième passe complète.
    Une troisième passe si des défauts subsistent. Pas plus : on livre et on
    note ce qui reste.
-4. **Consigner** : `docs/AVANCEMENT.md` (où on en est) et `docs/JOURNAL.md`
+5. **Consigner** : `docs/AVANCEMENT.md` (où on en est) et `docs/JOURNAL.md`
    (décisions et pourquoi).
 
 Rien n'est déclaré « fait » sans preuve : test vert, capture, ou rapport de test.
@@ -59,6 +62,8 @@ Règles apprises :
   vérification : sinon il est plus fiable qu'un vrai modèle et le test perd sa valeur.
   Tester aussi avec un modèle léger pour éprouver la robustesse.
 - Les données envoyées au modèle sont en JSON compact : l'indentation coûte des jetons pour rien.
+- La qualité de la langue fait partie de la qualité : un rapport juste mais qui
+  sonne traduit n'est pas fini. Elle ne passe jamais avant la fidélité aux données.
 - Les vraies données révèlent ce que les données fictives cachent : chaque
   fonctionnalité d'analyse est éprouvée sur un corpus réel (privé) avant d'être déclarée faite.
 

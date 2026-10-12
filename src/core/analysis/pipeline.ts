@@ -12,6 +12,8 @@ import {
   fixSchema,
   globalPrompt,
   globalSchema,
+  polishPrompt,
+  polishSchema,
   groupingPrompt,
   groupingSchema,
   groupSummaryPrompt,
@@ -22,6 +24,7 @@ import {
   type SummaryGroupInput,
 } from './prompts'
 import { LlmRunner, type ResponseCache } from './runner'
+import { DEFAULT_SETTINGS } from './types'
 import type {
   AnalysisSettings,
   AnalysisState,
@@ -53,7 +56,8 @@ export interface PipelineOptions {
   concurrency?: number
 }
 
-const STEPS: StepId[] = ['extract', 'group', 'summarize', 'themes', 'report']
+const STEPS: StepId[] = ['extract', 'group', 'summarize', 'themes', 'report', 'polish']
+export const POLISH_BATCH = 12
 
 export async function corpusHash(corpus: Corpus): Promise<string> {
   return sha256(
@@ -96,6 +100,10 @@ function clone<T>(v: T): T {
  */
 export async function runAnalysis(corpus: Corpus, initial: AnalysisState, options: PipelineOptions): Promise<AnalysisState> {
   const state = clone(initial)
+  // Analyses créées avant l'ajout d'une étape : on complète la liste.
+  for (const id of STEPS) if (!state.steps.some((s) => s.id === id)) state.steps.push({ id, state: 'pending', done: 0, total: 0 })
+  state.steps.sort((a, b) => STEPS.indexOf(a.id) - STEPS.indexOf(b.id))
+  state.settings = { ...DEFAULT_SETTINGS, ...state.settings }
   const runner = new LlmRunner(options.provider, options.cache, state.settings, options.signal)
   const baseCalls = { ...state.calls }
   const emit = async () => {
@@ -128,6 +136,8 @@ export async function runAnalysis(corpus: Corpus, initial: AnalysisState, option
     await emit()
     await writeGlobalSummary(corpus, state, runner)
     step('report').state = 'done'
+    current = 'polish'
+    await polishTexts(state, runner, emit)
     state.status = 'done'
     await emit()
     return state
@@ -201,6 +211,7 @@ function resetAfter(state: AnalysisState, id: StepId) {
   state.groups = []
   state.themes = []
   state.globalSummary = ''
+  state.polish = undefined
 }
 
 export async function extractParticipant(
@@ -397,50 +408,60 @@ async function groupIdeas(state: AnalysisState, runner: LlmRunner, emit: () => P
 
 const pct = (x: number) => `${Math.round(x * 100)} %`
 
+/**
+ * Les chiffres d'un groupe, en une phrase lisible. Ce texte est affiché dans le
+ * rapport ET recopié par le modèle dans ses synthèses : sa langue compte autant
+ * que celle du modèle (un défaut ici se répète dans tout le rapport).
+ */
 export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr'): string {
+  const pos = m.positiveOnly.length
+  const neg = m.negativeOnly.length
+  const mix = m.mixed.length
+  const polarised = pos + neg + mix
+  const top = Math.max(pos, neg)
+  // Un pourcentage n'a de sens qu'à partir d'une dizaine de personnes.
+  const share = (n: number, of: number, sep: string) => `${n} ${sep} ${of}${of >= 10 ? ` (${pct(n / of)})` : ''}`
+
   if (lang === 'en') {
-    const parts = [`${m.participants} people (${m.mentions} mentions)`]
-    parts.push(`positive only: ${m.positiveOnly.length}, negative only: ${m.negativeOnly.length}, mixed: ${m.mixed.length}`)
-    if (m.participantsByCategory.suggestion) parts.push(`suggestions from ${m.participantsByCategory.suggestion} people`)
-    if (m.participantsByCategory.neutral) parts.push(`neutral remarks from ${m.participantsByCategory.neutral} people`)
-    if (m.stance === 'thin') parts.push('too few opinions to speak of consensus')
-    else if (m.consensusRate !== null) parts.push(`${m.stance === 'consensus' ? 'consensus' : 'divided'} (${pct(m.consensusRate)})`)
-    if (m.minority) parts.push(`consistent minority ${m.minority.side}: ${m.minority.participantIds.length} people`)
-    return parts.join(' ; ')
+    const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
+    const parts = [`${n(m.participants, 'person', 'people')} (${n(m.mentions, 'mention')})`]
+    const opinions = [pos && `${pos} positive`, neg && `${neg} negative`, mix && `${mix} mixed`].filter(Boolean)
+    if (opinions.length) parts.push(`opinions: ${opinions.join(', ')}`)
+    if (m.participantsByCategory.suggestion) parts.push(`${n(m.participantsByCategory.suggestion, 'person', 'people')} made suggestions`)
+    if (m.participantsByCategory.neutral) parts.push(`neutral remarks from ${n(m.participantsByCategory.neutral, 'person', 'people')}`)
+    if (m.stance === 'thin') parts.push('few opinions')
+    else if (m.stance === 'consensus') parts.push(`${m.majority} consensus: ${share(top, polarised, 'out of')}`)
+    else if (m.stance === 'divided') parts.push('divided opinions')
+    if (m.minority) parts.push(`consistent ${m.minority.side} minority: ${n(m.minority.participantIds.length, 'person', 'people')}`)
+    return parts.join('; ')
   }
-  const parts = [`${m.participants} personne${m.participants > 1 ? 's' : ''} (${m.mentions} mention${m.mentions > 1 ? 's' : ''})`]
-  parts.push(
-    `uniquement positives : ${m.positiveOnly.length}, uniquement négatives : ${m.negativeOnly.length}, mitigées : ${m.mixed.length}`,
-  )
-  if (m.participantsByCategory.suggestion) parts.push(`suggestions de ${m.participantsByCategory.suggestion} personne(s)`)
-  if (m.participantsByCategory.neutral) parts.push(`constats neutres de ${m.participantsByCategory.neutral} personne(s)`)
-  if (m.stance === 'thin') parts.push("trop peu d'avis pour parler de consensus")
-  else if (m.consensusRate !== null) {
-    const polarised = m.positiveOnly.length + m.negativeOnly.length + m.mixed.length
-    const top = Math.max(m.positiveOnly.length, m.negativeOnly.length)
-    parts.push(
-      m.stance === 'consensus'
-        ? `consensus ${m.majority === 'positive' ? 'positif' : 'négatif'} : ${top} des ${polarised} personnes ayant donné un avis (${pct(m.consensusRate)}) sont uniquement ${m.majority === 'positive' ? 'positives' : 'négatives'}`
-        : `avis partagés : le camp le plus nombreux réunit ${top} des ${polarised} personnes ayant donné un avis (${pct(m.consensusRate)})`,
-    )
-  }
+
+  const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
+  const parts = [`${n(m.participants, 'personne')} (${n(m.mentions, 'mention')})`]
+  const opinions = [pos && n(pos, 'positive'), neg && n(neg, 'négative'), mix && n(mix, 'mitigée')].filter(Boolean)
+  if (opinions.length) parts.push(`avis : ${opinions.join(', ')}`)
+  const sug = m.participantsByCategory.suggestion
+  if (sug) parts.push(`${n(sug, 'personne')} ${sug > 1 ? 'font' : 'fait'} des suggestions`)
+  const neu = m.participantsByCategory.neutral
+  if (neu) parts.push(`constats neutres de ${n(neu, 'personne')}`)
+  if (m.stance === 'thin') parts.push("peu d'avis")
+  else if (m.stance === 'consensus') parts.push(`consensus ${m.majority === 'positive' ? 'positif' : 'négatif'} : ${share(top, polarised, 'sur')}`)
+  else if (m.stance === 'divided') parts.push('avis partagés')
   if (m.minority)
-    parts.push(
-      `position minoritaire constante (${m.minority.side === 'positive' ? 'positive' : 'négative'}) : ${m.minority.participantIds.length} personnes`,
-    )
+    parts.push(`minorité constante ${m.minority.side === 'positive' ? 'positive' : 'négative'} : ${n(m.minority.participantIds.length, 'personne')}`)
   return parts.join(' ; ')
 }
 
 /** Ne garde que les références [I…] qui appartiennent bien au périmètre. */
 export function sanitizeCitations(text: string, allowed: Set<string>): string {
   return text
-    .replace(/\[([^\]]*)\]/g, (whole, inner: string) => {
+    .replace(/(\s*)\[([^\]]*)\]/g, (whole, space: string, inner: string) => {
       const ids = inner.split(/[\s,;]+/).filter(Boolean)
       if (!ids.length || !ids.every((id) => /^I\d{4,}$/.test(id))) return whole
       const kept = ids.filter((id) => allowed.has(id))
-      return kept.length ? `[${kept.join(', ')}]` : ''
+      // Une référence retirée emporte l'espace qui la précède : la ponctuation reste intacte.
+      return kept.length ? `${space}[${kept.join(', ')}]` : ''
     })
-    .replace(/\s+([.,;:])/g, '$1')
     .replace(/ {2,}/g, ' ')
     .trim()
 }
@@ -591,6 +612,71 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
   }
   const res = await runner.json(globalPrompt({ facts, sections }, state.settings), globalSchema)
   state.globalSummary = sanitizeCitations(res.summary, new Set(state.ideas.map((i) => i.id)))
+}
+
+// ─── Étape 6 : relecture de la langue ────────────────────────────────────────
+
+const citationsOf = (t: string) => (t.match(/I\d{4,}/g) ?? []).sort().join(',')
+const numbersOf = (t: string) => (t.replace(/I\d{4,}/g, '').match(/\d+(?:[.,]\d+)?/g) ?? []).sort().join(',')
+
+/**
+ * Une réécriture n'est acceptée que si elle garde exactement les mêmes citations
+ * et les mêmes chiffres, avec une longueur comparable. Sinon on garde l'original :
+ * la relecture peut améliorer la langue, jamais altérer ce qui est démontré.
+ */
+export function acceptRewrite(original: string, rewrite: string): boolean {
+  const r = rewrite.trim()
+  if (!r) return false
+  if (citationsOf(original) !== citationsOf(r)) return false
+  if (numbersOf(original) !== numbersOf(r)) return false
+  const ratio = r.length / Math.max(1, original.length)
+  return ratio > 0.6 && ratio < 1.5
+}
+
+async function polishTexts(state: AnalysisState, runner: LlmRunner, emit: () => Promise<void>) {
+  const s = state.steps.find((x) => x.id === 'polish')!
+  // Les cibles : synthèses de groupes, de thèmes, résumé global.
+  const targets: { id: string; get: () => string; set: (t: string) => void }[] = []
+  state.groups.forEach((g) => g.summary && targets.push({ id: `G:${g.id}`, get: () => g.summary, set: (t) => (g.summary = t) }))
+  state.themes.forEach((t) => t.summary && targets.push({ id: `T:${t.id}`, get: () => t.summary, set: (x) => (t.summary = x) }))
+  if (state.globalSummary) targets.push({ id: 'R', get: () => state.globalSummary, set: (t) => (state.globalSummary = t) })
+
+  if (!state.settings.polish || !targets.length) {
+    s.state = 'done'
+    s.message = state.settings.polish ? undefined : 'Relecture désactivée.'
+    await emit()
+    return
+  }
+  s.state = 'running'
+  s.total = targets.length
+  s.done = 0
+  await emit()
+
+  const stats = { checked: 0, changed: 0, refused: 0 }
+  const batches: (typeof targets)[] = []
+  for (let i = 0; i < targets.length; i += POLISH_BATCH) batches.push(targets.slice(i, i + POLISH_BATCH))
+  await Promise.all(
+    batches.map(async (batch) => {
+      const res = await runner.json(polishPrompt({ texts: batch.map((t) => ({ id: t.id, text: t.get() })) }, state.settings), polishSchema)
+      const out = new Map(res.texts.map((t) => [t.id, t.text]))
+      for (const t of batch) {
+        stats.checked++
+        const original = t.get()
+        const rewrite = out.get(t.id)
+        if (rewrite === undefined || rewrite.trim() === original.trim()) continue
+        if (acceptRewrite(original, rewrite)) {
+          t.set(rewrite.trim())
+          stats.changed++
+        } else stats.refused++
+      }
+      s.done += batch.length
+      state.polish = { ...stats }
+      await emit()
+    }),
+  )
+  state.polish = stats
+  s.state = 'done'
+  await emit()
 }
 
 export { sortIds }

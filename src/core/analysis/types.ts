@@ -104,6 +104,8 @@ export interface AnalysisSettings {
   grid: string[]
   /** Objectif de l'étude, donné à l'IA comme contexte. */
   researchQuestion: string
+  /** Relecture de la langue des synthèses (fluidité, tournures naturelles), sens et citations contrôlés par le code. */
+  polish: boolean
   temperature: number
   seed: number
 }
@@ -113,11 +115,12 @@ export const DEFAULT_SETTINGS: AnalysisSettings = {
   mode: 'free',
   grid: [],
   researchQuestion: '',
+  polish: true,
   temperature: 0,
   seed: 42,
 }
 
-export type StepId = 'extract' | 'group' | 'summarize' | 'themes' | 'report'
+export type StepId = 'extract' | 'group' | 'summarize' | 'themes' | 'report' | 'polish'
 
 export interface StepStatus {
   id: StepId
@@ -144,6 +147,8 @@ export interface AnalysisState {
   groups: Group[]
   themes: Theme[]
   globalSummary: string
+  /** Bilan de la relecture : textes relus, modifiés, et réécritures refusées par le contrôle. */
+  polish?: { checked: number; changed: number; refused: number }
   steps: StepStatus[]
   /** Nombre d'appels au modèle, servis depuis le cache ou non. */
   calls: { total: number; cached: number; inputTokens: number; outputTokens: number }
