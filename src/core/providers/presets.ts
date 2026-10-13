@@ -20,6 +20,15 @@ export interface SetupStep {
 /** Où le fournisseur est présenté : pour essayer, pour garder tout chez soi, ou parmi les autres. */
 export type PresetFamily = 'free' | 'local' | 'other'
 
+/**
+ * Qui sert le modèle. Un fournisseur direct sert ses propres modèles (une
+ * politique de données, un contrat) ; un hébergeur de modèles ouverts sert sur
+ * ses machines les modèles d'autres éditeurs ; une plateforme multi-fournisseurs
+ * relaie vers de nombreux hébergeurs avec une seule clé (un intermédiaire de
+ * plus, et une politique qui dépend du modèle choisi).
+ */
+export type ProviderKind = 'direct' | 'host' | 'router' | 'local' | 'custom'
+
 export interface ProviderPreset {
   id: string
   label: string
@@ -42,6 +51,13 @@ export interface ProviderPreset {
   bestFor: string
   /** Guide pas à pas, du compte à la clé. */
   steps: SetupStep[]
+  kind: ProviderKind
+  /** En-têtes à ajouter à chaque demande (ex. l'autorisation d'appel depuis un navigateur chez Anthropic). */
+  extraHeaders?: Record<string, string>
+  /** Le fournisseur refuse le paramètre de température (la reproductibilité passe alors par le cache des réponses). */
+  omitTemperature?: boolean
+  /** Présenté en tête de son groupe. */
+  featured?: boolean
 }
 
 export const PROVIDER_PRESETS: ProviderPreset[] = [
@@ -56,15 +72,23 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     seedParam: 'random_seed',
     supportsJsonMode: true,
     freeRequestsPerMinute: 2,
-    freeTier: 'Offre « Experiment » gratuite, sans carte bancaire (vérification par téléphone), débit très limité.',
-    dataPolicy: 'may-train-free',
+    freeTier:
+      "Un forfait d'usage gratuit chaque mois (8,5 € en octobre 2026), mais les clés ne marchent qu'une fois le paiement à l'usage activé, avec une carte bancaire.",
+    dataPolicy: 'check',
     dataNote:
-      "Sur l'offre gratuite, vos données peuvent servir à améliorer les modèles, sauf si vous le refusez dans votre espace client chez Mistral. Hébergement en Europe.",
-    family: 'free',
-    bestFor: 'Essayer gratuitement, avec un hébergement en Europe.',
+      "Sauf refus de votre part, Mistral peut réutiliser vos demandes pour améliorer ses modèles : refusez-le dans Admin › API › Confidentialité, chez Mistral, avant d'envoyer des données de participants. Hébergement en Europe.",
+    family: 'other',
+    bestFor: 'Un fournisseur européen, avec un hébergement en Europe.',
+    kind: 'direct',
     steps: [
-      { text: "Créez un compte gratuit chez Mistral et choisissez l'offre « Experiment » (un numéro de téléphone est demandé, pas de carte bancaire).", link: { label: 'Ouvrir la console Mistral', url: 'https://console.mistral.ai/' } },
-      { text: 'Dans « API Keys », créez une nouvelle clé et copiez-la.', link: { label: 'Aller aux clés Mistral', url: 'https://console.mistral.ai/api-keys' } },
+      {
+        text: "Connectez-vous chez Mistral. Dans Admin › Abonnement, activez « API Pay-As-You-Go » (une carte bancaire est demandée) et fixez une limite de dépenses : le forfait gratuit du mois est consommé en premier.",
+        link: { label: "Ouvrir l'abonnement Mistral", url: 'https://admin.mistral.ai/subscription' },
+      },
+      {
+        text: 'Dans « Clés API », cliquez sur « Nouvelle clé » et copiez-la : elle ne s’affiche qu’une fois.',
+        link: { label: 'Aller aux clés Mistral', url: 'https://console.mistral.ai/api-keys' },
+      },
       { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
     ],
   },
@@ -84,9 +108,16 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     dataNote: "Vérifiez la politique de données de l'offre gratuite avant d'y envoyer des données de participants.",
     family: 'free',
     bestFor: 'Essayer gratuitement, avec des réponses très rapides.',
+    kind: 'host',
     steps: [
-      { text: 'Créez un compte gratuit chez Groq (adresse e-mail ou compte Google, pas de carte bancaire).', link: { label: 'Ouvrir la console Groq', url: 'https://console.groq.com/' } },
-      { text: 'Dans « API Keys », cliquez sur « Create API Key » et copiez la clé.', link: { label: 'Aller aux clés Groq', url: 'https://console.groq.com/keys' } },
+      {
+        text: 'Créez un compte gratuit chez Groq (adresse e-mail ou compte Google, pas de carte bancaire).',
+        link: { label: 'Ouvrir la console Groq', url: 'https://console.groq.com/' },
+      },
+      {
+        text: 'Dans « API Keys », cliquez sur « Create API Key » et copiez la clé.',
+        link: { label: 'Aller aux clés Groq', url: 'https://console.groq.com/keys' },
+      },
       { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
     ],
   },
@@ -94,8 +125,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     id: 'gemini',
     label: 'Google Gemini',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    defaultModel: 'gemini-2.5-flash',
-    suggestedModels: ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro'],
+    defaultModel: 'gemini-3.8-flash',
+    suggestedModels: ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-4-argon'],
     needsKey: true,
     keyUrl: 'https://aistudio.google.com/apikey',
     seedParam: 'seed',
@@ -104,11 +135,15 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     freeTier: 'Offre gratuite sans carte bancaire sur les modèles Flash.',
     dataPolicy: 'may-train-free',
     dataNote:
-      "Sur l'offre gratuite, vos contenus peuvent être utilisés par Google et relus par des humains. À éviter pour des données de participants sans leur accord.",
+      "Sur l'offre gratuite, vos contenus peuvent être utilisés par Google et relus par des humains, sauf si vous êtes dans l'Union européenne, en Suisse ou au Royaume-Uni (les conditions de l'offre payante s'appliquent alors). Offre payante : pas d'entraînement.",
     family: 'other',
     bestFor: 'Un essai gratuit si vous avez déjà un compte Google, pour des données non sensibles.',
+    kind: 'direct',
     steps: [
-      { text: 'Connectez-vous à Google AI Studio avec votre compte Google, puis cliquez sur « Create API key ».', link: { label: 'Ouvrir Google AI Studio', url: 'https://aistudio.google.com/apikey' } },
+      {
+        text: 'Connectez-vous à Google AI Studio avec votre compte Google, puis cliquez sur « Create API key ».',
+        link: { label: 'Ouvrir Google AI Studio', url: 'https://aistudio.google.com/apikey' },
+      },
       { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
     ],
   },
@@ -128,6 +163,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     dataNote: 'La politique de données dépend du modèle et de son hébergeur : vérifiez-la pour le modèle choisi.',
     family: 'other',
     bestFor: 'Accéder à de nombreux modèles avec une seule clé.',
+    kind: 'router',
     steps: [
       { text: 'Créez un compte chez OpenRouter, puis une clé dans « Keys ».', link: { label: 'Aller aux clés OpenRouter', url: 'https://openrouter.ai/keys' } },
       { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
@@ -148,10 +184,317 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     dataNote: "Vos verbatims sont traités sur cet ordinateur. Comptez au moins 8 Go de mémoire vive ; l'analyse est plus lente qu'avec un service en ligne.",
     family: 'local',
     bestFor: 'Des données sensibles : le moteur tourne sur votre ordinateur et rien ne quitte votre machine.',
+    kind: 'local',
     steps: [
-      { text: "Téléchargez et installez Ollama, puis ouvrez-le. Sur Mac, une petite icône apparaît dans la barre des menus ; sur Windows, l'icône apparaît près de l'horloge.", link: { label: 'Télécharger Ollama', url: 'https://ollama.com/download' } },
-      { text: "Sur Mac, ouvrez le Terminal (sur Windows, l'invite de commandes) et téléchargez un modèle (environ 5 Go, une seule fois) :", code: 'ollama pull qwen3:8b' },
+      {
+        text: "Téléchargez et installez Ollama, puis ouvrez-le. Sur Mac, une petite icône apparaît dans la barre des menus ; sur Windows, l'icône apparaît près de l'horloge.",
+        link: { label: 'Télécharger Ollama', url: 'https://ollama.com/download' },
+      },
+      {
+        text: "Sur Mac, ouvrez le Terminal (sur Windows, l'invite de commandes) et téléchargez un modèle (environ 5 Go, une seule fois) :",
+        code: 'ollama pull qwen3:8b',
+      },
       { text: 'Revenez ici : OpenScribe détecte Ollama et ses modèles tout seul. Cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'anthropic',
+    label: 'Anthropic (Claude)',
+    baseUrl: 'https://api.anthropic.com/v1',
+    defaultModel: 'claude-sonnet-5-5',
+    suggestedModels: ['claude-sonnet-5-5', 'claude-opus-5-5', 'claude-haiku-5-5'],
+    needsKey: true,
+    keyUrl: 'https://platform.claude.com/settings/keys',
+    supportsJsonMode: false,
+    freeRequestsPerMinute: 20,
+    freeTier: 'Payant, sans offre gratuite durable : crédit prépayé, avec un plafond de dépenses réglable.',
+    dataPolicy: 'no-training',
+    dataNote: "Les appels à l'API ne servent pas à entraîner les modèles ; ils sont supprimés sous 30 jours par défaut.",
+    family: 'other',
+    bestFor: 'Une rédaction et une analyse de longs textes de grande qualité, pour un rapport à diffuser.',
+    kind: 'direct',
+    featured: true,
+    extraHeaders: { 'anthropic-dangerous-direct-browser-access': 'true' },
+    omitTemperature: true,
+    steps: [
+      {
+        text: 'Créez un compte sur la console Anthropic et ajoutez un crédit (fixez un plafond de dépenses).',
+        link: { label: 'Ouvrir la console Anthropic', url: 'https://platform.claude.com/' },
+      },
+      { text: 'Dans « API keys », créez une clé et copiez-la.', link: { label: 'Aller aux clés Anthropic', url: 'https://platform.claude.com/settings/keys' } },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'openai',
+    label: 'OpenAI',
+    baseUrl: 'https://api.openai.com/v1',
+    defaultModel: 'gpt-6.1-sol',
+    suggestedModels: ['gpt-6.1-sol', 'gpt-6-luna', 'gpt-6-astra'],
+    needsKey: true,
+    keyUrl: 'https://platform.openai.com/api-keys',
+    seedParam: 'seed',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: 'Payant : crédit prépayé (5 $ minimum), sans offre gratuite.',
+    dataPolicy: 'no-training',
+    dataNote:
+      "Les appels à l'API ne servent pas à entraîner les modèles par défaut ; journaux de sécurité gardés 30 jours. Hébergement en Europe possible pour certains projets.",
+    family: 'other',
+    bestFor: 'Les modèles GPT, si vous avez déjà un compte développeur OpenAI.',
+    kind: 'direct',
+    steps: [
+      {
+        text: 'Créez un compte développeur OpenAI et ajoutez un crédit (fixez un plafond de dépenses).',
+        link: { label: 'Ouvrir la plateforme OpenAI', url: 'https://platform.openai.com/' },
+      },
+      { text: 'Dans « API keys », créez une clé et copiez-la.', link: { label: 'Aller aux clés OpenAI', url: 'https://platform.openai.com/api-keys' } },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'xai',
+    label: 'xAI (Grok)',
+    baseUrl: 'https://api.x.ai/v1',
+    defaultModel: 'grok-4.3',
+    suggestedModels: ['grok-4.3', 'grok-4.7'],
+    needsKey: true,
+    keyUrl: 'https://console.x.ai/',
+    seedParam: 'seed',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: 'Payant ; une éventuelle offre gratuite est à vérifier sur la console xAI.',
+    dataPolicy: 'no-training',
+    dataNote: "Pas d'entraînement sans autorisation explicite ; conservation 30 jours pour l'audit. Hébergement probablement aux États-Unis.",
+    family: 'other',
+    bestFor: 'Les modèles Grok, avec un très grand contexte.',
+    kind: 'direct',
+    steps: [
+      {
+        text: 'Créez un compte sur la console xAI, ajoutez un crédit, puis créez une clé.',
+        link: { label: 'Ouvrir la console xAI', url: 'https://console.x.ai/' },
+      },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'deepseek',
+    label: 'DeepSeek',
+    baseUrl: 'https://api.deepseek.com/v1',
+    defaultModel: 'deepseek-flash',
+    suggestedModels: ['deepseek-flash', 'deepseek-v4-pro'],
+    needsKey: true,
+    keyUrl: 'https://platform.deepseek.com/api_keys',
+    seedParam: 'seed',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: 'Payant, très bon marché (moitié prix en heures creuses), sans offre gratuite.',
+    dataPolicy: 'check',
+    dataNote: "Données stockées en Chine ; la réutilisation des appels à l'API n'est pas clairement exclue. À éviter pour des données de participants.",
+    family: 'other',
+    bestFor: 'Des modèles très bon marché, pour des données non sensibles.',
+    kind: 'direct',
+    steps: [
+      {
+        text: 'Créez un compte DeepSeek, ajoutez un solde, puis créez une clé.',
+        link: { label: 'Aller aux clés DeepSeek', url: 'https://platform.deepseek.com/api_keys' },
+      },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'qwen',
+    label: 'Alibaba (Qwen)',
+    baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+    defaultModel: 'qwen3.7-plus',
+    suggestedModels: ['qwen3.7-plus', 'qwen3.8-flash', 'qwen3.8-max'],
+    needsKey: true,
+    keyUrl: 'https://modelstudio.console.alibabacloud.com/',
+    seedParam: 'seed',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: '1 million de jetons offerts par modèle pendant 90 jours (offre internationale).',
+    dataPolicy: 'check',
+    dataNote: "Hébergement à Singapour ou aux États-Unis, au choix ; la réutilisation des données n'est pas documentée clairement.",
+    family: 'other',
+    bestFor: 'Les modèles Qwen, avec un quota offert pour essayer.',
+    kind: 'direct',
+    steps: [
+      {
+        text: 'Créez un compte Alibaba Cloud (Model Studio, région internationale), puis une clé d’API.',
+        link: { label: 'Ouvrir Model Studio', url: 'https://modelstudio.console.alibabacloud.com/' },
+      },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'moonshot',
+    label: 'Moonshot (Kimi)',
+    baseUrl: 'https://api.moonshot.ai/v1',
+    defaultModel: 'kimi-k3',
+    suggestedModels: ['kimi-k3', 'kimi-k2.6'],
+    needsKey: true,
+    keyUrl: 'https://platform.kimi.ai/',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: 'Payant ; offre gratuite non documentée.',
+    dataPolicy: 'check',
+    dataNote: "Serveurs à Singapour ; la politique n'exclut pas la réutilisation des appels à l'API pour améliorer les modèles.",
+    family: 'other',
+    bestFor: 'Les modèles Kimi, pour des données non sensibles.',
+    kind: 'direct',
+    steps: [
+      {
+        text: 'Créez un compte sur la plateforme Kimi, ajoutez un crédit, puis créez une clé.',
+        link: { label: 'Ouvrir la plateforme Kimi', url: 'https://platform.kimi.ai/' },
+      },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'scaleway',
+    label: 'Scaleway (Paris)',
+    baseUrl: 'https://api.scaleway.ai/v1',
+    defaultModel: 'mistral-medium-3.5-128b',
+    suggestedModels: ['mistral-medium-3.5-128b', 'qwen3.5-397b-a17b', 'gpt-oss-120b', 'llama-3.3-70b-instruct'],
+    needsKey: true,
+    keyUrl: 'https://console.scaleway.com/iam/api-keys',
+    seedParam: 'seed',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: '1 million de jetons offerts pour commencer, puis paiement à l’usage.',
+    dataPolicy: 'no-training',
+    dataNote:
+      'Hébergé à Paris ; les données ne servent pas à entraîner les modèles et ne sont pas conservées (sauf les demandes en erreur, deux semaines au plus).',
+    family: 'other',
+    bestFor: 'Des modèles ouverts hébergés en France, pour des données à garder en Europe.',
+    kind: 'host',
+    steps: [
+      {
+        text: 'Créez un compte Scaleway, puis une clé d’API dans « IAM ».',
+        link: { label: 'Aller aux clés Scaleway', url: 'https://console.scaleway.com/iam/api-keys' },
+      },
+      { text: 'Collez la clé secrète ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'together',
+    label: 'Together AI',
+    baseUrl: 'https://api.together.ai/v1',
+    defaultModel: 'openai/gpt-oss-120b',
+    suggestedModels: ['openai/gpt-oss-120b', 'Qwen/Qwen3.6-Plus', 'deepseek-ai/DeepSeek-V4-Pro-0813'],
+    needsKey: true,
+    keyUrl: 'https://api.together.ai/settings/api-keys',
+    seedParam: 'seed',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: 'Payant : 5 $ minimum, sans offre gratuite.',
+    dataPolicy: 'no-training',
+    dataNote: "Pas d'entraînement sans accord exprès ; la non-conservation se règle par organisation (désactivée par défaut).",
+    family: 'other',
+    bestFor: 'Un large choix de modèles ouverts, avec une seule clé.',
+    kind: 'host',
+    steps: [
+      {
+        text: 'Créez un compte Together AI, ajoutez un crédit, puis créez une clé.',
+        link: { label: 'Aller aux clés Together', url: 'https://api.together.ai/settings/api-keys' },
+      },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'fireworks',
+    label: 'Fireworks AI',
+    baseUrl: 'https://api.fireworks.ai/inference/v1',
+    defaultModel: 'accounts/fireworks/models/gpt-oss-120b',
+    suggestedModels: ['accounts/fireworks/models/gpt-oss-120b'],
+    needsKey: true,
+    keyUrl: 'https://app.fireworks.ai/settings/users/api-keys',
+    seedParam: 'seed',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: 'Petit crédit offert à l’inscription, puis paiement à l’usage.',
+    dataPolicy: 'no-training',
+    dataNote: 'Aucune conservation par défaut pour les modèles ouverts.',
+    family: 'other',
+    bestFor: 'Des modèles ouverts rapides, sans conservation des données.',
+    kind: 'host',
+    steps: [
+      {
+        text: 'Créez un compte Fireworks, puis une clé d’API.',
+        link: { label: 'Aller aux clés Fireworks', url: 'https://app.fireworks.ai/settings/users/api-keys' },
+      },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'deepinfra',
+    label: 'DeepInfra',
+    baseUrl: 'https://api.deepinfra.com/v1/openai',
+    defaultModel: 'deepseek-ai/DeepSeek-V4-Flash-0731',
+    suggestedModels: ['deepseek-ai/DeepSeek-V4-Flash-0731', 'openai/gpt-oss-120b'],
+    needsKey: true,
+    keyUrl: 'https://deepinfra.com/dash/api_keys',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: 'Paiement à l’usage ; une éventuelle offre d’essai est à vérifier.',
+    dataPolicy: 'no-training',
+    dataNote: "Données gardées en mémoire seulement, sans entraînement, sauf pour les modèles Google et Anthropic qu'il relaie (politique de ces éditeurs).",
+    family: 'other',
+    bestFor: 'Des modèles ouverts bon marché.',
+    kind: 'host',
+    steps: [
+      { text: 'Créez un compte DeepInfra, puis une clé d’API.', link: { label: 'Aller aux clés DeepInfra', url: 'https://deepinfra.com/dash/api_keys' } },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'huggingface',
+    label: 'Hugging Face',
+    baseUrl: 'https://router.huggingface.co/v1',
+    defaultModel: 'openai/gpt-oss-120b',
+    suggestedModels: ['openai/gpt-oss-120b', 'openai/gpt-oss-120b:cheapest'],
+    needsKey: true,
+    keyUrl: 'https://huggingface.co/settings/tokens',
+    seedParam: 'seed',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: 'Crédits à acheter (abonnement PRO : 2 $ inclus par mois), sans marge sur le prix des hébergeurs.',
+    dataPolicy: 'check',
+    dataNote: 'Hugging Face ne garde ni les demandes ni les réponses ; chaque hébergeur final applique sa propre politique.',
+    family: 'other',
+    bestFor: 'Les modèles ouverts de nombreux hébergeurs, avec votre compte Hugging Face.',
+    kind: 'router',
+    steps: [
+      {
+        text: 'Dans votre compte Hugging Face, créez un jeton d’accès (« Access Tokens ») autorisé pour « Inference Providers ».',
+        link: { label: 'Aller aux jetons Hugging Face', url: 'https://huggingface.co/settings/tokens' },
+      },
+      { text: 'Collez le jeton ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'lmstudio',
+    label: 'LM Studio (sur votre ordinateur)',
+    baseUrl: 'http://localhost:1234/v1',
+    defaultModel: '',
+    suggestedModels: [],
+    needsKey: false,
+    supportsJsonMode: false,
+    freeRequestsPerMinute: 60,
+    freeTier: 'Gratuit : le moteur tourne sur votre ordinateur, avec une interface pour choisir et télécharger les modèles.',
+    dataPolicy: 'local',
+    dataNote: 'Vos verbatims sont traités sur cet ordinateur.',
+    family: 'local',
+    bestFor: 'Des données sensibles, avec une application graphique pour gérer les modèles.',
+    kind: 'local',
+    steps: [
+      {
+        text: 'Installez LM Studio, téléchargez un modèle depuis l’application et chargez-le.',
+        link: { label: 'Télécharger LM Studio', url: 'https://lmstudio.ai/' },
+      },
+      { text: 'Dans l’onglet « Developer », démarrez le serveur et activez « Enable CORS » (sans cela, le navigateur ne peut pas l’appeler).' },
+      { text: 'Indiquez le nom du modèle chargé, puis cliquez sur « Enregistrer et tester ».' },
     ],
   },
   {
@@ -169,6 +512,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     dataNote: 'Vérifiez la politique de données du service choisi.',
     family: 'other',
     bestFor: 'Un service compatible OpenAI que vous connaissez déjà (LM Studio, vLLM, un relais…).',
+    kind: 'custom',
     steps: [{ text: "Renseignez l'adresse du service dans les réglages avancés, puis votre clé d'accès ci-dessus." }],
   },
 ]

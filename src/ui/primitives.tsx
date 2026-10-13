@@ -8,7 +8,7 @@ import * as TabsPrimitive from '@radix-ui/react-tabs'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { clsx, type ClassValue } from 'clsx'
-import { X } from 'lucide-react'
+import { Check, ChevronDown, X } from 'lucide-react'
 import * as React from 'react'
 import { twMerge } from 'tailwind-merge'
 
@@ -65,41 +65,29 @@ export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDi
   return <div className={cn('p-5 pt-0', className)} {...props} />
 }
 
-export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-  ({ className, ...props }, ref) => (
-    <input
-      ref={ref}
-      className={cn(
-        'flex h-10 w-full rounded-md border border-input bg-card px-3 py-2 text-sm placeholder:text-muted-foreground disabled:opacity-50',
-        className,
-      )}
-      {...props}
-    />
-  ),
-)
+export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(({ className, ...props }, ref) => (
+  <input
+    ref={ref}
+    className={cn('flex h-10 w-full rounded-md border border-input bg-card px-3 py-2 text-sm placeholder:text-muted-foreground disabled:opacity-50', className)}
+    {...props}
+  />
+))
 Input.displayName = 'Input'
 
-export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>(
-  ({ className, ...props }, ref) => (
-    <textarea
-      ref={ref}
-      className={cn(
-        'flex min-h-20 w-full rounded-md border border-input bg-card px-3 py-2 text-sm placeholder:text-muted-foreground disabled:opacity-50',
-        className,
-      )}
-      {...props}
-    />
-  ),
-)
+export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>(({ className, ...props }, ref) => (
+  <textarea
+    ref={ref}
+    className={cn(
+      'flex min-h-20 w-full rounded-md border border-input bg-card px-3 py-2 text-sm placeholder:text-muted-foreground disabled:opacity-50',
+      className,
+    )}
+    {...props}
+  />
+))
 Textarea.displayName = 'Textarea'
 
 export function Select({ className, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select
-      className={cn('flex h-10 w-full rounded-md border border-input bg-card px-3 text-sm disabled:opacity-50', className)}
-      {...props}
-    />
-  )
+  return <select className={cn('flex h-10 w-full rounded-md border border-input bg-card px-3 text-sm disabled:opacity-50', className)} {...props} />
 }
 
 export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
@@ -115,17 +103,14 @@ const badgeVariants = cva('inline-flex items-center gap-1 rounded-full border px
       negative: 'border-transparent bg-negative/15 text-negative',
       neutral: 'border-transparent bg-neutral/15 text-neutral',
       suggestion: 'border-transparent bg-suggestion/15 text-suggestion',
+      question: 'border-transparent bg-question/15 text-question',
       warning: 'border-transparent bg-warning/20 text-foreground',
     },
   },
   defaultVariants: { tone: 'default' },
 })
 
-export function Badge({
-  className,
-  tone,
-  ...props
-}: React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof badgeVariants>) {
+export function Badge({ className, tone, ...props }: React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof badgeVariants>) {
   return <span className={cn(badgeVariants({ tone }), className)} {...props} />
 }
 
@@ -145,11 +130,7 @@ export function Progress({ value, className, label }: { value: number; className
   )
 }
 
-export function Alert({
-  className,
-  tone = 'info',
-  ...props
-}: React.HTMLAttributes<HTMLDivElement> & { tone?: 'info' | 'warning' | 'error' | 'success' }) {
+export function Alert({ className, tone = 'info', ...props }: React.HTMLAttributes<HTMLDivElement> & { tone?: 'info' | 'warning' | 'error' | 'success' }) {
   const tones = {
     info: 'border-primary/30 bg-accent/60',
     warning: 'border-warning/60 bg-warning/10',
@@ -162,12 +143,7 @@ export function Alert({
 export const Tabs = TabsPrimitive.Root
 
 export function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
-  return (
-    <TabsPrimitive.List
-      className={cn('inline-flex h-10 items-center gap-1 rounded-lg bg-muted p-1 text-muted-foreground', className)}
-      {...props}
-    />
-  )
+  return <TabsPrimitive.List className={cn('inline-flex h-10 items-center gap-1 rounded-lg bg-muted p-1 text-muted-foreground', className)} {...props} />
 }
 
 export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
@@ -216,10 +192,7 @@ export function Dialog({
             <DialogPrimitive.Description className="sr-only">{title}</DialogPrimitive.Description>
           )}
           <div className="mt-4">{children}</div>
-          <DialogPrimitive.Close
-            className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground hover:bg-accent cursor-pointer"
-            aria-label="Fermer"
-          >
+          <DialogPrimitive.Close className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground hover:bg-accent cursor-pointer" aria-label="Fermer">
             <X className="size-4" />
           </DialogPrimitive.Close>
         </DialogPrimitive.Content>
@@ -257,7 +230,18 @@ export function Disclosure({
  * Infobulle : s'ouvre au survol et au focus clavier. Elle complète un libellé,
  * elle ne le remplace jamais (sur écran tactile, elle ne s'affiche pas).
  */
-export function Tooltip({ content, children, side = 'bottom' }: { content: React.ReactNode; children: React.ReactElement; side?: 'top' | 'bottom' | 'left' | 'right' }) {
+export function Tooltip({
+  content,
+  children,
+  side = 'bottom',
+  wide = false,
+}: {
+  content: React.ReactNode
+  children: React.ReactElement
+  side?: 'top' | 'bottom' | 'left' | 'right'
+  /** Bulle large, pour des citations. */
+  wide?: boolean
+}) {
   return (
     <TooltipPrimitive.Provider delayDuration={250}>
       <TooltipPrimitive.Root>
@@ -267,12 +251,130 @@ export function Tooltip({ content, children, side = 'bottom' }: { content: React
             side={side}
             sideOffset={6}
             collisionPadding={12}
-            className="z-50 max-w-72 rounded-md border bg-card px-3 py-2 text-xs leading-relaxed text-foreground shadow-lg"
+            className={`z-50 ${wide ? 'max-h-[70vh] max-w-lg overflow-y-auto' : 'max-w-72'} rounded-md border bg-card px-3 py-2 text-xs leading-relaxed text-foreground shadow-lg`}
           >
             {content}
           </TooltipPrimitive.Content>
         </TooltipPrimitive.Portal>
       </TooltipPrimitive.Root>
     </TooltipPrimitive.Provider>
+  )
+}
+
+/**
+ * Menu déroulant : un bouton, une liste qui s'ouvre dessous. Se ferme au clic
+ * ailleurs, avec Échap, ou après un choix. Un seul style pour tous les menus
+ * (exporter, choisir un segment…).
+ */
+export function DropMenu({
+  label,
+  icon,
+  children,
+  align = 'right',
+  ariaLabel,
+  width = 'w-72',
+  iconOnly = false,
+}: {
+  label: React.ReactNode
+  /** Un bouton réduit à son icône (« ⋯ ») : le libellé sert alors de nom accessible. */
+  iconOnly?: boolean
+  icon?: React.ReactNode
+  children: (close: () => void) => React.ReactNode
+  align?: 'left' | 'right'
+  ariaLabel?: string
+  width?: string
+}) {
+  const [open, setOpen] = React.useState(false)
+  const ref = React.useRef<HTMLDivElement>(null)
+  React.useEffect(() => {
+    if (!open) return
+    const close = (e: MouseEvent | KeyboardEvent) => {
+      if (e instanceof KeyboardEvent ? e.key === 'Escape' : !ref.current?.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    document.addEventListener('keydown', close)
+    return () => {
+      document.removeEventListener('mousedown', close)
+      document.removeEventListener('keydown', close)
+    }
+  }, [open])
+  return (
+    <div ref={ref} className="relative">
+      {iconOnly ? (
+        <Button variant="ghost" size="icon" aria-label={ariaLabel} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+          {icon}
+        </Button>
+      ) : (
+        <Button
+          variant="outline"
+          size="sm"
+          aria-label={ariaLabel}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
+          className="max-w-[16rem]"
+        >
+          {icon}
+          <span className="truncate">{label}</span>
+          <ChevronDown className="size-3.5 shrink-0 opacity-60" />
+        </Button>
+      )}
+      {open && (
+        <div
+          role="menu"
+          className={cn(
+            'absolute z-40 mt-1 max-h-[70vh] overflow-y-auto rounded-lg border bg-card p-1 shadow-lg',
+            width,
+            align === 'right' ? 'right-0' : 'left-0',
+          )}
+        >
+          {children(() => setOpen(false))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/** Titre d'une partie de menu. */
+export function MenuSection({ children }: { children: React.ReactNode }) {
+  return <p className="px-2.5 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{children}</p>
+}
+
+/** Un choix de menu : libellé, explication facultative, icône ou coche. */
+export function MenuItem({
+  label,
+  hint,
+  icon,
+  checked,
+  onSelect,
+  danger = false,
+}: {
+  label: React.ReactNode
+  hint?: React.ReactNode
+  icon?: React.ReactNode
+  checked?: boolean
+  onSelect: () => void
+  /** Action destructrice (supprimer) : en rouge. */
+  danger?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      role={checked === undefined ? 'menuitem' : 'menuitemradio'}
+      aria-checked={checked}
+      className={cn(
+        'flex w-full cursor-pointer items-start gap-2 rounded-md px-2.5 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none',
+        danger && 'text-negative hover:bg-negative/10',
+      )}
+      onClick={onSelect}
+    >
+      <span className={cn('mt-0.5 flex size-4 shrink-0 items-center justify-center', danger ? 'text-negative' : 'text-muted-foreground')}>
+        {checked ? <Check className="size-4 text-primary" /> : icon}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-medium">{label}</span>
+        {hint && <span className="block text-xs text-muted-foreground">{hint}</span>}
+      </span>
+    </button>
   )
 }

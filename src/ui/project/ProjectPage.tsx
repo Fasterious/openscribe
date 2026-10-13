@@ -9,6 +9,7 @@ import { download, plural, slug } from '../format'
 import { Alert, Badge, Button, Input, Tabs, TabsList, TabsTrigger, Tooltip } from '../primitives'
 import { AnalysisTab } from './AnalysisTab'
 import { DataTab } from './DataTab'
+import { TAB_ACTIONS } from './slots'
 import { ReportTab } from './ReportTab'
 
 export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' | 'report' }) {
@@ -27,9 +28,9 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
   if (project === null)
     return (
       <p>
-        Cette étude n'existe pas dans ce navigateur.{' '}
+        Cette synthèse n'existe pas dans ce navigateur.{' '}
         <a className="text-primary underline" href={href({ name: 'synthesis' })}>
-          Voir vos études
+          Voir vos synthèses
         </a>
       </p>
     )
@@ -50,7 +51,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
     <div className="space-y-6">
       <div className="no-print space-y-3">
         <a href={href({ name: 'synthesis' })} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-4" /> Vos études
+          <ArrowLeft className="size-4" /> Vos synthèses
         </a>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           {renaming ? (
@@ -62,7 +63,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
                 setRenaming(false)
               }}
             >
-              <Input aria-label="Nom de l'étude" autoFocus value={name} onChange={(e) => setName(e.target.value)} />
+              <Input aria-label="Nom de la synthèse" autoFocus value={name} onChange={(e) => setName(e.target.value)} />
               <Button type="submit">Valider</Button>
             </form>
           ) : (
@@ -72,7 +73,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Renommer l'étude"
+                  aria-label="Renommer la synthèse"
                   onClick={() => {
                     setName(project.name)
                     setRenaming(true)
@@ -92,33 +93,40 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
               </p>
             </div>
           )}
-          <Tooltip
-            side="left"
-            content={
-              <>
-                Vos modifications sont déjà enregistrées dans ce navigateur. Ce bouton en fait une copie complète dans un fichier (données,
-                réglages, analyse, rapport), pour la garder à l'abri ou la rouvrir sur un autre ordinateur avec « Ouvrir une sauvegarde ».
-              </>
-            }
-          >
-            <Button variant="outline" size="sm" onClick={exportFile} disabled={!hasData}>
-              <Save /> Sauvegarder l'étude
-            </Button>
-          </Tooltip>
+          {/* Sur le rapport, la sauvegarde rejoint le menu « Exporter » de la barre d'actions. */}
+          {tab !== 'report' && (
+            <Tooltip
+              side="left"
+              content={
+                <>
+                  Vos modifications sont déjà enregistrées dans ce navigateur. Ce bouton en fait une copie complète dans un fichier (données, réglages, analyse,
+                  rapport), pour la garder à l'abri ou la rouvrir sur un autre ordinateur avec « Ouvrir une sauvegarde ».
+                </>
+              }
+            >
+              <Button variant="outline" size="sm" onClick={exportFile} disabled={!hasData}>
+                <Save /> Sauvegarder la synthèse
+              </Button>
+            </Tooltip>
+          )}
         </div>
-        <Tabs value={tab} onValueChange={(v) => navigate({ name: 'project', id, tab: v as typeof tab })}>
-          <TabsList className="w-full sm:w-auto">
-            <TabsTrigger value="data" className="flex-1 sm:flex-none">
-              <Table2 className="size-4" /> Données
-            </TabsTrigger>
-            <TabsTrigger value="analysis" className="flex-1 sm:flex-none" disabled={!hasData}>
-              <FlaskConical className="size-4" /> Analyse
-            </TabsTrigger>
-            <TabsTrigger value="report" className="flex-1 sm:flex-none" disabled={!hasReport}>
-              <FileText className="size-4" /> Rapport
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Une seule barre : les onglets à gauche, les actions de l'onglet ouvert à droite (le rapport y place ses exports et ses filtres). */}
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+          <Tabs value={tab} onValueChange={(v) => navigate({ name: 'project', id, tab: v as typeof tab })}>
+            <TabsList className="w-full sm:w-auto">
+              <TabsTrigger value="data" className="flex-1 sm:flex-none">
+                <Table2 className="size-4" /> Données
+              </TabsTrigger>
+              <TabsTrigger value="analysis" className="flex-1 sm:flex-none" disabled={!hasData}>
+                <FlaskConical className="size-4" /> Analyse
+              </TabsTrigger>
+              <TabsTrigger value="report" className="flex-1 sm:flex-none" disabled={!hasReport}>
+                <FileText className="size-4" /> Rapport
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div id={TAB_ACTIONS} className="flex flex-wrap items-center gap-2 lg:justify-end" />
+        </div>
       </div>
 
       {tab === 'data' && <DataTab project={project} update={update} />}
@@ -133,16 +141,21 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
           </a>
         </Alert>
       )}
-      {tab === 'report' && report && <ReportTab project={project} analysis={report} />}
+      {tab === 'report' && report && <ReportTab project={project} analysis={report} onSaveStudy={exportFile} />}
       {tab !== 'data' && !hasData && (
         <p className="text-sm text-muted-foreground">
-          Importez d'abord des données. <a className="text-primary underline" href={href({ name: 'project', id, tab: 'data' })}>Aller aux données</a>
+          Importez d'abord des données.{' '}
+          <a className="text-primary underline" href={href({ name: 'project', id, tab: 'data' })}>
+            Aller aux données
+          </a>
         </p>
       )}
       {tab === 'report' && hasData && !hasReport && (
         <p className="text-sm text-muted-foreground">
           Le rapport apparaîtra ici à la fin de l'analyse.{' '}
-          <a className="text-primary underline" href={href({ name: 'project', id, tab: 'analysis' })}>Aller à l'analyse</a>
+          <a className="text-primary underline" href={href({ name: 'project', id, tab: 'analysis' })}>
+            Aller à l'analyse
+          </a>
         </p>
       )}
     </div>

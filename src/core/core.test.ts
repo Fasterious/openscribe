@@ -1,16 +1,51 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { computeMetrics } from './analysis/metrics'
-import { allowedNumbers, unverifiedNumbers } from './analysis/numbers'
-import { acceptRewrite, describeMetrics, describeTheme, groupTarget, newAnalysis, runAnalysis, sanitizeCitations } from './analysis/pipeline'
-import { reportToHtml, reportToMarkdown } from './analysis/report'
-import { MemoryCache } from './analysis/runner'
-import { DEFAULT_SETTINGS, type AnalysisState, type Idea } from './analysis/types'
+import { computeMetrics, isFragile, stanceOf } from './analysis/metrics'
+import {
+  allClaims,
+  allowedNumbers,
+  clauseCounts,
+  impliedOthers,
+  overcountedPeople,
+  undercitedPeople,
+  unverifiedNumbers,
+  vaguePlurals,
+} from './analysis/numbers'
+import {
+  acceptRewrite,
+  applyMerges,
+  applyReview,
+  applySplits,
+  applySupport,
+  dropUnreferenced,
+  checkOpposed,
+  spellLeadingNumbers,
+  withDivided,
+  missingCamps,
+  describeMetrics,
+  describeTheme,
+  dropSentences,
+  groupTarget,
+  extractParticipant,
+  isToneDefined,
+  needsConsolidation,
+  newAnalysis,
+  runAnalysis,
+  sanitizeCitations,
+} from './analysis/pipeline'
+import { uncoveredPassages } from './analysis/coverage'
+import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
+import { emptyCorpus, promptsOf, removeSource, renameSource } from './corpus'
+import { maskNames, verifiedNames } from './analysis/names'
+import { highlights } from './analysis/highlights'
+import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext } from './analysis/report'
+import { LlmRunner, MemoryCache } from './analysis/runner'
+import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
 import { activeParticipants, type Corpus } from './corpus'
 import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole } from './import/csv'
 import { detectSpeakers, textToCorpus } from './import/text'
-import { exportProject, importProject, newProject } from './project'
+import { corpusForAnalysis, exportProject, importProject, newProject } from './project'
 import { withLimits } from './providers/limits'
 import { createSimulationProvider } from './providers/simulation'
 import { ProviderError, type LlmProvider } from './providers/types'
@@ -106,22 +141,101 @@ describe('vérification des citations', () => {
 })
 
 describe('regroupement', () => {
-  it('vise des groupes fins, sans émietter les gros corpus', () => {
-    // 36 libellés : l'ancienne cible (2 à 6 groupes) forçait le mélange de sujets.
-    expect(groupTarget(36)).toEqual({ min: 6, max: 18 })
-    expect(groupTarget(5)).toEqual({ min: 3, max: 7 })
-    // Le nombre de groupes croît moins vite que les idées (saturation des motifs).
-    expect(groupTarget(300)).toEqual({ min: 17, max: 52 })
+  it('vise environ min(1,5 × √idées ; 1,2 × participants) motifs', () => {
+    expect(groupTarget(36)).toEqual({ min: 7, max: 11 })
+    expect(groupTarget(5)).toEqual({ min: 3, max: 6 })
+    // Corpus réel : 311 idées de 20 participants, dont un très prolixe. La racine seule visait 26 à 44 ; le nombre de participants borne à 24.
+    expect(groupTarget(311, 20)).toEqual({ min: 18, max: 30 })
   })
 
-  it("ne calcule ni consensus ni désaccord sur un thème, qui réunit des objets différents", () => {
+  it('sépare un motif à deux objets seulement si la proposition tient', () => {
+    const groups = [{ id: 'G1', title: 'Tractage et affichage', ideaIds: ['I1', 'I2', 'I3'] }]
+    const ok = applySplits(groups, [
+      {
+        group: 'G1',
+        objects: 2,
+        parts: [
+          { title: 'Tractage', ideas: ['I1', 'I2'] },
+          { title: 'Affichage', ideas: ['I3'] },
+        ],
+      },
+    ])
+    expect(ok.groups.map((g) => g.title)).toEqual(['Tractage', 'Affichage'])
+    // Une idée oubliée, un titre encore double : rien ne change.
+    expect(
+      applySplits(groups, [
+        {
+          group: 'G1',
+          objects: 2,
+          parts: [
+            { title: 'Tractage', ideas: ['I1'] },
+            { title: 'Affichage', ideas: ['I3'] },
+          ],
+        },
+      ]).changed,
+    ).toBe(false)
+    expect(
+      applySplits(groups, [
+        {
+          group: 'G1',
+          objects: 2,
+          parts: [
+            { title: 'Tracts et flyers', ideas: ['I1', 'I2'] },
+            { title: 'Affichage', ideas: ['I3'] },
+          ],
+        },
+      ]).changed,
+    ).toBe(false)
+    expect(applySplits(groups, [{ group: 'G1', objects: 1 }]).changed).toBe(false)
+  })
+
+  it('reconnaît un motif défini par son ton', () => {
+    expect(isToneDefined("Bilan positif de l'équipe", ['positive', 'positive', 'positive'])).toBe(true)
+    expect(isToneDefined('Ambiance du groupe', ['positive', 'positive', 'positive'])).toBe(false)
+    expect(isToneDefined('Points forts', ['positive', 'negative', 'positive'])).toBe(false)
+  })
+
+  it('déclenche la consolidation quand les motifs sont émiettés', () => {
+    // 16 motifs sur 75 portés par une seule personne : au-dessus de 15 %.
+    expect(needsConsolidation([...Array(16).fill(1), ...Array(59).fill(3)])).toBe(true)
+    // Médiane sous 3 personnes par motif.
+    expect(needsConsolidation([...Array(10).fill(2), ...Array(5).fill(4)])).toBe(true)
+    expect(needsConsolidation([...Array(2).fill(1), ...Array(20).fill(4)])).toBe(false)
+    // Trop peu de motifs pour juger.
+    expect(needsConsolidation([1, 1, 1])).toBe(false)
+  })
+
+  it('applique les fusions qui tiennent et refuse les autres', () => {
+    const g = (id: string, title: string, ideaIds: string[]) => ({ id, title, ideaIds })
+    const groups = [
+      g('G1', 'Communication tardive', ['I1']),
+      g('G2', 'Démarrage de la campagne', ['I2']),
+      g('G3', 'Budget', ['I3']),
+      g('G4', 'Affiches', ['I4']),
+    ]
+    const r = applyMerges(groups, [
+      { groups: ['G1', 'G2'], title: 'Calendrier et anticipation', reason: 'fourre-tout refusé' },
+      { groups: ['G1', 'G2', 'G9'], title: 'Calendrier de la campagne', reason: 'même objet' },
+      { groups: ['G2', 'G3'], title: 'Moyens', reason: 'G2 déjà pris' },
+      { groups: ['G4'], title: 'Seul', reason: 'un seul motif' },
+    ])
+    expect(r.merges).toEqual([{ title: 'Calendrier de la campagne', from: ['Communication tardive', 'Démarrage de la campagne'], reason: 'même objet' }])
+    // Une fusion sous un titre de jugement est refusée.
+    expect(applyMerges(groups, [{ groups: ['G3', 'G4'], title: 'Points faibles', reason: '' }]).merges).toEqual([])
+    expect(r.groups.map((x) => x.title).sort()).toEqual(['Affiches', 'Budget', 'Calendrier de la campagne'])
+    // Rien ne se perd.
+    expect(r.groups.flatMap((x) => x.ideaIds).sort()).toEqual(['I1', 'I2', 'I3', 'I4'])
+  })
+
+  it('ne calcule ni consensus ni désaccord sur un thème, qui réunit des objets différents', () => {
     const a = computeMetrics(['P1', 'P2'].map((p, k) => idea(`I000${k}`, p, 'positive')))
     const b = computeMetrics(['P3', 'P4', 'P5'].map((p, k) => idea(`I001${k}`, p, 'negative')))
-    const theme = computeMetrics(
-      [...['P1', 'P2'].map((p, k) => idea(`I000${k}`, p, 'positive')), ...['P3', 'P4', 'P5'].map((p, k) => idea(`I001${k}`, p, 'negative'))],
-    )
+    const theme = computeMetrics([
+      ...['P1', 'P2'].map((p, k) => idea(`I000${k}`, p, 'positive')),
+      ...['P3', 'P4', 'P5'].map((p, k) => idea(`I001${k}`, p, 'negative')),
+    ])
     const text = describeTheme({ metrics: theme }, [{ metrics: a }, { metrics: b }])
-    expect(text).not.toMatch(/consensus|partagés|peu d'avis/)
+    expect(text).not.toMatch(/consensus|partagés|peu d'avis|positif|négatif|mitigé/)
     expect(text).toContain('2 motifs')
   })
 })
@@ -146,11 +260,36 @@ describe('indicateurs', () => {
     expect(m.mixed).toEqual(['P6'])
     expect(m.negativeOnly).toHaveLength(5)
     expect(m.consensusRate).toBeCloseTo(5 / 7)
-    expect(m.stance).toBe('consensus')
+    // 71 % : majoritairement négatif ; le consensus demande 80 %.
+    expect(m.stance).toBe('majority')
     expect(m.majority).toBe('negative')
   })
 
-  it("les suggestions ne sont pas une polarité", () => {
+  it('situe chaque motif sur l’échelle d’avis (positifs, négatifs, mitigés)', () => {
+    expect(stanceOf(2, 8, 2)).toBe('majority') // 67 % : clairement négatif, pas « partagé »
+    expect(stanceOf(0, 4, 3)).toBe('majority') // 57 %, aucun avis positif
+    expect(stanceOf(3, 4, 0)).toBe('divided')
+    expect(stanceOf(1, 6, 0)).toBe('consensus') // 86 %
+    expect(stanceOf(0, 3, 1)).toBe('majority') // 75 %
+    expect(stanceOf(1, 3, 1)).toBe('majority') // 60 %
+    expect(stanceOf(1, 3, 2)).toBe('lean') // 50 %, les mitigés moins nombreux que le camp dominant
+    expect(stanceOf(2, 1, 2)).toBe('divided') // autant de mitigés que le camp le plus fort : avis partagés
+    expect(stanceOf(1, 1, 4)).toBe('divided') // les mitigés dominent
+    expect(stanceOf(0, 6, 0)).toBe('unanimous')
+    expect(stanceOf(0, 4, 0)).toBe('unanimous')
+    expect(stanceOf(2, 2, 0)).toBe('divided')
+    expect(stanceOf(1, 1, 0)).toBe('thin')
+    expect(stanceOf(0, 0, 0)).toBe('none')
+  })
+
+  it('« fragile » quand une seule voix changerait l’étiquette', () => {
+    expect(isFragile(4, 1, 0)).toBe(true) // 4 sur 5 large majorité ; 3 sur 5 majorité
+    expect(isFragile(0, 4, 0)).toBe(true) // unanime sur 4 : une voix et ce n'est plus unanime
+    expect(isFragile(1, 12, 0)).toBe(false) // 12 sur 13 reste une large majorité
+    expect(isFragile(2, 2, 0)).toBe(false) // avis partagés : pas d'étiquette de camp
+  })
+
+  it('les suggestions ne sont pas une polarité', () => {
     const m = computeMetrics(['P1', 'P2', 'P3', 'P4', 'P5'].map((p, i) => idea(`S${i}`, p, 'suggestion')))
     expect(m.stance).toBe('none')
     expect(m.consensusRate).toBeNull()
@@ -174,18 +313,228 @@ describe('chiffres en toutes lettres', () => {
   it('accorde, omet les zéros, et ne met de pourcentage qu’à partir de dix participants', () => {
     const ideas = ['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I000${k}`, p, k < 4 ? 'positive' : 'negative'))
     const text = describeMetrics(computeMetrics(ideas))
-    expect(text).toBe('5 participants (5 occurrences) ; avis : 4 positifs, 1 négatif ; consensus positif : 4 sur 5')
+    expect(text).toBe('5 participants · avis : 4 positifs, 1 négatif · large majorité positive (4 sur 5)')
     expect(text).not.toMatch(/\(s\)|: 0|%/)
   })
 })
 
+describe('idées qui se recouvrent', () => {
+  it('garde la plus longue quand deux idées d’une personne disent la même chose', async () => {
+    const corpus = surveyCorpus()
+    const text = corpus.contributions[0].text
+    const runner = new LlmRunner(
+      {
+        label: 'test',
+        fingerprint: { presetId: 'test', model: 't', baseUrl: '' },
+        async complete() {
+          return {
+            text: JSON.stringify({
+              ideas: [
+                { ref: 'C1', label: 'Long', verbatim: text.slice(0, 40), category: 'negative' },
+                { ref: 'C1', label: 'Court', verbatim: text.slice(5, 30), category: 'positive' },
+              ],
+              names: [],
+            }),
+          }
+        },
+      },
+      new MemoryCache(),
+      DEFAULT_SETTINGS,
+    )
+    const r = await extractParticipant([corpus.contributions[0]], corpus.contributions[0].participantId, DEFAULT_SETTINGS, runner)
+    expect(r.ideas.map((i) => i.label)).toEqual(['Long'])
+  })
+})
+
+describe('sources multiples', () => {
+  it('renomme et retire une source sans toucher aux autres', () => {
+    const base = emptyCorpus()
+    const corpus = {
+      ...base,
+      sources: [
+        { id: 'S1', kind: 'survey' as const, name: 'reponses.csv', importedAt: '' },
+        { id: 'S2', kind: 'transcript' as const, name: 'entretien.txt', importedAt: '' },
+      ],
+      participants: [
+        { id: 'P1', label: 'P1', attributes: {} },
+        { id: 'P2', label: 'P2', attributes: {} },
+      ],
+      contributions: [
+        { id: 'C1', participantId: 'P1', sourceId: 'S1', text: 'Oui' },
+        { id: 'C2', participantId: 'P2', sourceId: 'S2', text: 'Non' },
+      ],
+    }
+    expect(renameSource(corpus, 'S2', '  Entretien du 18 mai  ').sources[1].name).toBe('Entretien du 18 mai')
+    expect(renameSource(corpus, 'S2', '   ').sources[1].name).toBe('entretien.txt')
+    // Les relances de l'animateur ne sont pas des questions à choisir, et décocher une question du questionnaire n'écarte pas l'entretien.
+    const withPrompts = {
+      ...corpus,
+      contributions: [
+        { ...corpus.contributions[0], prompt: 'Q du questionnaire' },
+        { ...corpus.contributions[1], prompt: 'Relance de l’animatrice' },
+      ],
+    }
+    expect(promptsOf(withPrompts)).toEqual(['Q du questionnaire'])
+    const project = { ...newProject('t'), corpus: withPrompts, selectedPrompts: ['Autre question'] }
+    expect(corpusForAnalysis(project).contributions.map((c) => c.id)).toEqual(['C2'])
+    const r = removeSource(corpus, 'S2')
+    expect(r.sources.map((s) => s.id)).toEqual(['S1'])
+    expect(r.participants.map((p) => p.id)).toEqual(['P1'])
+    expect(r.contributions.map((c) => c.id)).toEqual(['C1'])
+  })
+})
+
+describe('citations coupées', () => {
+  const source =
+    "Je trouve que l'ergonomie est vraiment top. Ah, tant que j'y pense, la dernière mise à jour a planté hier soir. Ce que j'apprécie surtout, c'est l'iconographie minimale et claire."
+  it('accepte une coupure « […] » si chaque fragment existe, dans l’ordre', () => {
+    const q = "Je trouve que l'ergonomie est vraiment top. […] Ce que j'apprécie surtout, c'est l'iconographie minimale et claire."
+    const m = locateQuote(source, q)
+    expect(m?.parts).toHaveLength(2)
+    expect(quoteText(source, m!)).toBe(q)
+  })
+  it('refuse le désordre, l’invention, les fragments courts et plusieurs coupures', () => {
+    expect(locateQuote(source, "c'est l'iconographie minimale et claire […] Je trouve que l'ergonomie est vraiment top")).toBeNull()
+    expect(locateQuote(source, "Je trouve que l'ergonomie est vraiment top […] elle est aussi très rapide partout")).toBeNull()
+    expect(locateQuote(source, "Je trouve que l'ergonomie […] minimale et claire")).toBeNull()
+    expect(locateQuote(source, "Je trouve que l'ergonomie est […] la dernière mise à jour a planté […] l'iconographie minimale et claire")).toBeNull()
+    // Des points de suspension seuls restent une reformulation.
+    expect(locateQuote(source, "Je trouve que l'ergonomie est vraiment top… l'iconographie minimale et claire")).toBeNull()
+  })
+  it('refuse une coupure qui retire une négation ou un contraste', () => {
+    const s2 = 'Le site est clair, mais pas du tout pour les nouveaux venus qui arrivent, et il reste agréable à utiliser au quotidien.'
+    expect(locateQuote(s2, 'Le site est clair, […] et il reste agréable à utiliser au quotidien.')).toBeNull()
+  })
+})
+
+describe('citations qui renvoient à la phrase d’avant', () => {
+  it('« Malgré cela… » emporte la phrase précédente, rien d’autre ne change', () => {
+    const text = 'La commande a été modifiée deux fois. Malgré cela, tout est arrivé à temps. Merci.'
+    const m = locateQuote(text, 'Malgré cela, tout est arrivé à temps.')!
+    const w = withAntecedent(text, m)
+    expect(quoteText(text, w)).toBe('La commande a été modifiée deux fois. Malgré cela, tout est arrivé à temps.')
+    const plain = locateQuote(text, 'tout est arrivé à temps')!
+    expect(withAntecedent(text, plain)).toEqual(plain)
+    const first = locateQuote('Elle est pratique.', 'Elle est pratique.')!
+    expect(withAntecedent('Elle est pratique.', first)).toEqual(first)
+  })
+})
+
+describe('couverture des longues réponses', () => {
+  it('repère les passages assez longs qu’aucune citation ne couvre', () => {
+    const text = 'La livraison était rapide. On pourrait aussi parler du parking, qui reste introuvable pour la plupart des clients du samedi. Merci !'
+    const covered = [{ start: 0, end: 26 }]
+    expect(uncoveredPassages(text, covered)).toEqual([
+      'On pourrait aussi parler du parking, qui reste introuvable pour la plupart des clients du samedi. Merci !',
+    ])
+    expect(uncoveredPassages(text, [{ start: 0, end: 132 }])).toEqual([])
+  })
+})
+
+describe('prénoms des particuliers', () => {
+  it('ne garde que les noms présents dans le texte, et les masque mot entier', () => {
+    const texts = ['Mélodie a répondu à toutes mes questions.', 'Merci Karim pour le conseil.']
+    const names = verifiedNames(['Mélodie', 'Karim', 'Yanis', 'Al'], texts)
+    expect(names).toEqual(['Mélodie', 'Karim'])
+    expect(maskNames('Mélodie a tout réglé.', names)).toBe('[prénom] a tout réglé.')
+    // Pas de masquage à l'intérieur d'un mot.
+    expect(maskNames('Les Mélodiettes', names)).toBe('Les Mélodiettes')
+  })
+})
+
+describe('faits saillants', () => {
+  it('classe ce qui a marché, ce qui bloque, ce qui divise, avec les mêmes chiffres que le consensus', () => {
+    const mk = (id: string, title: string, list: [string, IdeaCategory][]) => {
+      const ideas = list.map(([p, c], k) => idea(`${id}-${k}`, p, c))
+      return { id, title, ideaIds: ideas.map((i) => i.id), summary: '', metrics: computeMetrics(ideas), ideas }
+    }
+    const groups = [
+      // 3 positifs, 1 négatif : consensus positif, 3 des 4 avis.
+      mk('G1', 'Ambiance', [
+        ['P1', 'positive'],
+        ['P2', 'positive'],
+        ['P3', 'positive'],
+        ['P4', 'negative'],
+      ]),
+      // Un mitigé ne compte dans aucun camp : 4 négatifs + 1 mitigé = 4 des 5 avis.
+      mk('G2', 'Budget', [
+        ['P1', 'negative'],
+        ['P2', 'negative'],
+        ['P3', 'negative'],
+        ['P4', 'negative'],
+        ['P6', 'negative'],
+        ['P6', 'positive'],
+        ['P5', 'suggestion'],
+      ]),
+      // Trop peu d'avis : aucune liste.
+      mk('G3', 'Affiches', [['P1', 'negative']]),
+      mk('G4', 'Formation', [
+        ['P2', 'suggestion'],
+        ['P3', 'suggestion'],
+      ]),
+      mk('G5', 'Réseaux sociaux', [
+        ['P1', 'positive'],
+        ['P2', 'positive'],
+        ['P3', 'negative'],
+        ['P4', 'negative'],
+      ]),
+    ]
+    const byId = new Map(groups.flatMap((g) => g.ideas).map((i) => [i.id, i]))
+    const h = highlights(groups, byId)
+    expect(h.strengths.map((x) => [x.title, x.people, x.of])).toEqual([['Ambiance', 3, 4]])
+    expect(h.blockers.map((x) => [x.title, x.people, x.of])).toEqual([['Budget', 4, 5]])
+    expect(h.divided.map((x) => x.title)).toEqual(['Réseaux sociaux'])
+    expect(h.proposals.map((x) => [x.title, x.people])).toEqual([
+      ['Formation', 2],
+      ['Budget', 1],
+    ])
+    // Les propositions portent leurs propres idées, pour les montrer.
+    expect(h.proposals[0].ideaIds).toEqual(['G4-0', 'G4-1'])
+  })
+})
+
+describe('ligne de chiffres affichée', () => {
+  it('donne la fraction sans pourcentage, les constats, et « peu d’avis »', () => {
+    const many = computeMetrics([
+      ...Array.from({ length: 10 }, (_, k) => idea(`N${k}`, `P${k}`, 'negative')),
+      idea('A', 'P20', 'positive'),
+      idea('B', 'P21', 'neutral'),
+    ])
+    expect(metricsLine(many)).toBe('12 participants · avis : 1 positif, 10 négatifs · 1 participant fait un constat · large majorité négative (10 sur 11 qui donnent un avis)')
+    expect(metricsLine(computeMetrics([idea('X', 'P1', 'negative')]))).toBe('1 participant · avis : 1 négatif')
+  })
+})
+
 describe('contrôle des chiffres des synthèses', () => {
+  it('retire une phrase au nombre introuvable plutôt que de la livrer', () => {
+    expect(dropSentences('Une personne apprécie [I0001]. Deux autres la jugent insuffisante.', ['Deux autres'])).toEqual({
+      text: 'Une personne apprécie [I0001].',
+      removed: 1,
+    })
+    // Si tout tombait, on garde le texte et son signalement.
+    expect(dropSentences('Sept personnes apprécient.', ['Sept personnes']).removed).toBe(0)
+  })
   it('signale un nombre, en chiffres ou en lettres, qui ne vient ni du calcul ni des citations', () => {
     const ideas = ['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I000${k}`, p, k < 4 ? 'positive' : 'negative'))
     const ok = allowedNumbers([computeMetrics(ideas)], ['On était 12 bénévoles en 2020'])
     expect(unverifiedNumbers('Quatre personnes sur cinq apprécient [I0001]. Une personne regrette [I0004].', ok)).toEqual([])
     expect(unverifiedNumbers('Les 12 bénévoles de 2020 sont cités.', ok)).toEqual([])
     expect(unverifiedNumbers('Sept personnes apprécient, soit 64 %.', ok)).toEqual(['64', 'Sept personnes'])
+  })
+  it('repère deux idées d’une même personne comptées comme deux personnes', () => {
+    const person = (id: string) => ({ I0252: 'P15', I0253: 'P15', I0010: 'P1', I0011: 'P2' })[id]
+    expect(overcountedPeople('Deux personnes suggèrent un debrief [I0252, I0253].', person)).toEqual(['Deux personnes'])
+    expect(overcountedPeople('Deux personnes regrettent [I0010, I0011].', person)).toEqual([])
+    // Une phrase qui cite un exemple pour six personnes n'affirme rien sur les autres.
+    expect(overcountedPeople('Six personnes saluent la collaboration [I0010].', person)).toEqual([])
+  })
+  it('dans un thème, « trois personnes » doit citer trois personnes', () => {
+    const person = (id: string) => ({ I0069: 'P5', I0070: 'P5', I0010: 'P1', I0011: 'P2', I0012: 'P3' })[id]
+    expect(undercitedPeople('Trois personnes saluent la déclaration de la liste [I0069].', person)).toEqual(['Trois personnes'])
+    expect(undercitedPeople('Trois personnes saluent la déclaration [I0010, I0011, I0012].', person)).toEqual([])
+    // Un ratio repris des listes du code n'est pas un comptage à prouver idée par idée.
+    expect(undercitedPeople('10 des 12 participants qui donnent un avis la critiquent [I0010].', person)).toEqual([])
+    expect(undercitedPeople('Une personne regrette [I0069].', person)).toEqual([])
   })
   it('la relecture ne peut pas changer « deux » en « trois »', () => {
     expect(acceptRewrite('Deux personnes regrettent [I0001].', 'Trois personnes regrettent [I0001].')).toBe(false)
@@ -276,6 +625,14 @@ describe('chaîne complète (simulation)', () => {
     expect(bad.state.groups.map((g) => g.summary)).toEqual(good.state.groups.map((g) => g.summary))
   })
 
+  it('redonne au modèle les motifs qu’il a oubliés en formant les thèmes', async () => {
+    const { state } = await runSim(surveyCorpus(), { forgetHalfThemes: true })
+    expect(state.status).toBe('done')
+    expect(state.themes.some((t) => t.title === 'Autres sujets')).toBe(false)
+    // Chaque motif est dans exactement un thème.
+    expect(state.themes.flatMap((t) => t.groupIds).sort()).toEqual(state.groups.map((g) => g.id).sort())
+  })
+
   it('est reproductible mot pour mot, et la relance passe entièrement par le cache', async () => {
     const corpus = surveyCorpus()
     const cache = new MemoryCache()
@@ -342,6 +699,194 @@ describe('chaîne complète (simulation)', () => {
   })
 })
 
+describe('relecture des motifs', () => {
+  const idea = (id: string, participantId: string, category: IdeaCategory) => ({ id, participantId, category }) as Idea
+  it('déplace une idée hors sujet, corrige un ton, refuse ce qui ne tient pas, et garde la trace', () => {
+    const ideas = [idea('I1', 'P5', 'positive'), idea('I2', 'P5', 'negative'), idea('I3', 'P9', 'positive'), idea('I4', 'P4', 'positive')]
+    const groups = [
+      { id: 'G1', title: 'Outils numériques et IA', ideaIds: ['I1', 'I2'] },
+      { id: 'G2', title: 'Accueil des nouveaux', ideaIds: ['I3'] },
+      { id: 'G3', title: 'Calendrier de la campagne', ideaIds: ['I4'] },
+    ]
+    const r = applyReview(ideas, groups, [
+      { id: 'I2', new: 'Ouverture aux nouveaux outils' },
+      { id: 'I4', category: 'negative' },
+      { id: 'I3', new: 'Points forts' }, // titre de jugement : refusé
+      { id: 'I9', to: 'G2' }, // idée inconnue
+      { id: 'I1', to: 'G9' }, // motif inconnu
+    ])
+    expect(r.groups.map((g) => [g.title, g.ideaIds])).toEqual([
+      ['Outils numériques et IA', ['I1']],
+      ['Accueil des nouveaux', ['I3']],
+      ['Calendrier de la campagne', ['I4']],
+      ['Ouverture aux nouveaux outils', ['I2']],
+    ])
+    expect(r.moved).toEqual([{ id: 'I2', from: 'Outils numériques et IA', to: 'Ouverture aux nouveaux outils' }])
+    expect(r.retoned).toEqual([{ id: 'I4', from: 'positive', to: 'negative' }])
+  })
+
+  it('pistes opposées : deux propositions du motif, de deux personnes différentes', () => {
+    const s = (id: string, p: string, c: IdeaCategory = 'suggestion') => ({ id, participantId: p, category: c }) as Idea
+    const byId = new Map([s('I1', 'P12'), s('I2', 'P20'), s('I3', 'P20'), s('I4', 'P5', 'negative')].map((i) => [i.id, i]))
+    const g = { ideaIds: ['I1', 'I2', 'I3', 'I4'] }
+    expect(
+      checkOpposed(g, byId, [
+        { a: 'I1', b: 'I2', about: 'étiquette politique' },
+        { a: 'I2', b: 'I3', about: 'même personne' },
+        { a: 'I1', b: 'I4', about: 'pas une proposition' },
+        { a: 'I2', b: 'I1', about: 'doublon' },
+      ]),
+    ).toEqual([{ a: 'I1', b: 'I2', about: 'étiquette politique' }])
+  })
+})
+
+describe('vérification des renvois', () => {
+  const text =
+    'Cinq personnes critiquent les ateliers, l’une pour leur horaire tardif [I0001].\n\nUne personne propose un atelier [I0002]. Une autre salue la presse [I0003].'
+  it('remplace une phrase mal appuyée, retire une phrase sans appui, garde les paragraphes', () => {
+    const r = applySupport(text, new Set(['I0001', 'I0002', 'I0003', 'I0015']), [
+      { n: 1, sentence: 'Cinq personnes critiquent les ateliers, l’une pour leur horaire tardif [I0015].' },
+      { n: 3, drop: true },
+    ])
+    expect(r).toEqual({
+      text: 'Cinq personnes critiquent les ateliers, l’une pour leur horaire tardif [I0015].\n\nUne personne propose un atelier [I0002].',
+      fixed: 1,
+      dropped: 1,
+      added: 0,
+    })
+  })
+  it('ajoute une phrase demandée (n = 0) si ses renvois sont permis et ses nombres signalés', () => {
+    const allowed = new Set(['I0001', 'I0002', 'I0003', 'I0015'])
+    const add = (sentence: string) => applySupport(text, allowed, [{ n: 0, sentence }], { addNumbers: new Set([2]), addTo: 'second' })
+    expect(add('Deux personnes regrettent le bruit [I0015].').text).toBe(
+      'Cinq personnes critiquent les ateliers, l’une pour leur horaire tardif [I0001].\n\nUne personne propose un atelier [I0002]. Une autre salue la presse [I0003]. Deux personnes regrettent le bruit [I0015].',
+    )
+    expect(add('Quatre personnes regrettent le bruit [I0015].').added).toBe(0)
+    expect(add('Deux personnes regrettent le bruit [I0099].').added).toBe(0)
+  })
+
+  it('repère un camp d’avis compté mais absent de la synthèse', () => {
+    const i = (id: string, p: string, c: IdeaCategory) => ({ id, participantId: p, category: c }) as Idea
+    const byId = new Map([i('I0001', 'P1', 'positive'), i('I0002', 'P2', 'negative'), i('I0003', 'P3', 'negative')].map((x) => [x.id, x]))
+    const g = { id: 'G1', title: 'x', ideaIds: ['I0001', 'I0002', 'I0003'], summary: 'Une personne apprécie [I0001].' } as unknown as Group
+    expect(missingCamps(g, byId)).toEqual([{ side: 'negative', people: ['P2', 'P3'], ideaIds: ['I0002', 'I0003'] }])
+  })
+
+  it('refuse un renvoi hors du texte, un nombre ajouté, et ne vide jamais le texte', () => {
+    const allowed = new Set(['I0001', 'I0002', 'I0003'])
+    expect(applySupport(text, allowed, [{ n: 2, sentence: 'Une personne propose un atelier [I0099].' }]).fixed).toBe(0)
+    expect(applySupport(text, allowed, [{ n: 2, sentence: 'Trois personnes proposent un atelier [I0002].' }]).fixed).toBe(0)
+    expect(
+      applySupport(
+        text,
+        allowed,
+        [1, 2, 3].map((n) => ({ n, drop: true })),
+      ).text,
+    ).toBe(text)
+  })
+})
+
+describe('contrôles ajoutés à la certification B8', () => {
+  const person = (id: string) => ({ I0001: 'P4', I0002: 'P4', I0003: 'P7', I0004: 'P9' })[id]
+  it('« une autre » exige une personne différente', () => {
+    expect(impliedOthers('Une personne apprécie X, une autre regrette Y [I0001, I0002].', person)).toEqual(['une autre'])
+    expect(impliedOthers('Une personne apprécie X, une autre regrette Y [I0001, I0003].', person)).toEqual([])
+    expect(impliedOthers('Une personne apprécie X [I0001]. Une autre regrette Y [I0003].', person)).toEqual([])
+    expect(impliedOthers('Une personne apprécie X [I0001]. Une autre regrette Y [I0002].', person)).toEqual(['Une autre'])
+    expect(impliedOthers('Une personne, une autre et une troisième proposent Z [I0001, I0003].', person)).toEqual(['une troisième'])
+  })
+  it('« il faut » n’est pas une reprise ; une question de deux mots emporte sa phrase ; jamais par-dessus une autre idée', () => {
+    const text = 'Le magasin est loin. Il faut prendre la voiture. Pourquoi pas ? comment ?'
+    const m = locateQuote(text, 'Il faut prendre la voiture.')!
+    expect(withAntecedent(text, m)).toEqual(m)
+    const t2 = 'On voudrait plus de caisses ouvertes, mais comment ?'
+    const q = locateQuote(t2, 'comment ?')!
+    expect(quoteText(t2, withAntecedent(t2, q))).toBe('On voudrait plus de caisses ouvertes, mais comment ?')
+    const t3 = 'La commande a été modifiée deux fois. Malgré cela, tout est arrivé à temps.'
+    const r = locateQuote(t3, 'Malgré cela, tout est arrivé à temps.')!
+    expect(withAntecedent(t3, r, 260, [{ start: 0, end: 37 }])).toEqual(r)
+  })
+  it('un compte réécrit est accepté s’il égale les personnes citées', () => {
+    const text = 'Quatre personnes regrettent le bruit [I0001, I0003, I0004].'
+    const r = applySupport(text, new Set(['I0001', 'I0003', 'I0004']), [{ n: 1, sentence: 'Trois personnes regrettent le bruit [I0001, I0003, I0004].' }], {
+      personOf: (id) => ({ I0001: 'P1', I0003: 'P3', I0004: 'P4' })[id],
+    })
+    expect(r.fixed).toBe(1)
+  })
+  it('deux renvois identiques dans une phrase n’en font qu’un', () => {
+    const byId = new Map([{ id: 'I0001', participantId: 'P4' } as Idea].map((i) => [i.id, i]))
+    expect(refsToPeople('Elle salue X [I0001] et regrette Y [I0001].', byId)).toBe('Elle salue X et regrette Y (cf. P4).')
+  })
+})
+
+describe('phrases sans renvoi', () => {
+  it('ne sont pas livrées dans un motif, sauf si rien d’autre ne reste', () => {
+    expect(dropUnreferenced('L’accueil reste inégal. Deux personnes regrettent X [I0001, I0002].')).toEqual({
+      text: 'Deux personnes regrettent X [I0001, I0002].',
+      removed: 1,
+    })
+    expect(dropUnreferenced('Un texte sans aucun renvoi.')).toEqual({ text: 'Un texte sans aucun renvoi.', removed: 0 })
+  })
+})
+
+describe('contrôles ajoutés à la certification B9', () => {
+  const person = (id: string) => ({ I0001: 'P4', I0002: 'P7', I0003: 'P9' })[id]
+  it('un compte vaut pour son passage, jusqu’à la voix suivante', () => {
+    expect(clauseCounts('Deux personnes proposent de filmer [I0001], et une troisième de créer un lien [I0002].', person)).toEqual(['Deux personnes'])
+    expect(clauseCounts('Deux personnes proposent : filmer [I0001], ou créer un lien [I0002].', person)).toEqual([])
+    expect(clauseCounts('6 des 7 participants qui donnent un avis le critiquent [I0001].', person)).toEqual([])
+  })
+  it('« toutes les personnes » couvre chaque personne qui donne un avis', () => {
+    expect(allClaims('Toutes les personnes qui en parlent le jugent tardif [I0001, I0002].', person, 3)).toEqual(['Toutes les personnes'])
+    expect(allClaims('Toutes les personnes qui en parlent le jugent tardif [I0001, I0002, I0003].', person, 3)).toEqual([])
+  })
+  it('les sujets qui divisent sont nommés une fois, par le code', () => {
+    const g = (id: string, title: string, stance: string, opposed?: { a: string; b: string; about: string }[]) =>
+      ({
+        id,
+        title,
+        ideaIds: [],
+        summary: '',
+        opposed,
+        metrics: { stance, positiveOnly: ['a', 'b'], negativeOnly: ['c', 'd'], mixed: [], participantsByCategory: {} },
+      }) as unknown as Group
+    const out = withDivided('Ce qui a marché.\n\nCe qui a bloqué.\n\nCe que demandent les participants.', [
+      g('G1', 'Prise de décision', 'divided'),
+      g('G2', 'Positionnement', 'consensus', [{ a: 'I0001', b: 'I0002', about: 'afficher ou non une étiquette' }]),
+    ])
+    expect(out.split('\n\n')[1]).toBe(
+      'Ce qui a bloqué. Les avis s’opposent sur « Prise de décision ». Sur « Positionnement », les critiques se rejoignent mais les remèdes proposés s’opposent : afficher ou non une étiquette [I0001, I0002].'.replace(
+        /’/g,
+        "'",
+      ),
+    )
+  })
+  it('un nombre en tête de phrase s’écrit en lettres', () => {
+    expect(spellLeadingNumbers('3 personnes regrettent X. Puis 4 autres.\n\n2 personnes proposent Y.')).toBe(
+      'Trois personnes regrettent X. Puis 4 autres.\n\nDeux personnes proposent Y.',
+    )
+  })
+})
+
+describe('pluriels vagues', () => {
+  const person = (id: string) => ({ I0129: 'P6', I0130: 'P6', I0010: 'P2', I0011: 'P3', I0012: 'P4' })[id]
+  it("« d'autres » qui ne cite qu'une personne est signalé", () => {
+    expect(vaguePlurals("Le manque d'implication a pesé, alors que d'autres ont salué l'engagement [I0130, I0129].", person)).toEqual(["d'autres"])
+    expect(vaguePlurals('Certains saluent la bienveillance [I0010, I0011].', person)).toEqual([])
+    expect(vaguePlurals('Plusieurs personnes regrettent [I0010, I0011].', person)).toEqual(['Plusieurs'])
+    expect(vaguePlurals('Plusieurs personnes regrettent [I0010, I0011, I0012].', person)).toEqual([])
+    // Ce qu'une personne rapporte n'est pas un compte : « reprises par d'autres », « a vu plusieurs personnes partir ».
+    expect(vaguePlurals("Une personne décrit des tâches reprises par d'autres [I0129].", person)).toEqual([])
+    expect(vaguePlurals('Une personne a vu plusieurs personnes motivées se désinvestir [I0129].', person)).toEqual([])
+    // Une énumération après le pluriel compte tous ses renvois.
+    expect(vaguePlurals("Trois l'apprécient [I0010], d'autres lui reprochent un flou [I0011] ou des lenteurs [I0012].", person)).toEqual([])
+    // Résumé : la référence d'une ligne de liste vaut pour son motif.
+    expect(vaguePlurals('Certains regrettent le calendrier [I0129].', person, () => 6)).toEqual([])
+    // « Certains points » ne parle pas de personnes.
+    expect(vaguePlurals('Une personne juge certains points flous [I0129].', person)).toEqual([])
+  })
+})
+
 describe('rapport', () => {
   it('échappe le HTML venant des participants', async () => {
     const corpus = surveyCorpus()
@@ -353,6 +898,75 @@ describe('rapport', () => {
     expect(html).toContain('Test &lt;b&gt;titre&lt;/b&gt;')
     const md = reportToMarkdown(state, corpus, 'Test')
     expect(md).toContain('## Méthode')
+    // Les références d'idées ne paraissent pas dans un rapport à lire.
+    expect(md).not.toMatch(/\[I\d{4}/)
+    expect(html).not.toMatch(/\[I\d{4}/)
+  })
+
+  it('remplace les références par les participants cités, sans doublon', () => {
+    const idea = (id: string, participantId: string) => ({ id, participantId, verbatim: `v ${id}` }) as Idea
+    const byId = new Map([idea('I0001', 'P2'), idea('I0002', 'P2'), idea('I0003', 'P7')].map((i) => [i.id, i]))
+    expect(refsToPeople('Deux personnes regrettent [I0001, I0002, I0003].', byId)).toBe('Deux personnes regrettent (cf. P2, P7).')
+    expect(refsToPeople('Inconnue [I0099].', byId)).toBe('Inconnue.')
+    expect(refsToPeople('Lien [I0003].', byId, (who, i) => `<a href="#${i.id}">${who}</a>`)).toBe('Lien (cf. <a href="#I0003">P7</a>).')
+  })
+
+  it('une case par participant : avis en couleur, les autres en blanc', () => {
+    const m = { participants: 6, positiveOnly: ['a'], mixed: ['b'], negativeOnly: ['c', 'd'] } as unknown as Metrics
+    expect(opinionSquares(m)).toBe('🟩🟨🟥🟥⬜⬜')
+    expect(opinionSquares(m, 5)).toBe('')
+  })
+
+  it('« par ex. » quand la phrase compte plus de personnes que les renvois, numéros triés', () => {
+    const idea = (id: string, participantId: string) => ({ id, participantId, verbatim: 'v' }) as Idea
+    const byId = new Map([idea('I0001', 'P12'), idea('I0002', 'P2')].map((i) => [i.id, i]))
+    expect(refsToPeople('Pour 10 des 13 personnes, l’ambiance a tenu [I0001].', byId)).toBe('Pour 10 des 13 personnes, l’ambiance a tenu (par ex. P12).')
+    expect(refsToPeople('Deux personnes regrettent [I0001, I0002].', byId)).toBe('Deux personnes regrettent (cf. P2, P12).')
+    // Un nombre qui compte autre chose que les personnes, ou deux renvois d'une même phrase qui couvrent son compte : « cf. ».
+    expect(refsToPeople('Une personne rapporte qu’au moins trois membres sont partis [I0001].', byId)).toBe(
+      'Une personne rapporte qu’au moins trois membres sont partis (cf. P12).',
+    )
+    expect(refsToPeople('Une autre dit avoir vu plusieurs personnes motivées partir [I0001].', byId)).toBe(
+      'Une autre dit avoir vu plusieurs personnes motivées partir (cf. P12).',
+    )
+    expect(refsToPeople('Plusieurs personnes regrettent le bruit [I0001].', byId)).toBe('Plusieurs personnes regrettent le bruit (par ex. P12).')
+    // « Toutes les personnes qui en parlent » : un exemple si le motif compte plus de personnes que les renvois.
+    expect(refsToPeople('Toutes les personnes qui en parlent le saluent [I0001].', byId, undefined, () => 5)).toBe(
+      'Toutes les personnes qui en parlent le saluent (par ex. P12).',
+    )
+    expect(refsToPeople('Toutes les personnes qui en parlent le saluent [I0001, I0002].', byId, undefined, () => 2)).toBe(
+      'Toutes les personnes qui en parlent le saluent (cf. P2, P12).',
+    )
+    expect(refsToPeople('Une personne signale des tâches reprises par d’autres [I0001].', byId)).toBe(
+      'Une personne signale des tâches reprises par d’autres (cf. P12).',
+    )
+    expect(refsToPeople('Deux personnes proposent : décider ensemble [I0001], ou suivre une méthode [I0002].', byId)).toBe(
+      'Deux personnes proposent : décider ensemble (cf. P12), ou suivre une méthode (cf. P2).',
+    )
+  })
+
+  it('la question suit une réponse courte qui est toute la réponse, jamais un fragment', () => {
+    const corpus = {
+      sources: [{ id: 's', kind: 'survey', name: 'q' }],
+      contributions: [
+        { id: 'c1', sourceId: 's', participantId: 'P1', prompt: '⚠️ Qu’est-ce qui a moins bien marché ?', text: 'Tarifs' },
+        {
+          id: 'c2',
+          sourceId: 's',
+          participantId: 'P2',
+          prompt: '✅ Qu’est-ce qui a bien marché ?',
+          text: 'Le service client, mais pas assez de caisses ouvertes le samedi.',
+        },
+      ],
+    } as unknown as Corpus
+    const ctx = shortAnswerContext(corpus)
+    const idea = (contributionId: string, verbatim: string, category: IdeaCategory) => ({ id: verbatim, contributionId, verbatim, category }) as Idea
+    expect(ctx(idea('c1', 'Tarifs', 'negative'))).toBe('Qu’est-ce qui a moins bien marché ?')
+    expect(ctx(idea('c2', 'pas assez de caisses ouvertes', 'negative'))).toBeUndefined()
+    expect(ctx(idea('c1', 'Tarifs', 'suggestion'))).toBeUndefined()
+    // Une seule fois par motif et par question.
+    const ideas = [idea('c1', 'Tarifs', 'negative'), { ...idea('c1', 'Tarifs', 'negative'), id: 'autre' }]
+    expect([...fullQuestionIds(ideas, ctx)]).toEqual(['Tarifs'])
   })
 })
 

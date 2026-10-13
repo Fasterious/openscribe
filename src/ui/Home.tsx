@@ -48,18 +48,18 @@ export function Home() {
                   Reprendre là où vous en étiez
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Votre dernière étude, « {last.name} », a été modifiée le {formatDate(last.updatedAt)}.
+                  Votre dernière synthèse, « {last.name} », a été modifiée le {formatDate(last.updatedAt)}.
                 </p>
               </div>
               <div className="flex shrink-0 flex-wrap gap-2">
                 <a href={href({ name: 'synthesis' })}>
                   <Button variant="ghost" tabIndex={-1}>
-                    Toutes vos études
+                    Toutes vos synthèses
                   </Button>
                 </a>
                 <a href={projectHref(last)}>
                   <Button tabIndex={-1}>
-                    Ouvrir l'étude <ArrowRight />
+                    Ouvrir la synthèse <ArrowRight />
                   </Button>
                 </a>
               </div>
@@ -73,19 +73,19 @@ export function Home() {
               Des verbatims au rapport, preuves à l'appui.
             </h1>
             <p className="max-w-xl text-lg text-muted-foreground">
-              Importez les réponses ouvertes de vos participants : OpenScribe en tire les motifs et les thèmes, compte qui dit quoi, et relie
-              chaque chiffre au verbatim exact.
+              Importez les réponses ouvertes de vos participants : OpenScribe en tire les motifs et les thèmes, compte qui dit quoi, et relie chaque chiffre au
+              verbatim exact.
             </p>
             <div className="flex flex-wrap gap-2">
               <Button size="lg" onClick={actions.newStudy}>
-                Commencer une étude <ArrowRight />
+                Commencer une synthèse <ArrowRight />
               </Button>
               <Button size="lg" variant="outline" onClick={() => openExample(projects)}>
                 <Sparkles /> Voir un exemple de rapport
               </Button>
             </div>
             <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              {['Gratuit et libre', 'Sans compte', 'Vos études restent dans votre navigateur'].map((t) => (
+              {['Gratuit et libre', 'Sans compte', 'Vos données restent dans votre navigateur'].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <Check className="size-4 text-positive" /> {t}
                 </li>
@@ -101,18 +101,18 @@ export function Home() {
         <SectionTitle id="comment" title="Comment ça marche" />
         <ol className="grid gap-4 md:grid-cols-3">
           <Step n={1} icon={<Upload />} title="Importez vos réponses">
-            Un export de questionnaire (CSV), des transcriptions d'entretiens ou vos notes. Vous vérifiez l'aperçu avant de lancer quoi que ce
-            soit.
+            Un questionnaire (CSV), des transcriptions d'entretiens, vos notes : seuls ou mêlés dans la même synthèse, chacun avec son nom. Vous vérifiez
+            l'aperçu avant de lancer quoi que ce soit.
           </Step>
           <Step n={2} icon={<KeyRound />} title="Branchez un moteur d'IA">
-            Une clé gratuite Groq ou Mistral se crée en quelques minutes. Vous pouvez aussi faire tourner Ollama sur votre ordinateur.{' '}
+            Une clé gratuite Groq se crée en quelques minutes. Vous pouvez aussi faire tourner Ollama sur votre ordinateur.{' '}
             <a className="text-primary underline-offset-4 hover:underline" href={href({ name: 'settings' })}>
               Choisir un moteur
             </a>
           </Step>
           <Step n={3} icon={<ScanSearch />} title="Lisez le rapport, vérifiez tout">
-            Vous suivez chaque étape de l'analyse, puis vous remontez de chaque thème jusqu'au verbatim. Téléchargez le rapport en Markdown, en page
-            HTML ou en PDF.
+            Vous suivez chaque étape de l'analyse, puis vous remontez de chaque thème jusqu'au verbatim. Téléchargez le rapport en Markdown, en page HTML ou en
+            PDF.
           </Step>
         </ol>
       </section>
@@ -140,8 +140,10 @@ export function Home() {
             </p>
             <ul className="mt-4 space-y-2 text-sm">
               {[
+                'Un questionnaire et des entretiens analysés ensemble, avec la même méthode',
                 'Motifs et thèmes, avec le nombre de participants derrière chacun',
-                'La tonalité de chaque avis (positif, négatif, mitigé), les suggestions, et où en sont les participants : consensus, avis partagés, minorités',
+                'Les avis (positifs, négatifs, mitigés), les suggestions et les questions que se pose le groupe ; où en sont les participants : consensus, majorité, avis partagés',
+                "Chaque verbatim tel quel, à retrouver dans son texte d'origine",
                 'Filtrer par segment (par exemple les étudiants, puis les retraités)',
               ].map((t) => (
                 <li key={t} className="flex gap-2">
@@ -155,8 +157,8 @@ export function Home() {
           </a>
           <div className="grid gap-4">
             <SoonModule icon={<Video />} title="Entretiens et tests">
-              Passez de l'enregistrement d'un entretien, d'un test utilisateur ou d'une observation de terrain à un texte exploitable : locuteurs
-              identifiés, vidéo synchronisée avec le texte.
+              Passez de l'enregistrement d'un entretien, d'un test utilisateur ou d'une observation de terrain à un texte exploitable : locuteurs identifiés,
+              vidéo synchronisée avec le texte.
             </SoonModule>
             <SoonModule icon={<UserRoundSearch />} title="Personas">
               Construisez des profils de participants à partir de vos questionnaires à échelles.
@@ -169,19 +171,19 @@ export function Home() {
         <SectionTitle id="difference" title="Ce qui fait la différence" />
         <div className="grid gap-4 sm:grid-cols-2">
           <Feature icon={<Quote />} title="Chaque chiffre a une source">
-            Cliquez sur la pastille d'un constat du rapport : vous remontez jusqu'au verbatim exact du participant. Chaque verbatim est vérifié mot
-            pour mot dans vos données.
+            Cliquez sur la pastille d'un constat du rapport : vous remontez jusqu'au verbatim exact du participant. Chaque verbatim est vérifié mot pour mot
+            dans vos données.
           </Feature>
           <Feature icon={<Users />} title="Des participants, pas seulement des occurrences">
-            « 12 participants sur 40 » dit plus que « 57 occurrences ». OpenScribe compte les deux et les distingue, pour qu'un participant bavard ne
-            pèse pas plus que les autres.
+            « 12 participants sur 40 » dit plus que « 57 occurrences ». OpenScribe compte les deux et les distingue, pour qu'un participant bavard ne pèse pas
+            plus que les autres.
           </Feature>
           <Feature icon={<ListChecks />} title="Les voix minoritaires restent visibles">
-            Consensus, avis partagés, minorités constantes : un avis porté par trois participants ne disparaît pas sous celui de la majorité.
+            Unanimité, majorité, avis partagés, minorités constantes : un avis porté par trois participants ne disparaît pas sous celui de la majorité.
           </Feature>
           <Feature icon={<Repeat />} title="Le même résultat, à chaque fois">
-            Mêmes données, mêmes réglages, même rapport. L'IA lit et rédige, le code compte et vérifie, et vous voyez chaque étape avec ses
-            résultats intermédiaires.
+            Mêmes données, mêmes réglages, même rapport. L'IA lit et rédige, le code compte et vérifie, et vous voyez chaque étape avec ses résultats
+            intermédiaires.
           </Feature>
         </div>
       </section>
@@ -190,19 +192,19 @@ export function Home() {
         <SectionTitle id="donnees" title="Vos données, vos règles" />
         <div className="grid gap-4 sm:grid-cols-2">
           <Feature icon={<HardDrive />} title="Tout reste dans votre navigateur">
-            Vos études sont enregistrées dans votre navigateur. Il n'y a pas de compte, et aucun serveur OpenScribe ne voit vos données.
+            Vos synthèses sont enregistrées dans votre navigateur. Il n'y a pas de compte, et aucun serveur OpenScribe ne voit vos données.
           </Feature>
           <Feature icon={<FileUp />} title="Pensez à sauvegarder">
-            Vider les données de votre navigateur efface vos études. Sauvegardez chaque étude dans un fichier : vous la rouvrirez sur ce
-            navigateur ou sur un autre ordinateur.
+            Vider les données de votre navigateur efface vos synthèses. Sauvegardez chaque synthèse dans un fichier : vous la rouvrirez sur ce navigateur ou sur
+            un autre ordinateur.
           </Feature>
           <Feature icon={<KeyRound />} title="Vous choisissez votre moteur d'IA">
-            Dans le cloud, avec votre propre clé (Groq, Mistral, Google Gemini, OpenRouter), ou sur votre ordinateur avec Ollama, et rien ne
-            quitte votre machine. Les verbatims partent directement de votre navigateur vers le moteur choisi.
+            Dans le cloud, avec votre propre clé (Groq, Mistral, Google Gemini, OpenRouter), ou sur votre ordinateur avec Ollama, et rien ne quitte votre
+            machine. Les verbatims partent directement de votre navigateur vers le moteur choisi.
           </Feature>
           <Feature icon={<ShieldCheck />} title="Lisez les conditions des offres gratuites">
-            Certaines offres gratuites peuvent réutiliser les données qu'on leur envoie. Pour des données sensibles, préférez une offre qui exclut
-            cette réutilisation, ou Ollama.
+            Certaines offres gratuites peuvent réutiliser les données qu'on leur envoie. Pour des données sensibles, préférez une offre qui exclut cette
+            réutilisation, ou Ollama.
           </Feature>
         </div>
       </section>
@@ -237,9 +239,7 @@ export function Home() {
             </li>
           ))}
         </ol>
-        <p className="text-sm text-muted-foreground">
-          Nous réfléchissons aussi à une offre hébergée clé en main, pour ceux qui ne veulent rien configurer.
-        </p>
+        <p className="text-sm text-muted-foreground">Nous réfléchissons aussi à une offre hébergée clé en main, pour ceux qui ne veulent rien configurer.</p>
       </section>
 
       {actions.dialogs}
@@ -254,16 +254,16 @@ const FAQ: [string, string][] = [
   ],
   [
     'Combien ça coûte ?',
-    "OpenScribe est gratuit et son code est libre (AGPL-3.0). Groq et Mistral proposent des offres gratuites sans carte bancaire. Sur une offre payante, une étude de quelques dizaines de participants coûte en général quelques centimes, payés directement au fournisseur. OpenScribe ne prend rien au passage.",
+    'OpenScribe est gratuit et son code est libre (AGPL-3.0). Groq propose une offre gratuite sans carte bancaire. Sur une offre payante, une synthèse de quelques dizaines de participants coûte en général quelques centimes, payés directement au fournisseur. OpenScribe ne prend rien au passage.',
   ],
-  ['Faut-il créer un compte ?', 'Non, ni inscription ni adresse e-mail. Pour retrouver une étude ailleurs, sauvegardez-la dans un fichier et rouvrez-la.'],
+  ['Faut-il créer un compte ?', 'Non, ni inscription ni adresse e-mail. Pour retrouver une synthèse ailleurs, sauvegardez-la dans un fichier et rouvrez-la.'],
   [
     'Où vont mes données ?',
     "Nulle part chez nous. Elles restent dans votre navigateur. Pour l'analyse, les verbatims partent uniquement vers le moteur d'IA que vous avez choisi, accompagnés d'un pseudonyme (P1, P2…), jamais de noms ni d'adresses. Avec Ollama, ils ne quittent pas votre ordinateur.",
   ],
   [
     "Quel moteur d'IA choisir ?",
-    "Pour démarrer, prenez Groq ou Mistral : c'est gratuit et la clé se crée en quelques minutes. Pour des données sensibles, prenez Ollama sur votre ordinateur, ou une offre qui ne réutilise pas vos données. Vous pouvez en changer à tout moment.",
+    "Pour démarrer, prenez Groq : c'est gratuit et la clé se crée en quelques minutes. Pour des données sensibles, prenez Ollama sur votre ordinateur, ou une offre qui ne réutilise pas vos données. Vous pouvez en changer à tout moment.",
   ],
   ['Et après ?', 'Les modules « Entretiens et tests » et « Personas » sont en préparation. Voir « Ce qui arrive » ci-dessous.'],
 ]
@@ -278,7 +278,7 @@ const ROADMAP = [
   { title: 'Personas', text: 'Des profils à partir de questionnaires à échelles.', status: 'En préparation' },
   {
     title: 'Synchronisation chiffrée',
-    text: 'Vos études copiées sur votre propre Drive, pour les retrouver sur tous vos appareils.',
+    text: 'Vos travaux copiés sur votre propre Drive, pour les retrouver sur tous vos appareils.',
     status: 'Envisagé',
   },
   { title: 'Tests à distance et ateliers en direct', text: 'Mener vos tests et vos ateliers directement dans OpenScribe.', status: 'Envisagé' },
@@ -308,8 +308,8 @@ function ProofDemo() {
         <div className="w-full bg-negative" />
       </div>
       <p className="mt-3 text-sm leading-relaxed">
-        Trois personnes trouvent l'application lente. L'une attend parfois dix secondes au démarrage, une autre précise que c'est surtout vrai
-        sur son vieux téléphone.
+        Trois personnes trouvent l'application lente. L'une attend parfois dix secondes au démarrage, une autre précise que c'est surtout vrai sur son vieux
+        téléphone.
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}

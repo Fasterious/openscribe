@@ -34,9 +34,7 @@ export function parseJson<T>(raw: string, schema: z.ZodType<T>): T {
   const result = schema.safeParse(value)
   if (!result.success) {
     const issue = result.error.issues[0]
-    throw new JsonShapeError(
-      `La réponse du modèle n'a pas la forme attendue (${issue?.path.join('.') || 'racine'} : ${issue?.message}).`,
-    )
+    throw new JsonShapeError(`La réponse du modèle n'a pas la forme attendue (${issue?.path.join('.') || 'racine'} : ${issue?.message}).`)
   }
   return result.data
 }

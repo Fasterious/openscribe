@@ -1,6 +1,7 @@
 import {
   readDataBlock,
   type AssignInput,
+  type ConsolidationInput,
   type ExtractionInput,
   type FixInput,
   type GlobalInput,
@@ -33,6 +34,8 @@ export interface SimulationFaults {
   brokenJsonTasks?: string[]
   /** La relecture supprime les citations : le code doit refuser ces réécritures. */
   badPolish?: boolean
+  /** La première demande de thèmes oublie la moitié des groupes. */
+  forgetHalfThemes?: boolean
 }
 
 const STOP = new Set(
@@ -79,6 +82,7 @@ function labelFor(s: string): string {
 
 export function createSimulationProvider(faults: SimulationFaults = {}): LlmProvider {
   let counter = 0
+  let themesForgotten = false
   const brokenOnce = new Set(faults.brokenJsonTasks ?? [])
 
   function answer(req: ChatRequest): unknown {
@@ -88,13 +92,40 @@ export function createSimulationProvider(faults: SimulationFaults = {}): LlmProv
         const ideas = input.contributions.flatMap((c) =>
           sentences(c.text).map((s) => {
             counter++
-            const verbatim =
-              faults.paraphraseEvery && counter % faults.paraphraseEvery === 0 ? `En résumé, ${s.toLowerCase()}` : s
+            const verbatim = faults.paraphraseEvery && counter % faults.paraphraseEvery === 0 ? `En résumé, ${s.toLowerCase()}` : s
             return { ref: c.ref, label: labelFor(s), verbatim, category: categorize(s) }
           }),
         )
-        return { ideas }
+        return { ideas, names: [] }
       }
+      case 'complete': {
+        // La simulation découpe déjà chaque phrase : les passages non couverts n'ont pas d'idée de plus.
+        return { ideas: [] }
+      }
+      case 'consolidate': {
+        // Fusionne les motifs d'une seule personne qui partagent leur premier mot-clé avec un autre motif.
+        const input = readDataBlock<ConsolidationInput>(req.user)
+        const byKey = new Map<string, string[]>()
+        for (const g of input.groups) {
+          const k = keywords(g.title)[0]
+          if (k) byKey.set(k, [...(byKey.get(k) ?? []), g.id])
+        }
+        const merges = [...byKey]
+          .filter(([, ids]) => ids.length > 1 && ids.some((id) => input.groups.find((g) => g.id === id)!.people <= 1))
+          .map(([k, ids]) => ({ groups: ids, title: cap(k), reason: 'Même mot-clé.' }))
+        return { merges }
+      }
+      case 'split': {
+        // La simulation garde chaque motif tel quel.
+        const input = readDataBlock<{ groups: { id: string }[] }>(req.user)
+        return { decisions: input.groups.map((g) => ({ group: g.id, objects: 1 })) }
+      }
+      case 'review':
+        // La simulation garde le rangement et le ton du regroupement.
+        return { changes: [] }
+      case 'support':
+        // La simulation tient ses renvois pour justes.
+        return { fixes: [] }
       case 'fix': {
         const input = readDataBlock<FixInput>(req.user)
         return {
@@ -148,7 +179,9 @@ export function createSimulationProvider(faults: SimulationFaults = {}): LlmProv
         }
       }
       case 'themes': {
-        const input = readDataBlock<ThemeInput>(req.user)
+        const all = readDataBlock<ThemeInput>(req.user)
+        const input = faults.forgetHalfThemes && !themesForgotten ? { groups: all.groups.slice(0, Math.ceil(all.groups.length / 2)) } : all
+        if (faults.forgetHalfThemes) themesForgotten = true
         const size = Math.max(2, Math.ceil(input.groups.length / 5))
         const themes = []
         for (let i = 0; i < input.groups.length; i += size) {

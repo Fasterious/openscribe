@@ -19,10 +19,11 @@ export const CATEGORY: Record<IdeaCategory, { label: string; plural: string; ton
   positive: { label: 'Positif', plural: 'Positifs', tone: 'positive', mark: '+' },
   negative: { label: 'Négatif', plural: 'Négatifs', tone: 'negative', mark: '−' },
   suggestion: { label: 'Suggestion', plural: 'Suggestions', tone: 'suggestion', mark: '→' },
-  neutral: { label: 'Neutre', plural: 'Neutres', tone: 'neutral', mark: '·' },
+  question: { label: 'Question', plural: 'Questions', tone: 'question', mark: '?' },
+  neutral: { label: 'Constat', plural: 'Constats', tone: 'neutral', mark: '·' },
 }
 
-export const CATEGORY_ORDER: IdeaCategory[] = ['negative', 'positive', 'suggestion', 'neutral']
+export const CATEGORY_ORDER: IdeaCategory[] = ['negative', 'positive', 'suggestion', 'question', 'neutral']
 
 export function download(filename: string, content: string, type: string) {
   const blob = new Blob([content], { type })

@@ -1,8 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 
-const shot = (page: Page, name: string) =>
-  page.screenshot({ path: `e2e/screenshots/${test.info().project.name}-${name}.png`, fullPage: true })
+const shot = (page: Page, name: string) => page.screenshot({ path: `e2e/screenshots/${test.info().project.name}-${name}.png`, fullPage: true })
 
 /** Aucune page ne doit défiler horizontalement (mobile surtout). */
 async function noHorizontalScroll(page: Page) {
@@ -28,8 +27,8 @@ async function projectCount(page: Page): Promise<number> {
 
 async function newStudy(page: Page, name: string) {
   await page.goto('/#/synthese')
-  await page.getByRole('button', { name: 'Nouvelle étude' }).click()
-  await page.getByLabel("Nom de l'étude").fill(name)
+  await page.getByRole('button', { name: 'Nouvelle synthèse' }).click()
+  await page.getByLabel("Nom de la synthèse").fill(name)
   await page.getByRole('button', { name: 'Créer' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toContainText(name)
 }
@@ -49,7 +48,7 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
 
   // Le module Synthèse est cliquable et mène à son espace.
   await page.getByRole('link', { name: /Ouvrir l'espace Synthèse/ }).click()
-  await expect(page.getByRole('heading', { name: 'Vos études' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Vos synthèses' })).toBeVisible()
 })
 
 test('exemple : de l’accueil au rapport, verbatims dépliés sur place et exports', async ({ page }) => {
@@ -65,14 +64,18 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   await shot(page, '3-rapport')
 
   // Une référence de la synthèse déplie ses verbatims juste en dessous, sans fenêtre.
-  await page.getByRole('button', { name: /Voir \d+ verbatims?/ }).first().click()
+  await page
+    .getByRole('button', { name: /Voir \d+ verbatims?/ })
+    .first()
+    .click()
   await expect(page.getByRole('button', { name: /Masquer \d+ verbatims?/ })).toHaveAttribute('aria-expanded', 'true')
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page.locator('article mark').first()).toBeVisible()
   await shot(page, '4-verbatims')
 
   // Export Markdown.
-  const [md] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Markdown' }).click()])
+  await page.getByRole('button', { name: /Exporter/ }).click()
+  const [md] = await Promise.all([page.waitForEvent('download'), page.getByRole('menuitem', { name: /Markdown/ }).click()])
   const text = readFileSync((await md.path())!, 'utf8')
   expect(text).toContain('## Résumé')
   expect(text).toContain('Méthode')
@@ -81,6 +84,81 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   await page.emulateMedia({ media: 'print' })
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')))
   expect(await page.locator('article details:not([open])').count()).toBe(0)
+})
+
+test('sources multiples : un questionnaire et deux entretiens déposés ensemble, renommés, analysés', async ({ page }) => {
+  await newStudy(page, 'Étude mixte')
+  const interview = (who: string, said: string) => ({
+    name: `entretien-${who}.txt`,
+    mimeType: 'text/plain',
+    buffer: Buffer.from(
+      `Animatrice : Comment trouvez-vous la médiathèque ?\n${who} : ${said}\nAnimatrice : Autre chose ?\n${who} : Les horaires du samedi sont trop courts pour moi.`,
+    ),
+  })
+  // Trois fichiers d'un coup : le questionnaire, puis chaque entretien, aucun n'est perdu.
+  await page
+    .getByLabel('Fichier à importer')
+    .setInputFiles([
+      { name: 'mediatheque.csv', mimeType: 'text/csv', buffer: readFileSync('fixtures/mediatheque.csv') },
+      interview('Julie', "J'aime beaucoup l'accueil, les bibliothécaires sont très disponibles."),
+      interview('Marc', "Le site de réservation est lent, j'abandonne souvent avant la fin."),
+    ])
+  await page.getByRole('button', { name: /Importer les réponses à \d+ questions? · fichier suivant ensuite \(2\)/ }).click()
+  // Un entretien est nommé « Entretien 1 » par défaut, pas par son nom de fichier (qui contient le prénom).
+  await expect(page.getByLabel('Nom de la source')).toHaveValue('Entretien 1')
+  await expect(page.getByText('Fichier : entretien-Julie.txt')).toBeVisible()
+  await page.getByRole('checkbox', { name: /Animatrice/ }).uncheck()
+  await page.getByRole('button', { name: /Importer · fichier suivant ensuite/ }).click()
+  await expect(page.getByLabel('Nom de la source')).toHaveValue('Entretien 2')
+  // L'animatrice reste décochée d'un entretien à l'autre.
+  await expect(page.getByRole('checkbox', { name: /Animatrice/ })).not.toBeChecked()
+  await page.getByRole('button', { name: 'Importer', exact: true }).click()
+  await expect(page.getByText(/14 participants/).first()).toBeVisible()
+  await expect(page.getByText(/3 sources/).first()).toBeVisible()
+
+  // Renommer une source.
+  await page.getByRole('button', { name: 'Renommer Entretien 1' }).click()
+  await page.getByLabel('Nom de la source').fill('Entretien du 18 mai')
+  await page.getByRole('button', { name: 'Renommer', exact: true }).click()
+  await expect(page.getByText('Entretien du 18 mai')).toBeVisible()
+  // Les relances de l'animatrice ne sont pas des questions à choisir.
+  await expect(page.getByRole('group', { name: 'Questions à analyser' }).getByText('Comment trouvez-vous la médiathèque ?')).toHaveCount(0)
+  await noHorizontalScroll(page)
+
+  // L'analyse lit les trois sources ; le rapport dit d'où vient un verbatim d'entretien.
+  await page.getByRole('tab', { name: /Analyse/ }).click()
+  await page.getByRole('button', { name: "Lancer l'analyse" }).click()
+  await page.getByRole('button', { name: 'Voir le rapport' }).click()
+  await expect(page.getByText(/Entretien du 18 mai \(1 participant\)/)).toBeVisible()
+
+  // Une source retirée après l'analyse : la liste des études ne dit plus « Rapport prêt ».
+  await page.getByRole('tab', { name: /Données/ }).click()
+  await page.getByRole('button', { name: 'Retirer Entretien 2' }).click()
+  await page.getByRole('button', { name: 'Retirer', exact: true }).click()
+  await page.getByRole('link', { name: /Vos synthèses/ }).click()
+  const card = page.getByRole('link', { name: /Étude mixte/ })
+  await expect(card).toContainText('Rapport à relancer')
+  await expect(card).not.toContainText('Rapport prêt')
+})
+
+test('un fichier vide dans une série est sauté et signalé, jamais l’entretien précédent importé deux fois', async ({ page }) => {
+  await newStudy(page, 'Série avec un fichier vide')
+  const file = (name: string, text: string) => ({ name, mimeType: 'text/plain', buffer: Buffer.from(text) })
+  await page
+    .getByLabel('Fichier à importer')
+    .setInputFiles([
+      file('sophie.txt', 'Animatrice : Votre avis ?\nSophie : Le catalogue est clair.'),
+      file('vide.txt', '   '),
+      file('lea.txt', 'Animatrice : Votre avis ?\nLéa : La réservation est lente.'),
+    ])
+  await page.getByRole('checkbox', { name: /Animatrice/ }).uncheck()
+  await page.getByRole('button', { name: /Importer · fichier suivant ensuite/ }).click()
+  await expect(page.getByText(/Ignoré : vide\.txt/)).toBeVisible()
+  await expect(page.getByText('Fichier : lea.txt')).toBeVisible()
+  await expect(page.getByLabel('Nom de la source')).toHaveValue('Entretien 2')
+  await page.getByRole('button', { name: 'Importer', exact: true }).click()
+  await expect(page.getByText(/2 participants/).first()).toBeVisible()
+  await expect(page.getByText(/2 sources/).first()).toBeVisible()
 })
 
 test('nouvelle étude : import CSV, puis l’utilisateur qui revient retrouve son étude', async ({ page }) => {
@@ -107,21 +185,23 @@ test('nouvelle étude : import CSV, puis l’utilisateur qui revient retrouve so
   await page.goto('/#/')
   await expect(page.getByText('Reprendre là où vous en étiez')).toBeVisible()
   await expect(page.getByText('« Étude test CSV »')).toBeVisible()
-  await page.getByRole('link', { name: "Ouvrir l'étude" }).click()
+  await page.getByRole('link', { name: "Ouvrir la synthèse" }).click()
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Étude test CSV')
 })
 
 test('import de texte : l’animateur est exclu, sa question devient le contexte', async ({ page }) => {
   await newStudy(page, 'Entretiens')
   await page.getByRole('button', { name: 'Coller du texte' }).click()
-  await page.getByLabel('Texte').fill(
-    [
-      'Animatrice : Qu’avez-vous pensé de l’atelier ?',
-      'Julie : J’ai trouvé les échanges riches, mais la salle était trop petite.',
-      'Animatrice : Et la suite ?',
-      'Marc : Il faudrait refaire un atelier au printemps.',
-    ].join('\n'),
-  )
+  await page
+    .getByLabel('Texte')
+    .fill(
+      [
+        'Animatrice : Qu’avez-vous pensé de l’atelier ?',
+        'Julie : J’ai trouvé les échanges riches, mais la salle était trop petite.',
+        'Animatrice : Et la suite ?',
+        'Marc : Il faudrait refaire un atelier au printemps.',
+      ].join('\n'),
+    )
   await page.getByRole('checkbox', { name: /Animatrice/ }).uncheck()
   await shot(page, '7-texte')
   await page.getByRole('button', { name: 'Importer', exact: true }).click()
@@ -156,7 +236,7 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   await expect(page.getByText("N'a pas répondu au test", { exact: true })).toBeVisible()
 
   // Retour à l'étude en un clic.
-  await page.getByRole('link', { name: 'Revenir à votre étude' }).first().click()
+  await page.getByRole('link', { name: 'Revenir à votre synthèse' }).first().click()
   expect(page.url()).toContain(studyUrl.split('#')[1].split('/').slice(0, 3).join('/'))
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Étude moteur')
   await page.goto('/#/moteurs')
@@ -179,11 +259,15 @@ test('étude : sauvegarder puis rouvrir avec son rapport', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Voir un exemple de rapport' }).click()
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
-  const [file] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: "Sauvegarder l'étude" }).click()])
+  // Sur le rapport, la sauvegarde de l'étude est dans le menu « Exporter ».
+  await page.getByRole('button', { name: /Exporter/ }).click()
+  const [file] = await Promise.all([page.waitForEvent('download'), page.getByRole('menuitem', { name: /Sauvegarder la synthèse/ }).click()])
   const path = (await file.path())!
 
   await page.goto('/#/synthese')
-  await page.getByLabel("Fichier d'étude OpenScribe").setInputFiles({ name: 'projet.openscribe.json', mimeType: 'application/json', buffer: readFileSync(path) })
+  await page
+    .getByLabel("Fichier de synthèse OpenScribe")
+    .setInputFiles({ name: 'projet.openscribe.json', mimeType: 'application/json', buffer: readFileSync(path) })
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
 })
 
@@ -219,9 +303,9 @@ test('relancer une analyse ne fait jamais disparaître le rapport précédent', 
 
 test('un double clic sur « Créer » ne crée qu’une étude, nommée par sa date', async ({ page }) => {
   await page.goto('/#/synthese')
-  await page.getByRole('button', { name: 'Nouvelle étude' }).click()
+  await page.getByRole('button', { name: 'Nouvelle synthèse' }).click()
   await page.getByRole('button', { name: 'Créer' }).dblclick()
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Étude du')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Synthèse du')
   expect(await projectCount(page)).toBe(1)
 })
 
@@ -238,6 +322,29 @@ test('un moteur qui n’a pas répondu au test n’est ni annoncé prêt ni choi
   await expect(page.getByText("N'a pas répondu au test", { exact: true })).toBeVisible()
   await expect(page.getByText(/enregistré, mais il n'a pas répondu au test/)).toBeVisible()
   await expect(page.getByText('Votre moteur est prêt')).toHaveCount(0)
-  await page.getByRole('link', { name: 'Revenir à votre étude' }).first().click()
+  await page.getByRole('link', { name: 'Revenir à votre synthèse' }).first().click()
   await expect(page.getByLabel("Moteur d'IA")).toHaveValue('simulation')
+})
+
+test('vos études : renommer, dupliquer et supprimer depuis le menu d’une étude', async ({ page }) => {
+  await newStudy(page, 'Étude à ranger')
+  await page.goto('/#/synthese')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Synthèse')
+  await expect(page.getByRole('heading', { name: 'Vos synthèses' })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Actions sur Étude à ranger' }).click()
+  await page.getByRole('menuitem', { name: 'Renommer' }).click()
+  await page.getByLabel('Nouveau nom').fill('Étude rangée')
+  await page.getByRole('button', { name: 'Renommer', exact: true }).click()
+  await expect(page.getByRole('link', { name: /Étude rangée/ })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Actions sur Étude rangée' }).click()
+  await page.getByRole('menuitem', { name: 'Dupliquer' }).click()
+  await expect(page.getByRole('link', { name: /Étude rangée \(copie\)/ })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Actions sur Étude rangée (copie)' }).click()
+  await page.getByRole('menuitem', { name: 'Supprimer' }).click()
+  await page.getByRole('button', { name: 'Supprimer', exact: true }).click()
+  await expect(page.getByRole('link', { name: /Étude rangée \(copie\)/ })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: /Étude rangée/ })).toBeVisible()
 })

@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, CheckCircle2, Copy, ExternalLink, HardDrive, Loader2, RefreshCw, Sparkles, Trash2, Zap } from 'lucide-react'
+import { ArrowLeft, Check, CheckCircle2, Copy, ExternalLink, HardDrive, Info, Loader2, RefreshCw, Sparkles, Trash2, Zap } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import {
   detectOllama,
@@ -12,8 +12,8 @@ import {
   type OllamaStatus,
 } from '@/app/engines'
 import { href } from '@/app/router'
-import { PROVIDER_PRESETS, presetById, type DataPolicy, type PresetFamily, type ProviderPreset } from '@/core/providers/presets'
-import { Alert, Badge, Button, Card, CardContent, Dialog, Input, Label, Select, cn } from './primitives'
+import { PROVIDER_PRESETS, presetById, type DataPolicy, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
+import { Alert, Badge, Button, Card, CardContent, Dialog, Input, Label, Select, Tooltip, cn } from './primitives'
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
   local: { label: 'Rien ne quitte votre ordinateur', tone: 'positive' },
@@ -21,6 +21,26 @@ const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' |
   'may-train-free': { label: 'Offre gratuite : vos données peuvent être réutilisées', tone: 'warning' },
   check: { label: 'Politique de données à vérifier', tone: 'outline' },
 }
+
+/** Les autres fournisseurs, rangés par type : l'explication reste discrète, au survol. */
+const KINDS: { id: ProviderKind | null; title: string; hint: string }[] = [
+  {
+    id: 'direct',
+    title: 'Fournisseurs directs',
+    hint: "L'éditeur sert ses propres modèles : un seul contrat, une politique de données claire, le prix catalogue. Il faut une clé par éditeur.",
+  },
+  {
+    id: 'host',
+    title: 'Hébergeurs de modèles ouverts',
+    hint: "Ils font tourner sur leurs machines des modèles publiés par d'autres (Mistral, Qwen, gpt-oss…) : on sait qui traite les données, et le choix se limite aux modèles ouverts.",
+  },
+  {
+    id: 'router',
+    title: 'Plateformes multi-fournisseurs',
+    hint: 'Une seule clé pour des centaines de modèles, relayés vers de nombreux hébergeurs. En contrepartie, un intermédiaire de plus voit passer les données, et la politique de données dépend du modèle choisi.',
+  },
+  { id: 'custom', title: 'Autre service', hint: "Tout service compatible avec l'API d'OpenAI (vLLM, un relais personnel…)." },
+]
 
 const FAMILIES: { id: PresetFamily; title: string; icon: React.ReactNode }[] = [
   { id: 'free', title: 'Pour essayer gratuitement', icon: <Zap /> },
@@ -51,13 +71,13 @@ export function SettingsPage({ back }: { back?: string }) {
       <header className="space-y-3">
         {backHref && (
           <a href={backHref} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="size-4" /> Revenir à votre étude
+            <ArrowLeft className="size-4" /> Revenir à votre synthèse
           </a>
         )}
         <h1 className="text-3xl font-bold tracking-tight">Moteurs d'IA</h1>
         <p className="max-w-2xl text-muted-foreground">
-          Le moteur d'IA lit les verbatims et rédige ; OpenScribe vérifie les verbatims cités et fait les comptes. Pour commencer, créez une clé
-          gratuite Groq ou Mistral en quelques minutes. Pour que rien ne quitte votre ordinateur, choisissez Ollama.
+          Le moteur d'IA lit les verbatims et rédige ; OpenScribe vérifie les verbatims cités et fait les comptes. Pour commencer, créez une clé gratuite Groq
+          en quelques minutes. Pour que rien ne quitte votre ordinateur, choisissez Ollama.
         </p>
       </header>
 
@@ -75,7 +95,7 @@ export function SettingsPage({ back }: { back?: string }) {
           )}
           <a href={backHref}>
             <Button size="sm" tabIndex={-1}>
-              <ArrowLeft /> Revenir à votre étude
+              <ArrowLeft /> Revenir à votre synthèse
             </Button>
           </a>
         </Alert>
@@ -137,19 +157,36 @@ export function SettingsPage({ back }: { back?: string }) {
             <h3 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground [&_svg]:size-4">
               {f.icon} {f.title}
             </h3>
-            <ul className={cn('grid gap-3', f.id === 'other' ? 'sm:grid-cols-3' : 'sm:grid-cols-2')}>
-              {PROVIDER_PRESETS.filter((p) => p.family === f.id).map((p) => (
-                <li key={p.id}>
-                  <ProviderCard
-                    preset={p}
-                    configured={engines.some((e) => e.presetId === p.id && e.verified !== false)}
-                    ollama={p.id === 'ollama' ? ollama.status : undefined}
-                    compact={f.id === 'other'}
-                    onSetup={() => setEditing(engines.find((e) => e.presetId === p.id) ?? newEngineFromPreset(p.id))}
-                  />
-                </li>
-              ))}
-            </ul>
+            {(f.id === 'other' ? KINDS : [{ id: null, title: '', hint: '' }]).map((k) => {
+              const presets = PROVIDER_PRESETS.filter((p) => p.family === f.id && (k.id === null || p.kind === k.id)).sort(
+                (a, b) => Number(!!b.featured) - Number(!!a.featured),
+              )
+              if (!presets.length) return null
+              return (
+                <div key={k.id ?? f.id} className="space-y-2">
+                  {k.id && (
+                    <Tooltip content={k.hint}>
+                      <h4 tabIndex={0} className="inline-flex cursor-help items-center gap-1 text-xs font-medium text-muted-foreground">
+                        {k.title} <Info className="size-3" />
+                      </h4>
+                    </Tooltip>
+                  )}
+                  <ul className={cn('grid gap-3', f.id === 'other' ? 'sm:grid-cols-3' : 'sm:grid-cols-2')}>
+                    {presets.map((p) => (
+                      <li key={p.id}>
+                        <ProviderCard
+                          preset={p}
+                          configured={engines.some((e) => e.presetId === p.id && e.verified !== false)}
+                          ollama={p.id === 'ollama' ? ollama.status : undefined}
+                          compact={f.id === 'other'}
+                          onSetup={() => setEditing(engines.find((e) => e.presetId === p.id) ?? newEngineFromPreset(p.id))}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            })}
           </div>
         ))}
       </section>
@@ -157,12 +194,12 @@ export function SettingsPage({ back }: { back?: string }) {
       <section className="space-y-2 rounded-xl bg-muted/50 p-5 text-sm text-muted-foreground">
         <h2 className="font-semibold text-foreground">Bon à savoir</h2>
         <p>
-          Vos clés restent enregistrées dans ce navigateur. Pour l'analyse, seuls les verbatims partent vers le moteur choisi, avec un pseudonyme
-          (P1, P2…) : jamais les noms ni les adresses.
+          Vos clés restent enregistrées dans ce navigateur. Pour l'analyse, seuls les verbatims partent vers le moteur choisi, avec un pseudonyme (P1, P2…) :
+          jamais les noms ni les adresses.
         </p>
         <p>
-          Données de participants : vérifiez que la politique du fournisseur est compatible avec le consentement recueilli. Avant d'ajouter une
-          carte bancaire chez un fournisseur, fixez un plafond de dépenses dans son espace client.
+          Données de participants : vérifiez que la politique du fournisseur est compatible avec le consentement recueilli. Avant d'ajouter une carte bancaire
+          chez un fournisseur, fixez un plafond de dépenses dans son espace client.
         </p>
       </section>
 
@@ -307,7 +344,7 @@ function SetupDialog({
             {back ? (
               <a href={back} onClick={onClose}>
                 <Button tabIndex={-1}>
-                  <ArrowLeft /> Revenir à votre étude
+                  <ArrowLeft /> Revenir à votre synthèse
                 </Button>
               </a>
             ) : (
@@ -390,7 +427,9 @@ function SetupDialog({
               <>
                 <Input id="modele" list="modeles" value={draft.model} onChange={(e) => set({ model: e.target.value.trim() })} />
                 <datalist id="modeles">
-                  {preset?.suggestedModels.map((m) => <option key={m} value={m} />)}
+                  {preset?.suggestedModels.map((m) => (
+                    <option key={m} value={m} />
+                  ))}
                 </datalist>
               </>
             )}
@@ -441,8 +480,8 @@ function SetupDialog({
               </div>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Le débit proposé respecte l'offre gratuite du fournisseur. Pour des résultats reproductibles, préférez un nom de modèle qui finit par
-              une date plutôt que par « latest ».
+              Le débit proposé respecte l'offre gratuite du fournisseur. Pour des résultats reproductibles, préférez un nom de modèle qui finit par une date
+              plutôt que par « latest ».
             </p>
           </details>
 

@@ -3,9 +3,18 @@ import { activeParticipants, contributionsOf } from '../corpus'
 import { randomId, sha256, stableStringify } from '../ids'
 import type { LlmProvider } from '../providers/types'
 import { computeMetrics, sortIds } from './metrics'
+import { uncoveredPassages } from './coverage'
+import { highlightLine, highlights } from './highlights'
+import { verifiedNames } from './names'
 import {
   assignPrompt,
   assignSchema,
+  consolidationPrompt,
+  consolidationSchema,
+  splitPrompt,
+  splitSchema,
+  coveragePrompt,
+  coverageSchema,
   extractionPrompt,
   extractionSchema,
   fixPrompt,
@@ -20,28 +29,38 @@ import {
   groupSummarySchema,
   themePrompt,
   themeSchema,
+  reviewPrompt,
+  reviewSchema,
+  supportPrompt,
+  supportSchema,
   type ExtractionOutput,
   type SummaryGroupInput,
 } from './prompts'
 import { LlmRunner, type ResponseCache } from './runner'
-import { DEFAULT_SETTINGS } from './types'
-import { allowedNumbers, sameNumbers, unverifiedNumbers } from './numbers'
-import type {
-  AnalysisSettings,
-  AnalysisState,
-  Group,
-  Idea,
-  IdeaCategory,
-  Metrics,
-  RejectedIdea,
-  StepId,
-  Theme,
-} from './types'
-import { explainMiss, locateVerbatim } from './verbatim'
+import { DEFAULT_SETTINGS, IDEA_CATEGORIES } from './types'
+import {
+  allClaims,
+  allowedNumbers,
+  clauseCounts,
+  countSpan,
+  impliedOthers,
+  numbersIn,
+  overcountedPeople,
+  sameNumbers,
+  undercitedPeople,
+  unverifiedNumbers,
+  vaguePlurals,
+} from './numbers'
+import type { AnalysisSettings, AnalysisState, Group, Idea, IdeaCategory, Merge, Metrics, RejectedIdea, StepId, Theme } from './types'
+import { explainMiss, locateQuote, quoteText, withAntecedent } from './verbatim'
 
 /** Au-delà, le regroupement se fait par lots : un premier lot fonde les groupes, les suivants s'y rangent. */
 export const GROUPING_BATCH = 350
 export const ASSIGN_BATCH = 200
+/** Idées relues par appel lors de la relecture des motifs. */
+export const REVIEW_BATCH_IDEAS = 140
+/** Idées fournies par appel pour vérifier les renvois. */
+export const SUPPORT_BATCH_IDEAS = 220
 /** Nombre maximal d'idées envoyées dans une même demande de synthèse. */
 export const SUMMARY_BATCH_IDEAS = 90
 /** Au-delà de ce nombre de groupes, on ajoute un niveau de thèmes (le rapprochement des sujets voisins). */
@@ -61,11 +80,7 @@ const STEPS: StepId[] = ['extract', 'group', 'summarize', 'themes', 'report', 'p
 export const POLISH_BATCH = 12
 
 export async function corpusHash(corpus: Corpus): Promise<string> {
-  return sha256(
-    stableStringify(
-      corpus.contributions.map((c) => ({ id: c.id, p: c.participantId, q: c.prompt ?? '', t: c.text })),
-    ),
-  )
+  return sha256(stableStringify(corpus.contributions.map((c) => ({ id: c.id, p: c.participantId, q: c.prompt ?? '', t: c.text }))))
 }
 
 export async function newAnalysis(corpus: Corpus, settings: AnalysisSettings, provider: LlmProvider): Promise<AnalysisState> {
@@ -127,7 +142,7 @@ export async function runAnalysis(corpus: Corpus, initial: AnalysisState, option
     current = 'extract'
     await extractAll(corpus, state, runner, options, emit)
     current = 'group'
-    await groupIdeas(state, runner, emit)
+    await groupIdeas(corpus, state, runner, emit)
     current = 'summarize'
     await summarizeGroups(corpus, state, runner, emit)
     current = 'themes'
@@ -139,7 +154,10 @@ export async function runAnalysis(corpus: Corpus, initial: AnalysisState, option
     step('report').state = 'done'
     current = 'polish'
     await polishTexts(state, runner, emit)
+    markUnverified(corpus, state)
+    await checkSupport(state, runner, emit)
     verifyNumbers(corpus, state)
+    ensureCamps(state)
     state.status = 'done'
     await emit()
     return state
@@ -161,15 +179,11 @@ interface ParticipantResult {
   participantId: string
   ideas: Omit<Idea, 'id'>[]
   rejected: RejectedIdea[]
+  /** Particuliers nommés, vérifiés dans les textes de la personne. */
+  names: string[]
 }
 
-async function extractAll(
-  corpus: Corpus,
-  state: AnalysisState,
-  runner: LlmRunner,
-  options: PipelineOptions,
-  emit: () => Promise<void>,
-) {
+async function extractAll(corpus: Corpus, state: AnalysisState, runner: LlmRunner, options: PipelineOptions, emit: () => Promise<void>) {
   const s = state.steps.find((x) => x.id === 'extract')!
   const people = activeParticipants(corpus)
   const done = new Set(state.extractedParticipants)
@@ -183,7 +197,14 @@ async function extractAll(
   for (let i = 0; i < pending.length; i += concurrency) {
     const batch = pending.slice(i, i + concurrency)
     const results = await Promise.all(
-      batch.map((p) => extractParticipant(contributionsOf(corpus, p.id).filter((c) => c.text.trim()), p.id, state.settings, runner)),
+      batch.map((p) =>
+        extractParticipant(
+          contributionsOf(corpus, p.id).filter((c) => c.text.trim()),
+          p.id,
+          state.settings,
+          runner,
+        ),
+      ),
     )
     // On enregistre dans l'ordre du corpus : les identifiants restent stables quelle que soit la vitesse des réponses.
     for (const r of results) {
@@ -191,6 +212,7 @@ async function extractAll(
         state.ideas.push({ ...idea, id: `I${String(state.ideas.length + 1).padStart(4, '0')}` })
       }
       state.rejected.push(...r.rejected)
+      if (r.names.length) state.names = [...new Set([...(state.names ?? []), ...r.names])].sort((a, b) => b.length - a.length || a.localeCompare(b))
       state.extractedParticipants.push(r.participantId)
       s.done++
     }
@@ -238,8 +260,15 @@ export async function extractParticipant(
     // textes de la même personne (le modèle se trompe parfois de référence).
     const ordered = [byRef.get(ref), ...contributions].filter((c): c is Contribution => Boolean(c))
     for (const c of ordered) {
-      const m = locateVerbatim(c.text, verbatim)
-      if (!m) continue
+      const found = locateQuote(c.text, verbatim)
+      if (!found) continue
+      // Une citation qui commence par une reprise (« Malgré cela… ») emporte la phrase d'avant.
+      const m = withAntecedent(
+        c.text,
+        found,
+        260,
+        ideas.filter((i) => i.contributionId === c.id).flatMap((i) => i.parts ?? [i.span]),
+      )
       const key = `${c.id}:${m.start}:${m.end}:${category}`
       if (seen.has(key)) return true
       seen.add(key)
@@ -247,9 +276,10 @@ export async function extractParticipant(
         participantId,
         contributionId: c.id,
         label: label.trim(),
-        verbatim: c.text.slice(m.start, m.end),
+        verbatim: quoteText(c.text, m),
         category,
         span: { start: m.start, end: m.end },
+        ...(m.parts ? { parts: m.parts } : {}),
         approximate: m.approximate,
       })
       return true
@@ -261,12 +291,23 @@ export async function extractParticipant(
     if (!accept(item.ref, item.label, item.verbatim, item.category)) misses.push(item)
   }
 
+  // Couverture : les passages assez longs qu'aucune idée ne couvre sont relus une fois.
+  const passages = refs.flatMap((r) =>
+    uncoveredPassages(
+      r.c.text,
+      ideas.filter((i) => i.contributionId === r.c.id).flatMap((i) => i.parts ?? [i.span]),
+    ).map((text) => ({ ref: r.ref, question: r.c.prompt, text })),
+  )
+  if (passages.length) {
+    const more = await runner.json(coveragePrompt({ passages }, settings), coverageSchema)
+    for (const item of more.ideas) {
+      if (!accept(item.ref, item.label, item.verbatim, item.category)) misses.push(item)
+    }
+  }
+
   const rejected: RejectedIdea[] = []
   if (misses.length) {
-    const fixed = await runner.json(
-      fixPrompt({ contributions: refs.map((r) => ({ ref: r.ref, text: r.c.text })), attempts: misses }, settings),
-      fixSchema,
-    )
+    const fixed = await runner.json(fixPrompt({ contributions: refs.map((r) => ({ ref: r.ref, text: r.c.text })), attempts: misses }, settings), fixSchema)
     misses.forEach((miss, i) => {
       const f = fixed.ideas[i]
       if (f && f.verbatim.trim() && accept(f.ref, f.label || miss.label, f.verbatim, f.category)) return
@@ -275,44 +316,131 @@ export async function extractParticipant(
     })
   }
 
+  // Deux idées d'une même personne qui se recouvrent dans le même texte (l'une contenue dans l'autre, ou plus de la moitié de la plus
+  // courte en commun) disent la même chose : la garder deux fois fabriquerait un faux « mitigé ». On garde la plus longue.
+  // Une citation coupée par « […] » ne couvre que ses fragments, pas le passage sauté.
+  const segs = (i: Omit<Idea, 'id'>) => i.parts ?? [i.span]
+  const len = (i: Omit<Idea, 'id'>) => segs(i).reduce((n, p) => n + p.end - p.start, 0)
+  const overlap = (a: Omit<Idea, 'id'>, b: Omit<Idea, 'id'>) =>
+    a.contributionId !== b.contributionId
+      ? 0
+      : segs(a).reduce((n, p) => n + segs(b).reduce((m, q) => m + Math.max(0, Math.min(p.end, q.end) - Math.max(p.start, q.start)), 0), 0)
+  const dropped = new Set<Omit<Idea, 'id'>>()
+  const bySize = [...ideas].sort((a, b) => len(b) - len(a) || ideas.indexOf(a) - ideas.indexOf(b))
+  for (const [k, a] of bySize.entries()) {
+    if (dropped.has(a)) continue
+    for (const b of bySize.slice(k + 1)) {
+      // Une même citation pour deux objets d'une énumération (« le programme et l'équipe », même ton, libellés différents) : deux idées légitimes.
+      const enumeration = a.category === b.category && a.span.start === b.span.start && a.span.end === b.span.end && normLabel(a.label) !== normLabel(b.label)
+      if (!dropped.has(b) && !enumeration && overlap(a, b) >= 0.5 * len(b)) dropped.add(b)
+    }
+  }
+  const kept = ideas.filter((i) => !dropped.has(i))
+  ideas.splice(0, ideas.length, ...kept)
+
   // Ordre de lecture : par contribution, puis par position dans le texte.
   const order = new Map(contributions.map((c, i) => [c.id, i]))
   ideas.sort((a, b) => order.get(a.contributionId)! - order.get(b.contributionId)! || a.span.start - b.span.start)
-  return { participantId, ideas, rejected }
+  const names = verifiedNames(
+    out.names ?? [],
+    contributions.map((c) => c.text),
+  )
+  return { participantId, ideas, rejected, names }
 }
 
 // ─── Étape 2 ─────────────────────────────────────────────────────────────────
 
 function normLabel(s: string): string {
-  return s.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[.!?;:]+$/, '')
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .replace(/[.!?;:]+$/, '')
 }
 
 /**
- * Nombre de groupes visé pour n libellés distincts. Un groupe est un motif
- * précis (un seul sujet) : on vise large, le rapprochement des sujets voisins
- * se fait à l'étape des thèmes. Une fourchette trop basse obligeait le modèle
- * à fusionner des sujets différents.
+ * Nombre de groupes visé pour n idées venues de p participants : environ
+ * min(1,5 × √n ; 1,2 × p), validé par le `methodologue` sur un corpus réel.
+ * La racine seule grossit avec la prolixité de quelques personnes ; le nombre
+ * de participants borne ce qu'un motif peut réunir. La cible n'est qu'une
+ * indication donnée au modèle ; ce qui compte est la porte de qualité calculée
+ * par le code (`needsConsolidation`).
  */
-export function groupTarget(n: number): { min: number; max: number } {
+export function groupTarget(n: number, participants = Infinity): { min: number; max: number } {
   // Plus le corpus grossit, plus les motifs se répètent : le nombre de groupes croît moins vite que les idées.
-  const max = Math.max(6, Math.min(60, Math.round(3 * Math.sqrt(n))))
-  return { min: Math.max(3, Math.round(max / 3)), max }
+  const t = Math.min(1.5 * Math.sqrt(n), 1.2 * participants)
+  return { min: Math.max(3, Math.round(0.75 * t)), max: Math.max(6, Math.min(60, Math.round(1.25 * t))) }
 }
 
-async function groupIdeas(state: AnalysisState, runner: LlmRunner, emit: () => Promise<void>) {
+/** Un titre qui porte un jugement plutôt qu'un objet (« Bilan positif », « Points forts ») : le motif est défini par son ton. */
+const JUDGMENT_TITLE =
+  /\b(positi\w*|négati\w*|bilan|points? forts?|points? faibles?|réussites?|critiques?|satisfactions?|reproches?|positive|negative|strengths?|weakness\w*)\b/iu
+
+/** Un motif dont toutes les idées ont le même ton et dont le titre est un jugement ne pouvait donner que 100 % : faux consensus. */
+export function isToneDefined(title: string, categories: string[]): boolean {
+  return categories.length >= 3 && new Set(categories).size === 1 && JUDGMENT_TITLE.test(title)
+}
+
+/**
+ * Porte de qualité du regroupement : trop de motifs portés par une seule
+ * personne (plus de 15 %), ou une médiane sous 3 personnes par motif, signale
+ * un émiettement. La passe de consolidation se déclenche alors.
+ */
+export function needsConsolidation(participantsPerGroup: number[], respondents = Infinity): boolean {
+  const n = participantsPerGroup.length
+  if (n < 8) return false
+  const single = participantsPerGroup.filter((p) => p <= 1).length
+  const sorted = [...participantsPerGroup].sort((a, b) => a - b)
+  const median = n % 2 ? sorted[(n - 1) / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2
+  // Médiane visée : 4 participants par motif, ou moins sur un très petit corpus.
+  return single / n > 0.15 || median < Math.min(4, Math.max(2, Math.round(respondents / 5)))
+}
+
+/** Un verbatim d'exemple, court : assez pour juger le sens, sans alourdir la demande. */
+function shortExample(text: string, max = 140): string {
+  const t = text.replace(/\s+/g, ' ').trim()
+  return t.length <= max ? t : `${t.slice(0, max - 1).replace(/\s+\S*$/, '')}…`
+}
+
+/** La question, sans pictogramme ni ponctuation de tête, et courte. */
+export function shortPrompt(prompt: string | undefined, max = 70): string | undefined {
+  if (!prompt) return undefined
+  const t = prompt
+    .replace(/^[^\p{L}\p{N}]+/u, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return t.length <= max ? t : `${t.slice(0, max - 1).replace(/\s+\S*$/, '')}…`
+}
+
+async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunner, emit: () => Promise<void>) {
   const s = state.steps.find((x) => x.id === 'group')!
+  // Un regroupement relancé repart des catégories de l'extraction : le ton jugé par motif ne vaut que pour ces motifs-là.
+  const original = new Map(state.ideas.map((i) => [i.id, i]))
+  for (const r of state.retoned ?? []) {
+    const idea = original.get(r.id)
+    if (idea) idea.category = r.from
+  }
+  state.retoned = []
+  state.moved = []
   s.state = 'running'
   s.done = 0
   await emit()
 
   // Les libellés identiques sont envoyés une seule fois, avec leur nombre de mentions.
-  const items: { id: string; label: string; ideaIds: string[] }[] = []
+  const contributionById = new Map(corpus.contributions.map((c) => [c.id, c]))
+  const items: { id: string; label: string; ideaIds: string[]; example: string; question?: string }[] = []
   const byLabel = new Map<string, (typeof items)[number]>()
   for (const idea of state.ideas) {
     const k = normLabel(idea.label)
     let item = byLabel.get(k)
     if (!item) {
-      item = { id: `L${items.length + 1}`, label: idea.label.trim(), ideaIds: [] }
+      item = {
+        id: `L${items.length + 1}`,
+        label: idea.label.trim(),
+        ideaIds: [],
+        example: shortExample(idea.verbatim),
+        question: shortPrompt(contributionById.get(idea.contributionId)?.prompt),
+      }
       byLabel.set(k, item)
       items.push(item)
     }
@@ -343,8 +471,10 @@ async function groupIdeas(state: AnalysisState, runner: LlmRunner, emit: () => P
   }
   grid.forEach(addTitle)
 
+  // Titres écartés parce qu'ils définissaient un motif par son ton : le modèle ne peut pas y revenir.
+  const banned = new Set<string>()
   const allowedTitle = (t: string): string | null => {
-    if (!grid.length) return addTitle(t)
+    if (!grid.length) return banned.has(titleKey(t)) ? null : addTitle(t)
     const k = titleKey(t)
     if (canonical.has(k)) return canonical.get(k)!
     if (k === titleKey(OUTSIDE)) return addTitle(OUTSIDE)
@@ -355,9 +485,15 @@ async function groupIdeas(state: AnalysisState, runner: LlmRunner, emit: () => P
   const first = items.slice(0, GROUPING_BATCH)
   const grouped = await runner.json(
     groupingPrompt(
-      { items: first.map((i) => ({ id: i.id, label: i.label, count: i.ideaIds.length })), grid: grid.length ? grid : undefined },
+      {
+        items: first.map((i) => ({ id: i.id, label: i.label, count: i.ideaIds.length, example: i.example, question: i.question })),
+        grid: grid.length ? grid : undefined,
+      },
       state.settings,
-      groupTarget(first.length),
+      groupTarget(
+        first.reduce((n, i) => n + i.ideaIds.length, 0),
+        new Set(state.ideas.map((i) => i.participantId)).size,
+      ),
     ),
     groupingSchema,
   )
@@ -371,6 +507,24 @@ async function groupIdeas(state: AnalysisState, runner: LlmRunner, emit: () => P
   s.done = assigned.size
   await emit()
 
+  // Un motif défini par son ton (« Bilan positif ») ne pouvait donner que 100 % : ses idées sont rangées à nouveau selon leur objet.
+  if (!grid.length) {
+    const ideaCat = new Map(state.ideas.map((i) => [i.id, i.category]))
+    for (const title of [...titles]) {
+      const its = items.filter((i) => assigned.get(i.id) === title)
+      if (
+        !isToneDefined(
+          title,
+          its.flatMap((i) => i.ideaIds.map((id) => ideaCat.get(id)!)),
+        )
+      )
+        continue
+      banned.add(titleKey(title))
+      titles.splice(titles.indexOf(title), 1)
+      its.forEach((i) => assigned.delete(i.id))
+    }
+  }
+
   // Lots suivants et oubliés : rangés dans les groupes existants (ou de nouveaux en mode libre).
   for (let round = 0; round < 2; round++) {
     const left = items.filter((i) => !assigned.has(i.id))
@@ -379,7 +533,7 @@ async function groupIdeas(state: AnalysisState, runner: LlmRunner, emit: () => P
       const batch = left.slice(i, i + ASSIGN_BATCH)
       const res = await runner.json(
         assignPrompt(
-          { groups: [...titles], items: batch.map((b) => ({ id: b.id, label: b.label })), allowNew: !grid.length },
+          { groups: [...titles], items: batch.map((b) => ({ id: b.id, label: b.label, example: b.example })), allowNew: !grid.length },
           state.settings,
         ),
         assignSchema,
@@ -397,19 +551,278 @@ async function groupIdeas(state: AnalysisState, runner: LlmRunner, emit: () => P
   for (const i of items) if (!assigned.has(i.id)) assigned.set(i.id, addTitle(fallback))
 
   const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
-  const groups: Omit<Group, 'id'>[] = titles
-    .map((title) => {
-      const ideaIds = items.filter((i) => assigned.get(i.id) === title).flatMap((i) => i.ideaIds)
-      const ideas = ideaIds.map((id) => ideaById.get(id)!)
-      return { title, ideaIds: ideaIds.sort(), summary: '', metrics: computeMetrics(ideas) }
-    })
-    .filter((g) => g.ideaIds.length > 0)
-    .sort((a, b) => b.metrics.participants - a.metrics.participants || b.metrics.mentions - a.metrics.mentions || a.title.localeCompare(b.title))
+  const build = (list: { title: string; ideaIds: string[] }[]): Group[] =>
+    list
+      .map((g) => ({ title: g.title, ideaIds: [...g.ideaIds].sort(), summary: '', metrics: computeMetrics(g.ideaIds.map((id) => ideaById.get(id)!)) }))
+      .filter((g) => g.ideaIds.length > 0)
+      .sort((a, b) => b.metrics.participants - a.metrics.participants || b.metrics.mentions - a.metrics.mentions || a.title.localeCompare(b.title))
+      .map((g, i) => ({ ...g, id: `G${i + 1}` }))
 
-  state.groups = groups.map((g, i) => ({ ...g, id: `G${i + 1}` }))
+  let groups = build(titles.map((title) => ({ title, ideaIds: items.filter((i) => assigned.get(i.id) === title).flatMap((i) => i.ideaIds) })))
+  state.merges = []
+  // En mode grille, les titres sont imposés : pas de consolidation.
+  const respondents = new Set(state.ideas.map((i) => i.participantId)).size
+  if (
+    !grid.length &&
+    needsConsolidation(
+      groups.map((g) => g.metrics.participants),
+      respondents,
+    )
+  ) {
+    s.message = 'Consolidation des motifs'
+    await emit()
+    const res = await runner.json(
+      consolidationPrompt(
+        {
+          groups: groups.map((g) => ({
+            id: g.id,
+            title: g.title,
+            people: g.metrics.participants,
+            examples: g.ideaIds.slice(0, 3).map((id) => shortExample(ideaById.get(id)!.verbatim, 110)),
+          })),
+        },
+        state.settings,
+      ),
+      consolidationSchema,
+    )
+    const merged = applyMerges(groups, res.merges)
+    state.merges = merged.merges
+    groups = build(merged.groups)
+    s.message = undefined
+  }
+
+  // Un titre qui relie deux mots par « et » peut cacher deux objets : on pose la question au modèle, le code applique.
+  const joined = !grid.length ? groups.filter((g) => /\s(et|and)\s/i.test(g.title)) : []
+  if (joined.length) {
+    const res = await runner.json(
+      splitPrompt(
+        {
+          groups: joined.map((g) => ({
+            id: g.id,
+            title: g.title,
+            ideas: g.ideaIds.slice(0, 40).map((id) => ({ id, label: ideaById.get(id)!.label, verbatim: shortExample(ideaById.get(id)!.verbatim, 110) })),
+          })),
+        },
+        state.settings,
+      ),
+      splitSchema,
+    )
+    const split = applySplits(groups, res.decisions)
+    if (split.changed) groups = build(split.groups)
+  }
+
+  // Relecture des motifs : une idée hors de l'objet de son motif est déplacée, un ton faux par rapport à cet objet est corrigé.
+  // Les mitigés sont vérifiés en priorité : souvent leurs deux idées parlent de deux objets. Le modèle propose, le code applique et garde la trace.
+  if (!grid.length && groups.length > 1) {
+    s.message = 'Relecture des motifs'
+    await emit()
+    const before = (i: Idea) => {
+      const text = contributionById.get(i.contributionId)?.text ?? ''
+      const start = (i.parts ?? [i.span])[0].start
+      if (start <= 0) return undefined
+      const prev = text.slice(Math.max(0, start - 160), start)
+      return (start > 160 ? prev.slice(prev.indexOf(' ') + 1) : prev).trim() || undefined
+    }
+    const titles = groups.map((g) => ({ id: g.id, title: g.title }))
+    const batches: Group[][] = []
+    let cur: Group[] = []
+    for (const g of groups) {
+      if (cur.length && cur.reduce((n, x) => n + x.ideaIds.length, 0) + g.ideaIds.length > REVIEW_BATCH_IDEAS) {
+        batches.push(cur)
+        cur = []
+      }
+      cur.push(g)
+    }
+    if (cur.length) batches.push(cur)
+    const responses = await Promise.all(
+      batches.map((batch) =>
+        runner.json(
+          reviewPrompt(
+            {
+              titles,
+              groups: batch.map((g) => ({
+                id: g.id,
+                title: g.title,
+                mixed: g.metrics.mixed,
+                ideas: g.ideaIds.map((id) => {
+                  const i = ideaById.get(id)!
+                  return { id, participant: i.participantId, category: i.category, label: i.label, verbatim: shortExample(i.verbatim, 220), before: before(i) }
+                }),
+              })),
+            },
+            state.settings,
+          ),
+          reviewSchema,
+        ),
+      ),
+    )
+    const reviewed = applyReview(
+      state.ideas,
+      groups,
+      responses.flatMap((r) => r.changes),
+    )
+    state.retoned = reviewed.retoned
+    state.moved = reviewed.moved
+    if (reviewed.retoned.length || reviewed.moved.length) groups = build(reviewed.groups)
+    s.message = undefined
+  }
+
+  state.groups = groups
   s.done = items.length
   s.state = 'done'
   await emit()
+}
+
+/**
+ * Pistes opposées signalées par le moteur : le code ne garde que deux
+ * propositions du motif, de deux personnes différentes, avec un objet nommé.
+ */
+export function checkOpposed(
+  group: { ideaIds: string[] },
+  ideaById: Map<string, Idea>,
+  proposed: { a: string; b: string; about: string }[],
+): { a: string; b: string; about: string }[] {
+  const inGroup = new Set(group.ideaIds)
+  const seen = new Set<string>()
+  return proposed.filter((o) => {
+    const a = ideaById.get(o.a)
+    const b = ideaById.get(o.b)
+    const key = [o.a, o.b].sort().join('|')
+    const ok =
+      !!a &&
+      !!b &&
+      inGroup.has(o.a) &&
+      inGroup.has(o.b) &&
+      a.category === 'suggestion' &&
+      b.category === 'suggestion' &&
+      a.participantId !== b.participantId &&
+      !!o.about.trim() &&
+      !seen.has(key)
+    if (ok) seen.add(key)
+    return ok
+  })
+}
+
+/** Un titre qui nomme un jugement (« Points forts ») ou relie deux objets ne fonde pas un motif. */
+const JUDGEMENT_TITLE =
+  /\b(points? forts?|points? faibles?|critiques?|réussites?|satisfactions?|insatisfactions?|positifs?|négatifs?|avis|bilan|divers|autres sujets)\b/i
+
+/**
+ * Applique la relecture des motifs : déplacements vers un motif existant ou
+ * nouveau, et corrections de ton. Le code refuse ce qui ne tient pas (idée ou
+ * motif inconnus, titre de jugement ou à deux objets, catégorie invalide) et
+ * n'applique qu'un changement par idée. Renvoie les motifs refaits et la trace.
+ */
+export function applyReview(
+  ideas: Idea[],
+  groups: { id: string; title: string; ideaIds: string[] }[],
+  changes: { id: string; to?: string; new?: string; category?: IdeaCategory }[],
+): {
+  groups: { title: string; ideaIds: string[] }[]
+  retoned: { id: string; from: IdeaCategory; to: IdeaCategory }[]
+  moved: { id: string; from: string; to: string }[]
+} {
+  const byId = new Map(ideas.map((i) => [i.id, i]))
+  const home = new Map(groups.flatMap((g) => g.ideaIds.map((id) => [id, g.id] as const)))
+  const out = groups.map((g) => ({ id: g.id, title: g.title, ideaIds: [...g.ideaIds] }))
+  const byTitle = new Map(out.map((g) => [g.title.trim().toLowerCase(), g]))
+  const retoned: { id: string; from: IdeaCategory; to: IdeaCategory }[] = []
+  const moved: { id: string; from: string; to: string }[] = []
+  const done = new Set<string>()
+  for (const c of changes) {
+    const idea = byId.get(c.id)
+    const from = home.get(c.id)
+    if (!idea || !from || done.has(c.id)) continue
+    done.add(c.id)
+    if (c.category && c.category !== idea.category && IDEA_CATEGORIES.includes(c.category)) {
+      retoned.push({ id: c.id, from: idea.category, to: c.category })
+      idea.category = c.category
+    }
+    let target = c.to ? out.find((g) => g.id === c.to) : undefined
+    const title = c.new?.trim()
+    if (!target && title) {
+      target = byTitle.get(title.toLowerCase())
+      if (!target && title.length >= 3 && title.length <= 60 && !/\s(et|and)\s/i.test(title) && !JUDGEMENT_TITLE.test(title)) {
+        target = { id: `N${out.length + 1}`, title, ideaIds: [] }
+        out.push(target)
+        byTitle.set(title.toLowerCase(), target)
+      }
+    }
+    if (!target || target.id === from) continue
+    const source = out.find((g) => g.id === from)!
+    source.ideaIds = source.ideaIds.filter((id) => id !== c.id)
+    target.ideaIds.push(c.id)
+    home.set(c.id, target.id)
+    moved.push({ id: c.id, from: source.title, to: target.title })
+  }
+  return { groups: out.map(({ title, ideaIds }) => ({ title, ideaIds })), retoned, moved }
+}
+
+/**
+ * Sépare un motif en deux quand le modèle le demande, si la proposition tient :
+ * exactement deux parties, chaque idée du motif dans une seule, titres sans
+ * « et » ni jugement. Un motif de plus de 40 idées n'est pas séparé (le modèle
+ * n'en a vu qu'une partie). Sinon le motif reste tel quel.
+ */
+export function applySplits(
+  groups: { id: string; title: string; ideaIds: string[] }[],
+  decisions: { group: string; objects: number; parts?: { title: string; ideas: string[] }[] }[],
+): { groups: { title: string; ideaIds: string[] }[]; changed: boolean } {
+  let changed = false
+  const out: { title: string; ideaIds: string[] }[] = []
+  for (const g of groups) {
+    const d = decisions.find((x) => x.group === g.id)
+    const parts = d?.objects === 2 ? (d.parts ?? []) : []
+    const all = new Set(g.ideaIds)
+    const listed = parts.flatMap((p) => p.ideas)
+    const valid =
+      parts.length === 2 &&
+      g.ideaIds.length <= 40 &&
+      listed.length === all.size &&
+      new Set(listed).size === listed.length &&
+      listed.every((id) => all.has(id)) &&
+      parts.every((p) => p.ideas.length > 0 && p.title.trim() && !/\s(et|and)\s/i.test(p.title) && !JUDGMENT_TITLE.test(p.title))
+    if (!valid) {
+      out.push({ title: g.title, ideaIds: g.ideaIds })
+      continue
+    }
+    changed = true
+    for (const p of parts) out.push({ title: p.title.trim(), ideaIds: p.ideas })
+  }
+  return { groups: out, changed }
+}
+
+/**
+ * Applique les fusions proposées par le modèle, en refusant celles qui ne
+ * tiennent pas : identifiant inconnu ou déjà fusionné, moins de deux motifs,
+ * ou titre qui relie deux objets par « et » (le signe d'un fourre-tout).
+ */
+export function applyMerges(
+  groups: { id: string; title: string; ideaIds: string[] }[],
+  proposals: { groups: string[]; title: string; reason: string }[],
+): { groups: { title: string; ideaIds: string[] }[]; merges: Merge[] } {
+  const byId = new Map(groups.map((g) => [g.id, g]))
+  const used = new Set<string>()
+  const merges: Merge[] = []
+  const out: { title: string; ideaIds: string[] }[] = []
+  for (const p of proposals) {
+    const ids = [...new Set(p.groups)].filter((id) => byId.has(id) && !used.has(id))
+    const title = p.title.trim()
+    if (ids.length < 2 || !title || /\set\s/i.test(title) || /\sand\s/i.test(title) || JUDGMENT_TITLE.test(title)) continue
+    ids.forEach((id) => used.add(id))
+    out.push({ title, ideaIds: ids.flatMap((id) => byId.get(id)!.ideaIds) })
+    merges.push({ title, from: ids.map((id) => byId.get(id)!.title), reason: p.reason.trim() })
+  }
+  for (const g of groups) if (!used.has(g.id)) out.push({ title: g.title, ideaIds: g.ideaIds })
+  // Deux groupes peuvent finir sous le même titre : on les réunit.
+  const byTitle = new Map<string, { title: string; ideaIds: string[] }>()
+  for (const g of out) {
+    const k = g.title.toLowerCase()
+    const prev = byTitle.get(k)
+    if (prev) prev.ideaIds.push(...g.ideaIds)
+    else byTitle.set(k, { title: g.title, ideaIds: [...g.ideaIds] })
+  }
+  return { groups: [...byTitle.values()], merges }
 }
 
 // ─── Étape 3 ─────────────────────────────────────────────────────────────────
@@ -430,52 +843,69 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr', opts: { st
   const polarised = pos + neg + mix
   const top = Math.max(pos, neg)
   // Un pourcentage n'a de sens qu'à partir d'une dizaine de participants.
-  const share = (n: number, of: number, sep: string) => `${n} ${sep} ${of}${of >= 10 ? ` (${pct(n / of)})` : ''}`
+  // Placé entre parenthèses dans la ligne de chiffres : le pourcentage suit après une virgule, pas dans une seconde parenthèse.
+  const share = (n: number, of: number, sep: string) => `${n} ${sep} ${of}${of >= 10 ? `, ${pct(n / of)}` : ''}`
 
   if (lang === 'en') {
     const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
-    const parts = [`${n(m.participants, 'person', 'people')} (${n(m.mentions, 'idea')})`]
-    const opinions = [pos && `${pos} positive`, neg && `${neg} negative`, mix && `${mix} mixed`].filter(Boolean)
-    if (opinions.length) parts.push(`opinions: ${opinions.join(', ')}`)
+    const parts = [n(m.participants, 'person', 'people')]
+    if (withStance) {
+      const opinions = [pos && `${pos} positive`, neg && `${neg} negative`, mix && `${mix} mixed`].filter(Boolean)
+      if (opinions.length) parts.push(`opinions: ${opinions.join(', ')}`)
+    }
     if (m.participantsByCategory.suggestion) parts.push(`${n(m.participantsByCategory.suggestion, 'person', 'people')} made suggestions`)
-    if (m.participantsByCategory.neutral) parts.push(`neutral remarks from ${n(m.participantsByCategory.neutral, 'person', 'people')}`)
-    if (!withStance) return parts.join('; ')
-    if (m.stance === 'thin') parts.push('few opinions')
-    else if (m.stance === 'consensus') parts.push(`${m.majority} consensus: ${share(top, polarised, 'out of')}`)
+    if (m.participantsByCategory.question) parts.push(`${n(m.participantsByCategory.question, 'person', 'people')} raised questions`)
+    if (!withStance) return parts.join(' · ')
+    const scaleEn = { unanimous: 'unanimously', consensus: 'large majority', majority: 'majority', lean: 'no majority, leaning' } as const
+    if ((m.stance === 'unanimous' || m.stance === 'consensus' || m.stance === 'majority' || m.stance === 'lean') && m.majority)
+      parts.push(`${scaleEn[m.stance]} ${m.majority} (${share(top, polarised, 'out of')})`)
     else if (m.stance === 'divided') parts.push('divided opinions')
-    if (m.minority) parts.push(`consistent ${m.minority.side} minority: ${n(m.minority.participantIds.length, 'person', 'people')}`)
-    return parts.join('; ')
+    if (m.minority)
+      parts.push(
+        `against the grain: ${n(m.minority.participantIds.length, 'person', 'people')} ${m.minority.side === 'positive' ? 'appreciate it' : 'criticise it'}`,
+      )
+    return parts.join(' · ')
   }
 
   const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
-  const parts = [`${n(m.participants, 'participant')} (${n(m.mentions, 'occurrence')})`]
-  // « avis » est masculin : 3 positifs, 1 négatif.
-  const opinions = [pos && n(pos, 'positif'), neg && n(neg, 'négatif'), mix && n(mix, 'mitigé')].filter(Boolean)
-  if (opinions.length) parts.push(`avis : ${opinions.join(', ')}`)
+  const parts = [n(m.participants, 'participant')]
+  // Au niveau d'un thème, additionner des avis sur des objets différents n'a pas de sens : on ne les affiche pas.
+  if (withStance) {
+    // « avis » est masculin : 3 positifs, 1 négatif.
+    const opinions = [pos && n(pos, 'positif'), neg && n(neg, 'négatif'), mix && n(mix, 'mitigé')].filter(Boolean)
+    if (opinions.length) parts.push(`avis : ${opinions.join(', ')}`)
+  }
   const sug = m.participantsByCategory.suggestion
   if (sug) parts.push(`${n(sug, 'participant')} ${sug > 1 ? 'font' : 'fait'} des suggestions`)
-  const neu = m.participantsByCategory.neutral
-  if (neu) parts.push(`${n(neu, 'participant')} ${neu > 1 ? 'font des constats neutres' : 'fait un constat neutre'}`)
-  if (!withStance) return parts.join(' ; ')
-  if (m.stance === 'thin') parts.push("peu d'avis")
-  else if (m.stance === 'consensus') parts.push(`consensus ${m.majority === 'positive' ? 'positif' : 'négatif'} : ${share(top, polarised, 'sur')}`)
+  const qu = m.participantsByCategory.question ?? 0
+  if (qu) parts.push(`${n(qu, 'participant')} ${qu > 1 ? 'se posent' : 'se pose'} des questions`)
+  if (!withStance) return parts.join(' · ')
+  // « Peu d'avis » répétait le nombre de participants affiché juste avant : la Méthode explique le seuil.
+  const pol = m.majority === 'positive' ? 'positif' : 'négatif'
+  const fem = m.majority === 'negative' ? 'négative' : 'positive'
+  if (m.stance === 'unanimous' && m.majority) parts.push(`avis ${pol} unanime (${share(top, polarised, 'sur')})`)
+  else if (m.stance === 'consensus' && m.majority) parts.push(`large majorité ${fem} (${share(top, polarised, 'sur')})`)
+  else if (m.stance === 'majority' && m.majority) parts.push(`majorité ${fem} (${share(top, polarised, 'sur')})`)
+  else if (m.stance === 'lean' && m.majority) parts.push(`pas de majorité, penche vers le ${pol} (${share(top, polarised, 'sur')})`)
   else if (m.stance === 'divided') parts.push('avis partagés')
-  if (m.minority)
-    parts.push(`minorité constante ${m.minority.side === 'positive' ? 'positive' : 'négative'} : ${n(m.minority.participantIds.length, 'participant')}`)
-  return parts.join(' ; ')
+  if (m.minority) {
+    const k = m.minority.participantIds.length
+    parts.push(
+      `à contre-courant : ${n(k, 'participant')} ${m.minority.side === 'positive' ? (k > 1 ? "l'apprécient" : "l'apprécie") : k > 1 ? 'le critiquent' : 'le critique'}`,
+    )
+  }
+  return parts.join(' · ')
 }
 
 /**
- * Les chiffres d'un thème : participants et avis, sans consensus ni désaccord
- * (qui n'ont de sens que sur un même objet), plus le nombre de sujets et ceux
- * dont les avis sont partagés.
+ * Les chiffres d'un thème : participants et nombre de motifs. Ni avis, ni
+ * consensus : un thème réunit des objets différents, et additionner leurs avis
+ * produirait de faux consensus (« 12 positifs contre 1 » sur l'esprit d'équipe).
  */
 export function describeTheme(theme: { metrics: Metrics }, groups: { metrics: Metrics }[], lang: 'fr' | 'en' = 'fr'): string {
-  const base = describeMetrics(theme.metrics, lang, { stance: false })
-  const divided = groups.filter((g) => g.metrics.stance === 'divided').length
   const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
-  if (lang === 'en') return `${base}; ${n(groups.length, 'pattern')}${divided ? `, ${divided} with divided opinions` : ''}`
-  return `${base} ; ${n(groups.length, 'motif')}${divided ? `, dont ${divided} aux avis partagés` : ''}`
+  if (lang === 'en') return `${n(theme.metrics.participants, 'person', 'people')} · ${n(groups.length, 'pattern')}`
+  return `${n(theme.metrics.participants, 'participant')} · ${n(groups.length, 'motif')}`
 }
 
 /** Ne garde que les références [I…] qui appartiennent bien au périmètre. */
@@ -527,10 +957,12 @@ async function summarizeGroups(corpus: Corpus, state: AnalysisState, runner: Llm
   if (cur.length) batches.push(cur)
 
   const summaries = new Map<string, string>()
+  const opposedBy = new Map<string, { a: string; b: string; about: string }[]>()
   const apply = () => {
     for (const g of state.groups) {
       const raw = summaries.get(g.id)
       if (raw !== undefined) g.summary = sanitizeCitations(raw, new Set(g.ideaIds))
+      g.opposed = checkOpposed(g, ideaById, opposedBy.get(g.id) ?? [])
     }
     s.done = summaries.size
   }
@@ -541,7 +973,10 @@ async function summarizeGroups(corpus: Corpus, state: AnalysisState, runner: Llm
       for (let attempt = 0; attempt < 2 && missing.length; attempt++) {
         const res = await runner.json(groupSummaryPrompt({ groups: missing }, state.settings), groupSummarySchema)
         for (const r of res.groups) {
-          if (missing.some((m) => m.id === r.id) && r.summary.trim()) summaries.set(r.id, r.summary)
+          if (missing.some((m) => m.id === r.id) && r.summary.trim()) {
+            summaries.set(r.id, r.summary)
+            opposedBy.set(r.id, r.opposed ?? [])
+          }
         }
         missing = missing.filter((m) => !summaries.has(m.id))
       }
@@ -556,9 +991,10 @@ async function summarizeGroups(corpus: Corpus, state: AnalysisState, runner: Llm
 
 // ─── Étape 4 ─────────────────────────────────────────────────────────────────
 
+/** Racine carrée du nombre de motifs, à deux près : environ 4 à 8 thèmes pour 35 motifs. */
 export function themeTarget(groupCount: number): { min: number; max: number } {
-  const min = Math.max(3, Math.min(8, Math.round(Math.sqrt(groupCount))))
-  return { min, max: Math.max(min + 2, Math.min(12, Math.round(2 * Math.sqrt(groupCount)))) }
+  const r = Math.round(Math.sqrt(groupCount))
+  return { min: Math.max(3, r - 2), max: Math.max(5, Math.min(10, r + 2)) }
 }
 
 async function buildThemes(state: AnalysisState, runner: LlmRunner, emit: () => Promise<void>) {
@@ -575,30 +1011,39 @@ async function buildThemes(state: AnalysisState, runner: LlmRunner, emit: () => 
   await emit()
 
   const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
-  const res = await runner.json(
-    themePrompt(
-      {
-        groups: state.groups.map((g) => ({
-          id: g.id,
-          title: g.title,
-          // Une même personne peut parler dans plusieurs groupes : le modèle doit le savoir pour ne pas la compter deux fois.
-          people: [...new Set(g.ideaIds.map((id) => ideaById.get(id)!.participantId))].sort(),
-          summary: g.summary,
-        })),
-      },
-      state.settings,
-      themeTarget(state.groups.length),
-    ),
-    themeSchema,
-  )
+  const ask = (groups: Group[]) =>
+    runner.json(
+      themePrompt(
+        {
+          groups: groups.map((g) => ({
+            id: g.id,
+            title: g.title,
+            // Une même personne peut parler dans plusieurs groupes : le modèle doit le savoir pour ne pas la compter deux fois.
+            people: [...new Set(g.ideaIds.map((id) => ideaById.get(id)!.participantId))].sort(),
+            // L'échelle du motif (consensus, majoritairement…) : la synthèse du thème dit chaque constat au même degré.
+            facts: describeMetrics(g.metrics, state.settings.language),
+            summary: g.summary,
+          })),
+        },
+        state.settings,
+        themeTarget(groups.length),
+      ),
+      themeSchema,
+    )
   const groupIds = new Set(state.groups.map((g) => g.id))
   const taken = new Set<string>()
   const themes: Omit<Theme, 'id' | 'metrics'>[] = []
-  for (const t of res.themes) {
-    const own = t.groups.filter((id) => groupIds.has(id) && !taken.has(id))
-    own.forEach((id) => taken.add(id))
-    if (own.length) themes.push({ title: t.title.trim(), groupIds: own, summary: t.summary })
+  const collect = (res: { themes: { title: string; groups: string[]; summary: string }[] }) => {
+    for (const t of res.themes) {
+      const own = t.groups.filter((id) => groupIds.has(id) && !taken.has(id))
+      own.forEach((id) => taken.add(id))
+      if (own.length) themes.push({ title: t.title.trim(), groupIds: own, summary: t.summary })
+    }
   }
+  collect(await ask(state.groups))
+  // Le modèle a oublié des motifs : on les lui redonne seuls, plutôt que de les jeter dans « Autres sujets ».
+  const forgotten = state.groups.filter((g) => !taken.has(g.id))
+  if (forgotten.length > 1) collect(await ask(forgotten))
   const orphans = state.groups.filter((g) => !taken.has(g.id)).map((g) => g.id)
   if (orphans.length) themes.push({ title: state.settings.language === 'en' ? 'Other topics' : 'Autres sujets', groupIds: orphans, summary: '' })
 
@@ -606,9 +1051,7 @@ async function buildThemes(state: AnalysisState, runner: LlmRunner, emit: () => 
   state.themes = themes
     .map((t) => {
       const ideaIds = t.groupIds.flatMap((id) => groupById.get(id)!.ideaIds)
-      const sortedGroups = [...t.groupIds].sort(
-        (a, b) => groupById.get(b)!.metrics.participants - groupById.get(a)!.metrics.participants,
-      )
+      const sortedGroups = [...t.groupIds].sort((a, b) => groupById.get(b)!.metrics.participants - groupById.get(a)!.metrics.participants)
       return {
         ...t,
         groupIds: sortedGroups,
@@ -629,21 +1072,71 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
   const all = computeMetrics(state.ideas)
   const respondents = activeParticipants(corpus).length
   const lang = state.settings.language
-  const single = state.groups.filter((g) => g.metrics.participants === 1).length
   const facts =
-    lang === 'en'
-      ? `${state.ideas.length} ideas from ${all.participants} people (out of ${respondents} who answered), ${state.groups.length} patterns${state.themes.length ? ` grouped into ${state.themes.length} themes` : ''}; ${single} of these patterns rest on a single person.`
-      : `${state.ideas.length} idées exprimées par ${all.participants} participants (sur ${respondents} ayant répondu), ${state.groups.length} motifs${state.themes.length ? ` regroupés en ${state.themes.length} thèmes` : ''} ; ${single} de ces motifs ne reposent que sur un participant.`
+    lang === 'en' ? `${all.participants} people out of ${respondents} who answered.` : `${all.participants} participants sur ${respondents} ayant répondu.`
+  const h = highlights(state.groups, new Map(state.ideas.map((i) => [i.id, i])))
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
   const sections = state.themes.length
-    ? state.themes.map((t) => ({ title: t.title, facts: describeTheme(t, t.groupIds.map((id) => groupById.get(id)!), lang), summary: t.summary }))
+    ? state.themes.map((t) => ({
+        title: t.title,
+        facts: describeTheme(
+          t,
+          t.groupIds.map((id) => groupById.get(id)!),
+          lang,
+        ),
+        summary: t.summary,
+      }))
     : state.groups.slice(0, 15).map((g) => ({ title: g.title, facts: describeMetrics(g.metrics, lang), summary: g.summary }))
   if (!sections.length) {
     state.globalSummary = ''
     return
   }
-  const res = await runner.json(globalPrompt({ facts, sections }, state.settings), globalSchema)
-  state.globalSummary = sanitizeCitations(res.summary, new Set(state.ideas.map((i) => i.id)))
+  const lines = (kind: keyof typeof h, list = h[kind].slice(0, 6)) => list.map((x) => ({ text: highlightLine(x, kind, lang), ref: x.ideaIds[0] }))
+  const res = await runner.json(
+    globalPrompt(
+      {
+        facts,
+        strengths: lines('strengths'),
+        blockers: lines('blockers'),
+        divided: lines('divided'),
+        proposals: lines('proposals', h.proposals.slice(0, 8)),
+        questions: lines('questions', h.questions.slice(0, 6)),
+        sections,
+      },
+      state.settings,
+    ),
+    globalSchema,
+  )
+  state.globalSummary = withDivided(sanitizeCitations(res.summary, new Set(state.ideas.map((i) => i.id))), state.groups, lang)
+}
+
+/**
+ * La phrase du résumé sur ce qui divise est écrite par le code, à partir de la
+ * liste calculée : tous les sujets y sont nommés, une seule fois, et une
+ * critique partagée aux remèdes opposés cite ses deux propositions.
+ */
+export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' = 'fr'): string {
+  const divided = highlights(groups).divided
+  if (!divided.length || !summary.trim()) return summary
+  const list = (titles: string[]) =>
+    titles.length > 1 ? `${titles.slice(0, -1).join(', ')} ${lang === 'en' ? 'and' : 'et'} ${titles[titles.length - 1]}` : titles[0]
+  const q = (t: string) => (lang === 'en' ? `“${t}”` : `« ${t} »`)
+  const split = divided.filter((d) => !d.opposed)
+  const opposed = divided.filter((d) => d.opposed)
+  const sentences = [
+    ...(split.length
+      ? [lang === 'en' ? `Opinions are split on ${list(split.map((d) => q(d.title)))}.` : `Les avis s'opposent sur ${list(split.map((d) => q(d.title)))}.`]
+      : []),
+    ...opposed.map((d) =>
+      lang === 'en'
+        ? `On ${q(d.title)}, the criticism is shared but the proposals diverge: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
+        : `Sur ${q(d.title)}, les critiques se rejoignent mais les remèdes proposés s'opposent : ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`,
+    ),
+  ]
+  const paragraphs = summary.trim().split(/\n\s*\n/)
+  const at = paragraphs.length > 1 ? 1 : paragraphs.length - 1
+  paragraphs[at] = `${paragraphs[at].trim()} ${sentences.join(' ')}`
+  return paragraphs.join('\n\n')
 }
 
 // ─── Étape 6 : relecture de la langue ────────────────────────────────────────
@@ -710,27 +1203,311 @@ async function polishTexts(state: AnalysisState, runner: LlmRunner, emit: () => 
   await emit()
 }
 
+// ─── Vérification des renvois ────────────────────────────────────────────────
+
+/** Les phrases d'un texte, paragraphe par paragraphe, pour les vérifier une à une puis le recomposer. */
+export function sentencesOf(text: string): string[][] {
+  return text
+    .split(/\n\s*\n/)
+    .map((p) =>
+      p
+        .trim()
+        .split(/(?<=[.!?])\s+/)
+        .filter(Boolean),
+    )
+    .filter((p) => p.length)
+}
+
+/**
+ * Applique les corrections de renvois à un texte. Une phrase réécrite n'est
+ * gardée que si elle ne cite que des idées permises, n'ajoute aucun nombre et
+ * reste de longueur comparable ; une phrase retirée ne vide jamais le texte.
+ */
+export function applySupport(
+  text: string,
+  allowed: Set<string>,
+  fixes: { n: number; sentence?: string; drop?: boolean }[],
+  options: { addNumbers?: Set<number>; addTo?: 'last' | 'second'; personOf?: (ideaId: string) => string | undefined } = {},
+): { text: string; fixed: number; dropped: number; added: number } {
+  const paragraphs = sentencesOf(text)
+  const flat = paragraphs.flat()
+  const result = new Map<number, string | null>()
+  // Phrases ajoutées (n = 0) : renvois permis, aucun nombre hors de ceux du signalement.
+  const additions = fixes
+    .filter((f) => f.n === 0 && f.sentence?.trim())
+    .map((f) => f.sentence!.trim())
+    .filter((r) => {
+      const ids = r.match(/I\d{4,}/g) ?? []
+      return ids.length > 0 && ids.every((id) => allowed.has(id)) && numbersIn(r).every((x) => options.addNumbers?.has(x.value)) && r.length <= 400
+    })
+    .slice(0, 2)
+  for (const f of fixes.filter((x) => x.n > 0)) {
+    const original = flat[f.n - 1]
+    if (original === undefined || result.has(f.n)) continue
+    if (f.drop) {
+      result.set(f.n, null)
+      continue
+    }
+    const r = f.sentence?.trim()
+    if (!r) continue
+    const ids = r.match(/I\d{4,}/g) ?? []
+    const before = new Set(numbersIn(original).map((x) => x.value))
+    // Un nombre nouveau n'est accepté que s'il compte exactement les personnes distinctes citées dans la phrase réécrite.
+    const personOf = options.personOf
+    const cited = personOf ? new Set(ids.map(personOf).filter(Boolean)).size : -1
+    // Un compte vaut pour son passage (« Une personne propose X [a], une autre Y [b] ») ou pour toute la phrase.
+    const covers = (x: { raw: string; value: number }) => {
+      if (before.has(x.value) || x.value === cited) return true
+      if (!personOf) return false
+      const at = r.indexOf(x.raw)
+      return at >= 0 && new Set((countSpan(r, at).match(/I\d{4,}/g) ?? []).map(personOf).filter(Boolean)).size === x.value
+    }
+    const ok = ids.length > 0 && ids.every((id) => allowed.has(id)) && numbersIn(r).every(covers) && r.length <= original.length * 1.5
+    if (ok) result.set(f.n, r)
+  }
+  if (flat.every((_, i) => result.get(i + 1) === null)) return { text, fixed: 0, dropped: 0, added: 0 }
+  let n = 0
+  let fixed = 0
+  let dropped = 0
+  const out = paragraphs
+    .map((p) =>
+      p
+        .map((sentence) => {
+          n++
+          const r = result.get(n)
+          if (r === null) {
+            dropped++
+            return ''
+          }
+          if (r !== undefined && r !== sentence) {
+            fixed++
+            return r
+          }
+          return sentence
+        })
+        .filter(Boolean)
+        .join(' '),
+    )
+    .filter(Boolean)
+  if (additions.length) {
+    const at = options.addTo === 'second' && out.length > 1 ? 1 : out.length - 1
+    out[at] = `${out[at]} ${additions.join(' ')}`
+  }
+  return { text: out.join('\n\n'), fixed, dropped, added: additions.length }
+}
+
+const NUMBER_WORDS_FR: Record<number, string> = { 2: 'deux', 3: 'trois', 4: 'quatre', 5: 'cinq', 6: 'six', 7: 'sept', 8: 'huit', 9: 'neuf', 10: 'dix' }
+
+/** Les camps d'avis d'un motif (positif, négatif) que sa synthèse ne cite par aucune idée. */
+export function missingCamps(g: Group, ideaById: Map<string, Idea>): { side: 'positive' | 'negative'; people: string[]; ideaIds: string[] }[] {
+  const cited = new Set(g.summary.match(/I\d{4,}/g) ?? [])
+  return (['positive', 'negative'] as const)
+    .map((side) => {
+      const ideaIds = g.ideaIds.filter((id) => ideaById.get(id)?.category === side)
+      const people = [...new Set(ideaIds.map((id) => ideaById.get(id)!.participantId))]
+      return { side, people, ideaIds }
+    })
+    .filter((c) => c.ideaIds.length && !c.ideaIds.some((id) => cited.has(id)))
+}
+
+/** Les phrases d'un texte qui contiennent l'un des termes signalés par les contrôles (numéros à partir de 1). */
+function flaggedSentences(text: string, bad?: string[]): number[] {
+  if (!bad?.length) return []
+  const has = (x: string) => bad.some((b) => new RegExp(`(?<![\\p{L}\\p{N}])${b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}\\p{N}])`, 'iu').test(x))
+  return sentencesOf(text)
+    .flat()
+    .map((x, i) => (has(x) ? i + 1 : 0))
+    .filter(Boolean)
+}
+
+/**
+ * Chaque phrase des synthèses renvoie à des idées ; le lecteur suivra ces
+ * renvois jusqu'aux personnes. Le moteur relit chaque phrase face aux idées
+ * citées et propose une correction ; le code n'accepte que des renvois vers
+ * les idées du motif, du thème ou des listes du résumé. Les phrases que les
+ * contrôles du code ont signalées (compte sans appui, phrase sans renvoi) et
+ * ce qui manque (un camp d'avis absent d'un motif, un motif qui divise absent
+ * du résumé) lui sont désignés : il récrit ou complète, au lieu que le code
+ * retire.
+ */
+async function checkSupport(state: AnalysisState, runner: LlmRunner, emit: () => Promise<void>) {
+  const s = state.steps.find((x) => x.id === 'polish')!
+  const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
+  const groupById = new Map(state.groups.map((g) => [g.id, g]))
+  const groupOf = new Map(state.groups.flatMap((g) => g.ideaIds.map((id) => [id, g] as const)))
+  type Target = {
+    id: string
+    get: () => string
+    set: (t: string) => void
+    allowed: string[]
+    flags: { n: number; problem: string }[]
+    addTo: 'last' | 'second'
+  }
+  const targets: Target[] = []
+  const unsupported = (text: string, bad?: string[]) => [
+    ...flaggedSentences(text, bad).map((n) => ({
+      n,
+      problem: `compte ou nombre sans appui dans les idées citées (${bad!.map((b) => `« ${b} »`).join(', ')})`,
+    })),
+    ...sentencesOf(text)
+      .flat()
+      .map((x, i) => (/I\d{4,}/.test(x) ? null : { n: i + 1, problem: 'phrase sans renvoi : ajoute les idées qui la fondent, ou retire-la' }))
+      .filter((x): x is { n: number; problem: string } => !!x),
+  ]
+  for (const g of state.groups) {
+    if (!g.summary) continue
+    const flags = unsupported(g.summary, g.unverified)
+    for (const c of missingCamps(g, ideaById))
+      flags.push({
+        n: 0,
+        problem: `le camp ${c.side === 'positive' ? 'positif' : 'négatif'} (${c.people.length} ${c.people.length > 1 ? 'personnes' : 'personne'} : ${c.ideaIds.join(', ')}) n'est pas cité : ajoute une phrase sur ce qu'il dit`,
+      })
+    targets.push({ id: `G:${g.id}`, get: () => g.summary, set: (t) => (g.summary = t), allowed: g.ideaIds, flags, addTo: 'last' })
+  }
+  for (const t of state.themes)
+    if (t.summary)
+      targets.push({
+        id: `T:${t.id}`,
+        get: () => t.summary,
+        set: (x) => (t.summary = x),
+        allowed: t.groupIds.flatMap((id) => groupById.get(id)?.ideaIds ?? []),
+        flags: unsupported(t.summary, t.unverified),
+        addTo: 'last',
+      })
+  if (state.globalSummary) {
+    // Le résumé cite une idée par ligne de liste : il peut s'appuyer sur tout le motif de cette idée.
+    const cited = state.globalSummary.match(/I\d{4,}/g) ?? []
+    const allowed = [...new Set(cited.flatMap((id) => groupOf.get(id)?.ideaIds ?? []))]
+    const flags = flaggedSentences(state.globalSummary, state.globalUnverified).map((n) => ({
+      n,
+      problem: `compte ou nombre sans appui (${state.globalUnverified!.map((b) => `« ${b} »`).join(', ')})`,
+    }))
+    targets.push({ id: 'R', get: () => state.globalSummary, set: (t) => (state.globalSummary = t), allowed, flags, addTo: 'second' })
+  }
+  if (!targets.length) return
+  s.message = 'Vérification des renvois'
+  await emit()
+
+  const batches: Target[][] = []
+  let cur: Target[] = []
+  for (const t of targets) {
+    if (cur.length && cur.reduce((n, x) => n + x.allowed.length, 0) + t.allowed.length > SUPPORT_BATCH_IDEAS) {
+      batches.push(cur)
+      cur = []
+    }
+    cur.push(t)
+  }
+  if (cur.length) batches.push(cur)
+
+  const stats = { checked: 0, fixed: 0, dropped: 0, added: 0 }
+  const responses = await Promise.all(
+    batches.map((batch) =>
+      runner.json(
+        supportPrompt(
+          {
+            texts: batch.map((t) => ({
+              id: t.id,
+              sentences: sentencesOf(t.get())
+                .flat()
+                .map((text, i) => ({ n: i + 1, text })),
+              flags: t.flags.length ? t.flags : undefined,
+              ideas: t.allowed.map((id) => {
+                const i = ideaById.get(id)!
+                return { id, participant: i.participantId, category: i.category, verbatim: shortExample(i.verbatim, 200) }
+              }),
+            })),
+          },
+          state.settings,
+        ),
+        supportSchema,
+      ),
+    ),
+  )
+  const fixes = responses.flatMap((r) => r.fixes)
+  for (const t of targets) {
+    stats.checked += sentencesOf(t.get()).flat().length
+    // Une phrase ajoutée ne peut citer que les nombres donnés dans le signalement qui la demande.
+    const addNumbers = new Set(t.flags.filter((f) => f.n === 0).flatMap((f) => numbersIn(f.problem.replace(/I\d{4,}/g, '')).map((x) => x.value)))
+    const r = applySupport(
+      t.get(),
+      new Set(t.allowed),
+      fixes.filter((f) => f.text === t.id && (f.n > 0 || t.flags.some((x) => x.n === 0))),
+      { addNumbers, addTo: t.addTo, personOf: (id) => ideaById.get(id)?.participantId },
+    )
+    if (r.fixed || r.dropped || r.added) t.set(r.text)
+    stats.fixed += r.fixed
+    stats.dropped += r.dropped
+    stats.added += r.added
+  }
+  state.support = stats
+  s.message = undefined
+  await emit()
+}
+
+/**
+ * Filet final : un motif dont la synthèse ne cite toujours pas un camp d'avis
+ * reçoit une phrase écrite par le code, avec ses renvois. Un camp compté dans
+ * l'en-tête n'est jamais absent du texte.
+ */
+function ensureCamps(state: AnalysisState) {
+  const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
+  for (const g of state.groups) {
+    if (!g.summary) continue
+    for (const c of missingCamps(g, ideaById)) {
+      const n = c.people.length
+      const who = n > 1 ? `${NUMBER_WORDS_FR[n] ?? n} personnes` : 'Une personne'
+      const verb = c.side === 'positive' ? (n > 1 ? "l'apprécient" : "l'apprécie") : n > 1 ? 'le critiquent' : 'le critique'
+      const sentence = `${who.charAt(0).toUpperCase()}${who.slice(1)} ${verb} [${c.ideaIds.join(', ')}].`
+      g.summary = `${g.summary.trim()} ${sentence}`
+      state.campsAdded = (state.campsAdded ?? 0) + 1
+    }
+  }
+}
+
 // ─── Contrôle final des chiffres ─────────────────────────────────────────────
 
-function verifyNumbers(corpus: Corpus, state: AnalysisState) {
+/** Repère, dans chaque synthèse, les nombres et les comptes de personnes que rien n'appuie (sans rien retirer). */
+function markUnverified(corpus: Corpus, state: AnalysisState) {
   const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
   const quotes = (ids: string[]) => ids.map((id) => ideaById.get(id)!.verbatim)
   // « Trois personnes jugent l'application lente [I3, I15, I30] » : le nombre de personnes
   // derrière les références citées se vérifie aussi.
-  const check = (text: string, allowed: Set<number>) => {
+  const motifOf = new Map(state.groups.flatMap((g) => g.ideaIds.map((id) => [id, g.metrics.participants] as const)))
+  const check = (text: string, allowed: Set<number>, strict = false, global = false) => {
     const people = (part: string) => new Set((part.match(/I\d{4,}/g) ?? []).map((id) => ideaById.get(id)?.participantId).filter(Boolean)).size
     // Par référence et par phrase (« Deux personnes pointent X [I1] et Y [I2]. »).
     const counts = [...[...text.matchAll(/\[[^\]]*\]/g)].map((m) => people(m[0])), ...text.split(/(?<=[.!?])\s+/).map(people)]
     for (const n of counts) if (n > 0) allowed.add(n)
-    return unverifiedNumbers(text, allowed)
+    // Un nombre de personnes plus grand que les personnes réellement citées est faux, même s'il existe ailleurs dans les chiffres.
+    const personOf = (id: string) => ideaById.get(id)?.participantId
+    // Thèmes et résumé : « trois personnes » exige les idées de trois personnes citées dans la phrase.
+    // Le résumé ne cite qu'une référence par ligne de liste : elle vaut pour tout son motif.
+    const motifSize = global ? (id: string) => motifOf.get(id) ?? 0 : undefined
+    const strictPeople = strict ? undercitedPeople(text, personOf, motifSize) : []
+    return [
+      ...new Set([
+        ...unverifiedNumbers(text, allowed),
+        ...overcountedPeople(text, personOf),
+        ...strictPeople,
+        ...vaguePlurals(text, personOf, motifSize),
+        ...impliedOthers(text, personOf),
+        ...(global ? [] : clauseCounts(text, personOf)),
+      ]),
+    ]
   }
-  for (const g of state.groups) g.unverified = check(g.summary, allowedNumbers([g.metrics], quotes(g.ideaIds)))
+  for (const g of state.groups) {
+    g.unverified = check(g.summary, allowedNumbers([g.metrics], quotes(g.ideaIds)))
+    // « Toutes les personnes qui en parlent » couvre chaque personne qui donne un avis sur le motif.
+    const opinions = g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
+    const all = allClaims(g.summary, (id) => ideaById.get(id)?.participantId, opinions)
+    if (all.length) g.unverified = [...new Set([...(g.unverified ?? []), ...all])]
+  }
   for (const t of state.themes) {
     const groups = t.groupIds.map((id) => groupById.get(id)!)
     const allowed = allowedNumbers([t.metrics, ...groups.map((g) => g.metrics)], quotes(groups.flatMap((g) => g.ideaIds)))
     allowed.add(groups.length) // « ce thème réunit 7 sujets »
-    t.unverified = check(t.summary, allowed)
+    t.unverified = check(t.summary, allowed, true)
   }
   const all = computeMetrics(state.ideas)
   const allowed = allowedNumbers([all, ...state.themes.map((t) => t.metrics), ...state.groups.map((g) => g.metrics)], quotes(state.ideas.map((i) => i.id)))
@@ -742,7 +1519,81 @@ function verifyNumbers(corpus: Corpus, state: AnalysisState) {
   const single = state.groups.filter((g) => g.metrics.participants === 1).length
   allowed.add(single)
   allowed.add(state.groups.length - single)
-  state.globalUnverified = check(state.globalSummary, allowed)
+  const h = highlights(state.groups)
+  for (const x of [...h.strengths, ...h.blockers, ...h.divided, ...h.proposals, ...h.questions]) allowed.add(x.people).add(x.of)
+  state.globalUnverified = check(state.globalSummary, allowed, true, true)
+}
+
+/** Contrôle final : une phrase dont un nombre ou un compte reste sans appui n'est pas livrée ; on la retire et on le note dans la Méthode. */
+function verifyNumbers(corpus: Corpus, state: AnalysisState) {
+  markUnverified(corpus, state)
+  let removed = 0
+  // Le signalement ne reste que si la phrase n'a pas pu être retirée.
+  const clean = (o: { text: string; bad?: string[] }) => {
+    const r = dropSentences(o.text, o.bad)
+    removed += r.removed
+    return { text: r.text, bad: r.removed ? [] : o.bad }
+  }
+  for (const g of state.groups) ({ text: g.summary, bad: g.unverified } = clean({ text: g.summary, bad: g.unverified }))
+  for (const t of state.themes) ({ text: t.summary, bad: t.unverified } = clean({ text: t.summary, bad: t.unverified }))
+  // Une phrase de motif ou de thème restée sans renvoi après la vérification n'est pas livrée : rien ne permet de la contrôler.
+  const unreferenced = (text: string) => {
+    const r = dropUnreferenced(text)
+    removed += r.removed
+    return r.text
+  }
+  for (const g of state.groups) g.summary = spellLeadingNumbers(unreferenced(g.summary))
+  for (const t of state.themes) t.summary = spellLeadingNumbers(unreferenced(t.summary))
+  state.globalSummary = spellLeadingNumbers(state.globalSummary)
+  ;({ text: state.globalSummary, bad: state.globalUnverified } = clean({ text: state.globalSummary, bad: state.globalUnverified }))
+  state.removedSentences = removed
+}
+
+const LEADING: Record<string, string> = {
+  '2': 'Deux',
+  '3': 'Trois',
+  '4': 'Quatre',
+  '5': 'Cinq',
+  '6': 'Six',
+  '7': 'Sept',
+  '8': 'Huit',
+  '9': 'Neuf',
+  '10': 'Dix',
+  '11': 'Onze',
+  '12': 'Douze',
+  '13': 'Treize',
+  '14': 'Quatorze',
+  '15': 'Quinze',
+  '16': 'Seize',
+  '20': 'Vingt',
+}
+
+/** Un nombre en tête de phrase s'écrit en lettres (« Trois personnes… ») : règle typographique appliquée par le code, pas laissée au moteur. */
+export function spellLeadingNumbers(text: string): string {
+  return text.replace(/(^|[.!?]\s+|\n\s*\n)(\d{1,2})(?= )/g, (all, before: string, n: string) => (LEADING[n] ? `${before}${LEADING[n]}` : all))
+}
+
+/** Retire les phrases sans renvoi, paragraphe par paragraphe, sans jamais vider le texte. */
+export function dropUnreferenced(text: string): { text: string; removed: number } {
+  if (!text || !/I\d{4,}/.test(text)) return { text, removed: 0 }
+  const paragraphs = sentencesOf(text)
+  const kept = paragraphs.map((p) => p.filter((x) => /I\d{4,}/.test(x)).join(' ')).filter(Boolean)
+  const removed = paragraphs.flat().length - paragraphs.flat().filter((x) => /I\d{4,}/.test(x)).length
+  return { text: kept.join('\n\n'), removed }
+}
+
+/** Retire les phrases qui contiennent l'un des nombres signalés. */
+export function dropSentences(text: string, bad?: string[]): { text: string; removed: number } {
+  if (!bad?.length || !text) return { text, removed: 0 }
+  const has = (s: string) => bad.some((b) => new RegExp(`(?<![\\p{L}\\p{N}])${b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}\\p{N}])`, 'iu').test(s))
+  // Paragraphe par paragraphe : le résumé en trois temps garde ses paragraphes.
+  const paragraphs = text.split(/\n\s*\n/).map((p) => p.trim().split(/(?<=[.!?])\s+/))
+  const total = paragraphs.flat().length
+  const kept = paragraphs.map((p) => p.filter((x) => !has(x)).join(' ')).filter(Boolean)
+  const keptCount = paragraphs.flat().filter((x) => !has(x)).length
+  // Si toutes les phrases tombaient, on garde le texte : mieux vaut un signalement qu'une synthèse vide.
+  if (!keptCount) return { text, removed: 0 }
+  return { text: kept.join('\n\n'), removed: total - keptCount }
 }
 
 export { sortIds }

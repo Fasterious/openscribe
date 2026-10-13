@@ -13,12 +13,31 @@ export interface VerbatimMatch {
   end: number
   /** Retrouvée avec de légers écarts plutôt qu'à l'identique. */
   approximate: boolean
+  /** Citation coupée par « […] » : les fragments, dans l'ordre du texte. Absent pour une citation d'un seul tenant. */
+  parts?: { start: number; end: number }[]
 }
 
+/** La coupure explicite d'une citation : « […] » ou « [...] », jamais des points de suspension seuls. */
+export const CUT = /\s*\[(?:…|\.\.\.)\]\s*/
+export const CUT_MARK = ' […] '
+
 const QUOTES: Record<string, string> = {
-  '‘': "'", '’': "'", '‚': "'", '′': "'", '`': "'", '´': "'",
-  '“': '"', '”': '"', '„': '"', '«': '"', '»': '"',
-  '–': '-', '—': '-', '…': '...', ' ': ' ', ' ': ' ',
+  '‘': "'",
+  '’': "'",
+  '‚': "'",
+  '′': "'",
+  '`': "'",
+  '´': "'",
+  '“': '"',
+  '”': '"',
+  '„': '"',
+  '«': '"',
+  '»': '"',
+  '–': '-',
+  '—': '-',
+  '…': '...',
+  ' ': ' ',
+  ' ': ' ',
 }
 
 /**
@@ -77,14 +96,85 @@ export function locateVerbatim(source: string, verbatim: string): VerbatimMatch 
 }
 
 /**
+ * Une citation peut sauter un passage sans rapport inséré au milieu, marqué
+ * « […] ». Garde-fous (validés par le `methodologue`) : une seule coupure ;
+ * chaque fragment existe tel quel, dans l'ordre, dans le même texte, et compte
+ * au moins 4 mots ; le passage retiré ne contient ni négation ni contraste,
+ * sinon la coupure pourrait inverser le sens.
+ */
+const MIN_FRAGMENT_WORDS = 4
+const SENSE_CHANGERS =
+  /(?<![\p{L}])(ne|n'|n’|pas|plus|jamais|aucune?|rien|sauf|mais|sinon|sans|pourtant|cependant|toutefois|not|no|never|but|except|without)(?![\p{L}])/iu
+
+export function locateQuote(source: string, verbatim: string): VerbatimMatch | null {
+  const fragments = verbatim
+    .split(CUT)
+    .map((f) => f.trim())
+    .filter(Boolean)
+  if (fragments.length <= 1) return locateVerbatim(source, fragments[0] ?? '')
+  if (fragments.length > 2) return null
+  const parts: { start: number; end: number }[] = []
+  let from = 0
+  let approximate = false
+  for (const f of fragments) {
+    if (f.split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length < MIN_FRAGMENT_WORDS) return null
+    const m = locateVerbatim(source.slice(from), f)
+    if (!m) return null
+    parts.push({ start: from + m.start, end: from + m.end })
+    approximate ||= m.approximate
+    from += m.end
+  }
+  if (SENSE_CHANGERS.test(source.slice(parts[0].end, parts[1].start))) return null
+  return { start: parts[0].start, end: parts[1].end, approximate, parts }
+}
+
+/** Le texte d'une citation tel qu'il est montré : ses fragments exacts, reliés par « […] ». */
+export function quoteText(source: string, m: VerbatimMatch): string {
+  return m.parts ? m.parts.map((p) => source.slice(p.start, p.end)).join(CUT_MARK) : source.slice(m.start, m.end)
+}
+
+/**
  * Pour une citation introuvable : la citation est-elle une suite de fragments
  * du texte reliés par « … » ? On ne l'accepte pas, mais on renvoie le premier
  * fragment trouvé pour proposer une correction.
  */
 export function explainMiss(source: string, verbatim: string): string {
-  if (/\.\.\.|…|\[\.\.\.\]/.test(verbatim)) return 'citation coupée par des points de suspension'
-  const words = verbatim.toLowerCase().split(/\s+/).filter((w) => w.length > 3)
+  if (CUT.test(verbatim)) return 'citation coupée dont un fragment est introuvable'
+  if (/\.\.\.|…/.test(verbatim)) return 'citation coupée par des points de suspension'
+  const words = verbatim
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((w) => w.length > 3)
   const present = words.filter((w) => source.toLowerCase().includes(w)).length
   if (words.length && present / words.length > 0.6) return 'citation reformulée'
   return 'citation absente du texte'
+}
+
+/** Un début de citation qui renvoie à ce qui précède : seul, il ne se comprend pas. */
+// « Il faut », « il y a », « il est » sont impersonnels : ils ne renvoient à rien.
+const REPRISE =
+  /^(?:elle|elles|il(?!\s+(?:faut|faudra|faudrait|fallait|y a|y avait|est|était|serait|aurait))|ils|cela|ça|ceci|ce sont|c['’]est|en partie|mais|et|car|donc|sinon|malgré (?:cela|ça)|pour (?:cela|ça)|qui|dont|ce qui)(?![\p{L}])/iu
+
+/**
+ * Une citation qui commence par une reprise (« Malgré cela, tout est arrivé
+ * à temps », « En partie parce que… ») est étendue au début de la phrase
+ * précédente de la même réponse : le passage reste exact, et il se comprend
+ * seul. Rien ne change si la phrase d'avant est trop longue ou absente.
+ */
+export function withAntecedent(source: string, m: VerbatimMatch, max = 260, taken: { start: number; end: number }[] = []): VerbatimMatch {
+  const quote = source.slice(m.start, m.end).trim()
+  // Une reprise (« Malgré cela… ») ou une question de deux mots (« comment ? ») ne se comprend pas seule.
+  const tiny = /[?]$/.test(quote) && quote.split(/\s+/).length <= 2
+  if (m.parts || m.start <= 0 || !(REPRISE.test(quote) || tiny)) return m
+  const before = source.slice(0, m.start).replace(/\s+$/, '')
+  if (!before) return m
+  // Début de la phrase précédente : juste après la fin de phrase qui la précède, ou le début du texte.
+  const ends = [...before.slice(0, -1).matchAll(/[.!?…\n](?=\s|$)/g)]
+  const start = ends.length ? (ends[ends.length - 1].index ?? 0) + 1 : 0
+  const from = start + (source.slice(start).length - source.slice(start).trimStart().length)
+  if (m.start - from > max || from >= m.start) return m
+  // Jamais par-dessus une autre idée de la même réponse : la phrase d'avant serait affichée deux fois.
+  // (Sauf pour une question de deux mots : « comment ? » sans sa phrase ne veut rien dire.)
+  if (!tiny && taken.some((t) => t.start < m.start && t.end > from)) return m
+  return { ...m, start: from }
 }

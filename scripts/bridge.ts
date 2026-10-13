@@ -117,7 +117,7 @@ const state = await runAnalysis(corpus, initial, {
   },
 })
 writeFileSync(statePath, JSON.stringify(state, null, 1))
-const title = `Analyse — ${basename(csvPath)}`
+const title = opt('name') ?? `Analyse — ${basename(csvPath)}`
 writeFileSync(join(dir, 'rapport.md'), reportToMarkdown(state, corpus, title))
 writeFileSync(join(dir, 'rapport.html'), reportToHtml(state, corpus, title))
 console.log('Terminé :', state.status, state.error ?? '', `${state.ideas.length} idées, ${state.groups.length} groupes, ${state.themes.length} thèmes, ${state.rejected.length} citations écartées`)

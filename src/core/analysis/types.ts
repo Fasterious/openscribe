@@ -9,11 +9,13 @@
  */
 
 /**
- * Catégorie d'une idée. La suggestion n'est pas une polarité : elle est
- * comptée à part et n'entre jamais dans le calcul d'un consensus.
+ * Catégorie d'une idée. Suggestion, question et constat (neutre) ne sont pas
+ * des polarités : comptés à part, ils n'entrent jamais dans l'échelle d'avis.
+ * La question (« comment toucher d'autres publics ? ») ouvre des pistes au-delà
+ * des solutions proposées ; une question rhétorique qui juge garde sa polarité.
  */
-export type IdeaCategory = 'positive' | 'negative' | 'neutral' | 'suggestion'
-export const IDEA_CATEGORIES: IdeaCategory[] = ['positive', 'negative', 'neutral', 'suggestion']
+export type IdeaCategory = 'positive' | 'negative' | 'neutral' | 'suggestion' | 'question'
+export const IDEA_CATEGORIES: IdeaCategory[] = ['positive', 'negative', 'neutral', 'suggestion', 'question']
 
 export interface Idea {
   /** I0001, I0002… attribué par le code dans l'ordre du corpus. */
@@ -25,8 +27,10 @@ export interface Idea {
   /** Citation exacte, vérifiée dans le texte source. */
   verbatim: string
   category: IdeaCategory
-  /** Position de la citation dans le texte de la contribution. */
+  /** Position de la citation dans le texte de la contribution (du premier au dernier mot cité). */
   span: { start: number; end: number }
+  /** Citation coupée par « […] » : la position de chaque fragment. */
+  parts?: { start: number; end: number }[]
   /** Citation retrouvée avec de légers écarts (ponctuation, accents) plutôt qu'à l'identique. */
   approximate: boolean
 }
@@ -44,9 +48,17 @@ export interface CategoryCounts {
   negative: number
   neutral: number
   suggestion: number
+  question: number
 }
 
-export type Stance = 'consensus' | 'divided' | 'thin' | 'none'
+/**
+ * Échelle d'avis sur un motif (indicateurs v4, d'après la revue du
+ * `methodologue`) : unanime, large majorité (80 % ou plus), majorité (plus de
+ * la moitié), pas de majorité (un camp devant, sous la moitié), avis partagés
+ * (camps proches, ou autant de mitigés que le camp le plus fort), peu d'avis,
+ * ou aucun avis (seulement des suggestions, questions, constats).
+ */
+export type Stance = 'unanimous' | 'consensus' | 'majority' | 'lean' | 'divided' | 'thin' | 'none'
 
 /** Indicateurs calculés par le code, jamais par l'IA. */
 export interface Metrics {
@@ -68,6 +80,8 @@ export interface Metrics {
   /** Camp majoritaire, s'il y en a un. */
   majority: 'positive' | 'negative' | null
   stance: Stance
+  /** Une seule voix qui change de camp changerait l'étiquette : à lire avec prudence. */
+  fragile?: boolean
   /** Positions tenues par peu de personnes mais de façon constante. */
   minority: MinorityPosition | null
 }
@@ -87,6 +101,8 @@ export interface Group {
   metrics: Metrics
   /** Nombres de la synthèse qui ne correspondent à aucun chiffre calculé ni cité. */
   unverified?: string[]
+  /** Propositions de personnes différentes qui vont en sens contraire (signalées par le moteur, vérifiées par le code). */
+  opposed?: { a: string; b: string; about: string }[]
 }
 
 export interface Theme {
@@ -109,6 +125,11 @@ export interface AnalysisSettings {
   researchQuestion: string
   /** Relecture de la langue des synthèses (fluidité, tournures naturelles), sens et citations contrôlés par le code. */
   polish: boolean
+  /**
+   * Masque les prénoms des particuliers cités dans les réponses, à l'affichage et dans les exports.
+   * Désactivé par défaut : on restitue les verbatims tels quels, avec le moins de déformation possible.
+   */
+  maskNames: boolean
   temperature: number
   seed: number
 }
@@ -119,8 +140,16 @@ export const DEFAULT_SETTINGS: AnalysisSettings = {
   grid: [],
   researchQuestion: '',
   polish: true,
+  maskNames: false,
   temperature: 0,
   seed: 42,
+}
+
+/** Deux motifs ou plus fusionnés par la passe de consolidation : l'IA propose, le code applique et garde la trace. */
+export interface Merge {
+  title: string
+  from: string[]
+  reason: string
 }
 
 export type StepId = 'extract' | 'group' | 'summarize' | 'themes' | 'report' | 'polish'
@@ -151,6 +180,20 @@ export interface AnalysisState {
   themes: Theme[]
   globalSummary: string
   globalUnverified?: string[]
+  /** Particuliers nommés dans les réponses (vérifiés dans le texte source), masqués si `maskNames`. */
+  names?: string[]
+  /** Fusions de la passe de consolidation, dans l'ordre. */
+  merges?: Merge[]
+  /** Idées dont le ton a été rejugé par rapport à l'objet de leur motif (personnes mitigées), avec leur catégorie d'origine. */
+  retoned?: { id: string; from: IdeaCategory; to: IdeaCategory }[]
+  /** Idées déplacées par la relecture des motifs (titres du motif de départ et d'arrivée). */
+  moved?: { id: string; from: string; to: string }[]
+  /** Vérification des renvois : phrases relues, corrigées, retirées. */
+  support?: { checked: number; fixed: number; dropped: number; added?: number }
+  /** Phrases écrites par le code pour qu'aucun camp d'avis compté ne manque à la synthèse de son motif. */
+  campsAdded?: number
+  /** Phrases retirées des synthèses parce qu'elles citaient un nombre introuvable. */
+  removedSentences?: number
   /** Bilan de la relecture : textes relus, modifiés, et réécritures refusées par le contrôle. */
   polish?: { checked: number; changed: number; refused: number }
   steps: StepStatus[]

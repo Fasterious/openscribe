@@ -36,10 +36,59 @@ Mis à jour à chaque étape. Légende : ✅ fait et vérifié · 🔄 en cours 
 
 Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études créées le même jour portent le même nom par défaut ; message « Reprendre repart de là » encore affiché quand le moteur d'origine a été supprimé.
 
+## Itération 6 — Le rapport face à la v1 sur le corpus réel (13/10)
+
+- ✅ Étude ÉcoSol rejouée en trois passes avec un vrai modèle ; certifiée pour une restitution par le `methodologue` (4/5, contre 2,5/5 pour le rapport de la v1) et la `plume` (4/5 contre 3,5/5)
+- ✅ Extraction : énumérations découpées, passe de couverture des longues réponses (306 idées, 0 citation écartée)
+- ✅ Regroupement sur le sens, motif = objet sur lequel agir, porte de qualité et consolidation, motif défini par son ton redistribué (30 motifs, aucun à une personne)
+- ✅ Rapport : résumé en trois temps sourcé, « Ce qui a marché / bloque / divise / proposent » calculés par le code, signaux isolés, questions Q1…, prénoms masqués, biais annoncés
+- ✅ Tests : 41 règles d'analyse, 22 parcours (ordinateur et mobile) à cette étape
+- ⏳ Décisions d'Arnaud : mitigés au dénominateur du consensus ; masquage des personnalités publiques ; découpage d'une phrase conditionnelle ; motif à deux objets
+- ⏳ Liste des prénoms à valider avant l'export ; contexte affiché autour d'une citation tronquée ; idées d'une même personne qui se chevauchent ; analyse par rôle
+
+## Itération 7 — Retours d'Arnaud sur le rapport (13/10)
+
+- ✅ Catégorie « question » et section « Questions soulevées » ; « constat » gardé
+- ✅ Échelle d'avis v2 (consensus, majoritairement, plutôt, avis partagés, avis mitigés, peu d'avis), validée par le `methodologue`
+- ✅ Une ligne par personne, verbatims enchaînés avec leur origine, comptes « (dont N mitigés) » cohérents ; clic sur un verbatim = texte d'origine surligné
+- ✅ Restitution brute : nuances gardées, coupure « […] » encadrée, prénoms affichés (masquage manuel)
+- ✅ Sources multiples : questionnaire et entretiens dans la même étude, plusieurs fichiers d'un coup, sources renommables et retirables, rapport périmé signalé
+- ✅ ÉcoSol rejoué (passe 5) : certifié par le `methodologue` (4/5 ; v1 2,5/5), la `plume` (4,5/5) et le `testeur` ; exemple livré régénéré
+- ✅ Tests : 50 règles d'analyse, 26 parcours (ordinateur et mobile)
+- ⏳ Consignes de style en attente (ne pas relancer le cache pour rien) : « quand tous sont d'accord, le dire », « reprocher à quelqu'un », graphie unique des noms propres
+
+## Itération 8 — Lisibilité et ton juste (13/10)
+
+- ✅ Rapport en couleur : repères par avis et par section (Markdown), barre d'avis par motif (écran, HTML), une case par participant
+- ✅ Références d'idées remplacées par les participants cités dans les exports ; texte d'origine au survol à l'écran
+- ✅ Réponse courte affichée avec sa question ; consigne : la question donne le sens, l'ironie et le conditionnel aussi
+- ✅ Ton jugé par rapport à l'objet du motif (étape dédiée pour les mitigés) ; « certains / d'autres / plusieurs » vérifiés ; paragraphe des propositions obligatoire dans le résumé
+- ✅ Liste des études : « Rapport à relancer » quand les données ont changé
+- ✅ ÉcoSol rejoué en entier (passe 6) : `methodologue` 4/5 certifié, `plume` 4/5, `testeur` livrable ; corrections de code appliquées ensuite (renvois « par ex. », question seulement pour une réponse entière, barres avec « sans avis », bulle à hauteur limitée, Échap)
+- ⏳ Pour 5/5 : vérifier que chaque renvoi appuie sa phrase ; étape de ton qui peut déplacer une idée ; phrase précédente envoyée pour « malgré cela » (consigne ajoutée, à rejouer)
+
+## Itérations B7–B9 — Vers 5/5 (13/10)
+
+- ✅ Relecture des motifs (déplacer, rejuger le ton) ; pistes opposées dans « Ce qui divise » ; vérification des renvois guidée par les contrôles du code ; filets finaux
+- ✅ Corpus privé hors du dépôt (exemples fictifs, test de confidentialité) ; audit automatique : B9 sans défaut
+- ✅ Écran : survol sobre, barre d'actions unique, menus cohérents
+- ✅ B10 : `methodologue` 4,5/5 (B9 4,3 ; v1 2,5), `plume` 4/5 « nettement plus près de 5 » ; audit sans défaut
+- ✅ Interface : en-tête par modules (Accueil, Synthèse, modules à venir grisés ; moteurs à droite), « Vos synthèses », menu par synthèse, barre d'actions du rapport, menus communs
+- ✅ Moteurs d'IA : catalogue de 18 fournisseurs vérifiés, rangés par type (direct, hébergeur, plateforme, local)
+- ⏳ Pour 5/5 : mot isolé sans sens compté comme avis, passages au ton non couverts, « autres / l'une d'elles » à vérifier, motif fourre-tout ; deuxième corpus réel, double codage, relance sans cache, modèle léger
+- ⏳ Décisions d'Arnaud : échelle d'avis (proposition du `methodologue`), pistes opposées d'un motif à l'autre
+- ✅ Parcours Mistral joué dans le vrai compte (13/10) : la clé gratuite n'existe plus, il faut activer le paiement à l'usage ; guide et accueil corrigés (`docs/PARCOURS-FOURNISSEURS.md`)
+- ⏳ Synthèse ÉcoSol avec Mistral et comparaison avec la référence : attend la clé (activation du paiement par Arnaud)
+
+## Backlog (idées gardées, pas prioritaires)
+
+- Anonymisation en un geste : liste des prénoms détectés, validée par le chercheur, puis masquage (décision d'Arnaud du 13/10 : pas de masquage automatique pour l'instant ; priorité à la qualité de l'analyse).
+- Segments proposés : quand aucune colonne « Profil » n'existe, proposer des segments tirés des réponses (rôle, ancienneté…), au choix du chercheur ; comparer deux segments côte à côte. Prudence quand l'échantillon est trop petit.
+- Pistes opposées sous un même constat : les signaler dans « Ce qui divise » (à trancher avec Arnaud).
+
 ## Prochaines étapes
 
 - ⏳ Validation par Arnaud (`docs/VALIDATION.md`) : premier vrai appel (Groq, Mistral ou Ollama) depuis le navigateur
-- ⏳ Épreuve de la nouvelle méthode de regroupement sur le corpus réel ÉcoSol (privé)
 - ⏳ Langue : confirmer les dernières consignes de style sur un vrai moteur
 - ⏳ Mise en ligne (hébergement statique)
 - ⏳ Module Entretiens et tests (transcription, vidéo synchronisée), puis Personas

@@ -269,7 +269,7 @@ function StepIcon({ state }: { state: string }) {
 
 function RunView({ project, analysis, running, outdated }: { project: Project; analysis: AnalysisState; running: boolean; outdated: boolean }) {
   const byCat = useMemo(() => {
-    const c = { positive: 0, negative: 0, neutral: 0, suggestion: 0 }
+    const c = { positive: 0, negative: 0, neutral: 0, suggestion: 0, question: 0 }
     analysis.ideas.forEach((i) => c[i.category]++)
     return c
   }, [analysis.ideas])

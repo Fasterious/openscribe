@@ -2,6 +2,39 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-13 — Itération 7 : retours d'Arnaud (questions, échelle, une personne par ligne, sources multiples)
+
+**Ce qui a marché**
+- Faire valider les règles par le `methodologue` avant de coder : il a corrigé deux seuils et refusé un filtre naïf (« et » dans un titre) qui aurait cassé des motifs justes.
+- Trois relecteurs indépendants à chaque passe (`methodologue`, `plume`, `testeur`) : chacun a trouvé ce que les autres ne voyaient pas (affichage qui fait croire à un faux comptage, libellés mal accordés, fichier vide qui compte une personne deux fois).
+- Le `testeur` a trouvé un vrai défaut de données dès la première passe : décocher une question du questionnaire écartait les entretiens.
+
+**Ce qui a coûté pour rien**
+- J'ai modifié deux fichiers pendant une passe du `testeur` : son banc n'était plus figé. La règle existait ; je l'ai enfreinte.
+- Une retouche d'affichage (la ligne de chiffres) faisait aussi partie des données envoyées au modèle : elle invalidait le cache et forçait à relancer l'analyse. Même chose pour l'ordre d'une liste.
+- Une consigne ambiguë (« aucun autre « … » ») a fait éviter au modèle des points de suspension présents dans le texte.
+
+**Ce qu'on change**
+- Règle : ce qu'on affiche n'est jamais ce qu'on envoie au modèle ; une retouche de présentation ne doit pas invalider les réponses déjà obtenues (`metricsLine` pour l'écran, `describeMetrics` pour le modèle).
+- Règle : quand on renomme un concept (titre, catégorie), on cherche toutes ses mentions, méthode comprise.
+
+## 2026-10-13 — Itération 6 : le rapport face à la v1, sur données réelles
+
+**Ce qui a marché**
+- Comparer à une référence que le fondateur juge excellente, avec deux juges indépendants (`methodologue`, `plume`) et des mesures faites par le code (citations, chiffres, couverture). Les notes ont rendu les progrès et les reculs indiscutables.
+- Lire comment la v1 obtenait sa qualité avant de corriger : la cause était dans la structure de la chaîne (regroupement par le haut, synthèses écrites sur les verbatims), pas dans les mots des consignes.
+- Les pannes du modèle joué (réponse de thèmes à moitié vide, identifiant inventé) ont servi de vrais tests : le code a tenu, et l'une a révélé un manque (les motifs oubliés finissaient dans « Autres sujets »).
+
+**Ce qui a coûté pour rien**
+- Récupérer des documents par des exports en base64 recopiés à la main ; un export PDF lu par `pdftotext` aurait suffi dès le départ.
+- Un commit de documents qui citaient un produit concurrent : annulé avant l'envoi, mais il aurait dû être évité par la relecture de la règle.
+- Deux sous-agents « modèle » ont écrit un brouillon avant leur réponse : la consigne dit désormais « prépare la réponse complète avant d'écrire ».
+
+**Ce qu'on change**
+- Règle : tout chiffre affiché garde le même dénominateur partout dans le rapport ; il vient d'une seule formule du code.
+- Règle : avant d'écrire dans `docs/` ou de commiter un document externe, vérifier qu'il ne nomme aucun produit concurrent.
+- Avant une décision de produit, relire `docs/VISION.md` (ajouté au `CLAUDE.md`).
+
 ## 2026-10-12 — Itération 5 : retour d'Arnaud (accueil, moteurs, méthode)
 
 **Ce qui a marché**
@@ -66,3 +99,21 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - JSON compact dans les consignes.
 - Chemins absolus dans le pont.
 - Données réelles : la colonne « Répondant » (P1, P2…) était prise pour une réponse ouverte. Nouvelle règle de détection : valeurs courtes et presque toutes différentes = identifiant.
+
+## Itération 8 — Lisibilité et ton juste (13/10)
+
+- **Bien marché** : trois relecteurs en parallèle sur un commit figé, chacun avec une consigne précise ; leurs défauts se recoupent et se classent vite. Le test du même mot sous trois questions, avec un modèle léger, a prouvé la consigne en une minute.
+- **Coûté pour rien** : un contrôle (pluriels) écrit sans le passer sur le corpus réel avant le rejeu complet : 9 phrases retirées, dont des justes. Et un `prettier` lancé sans la configuration du dépôt, qui a reformaté deux fichiers entiers.
+- **On change** : tout nouveau contrôle qui retire du texte est d'abord passé sur les synthèses déjà en cache du corpus réel (sans appel au moteur), puis seulement le rejeu. Formatage : `prettier --no-semi --single-quote --print-width 160`.
+
+## Itérations B7–B9 — Vers 5/5 (13/10)
+
+- **Bien marché** : relier chaque défaut des relecteurs à sa cause dans le processus ; l'audit automatique transforme leurs remarques en contrôles rejouables sans appel au moteur ; réutiliser le cache de l'extraction quand ses consignes n'ont pas changé (B9 : une dizaine d'appels au lieu de trente).
+- **Coûté pour rien** : des exemples de consigne trop proches du corpus de certification (contamination) ; un contrôle « par ex. » écrit trop large, qui a déplacé le défaut au lieu de le corriger ; modifier le code pendant une relecture (rattrapé en ne régénérant rien).
+- **On change** : règle ajoutée (exemples jamais tirés du corpus de certification) ; chaque contrôle nouveau a ses cas fictifs en test et passe d'abord sur le rejeu précédent en cache ; il faut un deuxième corpus réel pour une certification indépendante.
+
+## Parcours Mistral réel (13/10)
+
+- **Bien marché** : jouer le parcours dans le vrai compte a révélé en cinq minutes une promesse fausse affichée sur l'accueil (« Mistral gratuit, sans carte »), invisible aux tests automatiques.
+- **Coûté pour rien** : la fiche Mistral avait été « vérifiée » sur la documentation, pas dans une console ; la documentation était périmée.
+- **On change** : une offre gratuite s'affirme seulement après un passage réel dans la console, daté dans `docs/PARCOURS-FOURNISSEURS.md`.

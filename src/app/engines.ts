@@ -56,7 +56,10 @@ export async function saveEngine(engine: EngineConfig): Promise<void> {
 }
 
 export async function removeEngine(id: string): Promise<void> {
-  await setSetting(KEY, (await loadEngines()).filter((e) => e.id !== id))
+  await setSetting(
+    KEY,
+    (await loadEngines()).filter((e) => e.id !== id),
+  )
   if ((await getSetting<string>(DEFAULT_KEY)) === id) await setSetting(DEFAULT_KEY, undefined)
   notify()
 }
@@ -90,8 +93,11 @@ export function providerFor(engine: EngineConfig, retries = 4, onRetry?: LimitOp
     baseUrl: engine.baseUrl,
     apiKey: engine.apiKey || undefined,
     model: engine.model,
-    seedParam: preset?.seedParam ?? 'seed',
+    // Un préréglage connu dit lui-même s'il accepte une graine ; un service inconnu en reçoit une, retirée s'il la refuse.
+    seedParam: preset ? preset.seedParam : 'seed',
     supportsJsonMode: preset?.supportsJsonMode ?? true,
+    extraHeaders: preset?.extraHeaders,
+    omitTemperature: preset?.omitTemperature,
   })
   return withLimits(base, { requestsPerMinute: engine.requestsPerMinute, concurrency: engine.concurrency, retries, onRetry })
 }

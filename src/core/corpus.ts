@@ -66,12 +66,17 @@ export function contributionsOf(corpus: Corpus, participantId: string): Contribu
   return corpus.contributions.filter((c) => c.participantId === participantId)
 }
 
-/** Questions distinctes du corpus, dans leur ordre d'apparition. */
+/**
+ * Questions distinctes des questionnaires, dans leur ordre d'apparition. Les
+ * relances d'un animateur dans un entretien ne sont pas des questions à choisir :
+ * elles servent seulement de contexte à la réponse qui suit.
+ */
 export function promptsOf(corpus: Corpus): string[] {
+  const surveys = new Set(corpus.sources.filter((s) => s.kind === 'survey').map((s) => s.id))
   const seen = new Set<string>()
   const out: string[] = []
   for (const c of corpus.contributions) {
-    if (c.prompt && !seen.has(c.prompt)) {
+    if (c.prompt && surveys.has(c.sourceId) && !seen.has(c.prompt)) {
       seen.add(c.prompt)
       out.push(c.prompt)
     }
@@ -94,5 +99,24 @@ export function mergeCorpus(base: Corpus, added: Corpus): Corpus {
     sources: [...base.sources, ...added.sources],
     participants: [...base.participants, ...added.participants],
     contributions: [...base.contributions, ...added.contributions],
+  }
+}
+
+/** Renomme une source : « Entretien du 18 mai — Julie » se lit mieux qu'un nom de fichier. */
+export function renameSource(corpus: Corpus, sourceId: string, name: string): Corpus {
+  const clean = name.trim()
+  if (!clean) return corpus
+  return { ...corpus, sources: corpus.sources.map((s) => (s.id === sourceId ? { ...s, name: clean } : s)) }
+}
+
+/** Retire une source, ses contributions, et les participants qui n'ont plus rien dit ailleurs. */
+export function removeSource(corpus: Corpus, sourceId: string): Corpus {
+  const contributions = corpus.contributions.filter((c) => c.sourceId !== sourceId)
+  const still = new Set(contributions.map((c) => c.participantId))
+  return {
+    ...corpus,
+    sources: corpus.sources.filter((s) => s.id !== sourceId),
+    participants: corpus.participants.filter((p) => still.has(p.id)),
+    contributions,
   }
 }

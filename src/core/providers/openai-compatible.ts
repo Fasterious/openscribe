@@ -9,6 +9,10 @@ export interface OpenAiCompatibleConfig {
   model: string
   seedParam?: ProviderPreset['seedParam']
   supportsJsonMode: boolean
+  /** En-têtes propres au fournisseur (ex. autorisation d'appel depuis un navigateur). */
+  extraHeaders?: Record<string, string>
+  /** Ne pas envoyer de température (refusée par certains modèles). */
+  omitTemperature?: boolean
   /** Délai maximal d'une demande, en millisecondes (90 s par défaut). */
   timeoutMs?: number
   /** Délai maximal du test de connexion (tâche « ping »), 20 s par défaut. */
@@ -101,12 +105,12 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
         { role: 'system', content: req.system },
         { role: 'user', content: req.user },
       ],
-      temperature: req.temperature,
     }
+    if (!config.omitTemperature) body.temperature = req.temperature
     if (req.maxTokens) body.max_tokens = req.maxTokens
     if (allowSeed && req.seed !== undefined && config.seedParam) body[config.seedParam] = req.seed
     if (allowJsonMode && req.json) body.response_format = { type: 'json_object' }
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    const headers: Record<string, string> = { 'Content-Type': 'application/json', ...config.extraHeaders }
     if (config.apiKey) headers.Authorization = `Bearer ${config.apiKey}`
     // Le test de connexion (tâche « ping ») doit échouer vite.
     const ms = req.task === 'ping' ? (config.pingTimeoutMs ?? DEFAULT_PING_TIMEOUT_MS) : (config.timeoutMs ?? DEFAULT_TIMEOUT_MS)
@@ -124,10 +128,9 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
       return new Response(nullBody ? null : text, { status: response.status, statusText: response.statusText, headers: response.headers })
     } catch (e) {
       if (limit.timedOut()) {
-        throw new ProviderError(
-          `${config.label} ne répond pas (délai dépassé). Vérifiez votre connexion ; un réseau d'entreprise peut bloquer ce service.`,
-          { status: 0 },
-        )
+        throw new ProviderError(`${config.label} ne répond pas (délai dépassé). Vérifiez votre connexion ; un réseau d'entreprise peut bloquer ce service.`, {
+          status: 0,
+        })
       }
       if (req.signal?.aborted) throw e
       const local = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(base)
@@ -186,9 +189,7 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
         })
       return {
         text,
-        usage: data.usage
-          ? { inputTokens: data.usage.prompt_tokens ?? 0, outputTokens: data.usage.completion_tokens ?? 0 }
-          : undefined,
+        usage: data.usage ? { inputTokens: data.usage.prompt_tokens ?? 0, outputTokens: data.usage.completion_tokens ?? 0 } : undefined,
       }
     },
   }

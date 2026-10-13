@@ -42,13 +42,14 @@ export function newProject(name: string): Project {
   }
 }
 
-/** Le corpus restreint aux questions retenues. */
+/** Le corpus restreint aux questions retenues ; le choix ne porte que sur les questionnaires, jamais sur les entretiens. */
 export function corpusForAnalysis(project: Project): Corpus {
   if (!project.selectedPrompts.length) return project.corpus
   const keep = new Set(project.selectedPrompts)
+  const surveys = new Set(project.corpus.sources.filter((s) => s.kind === 'survey').map((s) => s.id))
   return {
     ...project.corpus,
-    contributions: project.corpus.contributions.filter((c) => !c.prompt || keep.has(c.prompt)),
+    contributions: project.corpus.contributions.filter((c) => !c.prompt || !surveys.has(c.sourceId) || keep.has(c.prompt)),
   }
 }
 

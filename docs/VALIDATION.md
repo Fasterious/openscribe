@@ -15,7 +15,7 @@ Pour lancer l'application : `npm run dev`, puis http://localhost:5173.
 
 ## 3. Un vrai moteur (5 min)
 
-1. Dans « Moteurs d'IA », choisis **Groq** ou **Mistral** et suis le guide (lien direct vers la page des clés), ou **Ollama** si tu l'installes.
+1. Dans « Moteurs d'IA », choisis **Groq** (gratuit, sans carte) ou **Mistral** (paiement à l'usage à activer, voir `docs/PARCOURS-FOURNISSEURS.md`) et suis le guide (lien direct vers la page des clés), ou **Ollama** si tu l'installes.
 2. « Enregistrer et tester ».
 
 > Point non vérifiable d'ici : l'appel direct d'un fournisseur depuis le navigateur. Si le test répond « … refuse peut-être les demandes venant d'un navigateur » alors que la clé est bonne, dis-moi lequel : la solution est connue (un petit relais).
