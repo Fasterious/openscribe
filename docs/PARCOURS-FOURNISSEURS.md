@@ -10,6 +10,8 @@ Règle du test : aucune carte bancaire, aucun mot de passe saisi par l'agent ; u
 
 ## Mistral — 13/10/2026 (compte d'Arnaud, déjà connecté)
 
+Premier passage, par l'agent seul :
+
 | # | Étape | Ce qui se passe | Blocage | Levé ? |
 |---|---|---|---|---|
 | 1 | OpenScribe › Moteurs d'IA › Mistral › Configurer | Guide en 3 étapes, lien « Ouvrir la console Mistral » | — | — |
@@ -19,30 +21,64 @@ Règle du test : aucune carte bancaire, aucun mot de passe saisi par l'agent ; u
 | 5 | Admin › API › Confidentialité | Réglage de réutilisation des données pour l'entraînement | À refuser avant d'envoyer des données réelles | Geste d'Arnaud ou accord explicite |
 
 Ce qui a changé chez Mistral (recoupé avec d'autres utilisateurs début octobre 2026) :
-l'offre « Experiment » (gratuite, vérification par téléphone, sans carte) n'existe
-plus. Il reste un forfait gratuit mensuel, mais il ne sert qu'une fois le paiement à
-l'usage activé. La documentation officielle dit encore « API access is enabled by
-default with no credit card required » : elle est en retard sur la console.
+l'offre « Experiment » (gratuite, vérification par téléphone) n'existe plus. Conclusion
+du premier passage, **corrigée au deuxième** : on croyait qu'aucune clé ne marchait sans
+paiement ; en fait seuls les plus gros modèles sont fermés.
+
+### Deuxième passage, avec Arnaud (13/10, le soir) : il existe un chemin gratuit
+
+- La page « Clés API » **de Mistral Studio** (console) a le bouton grisé, mais la page
+  **Admin › Clés API** (clés de l'organisation) permet de créer une clé sans rien payer.
+  C'est par là qu'Arnaud a créé la sienne, sans activer le paiement à l'usage.
+- Avec cette clé, essai modèle par modèle :
+
+| Modèle | Réponse | Sens |
+|---|---|---|
+| `ministral-14b-2512`, `ministral-8b-2512`, `ministral-3b-2512`, `codestral-2508` | 200 | Inclus dans l'offre gratuite |
+| `mistral-small-2603`, `mistral-medium-2604`, `magistral-*` | 429 (code 1300) dès le premier appel | Quota nul sans paiement à l'usage |
+| `mistral-large-latest` | 403 `tier_not_allowed` | Hors offre |
+| `labs-*` | 403 | Modèles Labs à activer (et données réutilisées) |
+
+- Le modèle par défaut d'OpenScribe (`mistral-small-2506`) n'existait plus, et Small est
+  hors de l'offre gratuite : d'où le message « trop de demandes (429) » au test, faux
+  diagnostic qui a bloqué Arnaud.
+- Confidentialité : chez Arnaud, l'entraînement sur les appels API était déjà désactivé
+  (Admin › API › Confidentialité), modèles Labs désactivés.
 
 ### Ce qu'on a changé dans OpenScribe
 
-- Mistral quitte « Pour essayer gratuitement » (badge « Gratuit, sans carte » faux) et
-  rejoint les fournisseurs directs.
-- Guide : lien direct vers Admin › Abonnement, activer « API Pay-As-You-Go », fixer une
-  limite de dépenses ; puis « Clés API › Nouvelle clé » (la clé ne s'affiche qu'une fois).
-- Confidentialité : le chemin exact (Admin › API › Confidentialité).
-- Accueil et page des moteurs : seul Groq est annoncé comme gratuit sans carte.
+- Mistral revient dans « Pour essayer gratuitement », avec Ministral 14B par défaut.
+- Le modèle se choisit dans une liste expliquée (même menu que les autres listes) :
+  « Inclus dans l'offre gratuite » / « Avec le paiement à l'usage activé », le recommandé
+  marqué, et « Autre modèle… » pour la saisie libre.
+- Guide : lien direct vers Admin › Clés API, « Nouvelle clé », la clé ne s'affiche qu'une fois.
+- Erreurs : une 429 au test dit « ce modèle n'est sans doute pas inclus dans votre offre » ;
+  une 403 « tier » dit « votre offre ne donne pas accès à ce modèle », plus « clé refusée ».
 
-### Ce qui reste à faire par Arnaud
+### La synthèse ÉcoSol avec la clé gratuite
 
-1. Admin › Abonnement › « API Pay-As-You-Go » › Activer, avec une limite de dépenses
-   basse (le forfait gratuit de 8,5 € passe en premier ; une synthèse ÉcoSol complète
-   devrait coûter quelques centimes à quelques dizaines de centimes avec Mistral Small).
-2. Admin › API › Confidentialité : refuser la réutilisation des données (ÉcoSol est réel).
-3. Clés API › Nouvelle clé, copier, coller dans OpenScribe › Mistral › « Enregistrer et tester ».
+Ministral 14B, dans l'application, en trois passes : 7 à 10 minutes, gratuit, note
+3/5 (méthode et langue) contre 4,5 et 4 pour Sonnet. Détail et prochains leviers :
+`docs/METHODES.md`. En route, l'analyse s'est arrêtée trois fois sur des réponses mal
+formées (texte emballé dans un objet, piste opposée mal formée) et a subi un délai
+dépassé : la lecture des réponses est désormais tolérante, le délai trop court reste à
+revoir pour les modèles lents.
 
-Ensuite l'agent reprend : synthèse ÉcoSol avec Mistral, comparaison à la référence,
-réglages pour s'en approcher.
+## Google Gemini — 13/10/2026 (compte Google d'Arnaud, déjà connecté)
+
+| # | Étape | Ce qui se passe | Blocage | Levé ? |
+|---|---|---|---|---|
+| 1 | AI Studio › Clés API | Liste des clés ; bandeau « passer au prépaiement » (lié à un autre projet) | Bandeau anxiogène, sans rapport avec l'offre gratuite | On l'ignore |
+| 2 | « Créer une clé API » | Nom (« OPENSCRIBE NEXT ») et **projet** à choisir | **Piège** : un projet « Niveau 1 · Post-paiement » (facturation active) existe à côté du projet « Niveau sans frais ». Une clé du mauvais projet est facturée | Oui : le guide dit de choisir un projet au « Niveau sans frais » |
+| 3 | Détails de la clé | Clé au nouveau format « AQ. » (plus « AIza ») ; bouton « Copier la clé » | — | Collée par Arnaud |
+| 4 | OpenScribe › Enregistrer et tester (3.8 Flash) | « Google Gemini n'a rien renvoyé » | Notre test réservait 20 jetons ; la réflexion du modèle les consommait tous (`finish: length`, 0 jeton de réponse) | Oui : 1 024 jetons au test |
+| 5 | Même test, plus tard | 503 « high demand » sur 3.8 Flash ; délai dépassé | Modèle surchargé ; message qui accusait la connexion | Oui : message 503 dédié |
+| 6 | AI Studio › Limite de débit | Offre gratuite : 3.8 / 3.7 / 3.6 Flash à **20 demandes par jour** ; 3.5 et 3.1 Flash-Lite à 15 par minute et **500 par jour** ; Gemma 4 à 14 400 par jour mais 16 000 jetons par minute | Une synthèse de 20 participants (50 à 80 demandes) ne tient pas dans 20 par jour ; Gemma ne tient pas nos grosses demandes | Flash-Lite par défaut, liste expliquée |
+| 7 | Appels | Gemini refuse le paramètre `seed` (400) | Contourné automatiquement, mais inutile | Oui : plus envoyé |
+
+Données : dans l'Union européenne, en Suisse et au Royaume-Uni, les conditions de l'offre
+payante s'appliquent aussi au quota gratuit (pas d'entraînement sur les données). Ailleurs,
+l'offre gratuite réutilise les données et des humains peuvent les relire.
 
 ## Leçons pour tous les fournisseurs
 
@@ -53,5 +89,15 @@ réglages pour s'en approcher.
   l'utilisateur ne se lance, et lui donner le réflexe « limite de dépenses ».
 - **Le vocabulaire des consoles change** (nom du site, langue, intitulés) : citer les
   intitulés tels qu'à l'écran, et pointer le lien le plus profond possible.
+- **Une erreur doit nommer la cause probable dans le contexte** : une 429 au tout premier
+  appel n'est pas un excès de demandes, c'est un modèle hors offre.
+- **Deux pages qui se ressemblent** (console et administration) peuvent dire l'inverse :
+  quand un bouton est grisé, chercher l'autre entrée avant de conclure au blocage.
+- **Un projet peut en cacher un autre** : chez Google, deux projets du même compte n'ont pas
+  la même facturation. Le guide nomme le niveau à choisir (« Niveau sans frais »).
+- **Le quota quotidien décide du modèle**, pas seulement la qualité : 20 demandes par jour
+  ne suffisent pas à une synthèse. La liste des modèles le dit avant le choix.
+- **Un test de connexion doit laisser parler un modèle qui réfléchit** : un plafond de
+  jetons trop bas fait croire à une panne.
 - **Un clic de mise à niveau est une transaction** : l'agent de test ne le fait jamais,
   même pour « voir » ; il lit les pages d'abonnement sans toucher aux boutons.

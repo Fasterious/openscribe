@@ -1,4 +1,4 @@
-import type { z } from 'zod'
+import { z } from 'zod'
 
 /**
  * Lecture robuste d'une réponse JSON de modèle : tolère les balises de code,
@@ -37,4 +37,33 @@ export function parseJson<T>(raw: string, schema: z.ZodType<T>): T {
     throw new JsonShapeError(`La réponse du modèle n'a pas la forme attendue (${issue?.path.join('.') || 'racine'} : ${issue?.message}).`)
   }
   return result.data
+}
+
+/**
+ * Un texte rédigé que certains modèles légers renvoient emballé (`{"text": "…"}`)
+ * ou en liste de phrases : on en garde le texte. Les contrôles qui suivent
+ * (citations, comptes) s'appliquent ensuite comme d'habitude.
+ */
+export function asText(value: unknown): unknown {
+  if (typeof value === 'string' || value == null) return value
+  if (Array.isArray(value)) return value.map(asText).filter((v): v is string => typeof v === 'string' && v.trim() !== '').join(' ')
+  if (typeof value === 'object') {
+    const o = value as Record<string, unknown>
+    for (const k of ['text', 'summary', 'content', 'paragraph', 'texte', 'résumé']) if (typeof o[k] === 'string') return o[k]
+    const parts = Object.values(o).map(asText).filter((v): v is string => typeof v === 'string' && v.trim() !== '')
+    return parts.length ? parts.join(' ') : value
+  }
+  return value
+}
+
+/** Champ de texte rédigé, tolérant à l'emballage (voir `asText`). */
+export const prose = () => z.preprocess(asText, z.string())
+
+/**
+ * Liste dont les éléments mal formés sont ignorés au lieu de faire échouer toute
+ * la réponse : pour les champs annexes (pistes opposées, prénoms, corrections),
+ * qu'un modèle léger remplit parfois de travers.
+ */
+export function lenientArray<T extends z.ZodTypeAny>(item: T) {
+  return z.preprocess((v) => (Array.isArray(v) ? v.filter((x) => item.safeParse(x).success) : []), z.array(item))
 }

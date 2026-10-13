@@ -78,7 +78,17 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Pour 5/5 : mot isolé sans sens compté comme avis, passages au ton non couverts, « autres / l'une d'elles » à vérifier, motif fourre-tout ; deuxième corpus réel, double codage, relance sans cache, modèle léger
 - ⏳ Décisions d'Arnaud : échelle d'avis (proposition du `methodologue`), pistes opposées d'un motif à l'autre
 - ✅ Parcours Mistral joué dans le vrai compte (13/10) : la clé gratuite n'existe plus, il faut activer le paiement à l'usage ; guide et accueil corrigés (`docs/PARCOURS-FOURNISSEURS.md`)
-- ⏳ Synthèse ÉcoSol avec Mistral et comparaison avec la référence : attend la clé (activation du paiement par Arnaud)
+- ✅ Parcours Mistral, deuxième passage avec Arnaud : clé gratuite par Admin › Clés API (Ministral inclus, Small et Medium payants) ; liste des modèles expliquée, recommandé en tête
+- ✅ Synthèse ÉcoSol avec Ministral 14B (gratuit) en trois passes : 3/5 (`methodologue` et `plume`), contre 4,5 et 4 pour Sonnet (`docs/METHODES.md`)
+- ✅ Une méthode par famille de modèles : la référence (Sonnet) reste mot pour mot, Ministral a la sienne
+- ✅ Robustesse : réponses mal formées tolérées, réponse coupée signalée, citations inventées retirées, renvois réparés, estimation de durée recalée
+- ✅ Parcours Gemini réel : clé gratuite créée dans AI Studio (projet « Niveau sans frais »), Flash-Lite choisi pour son quota (500 demandes par jour)
+- ✅ ÉcoSol avec Gemini 3.5 Flash-Lite en quatre passes : 3,5/5 (`methodologue`), 2,5/5 (`plume`) ; méthode `gemini` (`docs/METHODES.md`)
+- ✅ Essai croisé des règles Gemini sur Ministral : rejeté (note en baisse), Ministral garde sa v3
+- ✅ Filets communs (sans effet sur Sonnet B10) : phrase dépendante, phrase répétée, sujets qui divisent rétablis, renvoi mal formé ; une reprise efface l'erreur de l'étape ; une synthèse propose son dernier moteur
+- ⏳ Stratégie « gratuit d'abord » (Arnaud) : un modèle plus fort plus tard, pour toute la synthèse (pas étape par étape)
+- ⏳ Méthode Ministral : phrase orpheline retirée avec sa phrase d'appui, un camp compté une fois, rangement guidé par la question, 6 à 8 thèmes
+- ⏳ Chantiers communs listés dans `docs/METHODES.md` (sujets qui divisent reformulés, consensus rétablis, comptes des intros de thème, renvois en double, motifs fourre-tout) ; message de délai dépassé qui accuse la connexion ; « Groq gratuit sans carte » pas encore vérifié dans sa console
 
 ## Backlog (idées gardées, pas prioritaires)
 

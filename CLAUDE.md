@@ -70,13 +70,14 @@ Règles apprises :
   injectons (chiffres, libellés) : on le corrige à la source, pas à la relecture.
 - Les vraies données révèlent ce que les données fictives cachent : chaque
   fonctionnalité d'analyse est éprouvée sur un corpus réel (privé) avant d'être déclarée faite.
-- Une passe de certification se fait sur un commit figé : on ne touche pas au dépôt pendant qu'elle tourne.
+- Une passe de certification se fait sur un commit figé : on ne touche pas au dépôt pendant qu'elle tourne (une analyse dans le navigateur s'interrompt : le serveur recharge la page au moindre fichier modifié).
 - Une cible chiffrée dans une consigne (nombre de groupes, de thèmes) est un choix de méthode : le `methodologue` la valide.
 - Un concept, un mot, un acteur nommé : synthèse (un travail du module Synthèse ; « étude » est réservé au jour où plusieurs modules se combineront), source, participant, verbatim, idée, motif, thème, segment, occurrences ; idées : positif, négatif, suggestion, question, constat ; échelle d'avis : unanime, large majorité, majorité, pas de majorité, avis partagés, peu d'avis (le chiffre toujours à côté ; « fragile » si une voix change l'étiquette) ; « le moteur d'IA propose, le code vérifie ».
 - Tout écran qui quitte une étude offre le retour, et ce retour est couvert par un test de parcours.
 - Un contrôle qui retire du texte se rode d'abord sur les synthèses en cache du corpus réel, avant tout rejeu.
 - Un exemple de consigne ou de test ne vient jamais du corpus de certification (sinon le test n'est plus indépendant) ; `src/core/privacy.test.ts` le vérifie.
 - Un défaut trouvé se corrige par une étape, une consigne ou un contrôle du processus, pas à la main dans le rapport.
+- Une méthode par famille de modèles : une nouvelle part de la meilleure, et un apport ne passe à une autre méthode que si sa note monte (`docs/METHODES.md`).
 - « Gratuit, sans carte » ne s'affiche qu'après un parcours réel dans la console du fournisseur, daté dans `docs/PARCOURS-FOURNISSEURS.md`.
 
 ## Principes produit (non négociables)

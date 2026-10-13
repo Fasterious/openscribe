@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import { asText, lenientArray, prose } from './json'
+import { methodOf, methodRules } from './methods'
 import type { AnalysisSettings, IdeaCategory } from './types'
 
 /**
@@ -105,7 +107,7 @@ const ideaItem = z.object({
 export const extractionSchema = z.object({
   ideas: z.array(ideaItem),
   /** Particuliers nommés : le code vérifie qu'ils figurent dans le texte avant de les masquer. */
-  names: z.array(z.string()).optional().default([]),
+  names: lenientArray(z.string()).optional().default([]),
 })
 export type ExtractionOutput = z.infer<typeof extractionSchema>
 
@@ -214,7 +216,7 @@ export function groupingPrompt(input: GroupingInput, settings: AnalysisSettings,
     ? `2. Utilise UNIQUEMENT ces titres de groupe, tels quels : ${input.grid.map((g) => `« ${g} »`).join(', ')}, plus « Hors grille » pour ce qui n'entre dans aucun.
 3. Dans un groupe, mêle les avis positifs et négatifs : c'est ce qui permet de voir les désaccords.`
     : `2. Un groupe = UN motif : un objet sur lequel l'équipe ou l'organisation pourrait agir (« Vitesse de l'application », « Délais de livraison », « Service client »). Juge sur le sens du verbatim, pas seulement sur les mots du libellé.
-3. Vont dans le même groupe : des libellés formulés différemment ; des avis de tons opposés sur le même objet (« Rappels utiles » / « Trop de rappels ») ; une cause, le problème et la solution proposée (« Démarrage tardif », « Communication de dernière minute », « Commencer un an avant » relèvent tous du calendrier). C'est ce qui fait apparaître les accords et les désaccords.
+3. Vont dans le même groupe : des libellés formulés différemment ; des avis de tons opposés sur le même objet (« Rappels utiles » / « Trop de rappels ») ; une cause, le problème et la solution proposée (${methodOf(settings).groupingExample}). C'est ce qui fait apparaître les accords et les désaccords.
 4. Ne réunis pas deux objets sur lesquels on agirait séparément (la lenteur et la clarté des menus, la réservation et l'historique des prêts) : ils seront rapprochés à l'étape des thèmes. Une idée vraiment sans équivalent peut rester seule, mais cherche d'abord le motif auquel elle appartient. À titre indicatif, on attend entre ${target.min} et ${target.max} groupes ; ne découpe ni ne fusionne seulement pour atteindre ce nombre.
 5. Donne à chaque groupe un titre court (2 à 6 mots) qui nomme l'objet, pas le jugement (« Vitesse de l'application », pas « Application trop lente »). Un groupe ne se définit jamais par son ton : pas de « Points positifs », « Bilan positif », « Critiques diverses » ; range ces idées selon leur objet. Un titre qui a besoin de « et » pour relier deux objets signale deux groupes.`
   return {
@@ -225,7 +227,7 @@ export function groupingPrompt(input: GroupingInput, settings: AnalysisSettings,
 Règles :
 1. Chaque identifiant (L1, L2…) doit apparaître dans EXACTEMENT un groupe. N'en oublie aucun, n'en invente aucun.
 ${rules}
-${lang(settings)}
+${methodRules(settings, 'grouping')}${lang(settings)}
 
 Réponds avec : {"groups":[{"title":"…","items":["L1","L7"]}]}
 
@@ -289,6 +291,36 @@ ${dataBlock(input)}`,
   }
 }
 
+// ─── Motifs isolés : rattachés à un motif existant, ou laissés seuls ─────────
+
+export interface AttachInput {
+  groups: { id: string; title: string; people: number }[]
+  singles: { id: string; title: string; examples: string[] }[]
+}
+
+export const attachSchema = z.object({
+  attachments: lenientArray(z.object({ single: z.string(), group: z.string() })),
+})
+
+export function attachPrompt(input: AttachInput, settings: AnalysisSettings) {
+  return {
+    task: 'attach',
+    system: SYSTEM,
+    user: `${context(settings)}Tu reçois des motifs portés par une seule personne (« singles ») et la liste des autres motifs (« groups »). Pour chaque motif isolé, dis s'il traite en réalité le même objet qu'un motif existant.
+
+Règles :
+1. Rattache seulement si l'équipe agirait d'un seul geste sur les deux (même objet, quel que soit le ton) : « Affiches trop rares » va avec « Affichage en ville ».
+2. Un objet simplement voisin ne se rattache pas : réponds « aucun ». Un avis isolé qui parle d'autre chose reste visible tel quel, c'est une information.
+3. Une réponse par motif isolé, avec l'identifiant d'un motif de « groups » ou « aucun ».
+${lang(settings)}
+
+Réponds avec : {"attachments":[{"single":"G40","group":"G3"},{"single":"G41","group":"aucun"}]}
+
+${dataBlock(input)}`,
+    json: true,
+  }
+}
+
 // ─── Motif à deux objets : un ou deux ? ──────────────────────────────────────
 
 export interface SplitInput {
@@ -342,7 +374,7 @@ export interface ReviewInput {
 }
 
 export const reviewSchema = z.object({
-  changes: z.array(
+  changes: lenientArray(
     z.object({
       id: z.string(),
       to: z.string().optional(),
@@ -387,10 +419,9 @@ export const groupSummarySchema = z.object({
   groups: z.array(
     z.object({
       id: z.string(),
-      summary: z.string(),
+      summary: prose(),
       /** Deux propositions de personnes différentes qui vont en sens contraire : le code les montre dans « Ce qui divise ». */
-      opposed: z
-        .array(z.object({ a: z.string(), b: z.string(), about: z.string() }))
+      opposed: lenientArray(z.object({ a: z.string(), b: z.string(), about: z.string() }))
         .optional()
         .default([]),
     }),
@@ -412,7 +443,7 @@ Règles :
 6. Après chaque affirmation, cite entre crochets les identifiants des idées qui la fondent, par exemple [I0004, I0017]. Le crochet ne cite que des idées qui disent ce que dit la phrase.
 7. N'écris « avis nuancé » ou « partagé » à propos d'une personne que si elle dit vraiment du bien et du mal du même objet. Chaque camp compté dans "facts" (positifs, négatifs, mitigés) apparaît dans la synthèse. Le constat se dit au même degré que les chiffres : 7 critiques sur 10, c'est « la livraison est jugée trop lente », pas « inégale ». Une personne mitigée n'est pas « une autre » : « trois, dont deux des précédentes ». Ne sous-entends jamais un verbe quand l'objet seul dirait le contraire du reproche (« une autre, une application rarement mise à jour », pas « une autre, la mise à jour de l'application »).
 8. "opposed" : si deux propositions ("suggestion") de deux personnes différentes vont en sens contraire sur ce motif (« rendre l'adhésion gratuite » contre « augmenter l'adhésion pour financer plus de services »), donne leurs identifiants et, en quelques mots, ce sur quoi elles s'opposent ("about" : « le prix de l'adhésion »). Sinon, liste vide. Deux propositions différentes ne sont pas opposées : il faut qu'on ne puisse pas faire les deux.
-${lang(settings)}
+${methodRules(settings, 'summary')}${lang(settings)}
 ${STYLE[settings.language]}
 
 Réponds avec : {"groups":[{"id":"G1","summary":"…","opposed":[]}]}
@@ -429,7 +460,7 @@ export interface ThemeInput {
 }
 
 export const themeSchema = z.object({
-  themes: z.array(z.object({ title: z.string().min(1), groups: z.array(z.string()), summary: z.string() })),
+  themes: z.array(z.object({ title: z.string().min(1), groups: z.array(z.string()), summary: prose() })),
 })
 
 export function themePrompt(input: ThemeInput, settings: AnalysisSettings, target: { min: number; max: number }) {
@@ -442,7 +473,7 @@ Règles :
 1. Chaque groupe (G1, G2…) appartient à EXACTEMENT un thème.
 2. Un thème rapproche des groupes dont les sujets sont voisins : ils concernent la même partie du service ou la même expérience (par exemple la réservation, la prolongation et l'historique des prêts). Les deux faces d'un même objet vont dans le même thème : ce qui va bien et ce qui va mal dans la vie d'une équipe (ambiance, désaccords, accueil) forment un seul thème, pas deux. Les propositions restent avec l'objet qu'elles visent. Ne réunis pas des groupes parce qu'ils sont petits ou de même ton, et évite le thème fourre-tout. Si le titre a besoin de « et » pour relier deux sujets sans rapport, fais deux thèmes. Titre court (2 à 6 mots) qui nomme ce que les groupes ont en commun.
 3. Pour chaque thème, une synthèse de 3 ou 4 phrases construite à partir des synthèses de ses groupes, sans rien ajouter. Elle tranche au lieu d'énumérer : ce qui a marché, ce qui a freiné, ce que les participants demandent. Si deux groupes ou deux propositions vont en sens contraire, dis-le. Varie les tournures d'un thème à l'autre (pas de « Si le groupe veut… » répété). Cite au plus trois exemples et ne passe pas en revue tous les groupes. Un seul crochet par phrase, repris des synthèses des groupes, qui peut contenir plusieurs identifiants ; n'en invente pas. Quand tu annonces un nombre de personnes (« trois personnes »), le crochet contient une idée de chacune d'elles ; sinon, écris « une personne » ou ne donne pas de nombre. N'oppose deux groupes (« à l'inverse », « en revanche ») que s'ils jugent le même objet de façon contraire. Dis chaque constat au même degré que les chiffres de son groupe : un consensus (6 sur 6) se dit « toutes les personnes qui en parlent », un avis majoritaire « la plupart », jamais « des personnes » ou « presque toutes ». Une même personne peut figurer dans plusieurs groupes (champ "people") : ne la compte pas deux fois et n'écris « une autre personne » que si elle est différente. Ne recopie pas la première phrase d'un groupe.
-${lang(settings)}
+${methodRules(settings, 'themes')}${lang(settings)}
 ${STYLE[settings.language]}
 
 Réponds avec : {"themes":[{"title":"…","groups":["G1","G4"],"summary":"…"}]}
@@ -465,7 +496,7 @@ export interface GlobalInput {
   sections: { title: string; facts: string; summary: string }[]
 }
 
-export const globalSchema = z.object({ summary: z.string().min(1) })
+export const globalSchema = z.object({ summary: z.preprocess(asText, z.string().min(1)) })
 
 export function globalPrompt(input: GlobalInput, settings: AnalysisSettings) {
   return {
@@ -480,7 +511,7 @@ Règles :
 4. N'écris rien sur les sujets de "divided" : le code ajoute lui-même, à la fin du deuxième paragraphe, la phrase qui les nomme tous.
 5. Quand un sujet ne repose que sur une ou deux personnes, dis-le (« une personne », « deux personnes »). Pour une question ou une proposition, rapporte ce que dit le verbatim, pas le titre du motif où elle est rangée.
 6. Aucune remarque de méthode. N'ajoute rien qui ne figure pas dans les données ; aucun lien de cause que les participants n'ont pas formulé. Résume, ne recopie pas les phrases des synthèses.
-${lang(settings)}
+${methodRules(settings, 'global')}${lang(settings)}
 ${STYLE[settings.language]}
 
 Réponds avec : {"summary":"…"}
@@ -504,7 +535,7 @@ export interface SupportInput {
 }
 
 export const supportSchema = z.object({
-  fixes: z.array(z.object({ text: z.string(), n: z.number(), sentence: z.string().optional(), drop: z.boolean().optional() })),
+  fixes: lenientArray(z.object({ text: z.string(), n: z.number(), sentence: z.string().optional(), drop: z.boolean().optional() })),
 })
 
 export function supportPrompt(input: SupportInput, settings: AnalysisSettings) {
@@ -536,7 +567,7 @@ export interface PolishInput {
 }
 
 export const polishSchema = z.object({
-  texts: z.array(z.object({ id: z.string(), text: z.string() })),
+  texts: z.array(z.object({ id: z.string(), text: prose() })),
 })
 
 export function polishPrompt(input: PolishInput, settings: AnalysisSettings) {

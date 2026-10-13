@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { newAnalysis, runAnalysis } from '@/core/analysis/pipeline'
 import type { AnalysisSettings, AnalysisState } from '@/core/analysis/types'
 import { corpusForAnalysis, type Project } from '@/core/project'
+import { methodForModel } from '@/core/providers/presets'
 import { getProject, listProjects, responseCache, saveProject } from './db'
 import { providerFor, type EngineConfig } from './engines'
 
@@ -129,7 +130,7 @@ export async function startAnalysis(
   })
   // Garde-fou : on ne reprend jamais une analyse avec un autre moteur que le sien.
   const sameEngine = resume && resume.engine.presetId === provider.fingerprint.presetId && resume.engine.model === provider.fingerprint.model
-  const initial = sameEngine ? resume : await newAnalysis(corpus, settings, provider)
+  const initial = sameEngine ? resume : await newAnalysis(corpus, { ...settings, method: methodForModel(engine.presetId, engine.model) }, provider)
   const controller = new AbortController()
   running.set(projectId, controller)
   emit(`run:${projectId}`)

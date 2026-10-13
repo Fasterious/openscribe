@@ -4,8 +4,9 @@
  * Une citation proposée par l'IA n'est acceptée que si elle existe dans le
  * texte source. On tolère seulement les écarts sans effet sur le sens : casse,
  * espaces, apostrophes et guillemets typographiques, ponctuation en bord de
- * citation, accents. Tout le reste est rejeté : aucune citation inventée ou
- * reformulée ne peut entrer dans le rapport.
+ * citation, accents, et quelques fautes de frappe corrigées par le modèle (le texte
+ * montré reste alors celui du participant). Tout le reste est rejeté : aucune
+ * citation inventée ou reformulée ne peut entrer dans le rapport.
  */
 
 export interface VerbatimMatch {
@@ -72,7 +73,7 @@ function trimEdges(s: string): string {
   return s.replace(/^[\s"'.,;:!?()[\]-]+|[\s"'.,;:!?()[\]-]+$/g, '')
 }
 
-export function locateVerbatim(source: string, verbatim: string): VerbatimMatch | null {
+export function locateVerbatim(source: string, verbatim: string, opts: { typos?: boolean } = {}): VerbatimMatch | null {
   const candidate = verbatim.trim()
   if (!candidate) return null
 
@@ -92,7 +93,61 @@ export function locateVerbatim(source: string, verbatim: string): VerbatimMatch 
       return { start, end, approximate: source.slice(start, end) !== candidate }
     }
   }
-  return null
+  return opts.typos ? locateNearMatch(source, candidate) : null
+}
+
+/**
+ * 4. Fautes de frappe corrigées par le modèle (« contributins » → « contributions »).
+ * On retrouve le passage d'origine et c'est lui qui est montré, fautes comprises.
+ * Garde-fous : citation d'au moins 25 caractères, au plus un écart pour 25 caractères
+ * (4 au total), et aucun mot qui change le sens ajouté ou retiré.
+ */
+const NEAR_MIN = 25
+/** Mots de degré ou de restriction, en plus de SENSE_CHANGERS (« peu » devenu « un peu » inverse le sens). */
+const NEAR_SENSE = /^(moins|peu|un|trop|tres|seul|seule|seuls|seules|seulement|guere|presque)$/
+function locateNearMatch(source: string, candidate: string): VerbatimMatch | null {
+  const src = normalizeWithMap(source, true)
+  const needle = trimEdges(normalizeWithMap(candidate, true).norm)
+  if (needle.length < NEAR_MIN) return null
+  const budget = Math.min(4, Math.floor(needle.length / 25))
+  const head = needle.slice(0, 10)
+  let best: { at: number; len: number; d: number } | null = null
+  for (let at = src.norm.indexOf(head); at >= 0; at = src.norm.indexOf(head, at + 1)) {
+    for (let len = needle.length - budget; len <= needle.length + budget; len++) {
+      if (at + len > src.norm.length) break
+      const d = editDistance(needle, src.norm.slice(at, at + len), budget)
+      if (d <= budget && (!best || d < best.d)) best = { at, len, d }
+    }
+  }
+  if (!best) return null
+  const found = src.norm.slice(best.at, best.at + best.len)
+  const words = (t: string) => new Set(t.split(/[^\p{L}]+/u).filter(Boolean).map((w) => (w === 'n' ? 'ne' : w)))
+  const a = words(found)
+  const b = words(needle)
+  const changed = [...a].filter((w) => !b.has(w)).concat([...b].filter((w) => !a.has(w)))
+  if (changed.some((w) => SENSE_CHANGERS.test(w) || NEAR_SENSE.test(w))) return null
+  // Un chiffre ne se corrige pas : « 3 » devenu « 8 » change le sens.
+  if ((found.match(/\d+/g) ?? []).join(' ') !== (needle.match(/\d+/g) ?? []).join(' ')) return null
+  const start = src.map[best.at]
+  const end = src.map[best.at + best.len - 1] + 1
+  return { start, end, approximate: true }
+}
+
+/** Distance d'édition, arrêtée dès qu'elle dépasse `max`. */
+function editDistance(a: string, b: string, max: number): number {
+  if (Math.abs(a.length - b.length) > max) return max + 1
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j)
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i]
+    let rowMin = i
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))
+      rowMin = Math.min(rowMin, cur[j])
+    }
+    if (rowMin > max) return max + 1
+    prev = cur
+  }
+  return prev[b.length]
 }
 
 /**
@@ -106,19 +161,19 @@ const MIN_FRAGMENT_WORDS = 4
 const SENSE_CHANGERS =
   /(?<![\p{L}])(ne|n'|n’|pas|plus|jamais|aucune?|rien|sauf|mais|sinon|sans|pourtant|cependant|toutefois|not|no|never|but|except|without)(?![\p{L}])/iu
 
-export function locateQuote(source: string, verbatim: string): VerbatimMatch | null {
+export function locateQuote(source: string, verbatim: string, opts: { typos?: boolean } = {}): VerbatimMatch | null {
   const fragments = verbatim
     .split(CUT)
     .map((f) => f.trim())
     .filter(Boolean)
-  if (fragments.length <= 1) return locateVerbatim(source, fragments[0] ?? '')
+  if (fragments.length <= 1) return locateVerbatim(source, fragments[0] ?? '', opts)
   if (fragments.length > 2) return null
   const parts: { start: number; end: number }[] = []
   let from = 0
   let approximate = false
   for (const f of fragments) {
     if (f.split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length < MIN_FRAGMENT_WORDS) return null
-    const m = locateVerbatim(source.slice(from), f)
+    const m = locateVerbatim(source.slice(from), f, opts)
     if (!m) return null
     parts.push({ start: from + m.start, end: from + m.end })
     approximate ||= m.approximate

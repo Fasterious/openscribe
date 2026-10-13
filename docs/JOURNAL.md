@@ -113,3 +113,20 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 - **« Avis mitigés » fondu dans « avis partagés »** (Arnaud : la nuance se lit dans les chiffres « dont N mitigés »).
 - **« Fragile »** calculé par le code : une seule voix qui change de camp changerait l'étiquette. Remplace honnêtement un intervalle de confiance, qui supposerait un tirage aléatoire.
 - Méthode : « se taire n'est ni approuver ni désapprouver » ; les proportions décrivent les personnes interrogées, pas une population.
+
+## 2026-10-13 — Ministral 14B sur ÉcoSol ; une méthode par famille de modèles
+
+- **Clé gratuite** : elle existe (Admin › Clés API), mais seuls les modèles Ministral et Codestral répondent ; Small et Medium ont un quota nul sans paiement à l'usage. Le défaut d'OpenScribe (`mistral-small-2506`) n'existait plus : d'où l'erreur 429 vue par Arnaud.
+- **Liste des modèles** (demande d'Arnaud) : même menu que les autres listes, sections « offre gratuite » / « paiement à l'usage », recommandé marqué, saisie libre.
+- **Trois passes** sur ÉcoSol : 2 → 2,5 → 3 (`methodologue`), 2,5 → 3 (`plume`). Le regroupement en un lot de 350 faisait trois fourre-tout ; des lots de 80 morcelaient (53 motifs) ; 150/75 donne 33 motifs. La prose plafonne.
+- **Décision d'Arnaud : une méthode par famille de modèles.** On part de la meilleure, on l'affine sur le corpus réel, on essaie ses apports sur les autres et on ne les garde que si la note monte. La référence (Sonnet) n'a pas bougé : test qui vérifie sa consigne mot pour mot. Processus : `docs/METHODES.md`.
+- **Ce que signalait Arnaud (JSON tronqué par un petit modèle)** : pas la cause ici (JSON complet mais mal rangé), mais le risque existe ; une réponse coupée est désormais détectée et nommée.
+
+## 2026-10-13 — Gemini sur ÉcoSol ; le processus « une méthode par modèle » appliqué
+
+- **Clé** : créée dans AI Studio par l'agent (accord d'Arnaud), dans le projet au « Niveau sans frais » ; un autre projet du compte est facturé. Arnaud a collé la clé (l'agent ne colle jamais une vraie clé).
+- **Modèle** : 3.8 Flash est limité à 20 demandes par jour en gratuit, une synthèse n'y tient pas : Flash-Lite 3.5 (500 par jour). Le test de connexion réservait 20 jetons, mangés par la réflexion du modèle (« n'a rien renvoyé ») : porté à 1 024. Gemini refuse `seed`.
+- **Méthode `gemini`** (copie de la référence), quatre passes : 2,5 → 3 → (61 motifs) → 3,5 (`methodologue`). Leviers qui ont marché : rattachement des motifs isolés un par un, « range d'abord ». Qui ont échoué : « ne range que si le titre décrit l'idée » (morcelle).
+- **Essai croisé** : les règles de rédaction de Gemini font baisser Ministral (3 → 2) : rejeté, comme le prévoit le processus d'Arnaud.
+- **Stratégie d'Arnaud** : pousser d'abord le gratuit (horizontal) ; un modèle plus fort plus tard, et alors pour toute la synthèse, pas étape par étape (trop complexe à expliquer).
+- **Quatrième passe** au-delà de la règle des trois : demandée par Arnaud (« itérer au maximum »), justifiée parce qu'elle combinait deux résultats déjà mesurés.

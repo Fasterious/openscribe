@@ -18,6 +18,7 @@ import {
   applySplits,
   applySupport,
   dropUnreferenced,
+  dropNearDuplicates,
   checkOpposed,
   spellLeadingNumbers,
   withDivided,
@@ -32,6 +33,8 @@ import {
   newAnalysis,
   runAnalysis,
   sanitizeCitations,
+  dropInventedQuotes,
+  applyAttachments,
 } from './analysis/pipeline'
 import { uncoveredPassages } from './analysis/coverage'
 import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
@@ -42,6 +45,8 @@ import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtm
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
+import { groupingPrompt, groupSummaryPrompt } from './analysis/prompts'
+import { methodRules } from './analysis/methods'
 import { activeParticipants, type Corpus } from './corpus'
 import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole } from './import/csv'
 import { detectSpeakers, textToCorpus } from './import/text'
@@ -699,6 +704,103 @@ describe('chaîne complète (simulation)', () => {
   })
 })
 
+describe('citation aux fautes de frappe corrigées (méthode Ministral seulement)', () => {
+  const source = "On a vu les contributins des ateliers , et c'était utile pour 3 commissions."
+  const typos = { typos: true }
+  it('retrouve le passage d’origine et montre le texte du participant', () => {
+    const m = locateVerbatim(source, "On a vu les contributions des ateliers, et c'était utile pour 3 commissions.", typos)
+    expect(m && source.slice(m.start, m.end)).toBe(source.replace(/\.$/, ''))
+    expect(m?.approximate).toBe(true)
+  })
+  it('refuse un écart qui change le sens, un chiffre changé, une citation trop courte', () => {
+    expect(locateVerbatim(source, "On a vu les contributions des ateliers, et ce n'était pas utile pour 3 commissions.", typos)).toBeNull()
+    expect(locateVerbatim(source, "On a vu les contributions des ateliers, et c'était utile pour 8 commissions.", typos)).toBeNull()
+    expect(locateVerbatim('Les contributins', 'Les contributions', typos)).toBeNull()
+  })
+  it('la méthode de référence reste stricte', () => {
+    expect(locateVerbatim(source, "On a vu les contributions des ateliers, et c'était utile pour 3 commissions.")).toBeNull()
+  })
+})
+
+describe('phrase qui dépend d’une phrase retirée', () => {
+  it('part avec elle ; une phrase autonome reste', () => {
+    expect(dropUnreferenced('Le tri plaît. Elles soulignent la rapidité [I0001]. Trois personnes jugent le site lent [I0002].').text).toBe(
+      'Trois personnes jugent le site lent [I0002].',
+    )
+    expect(dropUnreferenced('Le tri plaît. Six critiquent en revanche le délai [I0001]. Le site est lent [I0002].').text).toBe('Le site est lent [I0002].')
+    expect(dropUnreferenced('Le tri plaît [I0001]. Elles soulignent la rapidité [I0002].').text).toBe('Le tri plaît [I0001]. Elles soulignent la rapidité [I0002].')
+  })
+})
+
+describe('phrase répétée', () => {
+  it('la seconde de deux phrases presque identiques est retirée', () => {
+    const t =
+      'Quatre personnes jugent les affiches trop rares dans les quartiers [I0001]. Le tractage plaît [I0002]. Quatre personnes jugent les affiches beaucoup trop rares dans les quartiers [I0003].'
+    expect(dropNearDuplicates(t)).toEqual({ text: 'Quatre personnes jugent les affiches trop rares dans les quartiers [I0001]. Le tractage plaît [I0002].', removed: 1 })
+  })
+})
+
+describe('motifs isolés rattachés (méthode Gemini)', () => {
+  it('rattache un motif à une personne à un motif plus large ; « aucun », un motif inconnu ou une cible isolée sont ignorés', () => {
+    const g = (id: string, title: string, ideaIds: string[], participants: number) => ({ id, title, ideaIds, metrics: { participants } })
+    const groups = [g('G1', 'Affichage en ville', ['I1', 'I2'], 2), g('G2', 'Affiches trop rares', ['I3'], 1), g('G3', 'Chanson', ['I4'], 1), g('G4', 'Vidéos', ['I5'], 1)]
+    const r = applyAttachments(groups, [
+      { single: 'G2', group: 'g1' },
+      { single: 'G3', group: 'aucun' },
+      { single: 'G4', group: 'G3' }, // cible isolée : refusé
+      { single: 'G9', group: 'G1' },
+    ])
+    expect(r.groups.map((x) => [x.title, x.ideaIds])).toEqual([
+      ['Affichage en ville', ['I1', 'I2', 'I3']],
+      ['Chanson', ['I4']],
+      ['Vidéos', ['I5']],
+    ])
+    expect(r.merges).toHaveLength(1)
+  })
+})
+
+describe('méthodes par famille de modèles', () => {
+  it('la référence garde sa consigne de regroupement mot pour mot ; Ministral a la sienne', () => {
+    const input = { items: [{ id: 'L1', label: 'x', count: 1, example: 'x' }] }
+    const ref = groupingPrompt(input, DEFAULT_SETTINGS, { min: 3, max: 6 }).user
+    expect(ref).toContain('(« Démarrage tardif », « Communication de dernière minute », « Commencer un an avant » relèvent tous du calendrier)')
+    const light = groupingPrompt(input, { ...DEFAULT_SETTINGS, method: 'ministral' }, { min: 3, max: 6 }).user
+    expect(light).toContain("relèvent tous de l'attente au guichet")
+    expect(light.replace(/\(« Trop peu[^)]*\)/, '')).toBe(ref.replace(/\(« Démarrage tardif[^)]*\)/, ''))
+  })
+
+  it('la référence n’a aucune règle propre ; Gemini ajoute les siennes sans toucher le reste de la consigne', () => {
+    for (const k of ['grouping', 'summary', 'themes', 'global'] as const) expect(methodRules(DEFAULT_SETTINGS, k)).toBe('')
+    const input = { groups: [{ id: 'G1', title: 'x', facts: 'y', ideas: [] }] }
+    const ref = groupSummaryPrompt(input, DEFAULT_SETTINGS).user
+    const gem = groupSummaryPrompt(input, { ...DEFAULT_SETTINGS, method: 'gemini' }).user
+    expect(gem).toContain('Chaque phrase se comprend seule')
+    expect(gem.replace(/9\. Chaque phrase[^\n]*\n/, '')).toBe(ref)
+  })
+})
+
+describe('citations inventées', () => {
+  it('une phrase qui cite entre guillemets un texte absent des réponses est retirée', () => {
+    const known = ['Le guichet ferme trop tôt le samedi.', 'Attente au guichet']
+    const r = dropInventedQuotes(
+      'Une personne note que « le guichet ferme trop tôt » [I0001]. Une autre se demande : « Comment concilier horaires et budget ? » [I0002]. Le motif « Attente au guichet » revient.',
+      known,
+    )
+    expect(r).toEqual({ text: 'Une personne note que « le guichet ferme trop tôt » [I0001]. Le motif « Attente au guichet » revient.', removed: 1 })
+  })
+})
+
+describe('renvois mal formés', () => {
+  it('identifiants sans crochets, renvoi de motif et point manquant sont réparés', () => {
+    const allowed = new Set(['I0001', 'I0002', 'I0003'])
+    expect(sanitizeCitations('Le tri plaît [I0001] Deux personnes le jugent lent [I0002, I0003]. I0002 I0003', allowed)).toBe(
+      'Le tri plaît [I0001]. Deux personnes le jugent lent [I0002, I0003]. [I0002, I0003]',
+    )
+    expect(sanitizeCitations('Les affiches manquent [G3]. Le tractage plaît [I0001].', allowed)).toBe('Les affiches manquent. Le tractage plaît [I0001].')
+    expect(sanitizeCitations('Le tractage plaît [I016, I0001].', allowed)).toBe('Le tractage plaît [I0001].')
+  })
+})
+
 describe('relecture des motifs', () => {
   const idea = (id: string, participantId: string, category: IdeaCategory) => ({ id, participantId, category }) as Idea
   it('déplace une idée hors sujet, corrige un ton, refuse ce qui ne tient pas, et garde la trace', () => {
@@ -723,6 +825,22 @@ describe('relecture des motifs', () => {
     ])
     expect(r.moved).toEqual([{ id: 'I2', from: 'Outils numériques et IA', to: 'Ouverture aux nouveaux outils' }])
     expect(r.retoned).toEqual([{ id: 'I4', from: 'positive', to: 'negative' }])
+  })
+
+  it('un identifiant de motif donné comme nouveau titre vaut déplacement, jamais un motif « G2 »', () => {
+    const ideas = [idea('I1', 'P1', 'positive'), idea('I2', 'P2', 'positive')]
+    const groups = [
+      { id: 'G1', title: 'Tractage', ideaIds: ['I1', 'I2'] },
+      { id: 'G2', title: 'Affiches', ideaIds: [] },
+    ]
+    const r = applyReview(ideas, groups, [
+      { id: 'I1', new: 'g2' },
+      { id: 'I2', new: 'N7' }, // ressemble à un identifiant : refusé
+    ])
+    expect(r.groups.map((g) => [g.title, g.ideaIds])).toEqual([
+      ['Tractage', ['I2']],
+      ['Affiches', ['I1']],
+    ])
   })
 
   it('pistes opposées : deux propositions du motif, de deux personnes différentes', () => {

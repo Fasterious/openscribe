@@ -244,6 +244,25 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   await expect(page.getByText(/Modèle : openai\/gpt-oss-120b/)).toBeVisible()
 })
 
+test('moteurs d’IA : le modèle se choisit dans une liste expliquée, le recommandé en tête', async ({ page }) => {
+  await page.goto('/#/moteurs')
+  await page.getByRole('listitem').filter({ hasText: 'Mistral AI' }).getByRole('button', { name: 'Configurer' }).click()
+  const dialog = page.getByRole('dialog')
+  const picker = dialog.getByRole('button', { name: 'Choisir le modèle' })
+  await expect(picker).toContainText('Ministral 14B')
+  await picker.click()
+  await expect(dialog.getByRole('menuitemradio', { name: /Ministral 14B.*Recommandé/ })).toHaveAttribute('aria-checked', 'true')
+  await expect(dialog.getByText('Avec le paiement à l’usage activé')).toBeVisible()
+  await shot(page, '9b-modeles')
+  await dialog.getByRole('menuitemradio', { name: /Ministral 8B/ }).click()
+  await expect(picker).toContainText('Ministral 8B')
+  // Un modèle absent de la liste se saisit librement.
+  await picker.click()
+  await dialog.getByRole('menuitemradio', { name: /Autre modèle/ }).click()
+  await dialog.getByLabel('Nom du modèle').fill('mon-modele-2027')
+  await expect(dialog.getByLabel('Nom du modèle')).toHaveValue('mon-modele-2027')
+})
+
 test('Ollama absent : l’erreur dit quoi faire', async ({ page }) => {
   await page.goto('/#/moteurs')
   await page.getByRole('listitem').filter({ hasText: 'Ollama' }).getByRole('button', { name: 'Configurer' }).click()

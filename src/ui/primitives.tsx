@@ -274,8 +274,11 @@ export function DropMenu({
   ariaLabel,
   width = 'w-72',
   iconOnly = false,
+  block = false,
 }: {
   label: React.ReactNode
+  /** Pleine largeur, comme un champ de formulaire. */
+  block?: boolean
   /** Un bouton réduit à son icône (« ⋯ ») : le libellé sert alors de nom accessible. */
   iconOnly?: boolean
   icon?: React.ReactNode
@@ -312,10 +315,10 @@ export function DropMenu({
           aria-haspopup="menu"
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
-          className="max-w-[16rem]"
+          className={block ? 'h-10 w-full justify-between font-normal' : 'max-w-[16rem]'}
         >
           {icon}
-          <span className="truncate">{label}</span>
+          <span className={cn('truncate', block && 'flex-1 text-left')}>{label}</span>
           <ChevronDown className="size-3.5 shrink-0 opacity-60" />
         </Button>
       )}
@@ -323,9 +326,9 @@ export function DropMenu({
         <div
           role="menu"
           className={cn(
-            'absolute z-40 mt-1 max-h-[70vh] overflow-y-auto rounded-lg border bg-card p-1 shadow-lg',
-            width,
-            align === 'right' ? 'right-0' : 'left-0',
+            'z-40 mt-1 overflow-y-auto rounded-lg border bg-card p-1 shadow-lg',
+            // Pleine largeur (dans un formulaire) : la liste s'ouvre dans le flux, jamais coupée par une fenêtre qui défile.
+            block ? 'relative w-full' : cn('absolute max-h-[70vh]', width, align === 'right' ? 'right-0' : 'left-0'),
           )}
         >
           {children(() => setOpen(false))}

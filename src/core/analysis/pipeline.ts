@@ -11,6 +11,8 @@ import {
   assignSchema,
   consolidationPrompt,
   consolidationSchema,
+  attachPrompt,
+  attachSchema,
   splitPrompt,
   splitSchema,
   coveragePrompt,
@@ -52,6 +54,7 @@ import {
   vaguePlurals,
 } from './numbers'
 import type { AnalysisSettings, AnalysisState, Group, Idea, IdeaCategory, Merge, Metrics, RejectedIdea, StepId, Theme } from './types'
+import { methodOf } from './methods'
 import { explainMiss, locateQuote, quoteText, withAntecedent } from './verbatim'
 
 /** Au-delà, le regroupement se fait par lots : un premier lot fonde les groupes, les suivants s'y rangent. */
@@ -63,6 +66,10 @@ export const REVIEW_BATCH_IDEAS = 140
 export const SUPPORT_BATCH_IDEAS = 220
 /** Nombre maximal d'idées envoyées dans une même demande de synthèse. */
 export const SUMMARY_BATCH_IDEAS = 90
+function batchSizes(settings: AnalysisSettings) {
+  return methodOf(settings).batches
+}
+
 /** Au-delà de ce nombre de groupes, on ajoute un niveau de thèmes (le rapprochement des sujets voisins). */
 export const THEME_LEVEL_FROM = 4
 
@@ -137,6 +144,12 @@ export async function runAnalysis(corpus: Corpus, initial: AnalysisState, option
 
   state.status = 'running'
   state.error = undefined
+  // Une reprise efface l'erreur de l'étape qui avait échoué : elle est retentée.
+  for (const st of state.steps)
+    if (st.state === 'error') {
+      st.state = 'pending'
+      st.message = undefined
+    }
   let current: StepId = 'extract'
   try {
     current = 'extract'
@@ -158,6 +171,8 @@ export async function runAnalysis(corpus: Corpus, initial: AnalysisState, option
     await checkSupport(state, runner, emit)
     verifyNumbers(corpus, state)
     ensureCamps(state)
+    // La phrase du code sur les sujets qui divisent peut tomber à la vérification des renvois : on la rétablit pour ceux qui manquent.
+    state.globalSummary = withDivided(state.globalSummary ?? '', state.groups, state.settings.language, true)
     state.status = 'done'
     await emit()
     return state
@@ -260,7 +275,7 @@ export async function extractParticipant(
     // textes de la même personne (le modèle se trompe parfois de référence).
     const ordered = [byRef.get(ref), ...contributions].filter((c): c is Contribution => Boolean(c))
     for (const c of ordered) {
-      const found = locateQuote(c.text, verbatim)
+      const found = locateQuote(c.text, verbatim, { typos: methodOf(settings).typoTolerantQuotes })
       if (!found) continue
       // Une citation qui commence par une reprise (« Malgré cela… ») emporte la phrase d'avant.
       const m = withAntecedent(
@@ -482,7 +497,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   }
 
   // Premier lot : fonde les groupes.
-  const first = items.slice(0, GROUPING_BATCH)
+  const first = items.slice(0, batchSizes(state.settings).grouping)
   const grouped = await runner.json(
     groupingPrompt(
       {
@@ -529,8 +544,8 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   for (let round = 0; round < 2; round++) {
     const left = items.filter((i) => !assigned.has(i.id))
     if (!left.length) break
-    for (let i = 0; i < left.length; i += ASSIGN_BATCH) {
-      const batch = left.slice(i, i + ASSIGN_BATCH)
+    for (let i = 0; i < left.length; i += batchSizes(state.settings).assign) {
+      const batch = left.slice(i, i + batchSizes(state.settings).assign)
       const res = await runner.json(
         assignPrompt(
           { groups: [...titles], items: batch.map((b) => ({ id: b.id, label: b.label, example: b.example })), allowNew: !grid.length },
@@ -591,6 +606,38 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     s.message = undefined
   }
 
+  // Méthode qui le demande : chaque motif isolé est proposé au rattachement, une question simple à la fois par lot.
+  if (!grid.length && methodOf(state.settings).attachSingles) {
+    const singles = groups.filter((g) => g.metrics.participants === 1)
+    const targets = groups.filter((g) => g.metrics.participants > 1)
+    if (singles.length && targets.length) {
+      s.message = 'Rattachement des motifs isolés'
+      await emit()
+      const proposals: { single: string; group: string }[] = []
+      for (let i = 0; i < singles.length; i += 40) {
+        const res = await runner.json(
+          attachPrompt(
+            {
+              groups: targets.map((g) => ({ id: g.id, title: g.title, people: g.metrics.participants })),
+              singles: singles.slice(i, i + 40).map((g) => ({
+                id: g.id,
+                title: g.title,
+                examples: g.ideaIds.slice(0, 2).map((id) => shortExample(ideaById.get(id)!.verbatim, 110)),
+              })),
+            },
+            state.settings,
+          ),
+          attachSchema,
+        )
+        proposals.push(...res.attachments)
+      }
+      const attached = applyAttachments(groups, proposals)
+      state.merges = [...(state.merges ?? []), ...attached.merges]
+      groups = build(attached.groups)
+      s.message = undefined
+    }
+  }
+
   // Un titre qui relie deux mots par « et » peut cacher deux objets : on pose la question au modèle, le code applique.
   const joined = !grid.length ? groups.filter((g) => /\s(et|and)\s/i.test(g.title)) : []
   if (joined.length) {
@@ -627,7 +674,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     const batches: Group[][] = []
     let cur: Group[] = []
     for (const g of groups) {
-      if (cur.length && cur.reduce((n, x) => n + x.ideaIds.length, 0) + g.ideaIds.length > REVIEW_BATCH_IDEAS) {
+      if (cur.length && cur.reduce((n, x) => n + x.ideaIds.length, 0) + g.ideaIds.length > batchSizes(state.settings).review) {
         batches.push(cur)
         cur = []
       }
@@ -741,8 +788,9 @@ export function applyReview(
     let target = c.to ? out.find((g) => g.id === c.to) : undefined
     const title = c.new?.trim()
     if (!target && title) {
-      target = byTitle.get(title.toLowerCase())
-      if (!target && title.length >= 3 && title.length <= 60 && !/\s(et|and)\s/i.test(title) && !JUDGEMENT_TITLE.test(title)) {
+      // Un modèle léger met parfois l'identifiant d'un motif existant à la place d'un titre nouveau.
+      target = byTitle.get(title.toLowerCase()) ?? out.find((g) => g.id.toLowerCase() === title.toLowerCase())
+      if (!target && !/^[A-Z]\d+$/i.test(title) && title.length >= 3 && title.length <= 60 && !/\s(et|and)\s/i.test(title) && !JUDGEMENT_TITLE.test(title)) {
         target = { id: `N${out.length + 1}`, title, ideaIds: [] }
         out.push(target)
         byTitle.set(title.toLowerCase(), target)
@@ -823,6 +871,33 @@ export function applyMerges(
     else byTitle.set(k, { title: g.title, ideaIds: [...g.ideaIds] })
   }
   return { groups: [...byTitle.values()], merges }
+}
+
+/**
+ * Rattache un motif porté par une seule personne à un motif plus large, si le modèle le propose :
+ * le motif cible doit exister et réunir au moins deux personnes ; « aucun » laisse le motif isolé.
+ */
+export function applyAttachments(
+  groups: { id: string; title: string; ideaIds: string[]; metrics: { participants: number } }[],
+  proposals: { single: string; group: string }[],
+): { groups: { title: string; ideaIds: string[] }[]; merges: Merge[] } {
+  const byId = new Map(groups.map((g) => [g.id.toLowerCase(), g]))
+  const into = new Map<string, string[]>()
+  const moved = new Set<string>()
+  const merges: Merge[] = []
+  for (const p of proposals) {
+    const single = byId.get(p.single.trim().toLowerCase())
+    const target = byId.get(p.group.trim().toLowerCase())
+    if (!single || !target || single === target || moved.has(single.id)) continue
+    if (single.metrics.participants !== 1 || target.metrics.participants < 2) continue
+    moved.add(single.id)
+    into.set(target.id, [...(into.get(target.id) ?? []), ...single.ideaIds])
+    merges.push({ title: target.title, from: [target.title, single.title], reason: 'Motif isolé rattaché au motif qui traite le même objet.' })
+  }
+  return {
+    groups: groups.filter((g) => !moved.has(g.id)).map((g) => ({ title: g.title, ideaIds: [...g.ideaIds, ...(into.get(g.id) ?? [])] })),
+    merges,
+  }
 }
 
 // ─── Étape 3 ─────────────────────────────────────────────────────────────────
@@ -910,16 +985,33 @@ export function describeTheme(theme: { metrics: Metrics }, groups: { metrics: Me
 
 /** Ne garde que les références [I…] qui appartiennent bien au périmètre. */
 export function sanitizeCitations(text: string, allowed: Set<string>): string {
-  return text
+  return repairRefs(text)
     .replace(/(\s*)\[([^\]]*)\]/g, (whole, space: string, inner: string) => {
       const ids = inner.split(/[\s,;]+/).filter(Boolean)
-      if (!ids.length || !ids.every((id) => /^I\d{4,}$/.test(id))) return whole
+      // Renvoi à un motif (« [G3] ») : rien à montrer au lecteur.
+      if (ids.length && ids.every((id) => /^G\d+$/.test(id))) return ''
+      // Un renvoi mal formé (« [I016] ») n'existe pas : il tombe comme un renvoi inconnu.
+      if (!ids.length || !ids.every((id) => /^I\d+$/.test(id))) return whole
       const kept = ids.filter((id) => allowed.has(id))
       // Une référence retirée emporte l'espace qui la précède : la ponctuation reste intacte.
       return kept.length ? `${space}[${kept.join(', ')}]` : ''
     })
     .replace(/ {2,}/g, ' ')
     .trim()
+}
+
+/**
+ * Renvois mal formés par un modèle léger : identifiants laissés sans crochets,
+ * renvoi qui clôt une phrase sans point (« … [I0001] Neuf personnes… »).
+ */
+export function repairRefs(text: string): string {
+  return text
+    .split(/(\[[^\]]*\])/)
+    .map((part, i) =>
+      i % 2 ? part : part.replace(/\bI\d{4,}(?:[\s,;]+I\d{4,})*\b/g, (run) => `[${run.split(/[\s,;]+/).filter(Boolean).join(', ')}]`),
+    )
+    .join('')
+    .replace(/([^.!?\s])(\s*\[I\d{4,}(?:\s*,\s*I\d{4,})*\])(\s+)(?=\p{Lu})/gu, '$1$2.$3')
 }
 
 async function summarizeGroups(corpus: Corpus, state: AnalysisState, runner: LlmRunner, emit: () => Promise<void>) {
@@ -946,7 +1038,7 @@ async function summarizeGroups(corpus: Corpus, state: AnalysisState, runner: Llm
   let cur: SummaryGroupInput[] = []
   let size = 0
   for (const g of inputs) {
-    if (cur.length && size + g.ideas.length > SUMMARY_BATCH_IDEAS) {
+    if (cur.length && size + g.ideas.length > batchSizes(state.settings).summary) {
       batches.push(cur)
       cur = []
       size = 0
@@ -1115,8 +1207,9 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
  * liste calculée : tous les sujets y sont nommés, une seule fois, et une
  * critique partagée aux remèdes opposés cite ses deux propositions.
  */
-export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' = 'fr'): string {
-  const divided = highlights(groups).divided
+export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' = 'fr', onlyMissing = false): string {
+  const named = summary.toLowerCase()
+  const divided = highlights(groups).divided.filter((d) => !onlyMissing || !named.includes(d.title.toLowerCase()))
   if (!divided.length || !summary.trim()) return summary
   const list = (titles: string[]) =>
     titles.length > 1 ? `${titles.slice(0, -1).join(', ')} ${lang === 'en' ? 'and' : 'et'} ${titles[titles.length - 1]}` : titles[0]
@@ -1542,9 +1635,21 @@ function verifyNumbers(corpus: Corpus, state: AnalysisState) {
     removed += r.removed
     return r.text
   }
-  for (const g of state.groups) g.summary = spellLeadingNumbers(unreferenced(g.summary))
-  for (const t of state.themes) t.summary = spellLeadingNumbers(unreferenced(t.summary))
-  state.globalSummary = spellLeadingNumbers(state.globalSummary)
+  // Un texte entre guillemets doit exister tel quel : une réponse, une question posée, ou un titre de motif.
+  const known = [
+    ...corpus.contributions.flatMap((c) => [c.text, c.prompt ?? '']),
+    ...state.groups.map((g) => g.title),
+    ...state.themes.map((t) => t.title),
+  ].filter(Boolean)
+  const quoted = (text: string) => {
+    const r = dropInventedQuotes(text, known)
+    const d = dropNearDuplicates(r.text)
+    removed += r.removed + d.removed
+    return d.text
+  }
+  for (const g of state.groups) g.summary = spellLeadingNumbers(unreferenced(quoted(g.summary)))
+  for (const t of state.themes) t.summary = spellLeadingNumbers(unreferenced(quoted(t.summary)))
+  state.globalSummary = spellLeadingNumbers(quoted(state.globalSummary))
   ;({ text: state.globalSummary, bad: state.globalUnverified } = clean({ text: state.globalSummary, bad: state.globalUnverified }))
   state.removedSentences = removed
 }
@@ -1573,13 +1678,70 @@ export function spellLeadingNumbers(text: string): string {
   return text.replace(/(^|[.!?]\s+|\n\s*\n)(\d{1,2})(?= )/g, (all, before: string, n: string) => (LEADING[n] ? `${before}${LEADING[n]}` : all))
 }
 
+/**
+ * Phrase qui s'appuie sur la précédente (pronom ou connecteur en tête : « Elles… », « À l'inverse… »,
+ * « Une troisième… », « Six dénoncent en revanche… ») : retirée avec elle, sinon elle ne renvoie plus à rien.
+ */
+const DEPENDENT =
+  /^(?:Elles?|Ils|Celles?-ci|Ceux-ci|Celui-ci|L['’]une|L['’]un|Une autre|Un autre|D['’]autres|Les autres|Une (?:deuxième|seconde|troisième|quatrième)|Un (?:deuxième|second|troisième)|À l['’]inverse|Au contraire|En revanche|Enfin|Aussi|De plus|En outre|Toutefois|Cependant|Pourtant|Par ailleurs|Mais|Néanmoins|De même)(?![\p{L}])|^(?:\S+\s+){1,3}(?:en revanche|à l['’]inverse|quant à elles?|quant à eux)(?![\p{L}])/iu
+function dropWithDependents(sentences: string[], drop: (s: string) => boolean): string[] {
+  const out: string[] = []
+  let previousDropped = false
+  for (const s of sentences) {
+    previousDropped = drop(s) || (previousDropped && DEPENDENT.test(s.trim()))
+    if (!previousDropped) out.push(s)
+  }
+  return out
+}
+
+const contentWords = (s: string) => new Set(s.toLowerCase().replace(/\[[^\]]*\]/g, '').match(/\p{L}{4,}/gu) ?? [])
+/** Deux phrases presque identiques (même seuil que l'audit) : la seconde n'apporte rien. */
+function nearDuplicate(a: string, b: string): boolean {
+  const x = contentWords(a)
+  const y = contentWords(b)
+  if (Math.min(x.size, y.size) <= 5) return false
+  return [...x].filter((w) => y.has(w)).length / Math.min(x.size, y.size) > 0.7
+}
+/** Retire une phrase qui en répète une précédente du même texte (un modèle léger se répète parfois). */
+export function dropNearDuplicates(text: string): { text: string; removed: number } {
+  if (!text) return { text, removed: 0 }
+  const seen: string[] = []
+  const paragraphs = sentencesOf(text).map((p) =>
+    p.filter((s) => {
+      if (seen.some((x) => nearDuplicate(x, s))) return false
+      seen.push(s)
+      return true
+    }),
+  )
+  const removed = sentencesOf(text).flat().length - paragraphs.flat().length
+  return removed ? { text: paragraphs.map((p) => p.join(' ')).filter(Boolean).join('\n\n'), removed } : { text, removed: 0 }
+}
+
 /** Retire les phrases sans renvoi, paragraphe par paragraphe, sans jamais vider le texte. */
 export function dropUnreferenced(text: string): { text: string; removed: number } {
   if (!text || !/I\d{4,}/.test(text)) return { text, removed: 0 }
   const paragraphs = sentencesOf(text)
-  const kept = paragraphs.map((p) => p.filter((x) => /I\d{4,}/.test(x)).join(' ')).filter(Boolean)
-  const removed = paragraphs.flat().length - paragraphs.flat().filter((x) => /I\d{4,}/.test(x)).length
-  return { text: kept.join('\n\n'), removed }
+  const keptParts = paragraphs.map((p) => dropWithDependents(p, (x) => !/I\d{4,}/.test(x)))
+  const removed = paragraphs.flat().length - keptParts.flat().length
+  return { text: keptParts.map((p) => p.join(' ')).filter(Boolean).join('\n\n'), removed }
+}
+
+/** Retire les phrases qui mettent entre guillemets un texte de trois mots ou plus introuvable dans `known`. */
+export function dropInventedQuotes(text: string, known: string[]): { text: string; removed: number } {
+  if (!text || !/[«"“]/.test(text)) return { text, removed: 0 }
+  const invented = (sentence: string) =>
+    [...sentence.matchAll(/[«"“]\s*([^»"”]+?)\s*[»"”]/g)].some(
+      ([, q]) => q.split(/\s+/).length >= 3 && !known.some((k) => locateQuote(k, q)),
+    )
+  // La ponctuation d'une citation (« … ? ») ne coupe pas la phrase.
+  const MARKS: Record<string, string> = { '.': '\uE000', '!': '\uE001', '?': '\uE002' }
+  const protect = (t: string) => t.replace(/[«"“][^»"”]*[»"”]/g, (q) => q.replace(/[.!?]/g, (m) => MARKS[m]))
+  const restore = (t: string) => t.replace(/[\uE000-\uE002]/g, (m) => Object.keys(MARKS).find((k) => MARKS[k] === m)!)
+  const paragraphs = sentencesOf(protect(text)).map((p) => p.map(restore))
+  const kept = paragraphs.map((p) => dropWithDependents(p, invented))
+  const removed = paragraphs.flat().length - kept.flat().length
+  if (!removed || !kept.flat().length) return { text, removed: 0 }
+  return { text: kept.map((p) => p.join(' ')).filter(Boolean).join('\n\n'), removed }
 }
 
 /** Retire les phrases qui contiennent l'un des nombres signalés. */
@@ -1589,8 +1751,9 @@ export function dropSentences(text: string, bad?: string[]): { text: string; rem
   // Paragraphe par paragraphe : le résumé en trois temps garde ses paragraphes.
   const paragraphs = text.split(/\n\s*\n/).map((p) => p.trim().split(/(?<=[.!?])\s+/))
   const total = paragraphs.flat().length
-  const kept = paragraphs.map((p) => p.filter((x) => !has(x)).join(' ')).filter(Boolean)
-  const keptCount = paragraphs.flat().filter((x) => !has(x)).length
+  const keptParts = paragraphs.map((p) => dropWithDependents(p, has))
+  const kept = keptParts.map((p) => p.join(' ')).filter(Boolean)
+  const keptCount = keptParts.flat().length
   // Si toutes les phrases tombaient, on garde le texte : mieux vaut un signalement qu'une synthèse vide.
   if (!keptCount) return { text, removed: 0 }
   return { text: kept.join('\n\n'), removed: total - keptCount }

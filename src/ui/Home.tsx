@@ -105,7 +105,7 @@ export function Home() {
             l'aperçu avant de lancer quoi que ce soit.
           </Step>
           <Step n={2} icon={<KeyRound />} title="Branchez un moteur d'IA">
-            Une clé gratuite Groq se crée en quelques minutes. Vous pouvez aussi faire tourner Ollama sur votre ordinateur.{' '}
+            Une clé gratuite Mistral, Google Gemini ou Groq se crée en quelques minutes. Vous pouvez aussi faire tourner Ollama sur votre ordinateur.{' '}
             <a className="text-primary underline-offset-4 hover:underline" href={href({ name: 'settings' })}>
               Choisir un moteur
             </a>
@@ -254,7 +254,7 @@ const FAQ: [string, string][] = [
   ],
   [
     'Combien ça coûte ?',
-    'OpenScribe est gratuit et son code est libre (AGPL-3.0). Groq propose une offre gratuite sans carte bancaire. Sur une offre payante, une synthèse de quelques dizaines de participants coûte en général quelques centimes, payés directement au fournisseur. OpenScribe ne prend rien au passage.',
+    'OpenScribe est gratuit et son code est libre (AGPL-3.0). Mistral, Google Gemini et Groq proposent des offres gratuites sans carte bancaire. Sur une offre payante, une synthèse de quelques dizaines de participants coûte en général quelques centimes, payés directement au fournisseur. OpenScribe ne prend rien au passage.',
   ],
   ['Faut-il créer un compte ?', 'Non, ni inscription ni adresse e-mail. Pour retrouver une synthèse ailleurs, sauvegardez-la dans un fichier et rouvrez-la.'],
   [
@@ -263,7 +263,7 @@ const FAQ: [string, string][] = [
   ],
   [
     "Quel moteur d'IA choisir ?",
-    "Pour démarrer, prenez Groq : c'est gratuit et la clé se crée en quelques minutes. Pour des données sensibles, prenez Ollama sur votre ordinateur, ou une offre qui ne réutilise pas vos données. Vous pouvez en changer à tout moment.",
+    "Pour démarrer, prenez Mistral, Google Gemini ou Groq : c'est gratuit et la clé se crée en quelques minutes. Pour des données sensibles, prenez Ollama sur votre ordinateur, ou une offre qui ne réutilise pas vos données. Vous pouvez en changer à tout moment.",
   ],
   ['Et après ?', 'Les modules « Entretiens et tests » et « Personas » sont en préparation. Voir « Ce qui arrive » ci-dessous.'],
 ]

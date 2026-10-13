@@ -130,7 +130,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
       </div>
 
       {tab === 'data' && <DataTab project={project} update={update} />}
-      {tab === 'analysis' && hasData && <AnalysisTab project={project} />}
+      {tab === 'analysis' && hasData && <AnalysisTab key={project.id} project={project} />}
       {tab === 'report' && report && newerThanReport && (
         <Alert tone={newerThanReport.status === 'running' ? 'info' : 'warning'} className="no-print">
           {newerThanReport.status === 'running'

@@ -1,3 +1,4 @@
+import type { MethodId } from '../analysis/methods'
 /**
  * Registre des fournisseurs de moteurs d'IA.
  *
@@ -29,6 +30,20 @@ export type PresetFamily = 'free' | 'local' | 'other'
  */
 export type ProviderKind = 'direct' | 'host' | 'router' | 'local' | 'custom'
 
+/** Un modèle proposé dans la liste, avec de quoi choisir sans connaître le fournisseur. */
+export interface ModelChoice {
+  id: string
+  /** Nom lisible. */
+  label: string
+  /** Pourquoi le choisir, en une phrase. */
+  hint: string
+  /** Partie de la liste (ex. « Inclus dans l'offre gratuite »). */
+  section?: string
+  recommended?: boolean
+  /** Méthode d'analyse propre à ce modèle (voir src/core/analysis/methods.ts) ; à défaut, la référence. */
+  method?: MethodId
+}
+
 export interface ProviderPreset {
   id: string
   label: string
@@ -36,6 +51,8 @@ export interface ProviderPreset {
   /** Modèle proposé par défaut. Préférez un identifiant de version daté. */
   defaultModel: string
   suggestedModels: string[]
+  /** Liste expliquée des modèles ; à défaut, `suggestedModels` sans explication. */
+  models?: ModelChoice[]
   needsKey: boolean
   keyUrl?: string
   /** Nom du paramètre de graine, si le fournisseur en accepte un. */
@@ -65,30 +82,52 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     id: 'mistral',
     label: 'Mistral AI',
     baseUrl: 'https://api.mistral.ai/v1',
-    defaultModel: 'mistral-small-2506',
-    suggestedModels: ['mistral-small-2506', 'mistral-small-latest', 'mistral-medium-latest', 'mistral-large-latest'],
+    defaultModel: 'ministral-14b-2512',
+    suggestedModels: ['ministral-14b-2512', 'ministral-8b-2512', 'mistral-small-2603', 'mistral-medium-2604'],
+    // Vérifié le 13/10/2026 avec une clé de l'offre gratuite (sans paiement à l'usage).
+    models: [
+      {
+        id: 'ministral-14b-2512',
+        label: 'Ministral 14B',
+        hint: 'Le plus capable des modèles gratuits.',
+        section: "Inclus dans l'offre gratuite",
+        recommended: true,
+        method: 'ministral',
+      },
+      { id: 'ministral-8b-2512', label: 'Ministral 8B', hint: 'Plus rapide, des idées moins fines.', section: "Inclus dans l'offre gratuite", method: 'ministral' },
+      { id: 'ministral-3b-2512', label: 'Ministral 3B', hint: 'Très rapide, pour un essai seulement.', section: "Inclus dans l'offre gratuite", method: 'ministral' },
+      {
+        id: 'mistral-small-2603',
+        label: 'Mistral Small',
+        hint: 'Meilleure lecture des nuances, bon marché.',
+        section: 'Avec le paiement à l’usage activé',
+      },
+      {
+        id: 'mistral-medium-2604',
+        label: 'Mistral Medium',
+        hint: 'La meilleure qualité de rédaction chez Mistral.',
+        section: 'Avec le paiement à l’usage activé',
+      },
+    ],
     needsKey: true,
-    keyUrl: 'https://console.mistral.ai/api-keys',
+    keyUrl: 'https://admin.mistral.ai/organization/api-keys',
     seedParam: 'random_seed',
     supportsJsonMode: true,
-    freeRequestsPerMinute: 2,
+    freeRequestsPerMinute: 20,
     freeTier:
-      "Un forfait d'usage gratuit chaque mois (8,5 € en octobre 2026), mais les clés ne marchent qu'une fois le paiement à l'usage activé, avec une carte bancaire.",
+      "Gratuit sans carte avec les modèles Ministral. Mistral Small et Medium demandent d'activer le paiement à l'usage, avec une carte bancaire.",
     dataPolicy: 'check',
     dataNote:
       "Sauf refus de votre part, Mistral peut réutiliser vos demandes pour améliorer ses modèles : refusez-le dans Admin › API › Confidentialité, chez Mistral, avant d'envoyer des données de participants. Hébergement en Europe.",
-    family: 'other',
-    bestFor: 'Un fournisseur européen, avec un hébergement en Europe.',
+    family: 'free',
+    bestFor: 'Essayer gratuitement, avec un hébergement en Europe.',
     kind: 'direct',
     steps: [
       {
-        text: "Connectez-vous chez Mistral. Dans Admin › Abonnement, activez « API Pay-As-You-Go » (une carte bancaire est demandée) et fixez une limite de dépenses : le forfait gratuit du mois est consommé en premier.",
-        link: { label: "Ouvrir l'abonnement Mistral", url: 'https://admin.mistral.ai/subscription' },
+        text: 'Connectez-vous chez Mistral (ou créez un compte gratuit), puis ouvrez Admin › Clés API.',
+        link: { label: 'Aller aux clés Mistral', url: 'https://admin.mistral.ai/organization/api-keys' },
       },
-      {
-        text: 'Dans « Clés API », cliquez sur « Nouvelle clé » et copiez-la : elle ne s’affiche qu’une fois.',
-        link: { label: 'Aller aux clés Mistral', url: 'https://console.mistral.ai/api-keys' },
-      },
+      { text: 'Cliquez sur « Nouvelle clé », puis copiez-la : elle ne s’affiche qu’une fois.' },
       { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
     ],
   },
@@ -125,24 +164,52 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     id: 'gemini',
     label: 'Google Gemini',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    defaultModel: 'gemini-3.8-flash',
-    suggestedModels: ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-4-argon'],
+    defaultModel: 'gemini-3.5-flash-lite',
+    suggestedModels: ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'],
+    // Limites de l'offre gratuite lues dans AI Studio le 13/10/2026 (une synthèse de 20 participants : 50 à 80 demandes).
+    models: [
+      {
+        id: 'gemini-3.5-flash-lite',
+        label: 'Gemini 3.5 Flash-Lite',
+        hint: '500 demandes par jour : de quoi faire plusieurs synthèses.',
+        section: "Inclus dans l'offre gratuite",
+        recommended: true,
+        method: 'gemini',
+      },
+      {
+        id: 'gemini-3.1-flash-lite',
+        label: 'Gemini 3.1 Flash-Lite',
+        hint: 'Plus ancien, mêmes limites.',
+        section: "Inclus dans l'offre gratuite",
+        method: 'gemini',
+      },
+      {
+        id: 'gemini-3.8-flash',
+        label: 'Gemini 3.8 Flash',
+        hint: 'Plus fin, mais 20 demandes par jour en gratuit : une synthèse n’y tient pas.',
+        section: 'Avec la facturation activée',
+        method: 'gemini',
+      },
+    ],
     needsKey: true,
-    keyUrl: 'https://aistudio.google.com/apikey',
-    seedParam: 'seed',
+    keyUrl: 'https://aistudio.google.com/api-keys',
+    // Pas de graine : l'interface compatible OpenAI de Gemini refuse ce paramètre (vérifié le 13/10/2026).
     supportsJsonMode: true,
-    freeRequestsPerMinute: 10,
-    freeTier: 'Offre gratuite sans carte bancaire sur les modèles Flash.',
+    freeRequestsPerMinute: 12,
+    freeTier: 'Gratuit sans carte avec les modèles Flash-Lite (500 demandes par jour).',
     dataPolicy: 'may-train-free',
     dataNote:
       "Sur l'offre gratuite, vos contenus peuvent être utilisés par Google et relus par des humains, sauf si vous êtes dans l'Union européenne, en Suisse ou au Royaume-Uni (les conditions de l'offre payante s'appliquent alors). Offre payante : pas d'entraînement.",
-    family: 'other',
-    bestFor: 'Un essai gratuit si vous avez déjà un compte Google, pour des données non sensibles.',
+    family: 'free',
+    bestFor: 'Essayer gratuitement avec un compte Google.',
     kind: 'direct',
     steps: [
       {
-        text: 'Connectez-vous à Google AI Studio avec votre compte Google, puis cliquez sur « Create API key ».',
-        link: { label: 'Ouvrir Google AI Studio', url: 'https://aistudio.google.com/apikey' },
+        text: 'Connectez-vous à Google AI Studio avec votre compte Google, puis cliquez sur « Créer une clé API ».',
+        link: { label: 'Ouvrir Google AI Studio', url: 'https://aistudio.google.com/api-keys' },
+      },
+      {
+        text: "Choisissez un projet au « Niveau sans frais » : une clé d'un projet avec facturation vous serait facturée. Puis « Créer une clé » et « Copier la clé ».",
       },
       { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
     ],
@@ -519,4 +586,9 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
 
 export function presetById(id: string): ProviderPreset | undefined {
   return PROVIDER_PRESETS.find((p) => p.id === id)
+}
+
+/** La méthode d'analyse à suivre pour ce modèle : la sienne si elle existe, sinon la référence. */
+export function methodForModel(presetId: string, model: string): MethodId {
+  return presetById(presetId)?.models?.find((m) => m.id === model)?.method ?? 'reference'
 }

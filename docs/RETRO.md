@@ -117,3 +117,15 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - **Bien marché** : jouer le parcours dans le vrai compte a révélé en cinq minutes une promesse fausse affichée sur l'accueil (« Mistral gratuit, sans carte »), invisible aux tests automatiques.
 - **Coûté pour rien** : la fiche Mistral avait été « vérifiée » sur la documentation, pas dans une console ; la documentation était périmée.
 - **On change** : une offre gratuite s'affirme seulement après un passage réel dans la console, daté dans `docs/PARCOURS-FOURNISSEURS.md`.
+
+## Ministral 14B sur ÉcoSol (13/10, le soir)
+
+- **Bien marché** : les deux relecteurs en parallèle sur chaque passe, avec l'audit automatique pour les chiffres ; les nouveaux contrôles rodés sur les synthèses en cache de Sonnet avant d'être gardés (aucun effet). Le transfert de l'export de la page vers le disque par un récepteur local, sans rien faire sortir de la machine.
+- **Coûté pour rien** : un changement de consigne appliqué à toutes les méthodes, défait ensuite sur la remarque d'Arnaud ; une relance perdue parce que la page n'avait pas rechargé le code (naviguer vers la même adresse ne recharge pas).
+- **On change** : une méthode par famille de modèles, la référence intouchable sauf preuve que la note monte (règle ajoutée) ; recharger la page (`location.reload`) après chaque changement de code avant de relancer.
+
+## Gemini sur ÉcoSol (13/10, fin de soirée)
+
+- **Bien marché** : changer une seule cause à la fois grâce au cache (P4 reprend le regroupement de P2 et ne fait varier que la rédaction) ; l'essai croisé tranché par les notes, sans débat ; relancer Ministral v3 depuis le cache en 20 secondes et sans appel.
+- **Coûté pour rien** : une analyse interrompue parce que j'ai modifié un document pendant qu'elle tournait (le serveur de développement recharge la page pour tout fichier) ; des essais d'API groupés trop longs qui ont figé l'onglet (les lancer en tâche de fond, puis relever).
+- **On change** : aucune écriture dans le dépôt pendant une analyse dans le navigateur (règle ajoutée) ; un apport d'une méthode n'est essayé ailleurs qu'une variable à la fois.

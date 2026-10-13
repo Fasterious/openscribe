@@ -13,7 +13,7 @@ export interface OpenAiCompatibleConfig {
   extraHeaders?: Record<string, string>
   /** Ne pas envoyer de température (refusée par certains modèles). */
   omitTemperature?: boolean
-  /** Délai maximal d'une demande, en millisecondes (90 s par défaut). */
+  /** Délai maximal d'une demande, en millisecondes (180 s par défaut : un modèle qui réfléchit peut dépasser 90 s sur un long regroupement). */
   timeoutMs?: number
   /** Délai maximal du test de connexion (tâche « ping »), 20 s par défaut. */
   pingTimeoutMs?: number
@@ -21,7 +21,7 @@ export interface OpenAiCompatibleConfig {
   fetchImpl?: typeof fetch
 }
 
-const DEFAULT_TIMEOUT_MS = 90_000
+const DEFAULT_TIMEOUT_MS = 180_000
 const DEFAULT_PING_TIMEOUT_MS = 20_000
 
 class TimeoutError extends Error {}
@@ -164,12 +164,16 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
         const detail = (await response.text()).slice(0, 400)
         const status = response.status
         const fatal = status === 401 || status === 403 || status === 404
-        const message =
-          status === 401 || status === 403
+        const tierRefused = status === 403 && /tier|subscription|plan/i.test(detail)
+        const message = tierRefused
+          ? `Votre offre chez ${config.label} ne donne pas accès au modèle « ${config.model} » (erreur 403) : choisissez un autre modèle.`
+          : status === 401 || status === 403
             ? `${config.label} refuse la clé d'accès (erreur ${status}) : vérifiez qu'elle a été copiée en entier, sans espace, et qu'elle est toujours active.`
             : status === 404
               ? `${config.label} ne trouve pas le modèle « ${config.model} » (erreur 404) : vérifiez le nom du modèle dans la configuration du moteur.`
-              : status === 429
+              : status === 503
+                ? `${config.label} est surchargé pour l'instant (erreur 503) : réessayez dans quelques minutes, ou choisissez un autre modèle.`
+                : status === 429
                 ? `${config.label} reçoit trop de demandes et les refuse pour l'instant (erreur 429). Réessayez dans une minute, ou baissez le nombre de demandes par minute (réglages avancés du moteur).`
                 : `${config.label} a répondu par une erreur ${status}. Réessayez dans un instant ; si cela se répète, vérifiez la configuration du moteur.${detail ? ` Détail technique : ${detail}` : ''}`
         throw new ProviderError(message, {
@@ -179,9 +183,15 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
         })
       }
       const data = (await response.json()) as {
-        choices?: { message?: { content?: unknown } }[]
+        choices?: { message?: { content?: unknown }; finish_reason?: string }[]
         usage?: { prompt_tokens?: number; completion_tokens?: number }
       }
+      // Réponse coupée par la limite de longueur du modèle : la redemander à l'identique donnerait la même coupure.
+      if (data.choices?.[0]?.finish_reason === 'length' && !req.maxTokens)
+        throw new ProviderError(
+          `${config.label} a coupé sa réponse avant la fin : le modèle « ${config.model} » ne peut pas écrire une réponse aussi longue. Choisissez un modèle plus grand.`,
+          { status: response.status, fatal: true },
+        )
       const text = extractContent(data.choices?.[0]?.message?.content)
       if (!text)
         throw new ProviderError(`${config.label} n'a rien renvoyé. Réessayez dans un instant ; si cela se répète, essayez un autre modèle.`, {

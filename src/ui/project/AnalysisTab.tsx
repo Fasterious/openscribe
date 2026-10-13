@@ -30,9 +30,10 @@ function estimate(project: Project, engine: EngineConfig | undefined) {
   const corpus = corpusForAnalysis(project)
   const people = activeParticipants(corpus).length
   const ideas = Math.round(corpus.contributions.filter((c) => c.text.trim()).length * 2.5)
-  const calls = people + 2 + Math.ceil(ideas / 90) + 2 + 3
+  // Calé sur ÉcoSol (20 participants, 90 réponses) : 44 à 49 demandes, une vingtaine de secondes chacune avec un modèle léger.
+  const calls = Math.round(people * 1.2 + ideas / 10 + 8)
   const rpm = engine?.requestsPerMinute ?? 10
-  const seconds = (calls / rpm) * 60 + calls * 4
+  const seconds = Math.max((calls / rpm) * 60, (calls * 20) / Math.max(1, engine?.concurrency ?? 1))
   return { people, calls, seconds }
 }
 
@@ -50,7 +51,9 @@ export function AnalysisTab({ project }: { project: Project }) {
     if (!loaded || engineId) return
     // Un moteur qui n'a pas répondu au test n'est jamais choisi d'office.
     const usable = engines.filter((e) => e.verified !== false || e.id === defaultId)
-    setEngineId(defaultId && usable.some((e) => e.id === defaultId) ? defaultId : usable[0]?.id ?? SIMULATION_ENGINE_ID)
+    // Une synthèse déjà analysée propose son dernier moteur : une relance ne change pas de moteur par mégarde.
+    const previous = latest && usable.find((e) => e.presetId === latest.engine.presetId && e.model === latest.engine.model)
+    setEngineId(previous?.id ?? (defaultId && usable.some((e) => e.id === defaultId) ? defaultId : usable[0]?.id ?? SIMULATION_ENGINE_ID))
   }, [loaded, defaultId, engines, engineId])
   useEffect(() => {
     corpusHash(corpusForAnalysis(project)).then(setHash)

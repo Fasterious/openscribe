@@ -4,7 +4,7 @@ import { withLimits, type LimitOptions } from '@/core/providers/limits'
 import { createOpenAiCompatibleProvider } from '@/core/providers/openai-compatible'
 import { presetById } from '@/core/providers/presets'
 import { createSimulationProvider } from '@/core/providers/simulation'
-import type { LlmProvider } from '@/core/providers/types'
+import { ProviderError, type LlmProvider } from '@/core/providers/types'
 import { getSetting, setSetting } from './db'
 
 /** Un moteur configuré par l'utilisateur. La clé reste dans ce navigateur. */
@@ -113,10 +113,17 @@ export async function testEngine(engine: EngineConfig): Promise<{ ok: boolean; m
       user: 'Réponds exactement {"ok": true}',
       json: true,
       temperature: 0,
-      maxTokens: 20,
+      // Assez de place pour un modèle qui « réfléchit » avant de répondre (Gemini) : avec 20, sa réflexion mangeait tout.
+      maxTokens: 1024,
     })
     return { ok: true, message: `Connexion réussie. Réponse : ${res.text.slice(0, 60)}` }
   } catch (e) {
+    // Une seule demande refusée pour excès de demandes : le modèle n'est sans doute pas inclus dans l'offre (quota nul).
+    if (e instanceof ProviderError && e.status === 429)
+      return {
+        ok: false,
+        message: `${engine.name} refuse la demande de test (erreur 429). Au premier essai, cela veut le plus souvent dire que ce modèle n'est pas inclus dans votre offre : choisissez-en un autre dans la liste, ou réessayez dans une minute.`,
+      }
     return { ok: false, message: e instanceof Error ? e.message : String(e) }
   }
 }

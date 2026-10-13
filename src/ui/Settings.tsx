@@ -12,8 +12,8 @@ import {
   type OllamaStatus,
 } from '@/app/engines'
 import { href } from '@/app/router'
-import { PROVIDER_PRESETS, presetById, type DataPolicy, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
-import { Alert, Badge, Button, Card, CardContent, Dialog, Input, Label, Select, Tooltip, cn } from './primitives'
+import { PROVIDER_PRESETS, presetById, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
+import { Alert, Badge, Button, Card, CardContent, Dialog, DropMenu, Input, Label, MenuItem, MenuSection, Tooltip, cn } from './primitives'
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
   local: { label: 'Rien ne quitte votre ordinateur', tone: 'positive' },
@@ -76,8 +76,8 @@ export function SettingsPage({ back }: { back?: string }) {
         )}
         <h1 className="text-3xl font-bold tracking-tight">Moteurs d'IA</h1>
         <p className="max-w-2xl text-muted-foreground">
-          Le moteur d'IA lit les verbatims et rédige ; OpenScribe vérifie les verbatims cités et fait les comptes. Pour commencer, créez une clé gratuite Groq
-          en quelques minutes. Pour que rien ne quitte votre ordinateur, choisissez Ollama.
+          Le moteur d'IA lit les verbatims et rédige ; OpenScribe vérifie les verbatims cités et fait les comptes. Pour commencer, créez une clé gratuite Mistral, Google Gemini
+          ou Groq en quelques minutes. Pour que rien ne quitte votre ordinateur, choisissez Ollama.
         </p>
       </header>
 
@@ -413,28 +413,11 @@ function SetupDialog({
             </div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="modele">Modèle</Label>
-            {installed.length > 0 ? (
-              <Select id="modele" value={draft.model} onChange={(e) => set({ model: e.target.value })}>
-                {installed.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </Select>
-            ) : (
-              <>
-                <Input id="modele" list="modeles" value={draft.model} onChange={(e) => set({ model: e.target.value.trim() })} />
-                <datalist id="modeles">
-                  {preset?.suggestedModels.map((m) => (
-                    <option key={m} value={m} />
-                  ))}
-                </datalist>
-              </>
-            )}
-            <p className="text-xs text-muted-foreground">Le modèle proposé convient pour commencer.</p>
-          </div>
+          <ModelPicker
+            choices={installed.length ? installed.map((id) => ({ id, label: id, hint: 'Installé sur votre ordinateur.' })) : modelChoices(preset)}
+            value={draft.model}
+            onChange={(model) => set({ model })}
+          />
 
           {preset && (
             <p className="text-xs text-muted-foreground">
@@ -520,5 +503,91 @@ function SetupDialog({
         </form>
       )}
     </Dialog>
+  )
+}
+
+/** Les modèles à proposer : la liste expliquée du fournisseur, ou à défaut ses suggestions. */
+function modelChoices(preset: ProviderPreset | undefined): ModelChoice[] {
+  if (!preset) return []
+  if (preset.models?.length) return preset.models
+  return preset.suggestedModels.map((id) => ({
+    id,
+    label: id,
+    hint: id === preset.defaultModel ? 'Proposé par défaut.' : '',
+    recommended: id === preset.defaultModel,
+  }))
+}
+
+/** Choix du modèle : une liste expliquée, le modèle recommandé en tête, et la saisie libre pour les autres. */
+function ModelPicker({ choices, value, onChange }: { choices: ModelChoice[]; value: string; onChange: (model: string) => void }) {
+  const known = choices.find((c) => c.id === value)
+  const [custom, setCustom] = useState(!known && choices.length > 0 ? true : choices.length === 0)
+  const sections = [...new Set(choices.map((c) => c.section ?? ''))]
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={custom ? 'modele' : undefined}>Modèle</Label>
+      {choices.length > 0 && (
+        <DropMenu block align="left" ariaLabel="Choisir le modèle" label={custom ? 'Autre modèle' : (known?.label ?? value)}>
+          {(close) => (
+            <>
+              {sections.map((section) => (
+                <div key={section}>
+                  {section && <MenuSection>{section}</MenuSection>}
+                  {choices
+                    .filter((c) => (c.section ?? '') === section)
+                    .map((c) => (
+                      <MenuItem
+                        key={c.id}
+                        checked={!custom && c.id === value}
+                        label={
+                          <>
+                            {c.label}
+                            {c.recommended && (
+                              <Badge tone="default" className="ml-2 align-middle">
+                                Recommandé
+                              </Badge>
+                            )}
+                          </>
+                        }
+                        hint={
+                          <>
+                            {c.hint}
+                            {c.label !== c.id && <span className="block font-mono text-[11px]">{c.id}</span>}
+                          </>
+                        }
+                        onSelect={() => {
+                          setCustom(false)
+                          onChange(c.id)
+                          close()
+                        }}
+                      />
+                    ))}
+                </div>
+              ))}
+              <MenuSection>Autre</MenuSection>
+              <MenuItem
+                checked={custom}
+                label="Autre modèle…"
+                hint="Saisir le nom exact donné par le fournisseur."
+                onSelect={() => {
+                  setCustom(true)
+                  close()
+                }}
+              />
+            </>
+          )}
+        </DropMenu>
+      )}
+      {custom && (
+        <Input
+          id="modele"
+          aria-label="Nom du modèle"
+          placeholder="Nom exact du modèle"
+          value={value}
+          onChange={(e) => onChange(e.target.value.trim())}
+        />
+      )}
+      {!custom && known?.hint && <p className="text-xs text-muted-foreground">{known.hint}</p>}
+    </div>
   )
 }
