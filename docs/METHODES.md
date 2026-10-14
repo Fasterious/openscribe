@@ -151,3 +151,84 @@ camp ajoutée par le code nomme le motif au lieu de « le critiquent ».
    compte calculé plutôt que d'afficher « À vérifier ».
 4. Renvois en double en fin de paragraphe après les filets (« (cf. P5). (cf. P5, P19) »).
 5. Un motif d'au moins 8 personnes aux avis partagés : poser la question « un seul objet ? ».
+
+## Ce que la grille révèle sur la référence elle-même (14/10/2026, soir)
+
+Notée avec `docs/NOTATION.md` par trois lectures concordantes, la synthèse Sonnet B10 a 3/5. Les mêmes
+défauts reviennent dans les trois lectures, et chez Gemini : ce sont des défauts de la **méthode**,
+pas d'un modèle. Pistes à essayer sur la référence (gardées seulement si la note monte) :
+
+1. **Motifs coupés selon le ton** : deux motifs sur la vie du groupe, l'un unanime en positif (9 sur 9),
+   l'autre unanime en négatif (7 sur 7), portent sur le même objet ; le découpage fabrique deux unanimités
+   contraires. Règle à essayer au regroupement : « un motif ne rassemble jamais des idées parce qu'elles
+   ont le même ton ; l'éloge et la critique d'un même objet vont dans le même motif ».
+2. **Fourre-tout d'éloges** : un motif unanime (8 sur 8) rassemble des satisfecit sans objet commun. Un « bravo » sans objet n'est pas un motif : à classer en signal isolé.
+3. **Gouvernance émiettée** : décision, pilotage, rôles et réunions internes séparés ; les critiques
+   de la décision tombent ailleurs, et « Processus de décision » passe à tort dans « Ce qui a marché ».
+4. **Renvois faux** dans quelques synthèses (une personne citée pour un autre objet).
+5. Verbatims d'un mot, incompréhensibles seuls : déjà écartés de la règle 5 du découpage,
+   à contrôler par le code.
+
+## Opus 5.5 et le grand prompt (14/10/2026, soir)
+
+Grille `docs/NOTATION.md`, `methodologue` et `plume` sur Opus (réflexion moyenne), deux lectures
+pour la méthode. Réglages : température 0, graine fixe (pipeline) ; Opus joué par des sous-agents,
+une passe par demande, sans script.
+
+| Synthèse | Méthode | Langue | Relecture humaine | Remarques |
+|---|---|---|---|---|
+| Sonnet B10, méthode de référence (pipeline) | 3 · 3 · 3 (élevée) | 3 | 1 h 30 à 2 h | plafonné : motifs coupés selon le ton (deux unanimités contraires), fourre-tout d'éloges |
+| Gemini 3.5 Flash-Lite P4 (pipeline) | 2,5 | — | ~3 h | faux consensus, tons faux |
+| Opus 5.5, référence avec découpage par lots de 10 personnes (méthode `lots`) | 3 · 3 (plafond) | 3,5 | 1 h 30 à 2 h 30 | 22 demandes au lieu de 42 ; mêmes défauts de regroupement ; aucun gain de qualité |
+| **Opus 5.5, grand prompt en une demande** | **3,5 · 3,5** | **4** | 45 min à 1 h | 143 citations exactes sur 146 (une majuscule changée) ; aucun fourre-tout ni motif coupé selon le ton ; mais idées perdues et comptes incomplets (personne ne vérifie) |
+| Opus 5.5, méthode de référence (pipeline) | 3 (plafond) · 3,5 | 3,5 | 1 h 30 | 277 idées, 37 motifs, 0 défaut d'audit ; couverture quasi complète, renvois justes ; mais les mêmes défauts de regroupement que Sonnet |
+
+Leçons provisoires :
+- **Voir tout le corpus aide le regroupement.** Le pipeline regroupe des libellés avec un seul exemple ;
+  le grand prompt regroupe en lisant toutes les réponses. Les défauts qui plafonnent la référence
+  (ton, fourre-tout) disparaissent. Piste pour le pipeline : donner au regroupement plus de contexte
+  par idée (la réponse entière, la question), et la règle « l'éloge et la critique d'un même objet vont ensemble ».
+- **Le code reste indispensable pour l'exhaustivité** : sans couverture ni comptage par le code, le
+  grand prompt perd des idées et oublie des personnes. L'idéal serait les deux : la lecture d'ensemble
+  du modèle, les contrôles du code.
+- **Un motif de propositions** (8 personnes, un seul avis) s'affiche « 1 avis · peu d'avis » : l'en-tête
+  doit dire combien de personnes proposent quand le motif n'a presque pas d'avis (défaut commun au
+  rendu du pipeline).
+- **Renvois** : « (cf. P2) » et « (par ex. P2) » hachaient le texte (`plume`) ; une seule forme désormais,
+  « (P2, P14) », et « (notamment P2) » quand la phrase compte plus de personnes que les renvois.
+
+### Défauts des consignes signalés par le moteur lui-même (Opus, 14/10)
+
+Un modèle fort lit les consignes de près et signale leurs trous ; à corriger dans une prochaine
+version de la référence (gardée seulement si la note monte) :
+1. **Thèmes** : on exige « trois personnes » avec une idée de chacune entre crochets, mais les données
+   ne disent pas à qui appartient chaque idée (seulement la liste des personnes du motif). Donner
+   l'auteur de chaque idée citée dans les synthèses des motifs.
+2. **Synthèse de motif** : l'exemple de réponse ne montre pas le format d'une opposition
+   (`{"a","b","about"}`) ; Opus a écrit `{"ids":[…],"about"}`. Filet commun ajouté (les deux formes
+   sont lues) ; l'exemple reste à compléter dans la consigne.
+3. **Synthèse de motif** : « les chiffres sont calculés, n'en calcule pas d'autres » et « donne le nombre
+   exact de personnes derrière chaque affirmation » se lisent comme contradictoires ; préciser que le
+   nombre de personnes d'une phrase se compte sur ses crochets.
+
+**Conclusion (14/10, soir).** Avec la méthode de référence, Opus ne fait qu'un peu mieux que Sonnet
+(3 et 3,5 contre 3, 3, 3) : les défauts qui plafonnent la note sont **les mêmes avec les deux modèles**
+(une unanimité fabriquée parce que l'avis contraire est rangé dans un motif voisin, la communication
+émiettée en huit motifs, un fourre-tout d'éloges). Ils viennent donc de la méthode, à l'étape du
+regroupement, et non du modèle. Le grand prompt, qui regroupe en lisant tout le corpus, ne les a pas.
+Prochaine expérience, sur la référence : un regroupement qui voit plus de contexte et qui suit les
+règles « un objet, quel que soit le ton », « pas de motif d'éloges sans objet », « un même constat
+(par exemple “trop tard”) ne se disperse pas ». Elle ne sera gardée que si la note monte (deux lectures).
+
+Le tic « Toutes les personnes qui en parlent » en tête des intros de thème vient de notre consigne
+des thèmes (qui impose cette formule pour un consensus) : à reformuler à la source.
+4. **Contrôle des comptes** : la vérification des renvois (Opus, passe « lots ») signale six phrases dont
+   le nombre de personnes correspondait aux renvois (G1, G11, G13, G26, G32) ; probables fausses alertes
+   du contrôle de comptage, qui font récrire des phrases justes sans leur chiffre. À reproduire sur le
+   cache et corriger dans le code.
+
+**Découper plusieurs personnes par demande** (question d'Arnaud, 14/10) : à qualité égale, deux fois
+moins de demandes. Pas d'effet sur la note, puisque le défaut qui plafonne se joue au regroupement.
+La méthode `lots` reste disponible pour un moteur dont le quota de demandes est serré ; elle n'entre
+pas dans la référence. Le gain de qualité est ailleurs : dans ce que le modèle voit quand il regroupe
+(le grand prompt lit tout le corpus d'un coup).

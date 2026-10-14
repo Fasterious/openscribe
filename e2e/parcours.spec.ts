@@ -226,9 +226,9 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   for (const name of ['Mistral AI', 'Google Gemini', 'Groq', 'Ollama']) await expect(page.getByText(name, { exact: true }).first()).toBeVisible()
   // Seuil de qualité : Gemini est vérifié ; Mistral et Ollama restent visibles, à l'étude, avec la raison, et ne se configurent pas.
   const card = (name: string) => page.getByRole('listitem').filter({ hasText: name })
-  await expect(card('Google Gemini')).toContainText('Qualité vérifiée · 3,5/5')
+  await expect(card('Google Gemini')).toContainText('Qualité vérifiée')
   await expect(card('Mistral AI')).toContainText("À l'étude")
-  await expect(card('Mistral AI')).toContainText('noté 3/5')
+  await expect(card('Mistral AI')).toContainText('sous le niveau')
   await expect(card('Mistral AI').getByRole('button', { name: /à l'étude/ })).toBeDisabled()
   await expect(card('Ollama').first()).toContainText('24 Go')
   await noHorizontalScroll(page)

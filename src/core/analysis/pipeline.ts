@@ -214,18 +214,24 @@ async function extractAll(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   await emit()
 
   const concurrency = Math.max(1, options.concurrency ?? 2)
-  for (let i = 0; i < pending.length; i += concurrency) {
-    const batch = pending.slice(i, i + concurrency)
-    const results = await Promise.all(
-      batch.map((p) =>
-        extractParticipant(
-          contributionsOf(corpus, p.id).filter((c) => c.text.trim()),
-          p.id,
-          state.settings,
-          runner,
+  const perRequest = Math.max(1, methodOf(state.settings).batches.extract ?? 1)
+  const textsOf = (id: string) => contributionsOf(corpus, id).filter((c) => c.text.trim())
+  for (let i = 0; i < pending.length; i += concurrency * perRequest) {
+    const groups: (typeof pending)[] = []
+    for (let j = i; j < Math.min(pending.length, i + concurrency * perRequest); j += perRequest) groups.push(pending.slice(j, j + perRequest))
+    const results = (
+      await Promise.all(
+        groups.map((g) =>
+          g.length === 1
+            ? extractParticipant(textsOf(g[0].id), g[0].id, state.settings, runner).then((r) => [r])
+            : extractTogether(
+                g.map((p) => ({ participantId: p.id, contributions: textsOf(p.id) })),
+                state.settings,
+                runner,
+              ),
         ),
-      ),
-    )
+      )
+    ).flat()
     // On enregistre dans l'ordre du corpus : les identifiants restent stables quelle que soit la vitesse des réponses.
     for (const r of results) {
       for (const idea of r.ideas) {
@@ -258,18 +264,54 @@ function resetAfter(state: AnalysisState, id: StepId) {
   state.polish = undefined
 }
 
+/**
+ * Plusieurs personnes découpées dans une même demande (méthode à lots) : les références sont
+ * propres à chaque personne (P1-C1…), la réponse est répartie par personne, puis chaque personne
+ * passe par les mêmes contrôles qu'une demande seule (citations, couverture, doublons).
+ */
+async function extractTogether(
+  people: { participantId: string; contributions: Contribution[] }[],
+  settings: AnalysisSettings,
+  runner: LlmRunner,
+): Promise<ParticipantResult[]> {
+  const tag = (k: number) => `P${k + 1}`
+  const out: ExtractionOutput = await runner.json(
+    extractionPrompt(
+      {
+        contributions: people.flatMap((p, k) =>
+          p.contributions.map((c, i) => ({ ref: `${tag(k)}-C${i + 1}`, person: tag(k), question: c.prompt, text: c.text })),
+        ),
+      },
+      settings,
+    ),
+    extractionSchema,
+  )
+  return Promise.all(
+    people.map((p, k) => {
+      const prefix = `${tag(k)}-`
+      const ideas = out.ideas.filter((x) => x.ref.startsWith(prefix)).map((x) => ({ ...x, ref: x.ref.slice(prefix.length) }))
+      // Les noms sont vérifiés dans les textes de chaque personne : un nom absent de ses textes est écarté.
+      return extractParticipant(p.contributions, p.participantId, settings, runner, { ideas, names: out.names ?? [] })
+    }),
+  )
+}
+
 export async function extractParticipant(
   contributions: Contribution[],
   participantId: string,
   settings: AnalysisSettings,
   runner: LlmRunner,
+  /** Réponse déjà obtenue dans une demande à plusieurs personnes. */
+  given?: ExtractionOutput,
 ): Promise<ParticipantResult> {
   const refs = contributions.map((c, i) => ({ ref: `C${i + 1}`, c }))
   const byRef = new Map(refs.map((r) => [r.ref, r.c]))
-  const out: ExtractionOutput = await runner.json(
-    extractionPrompt({ contributions: refs.map((r) => ({ ref: r.ref, question: r.c.prompt, text: r.c.text })) }, settings),
-    extractionSchema,
-  )
+  const out: ExtractionOutput =
+    given ??
+    (await runner.json(
+      extractionPrompt({ contributions: refs.map((r) => ({ ref: r.ref, question: r.c.prompt, text: r.c.text })) }, settings),
+      extractionSchema,
+    ))
 
   const ideas: Omit<Idea, 'id'>[] = []
   const misses: { ref: string; label: string; verbatim: string; category: IdeaCategory }[] = []

@@ -98,14 +98,15 @@ export interface ProviderPreset {
 }
 
 /**
- * Seuil de qualité (décision d'Arnaud, 14/10/2026) : un moteur n'est proposé qu'à 3,5/5 au moins
- * (note du `methodologue` sur le corpus réel ÉcoSol), le niveau de l'offre gratuite de Gemini ; idéalement 4.
+ * Seuil de qualité (décision d'Arnaud, 14/10/2026) : un moteur n'est proposé qu'au niveau de l'offre
+ * gratuite de Gemini au moins, idéalement à celui de la référence. Notes du `methodologue` sur le corpus
+ * réel ÉcoSol, avec la grille de docs/NOTATION.md (Gemini 2,5/5, Sonnet 3/5 ; 3,5 et 4,5 sur l'ancienne échelle).
  * En dessous, ou pas encore évalué, il reste visible « à l'étude », avec la raison.
  */
-export const QUALITY_THRESHOLD = 3.5
+export const QUALITY_THRESHOLD = 2.5
 
 const NOT_EVALUATED =
-  "Pas encore évalué sur un corpus réel : OpenScribe ne propose un moteur d'IA qu'après une synthèse notée au moins 3,5/5."
+  "Pas encore évalué sur un corpus réel : OpenScribe ne propose un moteur d'IA qu'après une synthèse au moins du niveau de l'offre gratuite de Gemini."
 
 /** Un fournisseur est proposé quand au moins un de ses modèles est validé. */
 export function presetStudy(preset: ProviderPreset): string | undefined {
@@ -143,7 +144,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         section: "Inclus dans l'offre gratuite",
         recommended: true,
         method: 'ministral',
-        study: 'Noté 3/5 sur un corpus réel (13/10/2026), sous le seuil de 3,5/5.',
+        study: 'Sous le niveau de l’offre gratuite de Gemini sur un corpus réel (13/10/2026).',
         secondsPerCall: 10,
       },
       { id: 'ministral-8b-2512', label: 'Ministral 8B', hint: 'Plus rapide, des idées moins fines.', section: "Inclus dans l'offre gratuite", method: 'ministral' },
@@ -164,7 +165,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     needsKey: true,
     keyUrl: 'https://admin.mistral.ai/organization/api-keys',
     study:
-      "Ministral 14B, le meilleur modèle de l'offre gratuite, est noté 3/5 sur un corpus réel, sous le seuil de 3,5/5. Mistral Small et Medium (payants) restent à évaluer.",
+      "Ministral 14B, le meilleur modèle de l'offre gratuite, reste sous le niveau de l’offre gratuite de Gemini sur un corpus réel. Mistral Small et Medium (payants) restent à évaluer.",
     seedParam: 'random_seed',
     supportsJsonMode: true,
     freeRequestsPerMinute: 20,
@@ -254,7 +255,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         section: "Inclus dans l'offre gratuite",
         recommended: true,
         method: 'gemini',
-        validated: { score: 3.5, date: '2026-10-13' },
+        validated: { score: 2.5, date: '2026-10-14' },
         // ÉcoSol : 2 à 6 minutes pour 50 à 80 demandes.
         secondsPerCall: 5,
       },
@@ -323,7 +324,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     id: 'ollama',
     label: 'Ollama (sur votre ordinateur)',
     study:
-      'Essayé sur un ordinateur doté de 24 Go de mémoire (14/10/2026) : 3/5 au mieux, sous le seuil de 3,5/5, et 40 minutes ou plus par synthèse. À revoir avec des modèles locaux plus solides.',
+      'Essayé sur un ordinateur doté de 24 Go de mémoire (14/10/2026) : sous le niveau de l’offre gratuite de Gemini, et 40 minutes ou plus par synthèse. À revoir avec des modèles locaux plus solides.',
     // Mesuré sur ÉcoSol (Mac M5, 24 Go) : Gemma 4 12B environ 50 s par demande, gpt-oss 20B plusieurs minutes.
     modelSeconds: [
       { match: 'gemma', secondsPerCall: 50 },
@@ -384,9 +385,10 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         label: 'Claude Sonnet 5.5',
         hint: 'La référence : la synthèse la mieux notée sur un corpus réel.',
         recommended: true,
-        validated: { score: 4.5, date: '2026-10-13' },
+        validated: { score: 3, date: '2026-10-14' },
       },
-      { id: 'claude-opus-5-5', label: 'Claude Opus 5.5', hint: 'Le plus puissant, plus cher.', study: 'Pas encore évalué sur un corpus réel.' },
+      // Opus 5.5 (réflexion moyenne), méthode de référence : 3 et 3,5 (deux lectures), 14/10/2026.
+      { id: 'claude-opus-5-5', label: 'Claude Opus 5.5', hint: 'Le plus puissant, plus cher ; au moins la qualité de Sonnet.', validated: { score: 3, date: '2026-10-14' } },
       { id: 'claude-haiku-5-5', label: 'Claude Haiku 5.5', hint: 'Rapide et économique.', study: 'Pas encore évalué sur un corpus réel.' },
     ],
     needsKey: true,
@@ -686,7 +688,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
     id: 'lmstudio',
     label: 'LM Studio (sur votre ordinateur)',
-    study: 'Mêmes modèles que sur Ollama : sous le seuil de 3,5/5 sur un ordinateur doté de 24 Go de mémoire (14/10/2026).',
+    study: 'Mêmes modèles que sur Ollama : sous le niveau de l’offre gratuite de Gemini sur un ordinateur doté de 24 Go de mémoire (14/10/2026).',
     baseUrl: 'http://localhost:1234/v1',
     defaultModel: '',
     suggestedModels: [],

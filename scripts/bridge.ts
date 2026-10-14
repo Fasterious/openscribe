@@ -25,6 +25,7 @@ import { reportToHtml, reportToMarkdown } from '../src/core/analysis/report'
 import type { ResponseCache } from '../src/core/analysis/runner'
 import { stableStringify } from '../src/core/ids'
 import { DEFAULT_SETTINGS } from '../src/core/analysis/types'
+import type { MethodId } from '../src/core/analysis/methods'
 import { analyzeCsv, csvToCorpus, type ColumnRole } from '../src/core/import/csv'
 import type { ChatRequest, LlmProvider } from '../src/core/providers/types'
 
@@ -99,7 +100,8 @@ const csv = analyzeCsv(readFileSync(csvPath, 'utf8'))
 const roles: Record<number, ColumnRole> = Object.fromEntries(csv.columns.map((c) => [c.index, c.suggestedRole]))
 console.log('Colonnes :', csv.columns.map((c) => `${c.header.slice(0, 40)} → ${c.suggestedRole}`).join(' | '))
 const corpus = csvToCorpus(csv.table, { roles, sourceName: basename(csvPath) })
-const settings = { ...DEFAULT_SETTINGS, researchQuestion: opt('question') ?? '' }
+// --method lots : essai d'une méthode (voir src/core/analysis/methods.ts) ; par défaut, la référence.
+const settings = { ...DEFAULT_SETTINGS, researchQuestion: opt('question') ?? '', ...(opt('method') ? { method: opt('method') as MethodId } : {}) }
 
 const statePath = join(dir, 'state.json')
 const initial = existsSync(statePath)

@@ -46,7 +46,7 @@ import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtm
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
-import { groupingPrompt, groupSummaryPrompt } from './analysis/prompts'
+import { groupingPrompt, groupSummaryPrompt, groupSummarySchema } from './analysis/prompts'
 import { methodRules } from './analysis/methods'
 import { activeParticipants, type Corpus } from './corpus'
 import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole } from './import/csv'
@@ -694,6 +694,20 @@ describe('chaîne complète (simulation)', () => {
     expect(state.reviewSkipped).toBeGreaterThan(0)
   })
 
+  it('découpage par lots de personnes (méthode « lots ») : les idées sont rendues à chaque personne, comme une à une', async () => {
+    const corpus = surveyCorpus()
+    const provider = createSimulationProvider()
+    const one = await runAnalysis(corpus, await newAnalysis(corpus, DEFAULT_SETTINGS, provider), { provider, cache: new MemoryCache() })
+    const batched = await runAnalysis(corpus, await newAnalysis(corpus, { ...DEFAULT_SETTINGS, method: 'lots' }, provider), {
+      provider,
+      cache: new MemoryCache(),
+    })
+    expect(batched.status).toBe('done')
+    const key = (s: AnalysisState) => s.ideas.map((i) => `${i.participantId}|${i.verbatim}`).sort()
+    expect(key(batched)).toEqual(key(one))
+    expect(batched.calls.total).toBeLessThan(one.calls.total)
+  })
+
   it("s'arrête proprement quand on annule", async () => {
     const corpus = surveyCorpus()
     const controller = new AbortController()
@@ -825,6 +839,13 @@ describe('renvois mal formés', () => {
     )
     expect(sanitizeCitations('Les affiches manquent [G3]. Le tractage plaît [I0001].', allowed)).toBe('Les affiches manquent. Le tractage plaît [I0001].')
     expect(sanitizeCitations('Le tractage plaît [I016, I0001].', allowed)).toBe('Le tractage plaît [I0001].')
+  })
+})
+
+describe('propositions opposées', () => {
+  it('lit aussi une opposition écrite {"ids":[…],"about":…}', () => {
+    const r = groupSummarySchema.parse({ groups: [{ id: 'G1', summary: 'Texte.', opposed: [{ ids: ['I0001', 'I0002'], about: 'le prix' }] }] })
+    expect(r.groups[0].opposed).toEqual([expect.objectContaining({ a: 'I0001', b: 'I0002', about: 'le prix' })])
   })
 })
 
@@ -960,7 +981,7 @@ describe('contrôles ajoutés à la certification B8', () => {
   })
   it('deux renvois identiques dans une phrase n’en font qu’un', () => {
     const byId = new Map([{ id: 'I0001', participantId: 'P4' } as Idea].map((i) => [i.id, i]))
-    expect(refsToPeople('Elle salue X [I0001] et regrette Y [I0001].', byId)).toBe('Elle salue X et regrette Y (cf. P4).')
+    expect(refsToPeople('Elle salue X [I0001] et regrette Y [I0001].', byId)).toBe('Elle salue X et regrette Y (P4).')
   })
 })
 
@@ -1051,9 +1072,9 @@ describe('rapport', () => {
   it('remplace les références par les participants cités, sans doublon', () => {
     const idea = (id: string, participantId: string) => ({ id, participantId, verbatim: `v ${id}` }) as Idea
     const byId = new Map([idea('I0001', 'P2'), idea('I0002', 'P2'), idea('I0003', 'P7')].map((i) => [i.id, i]))
-    expect(refsToPeople('Deux personnes regrettent [I0001, I0002, I0003].', byId)).toBe('Deux personnes regrettent (cf. P2, P7).')
+    expect(refsToPeople('Deux personnes regrettent [I0001, I0002, I0003].', byId)).toBe('Deux personnes regrettent (P2, P7).')
     expect(refsToPeople('Inconnue [I0099].', byId)).toBe('Inconnue.')
-    expect(refsToPeople('Lien [I0003].', byId, (who, i) => `<a href="#${i.id}">${who}</a>`)).toBe('Lien (cf. <a href="#I0003">P7</a>).')
+    expect(refsToPeople('Lien [I0003].', byId, (who, i) => `<a href="#${i.id}">${who}</a>`)).toBe('Lien (<a href="#I0003">P7</a>).')
   })
 
   it('une case par participant : avis en couleur, les autres en blanc', () => {
@@ -1062,31 +1083,31 @@ describe('rapport', () => {
     expect(opinionSquares(m, 5)).toBe('')
   })
 
-  it('« par ex. » quand la phrase compte plus de personnes que les renvois, numéros triés', () => {
+  it('« notamment » quand la phrase compte plus de personnes que les renvois, numéros triés', () => {
     const idea = (id: string, participantId: string) => ({ id, participantId, verbatim: 'v' }) as Idea
     const byId = new Map([idea('I0001', 'P12'), idea('I0002', 'P2')].map((i) => [i.id, i]))
-    expect(refsToPeople('Pour 10 des 13 personnes, l’ambiance a tenu [I0001].', byId)).toBe('Pour 10 des 13 personnes, l’ambiance a tenu (par ex. P12).')
-    expect(refsToPeople('Deux personnes regrettent [I0001, I0002].', byId)).toBe('Deux personnes regrettent (cf. P2, P12).')
-    // Un nombre qui compte autre chose que les personnes, ou deux renvois d'une même phrase qui couvrent son compte : « cf. ».
+    expect(refsToPeople('Pour 10 des 13 personnes, l’ambiance a tenu [I0001].', byId)).toBe('Pour 10 des 13 personnes, l’ambiance a tenu (notamment P12).')
+    expect(refsToPeople('Deux personnes regrettent [I0001, I0002].', byId)).toBe('Deux personnes regrettent (P2, P12).')
+    // Un nombre qui compte autre chose que les personnes, ou deux renvois d'une même phrase qui couvrent son compte : sans « notamment ».
     expect(refsToPeople('Une personne rapporte qu’au moins trois membres sont partis [I0001].', byId)).toBe(
-      'Une personne rapporte qu’au moins trois membres sont partis (cf. P12).',
+      'Une personne rapporte qu’au moins trois membres sont partis (P12).',
     )
     expect(refsToPeople('Une autre dit avoir vu plusieurs personnes motivées partir [I0001].', byId)).toBe(
-      'Une autre dit avoir vu plusieurs personnes motivées partir (cf. P12).',
+      'Une autre dit avoir vu plusieurs personnes motivées partir (P12).',
     )
-    expect(refsToPeople('Plusieurs personnes regrettent le bruit [I0001].', byId)).toBe('Plusieurs personnes regrettent le bruit (par ex. P12).')
+    expect(refsToPeople('Plusieurs personnes regrettent le bruit [I0001].', byId)).toBe('Plusieurs personnes regrettent le bruit (notamment P12).')
     // « Toutes les personnes qui en parlent » : un exemple si le motif compte plus de personnes que les renvois.
     expect(refsToPeople('Toutes les personnes qui en parlent le saluent [I0001].', byId, undefined, () => 5)).toBe(
-      'Toutes les personnes qui en parlent le saluent (par ex. P12).',
+      'Toutes les personnes qui en parlent le saluent (notamment P12).',
     )
     expect(refsToPeople('Toutes les personnes qui en parlent le saluent [I0001, I0002].', byId, undefined, () => 2)).toBe(
-      'Toutes les personnes qui en parlent le saluent (cf. P2, P12).',
+      'Toutes les personnes qui en parlent le saluent (P2, P12).',
     )
     expect(refsToPeople('Une personne signale des tâches reprises par d’autres [I0001].', byId)).toBe(
-      'Une personne signale des tâches reprises par d’autres (cf. P12).',
+      'Une personne signale des tâches reprises par d’autres (P12).',
     )
     expect(refsToPeople('Deux personnes proposent : décider ensemble [I0001], ou suivre une méthode [I0002].', byId)).toBe(
-      'Deux personnes proposent : décider ensemble (cf. P12), ou suivre une méthode (cf. P2).',
+      'Deux personnes proposent : décider ensemble (P12), ou suivre une méthode (P2).',
     )
   })
 

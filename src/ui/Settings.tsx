@@ -277,7 +277,6 @@ function ProviderCard({
 }) {
   const policy = POLICY[preset.dataPolicy]
   const study = presetStudy(preset)
-  const best = preset.models?.filter((m) => m.validated).sort((a, b) => b.validated!.score - a.validated!.score)[0]
   return (
     <Card className={cn('flex h-full flex-col p-4', configured && 'border-positive/60', study && !configured && 'bg-muted/40')}>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -295,7 +294,7 @@ function ProviderCard({
           ) : (
             <>
               <Badge tone="positive" className="gap-1">
-                <BadgeCheck className="size-3" /> Qualité vérifiée{best ? ` · ${String(best.validated!.score).replace('.', ',')}/5` : ''}
+                <BadgeCheck className="size-3" /> Qualité vérifiée
               </Badge>
               {!configured && preset.family === 'free' && <Badge tone="default">Gratuit, sans carte</Badge>}
             </>

@@ -78,7 +78,7 @@ Règles apprises :
 - Un exemple de consigne ou de test ne vient jamais du corpus de certification (sinon le test n'est plus indépendant) ; `src/core/privacy.test.ts` le vérifie.
 - Un défaut trouvé se corrige par une étape, une consigne ou un contrôle du processus, pas à la main dans le rapport.
 - Une méthode par famille de modèles : une nouvelle part de la meilleure, et un apport ne passe à une autre méthode que si sa note monte (`docs/METHODES.md`).
-- Un moteur d'IA n'est proposé qu'à 3,5/5 au moins (`methodologue`) sur ÉcoSol, idéalement 4, et s'il n'est pas pénible à utiliser.
+- Un moteur d'IA n'est proposé qu'au niveau de Gemini Flash-Lite au moins sur ÉcoSol (grille `docs/NOTATION.md`, deux lectures `methodologue` sur Opus), idéalement à celui de la référence, et s'il n'est pas pénible à utiliser.
 - « Gratuit, sans carte » ne s'affiche qu'après un parcours réel dans la console du fournisseur, daté dans `docs/PARCOURS-FOURNISSEURS.md`.
 
 ## Principes produit (non négociables)

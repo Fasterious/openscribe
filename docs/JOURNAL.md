@@ -158,3 +158,10 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 - **Demande d'Arnaud** : une qualité minimale est essentielle ; les moteurs dont on n'est pas sûr restent dans la liste, désactivés, avec la raison (« à l'étude »).
 - **Fait** : statut par modèle (`validated` avec la note, ou `study` avec la raison) ; seuls Gemini 3.5 Flash-Lite (3,5/5) et Claude Sonnet (4,5/5) se configurent. Mistral passe à l'étude (3/5). L'accueil ne recommande plus que Gemini (gratuit) et Claude (payant).
 - **Durée estimée** : vitesse mesurée à la fin de chaque synthèse (temps écoulé ÷ demandes envoyées, moyenne des dernières), sinon vitesse de référence mesurée sur ÉcoSol, sinon estimation grossière ; le débit autorisé reste un plancher. L'écran dit d'où vient la durée.
+
+## 2026-10-14 (nuit) — Opus 5.5, découpage par lots, grand prompt ; évaluateurs sur Opus
+
+- **Demande d'Arnaud** : essayer Opus 5.5 (réflexion moyenne) avec la méthode de Sonnet ; tester si envoyer plus de données par demande change la qualité ; écrire la méthode en une seule consigne (utilisable hors d'OpenScribe, et comme point de comparaison) ; évaluer avec Opus.
+- **Évaluateurs** : `methodologue` et `plume` fixés sur Opus ; grille explicite (`docs/NOTATION.md`) ; trois lectures de Sonnet B10 concordantes (3/5), la réflexion élevée n'apporte rien. Nouvelle échelle plus sévère : Gemini 2,5, Sonnet 3.
+- **Résultats** : Opus avec la référence 3 et 3,5 (langue 3,5) ; Opus avec découpage par lots de 10 personnes 3 et 3 (deux fois moins de demandes) ; Opus avec le grand prompt 3,5 et 3,5 (langue 4). Les défauts qui plafonnent la référence (regroupement qui disperse un même objet, fourre-tout d'éloges) viennent de la méthode, pas du modèle.
+- **Décisions** : Opus validé ; seuil ramené à la nouvelle échelle (le niveau de Gemini) ; badge « Qualité vérifiée » sans chiffre ; renvois « (P2, P14) » et « (notamment P2) » ; opposition au format `ids` lue. Prochaine expérience : un regroupement qui voit plus de contexte, sur la référence.

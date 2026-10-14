@@ -94,7 +94,8 @@ function dataBlock(data: unknown): string {
 // ─── Étape 1 : extraction des idées atomiques ────────────────────────────────
 
 export interface ExtractionInput {
-  contributions: { ref: string; question?: string; text: string }[]
+  /** `person` : présent quand plusieurs personnes sont découpées dans la même demande. */
+  contributions: { ref: string; person?: string; question?: string; text: string }[]
 }
 
 const ideaItem = z.object({
@@ -125,7 +126,11 @@ export function extractionPrompt(input: ExtractionInput, settings: AnalysisSetti
   return {
     task: 'extract',
     system: SYSTEM,
-    user: `${context(settings)}Tu reçois tout ce qu'a exprimé UNE personne. Découpe-le en idées atomiques : une idée = un seul sujet et un seul ton.
+    user: `${context(settings)}${
+      input.contributions.some((c) => c.person)
+        ? `Tu reçois ce qu'ont exprimé PLUSIEURS personnes (champ "person"). Découpe chaque texte en idées atomiques : une idée = un seul sujet et un seul ton. Une idée vient toujours d'un seul texte, donc d'une seule personne ; traite chaque personne avec le même soin, la dernière comme la première.`
+        : `Tu reçois tout ce qu'a exprimé UNE personne. Découpe-le en idées atomiques : une idée = un seul sujet et un seul ton.`
+    }
 
 ${EXTRACTION_RULES}
 8. "names" : les prénoms ou noms de particuliers cités dans le texte (membres, collègues, proches), tels qu'ils sont écrits. N'y mets pas les personnalités publiques (élus, candidats, dirigeants connus), les organisations ni les lieux. Liste vide s'il n'y en a pas.
@@ -421,7 +426,13 @@ export const groupSummarySchema = z.object({
       id: z.string(),
       summary: prose(),
       /** Deux propositions de personnes différentes qui vont en sens contraire : le code les montre dans « Ce qui divise ». */
-      opposed: lenientArray(z.object({ a: z.string(), b: z.string(), about: z.string() }))
+      // Un modèle qui écrit {"ids":["I1","I2"],"about":…} (le format de l'exemple n'est pas montré) est lu de même.
+      opposed: lenientArray(
+        z.preprocess(
+          (o) => (o && typeof o === 'object' && Array.isArray((o as { ids?: unknown }).ids) ? { a: (o as { ids: unknown[] }).ids[0], b: (o as { ids: unknown[] }).ids[1], ...o } : o),
+          z.object({ a: z.string(), b: z.string(), about: z.string() }),
+        ),
+      )
         .optional()
         .default([]),
     }),

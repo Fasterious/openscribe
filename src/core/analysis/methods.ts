@@ -11,14 +11,15 @@ import type { AnalysisSettings } from './types'
  * mal formées tolérées) restent communs : ils ne touchent qu'une réponse
  * défectueuse, et ont été rodés sans effet sur la référence.
  */
-export type MethodId = 'reference' | 'ministral' | 'gemini' | 'groq' | 'gptoss' | 'gemma' | 'qwen'
+export type MethodId = 'reference' | 'ministral' | 'gemini' | 'groq' | 'gptoss' | 'gemma' | 'qwen' | 'lots'
 
 export interface Method {
   id: MethodId
   /** Nom montré dans la Méthode du rapport. */
   label: string
   /** Taille des lots envoyés au modèle. */
-  batches: { grouping: number; assign: number; review: number; summary: number; support: number; polish: number }
+  /** `extract` : personnes découpées par demande (1 par défaut). */
+  batches: { grouping: number; assign: number; review: number; summary: number; support: number; polish: number; extract?: number }
   /** Exemple de la règle 3 du regroupement (une cause, le problème et la solution vont ensemble). */
   groupingExample: string
   /** Citation dont le modèle a corrigé quelques fautes de frappe : rattachée au texte d'origine. */
@@ -91,6 +92,14 @@ export const METHODS: Record<MethodId, Method> = {
     // Passe 4 : réflexion moyenne et lots plus petits ; 40 synthèses, ou 12 textes à relire, d'un coup dépassaient 16 384 jetons de réponse.
     batches: { grouping: 100, assign: 50, review: 60, summary: 10, support: 220, polish: 4 },
     groupingExample: "« Trop peu d'agents le samedi », « Longue file au guichet », « Ouvrir un second guichet » relèvent tous de l'attente au guichet",
+  },
+  // Essai du 14/10 (Opus 5.5) : la référence, mais 10 personnes par demande de découpage. Note égale (3 et 3 contre 3 et 3,5),
+  // deux fois moins de demandes : utile pour un quota serré, pas un gain de qualité (docs/METHODES.md).
+  lots: {
+    ...REFERENCE,
+    id: 'lots',
+    label: 'méthode de référence, découpage par lots de personnes',
+    batches: { ...REFERENCE.batches, extract: 10 },
   },
   gemma: {
     ...REFERENCE,

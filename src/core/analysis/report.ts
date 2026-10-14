@@ -101,7 +101,7 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     `Moteur d'IA : ${state.engine.presetId === 'bridge' || state.engine.presetId === 'simulation' ? engine : `${engine}, modèle ${state.engine.model}`} · température ${state.settings.temperature} · graine ${state.settings.seed}.`,
     "Partage des rôles : le moteur d'IA découpe les réponses en idées (positif, négatif, suggestion, question ou constat), propose les motifs et les thèmes, et rédige les synthèses ; le code vérifie chaque verbatim, range chaque idée exactement une fois et calcule tous les chiffres, y compris les listes « Ce qui a marché », « Ce qui bloque », « Ce qui divise », « Ce que proposent les participants » et « Questions soulevées ». « Ce qui divise » réunit les motifs aux avis opposés et ceux où tous font la même critique mais proposent des remèdes opposés (repérés par le moteur d'IA ; le code vérifie qu'il s'agit de deux propositions de deux personnes différentes).",
     `Indicateurs : on compte des participants. Dans « 4 avis négatifs sur 5 », le total (5) compte les participants qui disent du bien du motif, du mal, ou les deux (mitigés, comptés dans le total mais dans aucun camp ; dans les listes de verbatims, un mitigé figure dans les deux camps) ; suggestions, questions et constats ne sont pas des avis. Le chiffre vient toujours avec le mot de l'échelle : « unanime » quand toutes les personnes qui donnent un avis sont du même côté ; « large majorité » à partir de 80 % ; « majorité » au-dessus de la moitié ; « pas de majorité » quand le camp en tête reste sous la moitié ; « avis partagés » quand les deux camps sont proches (chacun au moins deux personnes, le plus petit au moins la moitié du plus grand) ou quand les mitigés sont au moins aussi nombreux que le camp le plus fort ; en dessous de 4 avis, « peu d'avis ». « Fragile » signale qu'une seule voix changeant de camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver : la base est celle des personnes qui ont donné un avis spontanément. Ces proportions décrivent les personnes interrogées, pas une population. Un thème réunit des motifs différents : on n'y additionne pas les avis.`,
-    'Dans les synthèses, « (cf. P2, P14) » renvoie aux participants dont un verbatim appuie la phrase ; « (par ex. P2) » signale un exemple quand la phrase compte davantage de personnes.',
+    'Dans les synthèses, « (P2, P14) » renvoie aux participants dont un verbatim appuie la phrase ; « (notamment P2) » signale un exemple quand la phrase compte davantage de personnes.',
     'Une réponse de quelques mots est suivie de sa question, qui en donne le sens (en entier la première fois dans un motif, puis par son code).',
     "Les questions orientent les réponses (« qu'est-ce qui a bien marché ? ») : un motif où personne ne critique n'est pas pour autant un accord de tous, les autres participants n'en ont simplement pas parlé.",
   )
@@ -267,18 +267,19 @@ const REFS = /\[(I\d{4,}(?:\s*,\s*I\d{4,})*)\]/g
 /**
  * Les références [I0008, I0259] des synthèses désignent des idées : utiles à
  * l'écran (un clic montre les verbatims), illisibles sur papier. L'export les
- * remplace par les participants cités, « (cf. P2, P14) », chacun relié en
+ * remplace par les participants cités, « (P2, P14) », chacun relié en
  * HTML à son verbatim.
  */
 export function refsToPeople(
   text: string,
   byId: Map<string, Idea>,
   link?: (who: string, idea: Idea) => string,
-  /** Combien de personnes donnent un avis sur le motif d'une idée : « toutes les personnes » n'est un « cf. » que si toutes sont citées. */
+  /** Combien de personnes donnent un avis sur le motif d'une idée : « toutes les personnes » ne se renvoie sans « notamment » que si toutes sont citées. */
   sizeOf?: (ideaId: string) => number,
 ): string {
   const personOf = (id: string) => byId.get(id)?.participantId
-  // Phrase par phrase : « par ex. » seulement quand la phrase annonce plus de personnes que tous ses renvois n'en citent.
+  // Phrase par phrase : « notamment » seulement quand la phrase annonce plus de personnes que tous ses renvois n'en citent.
+  // Une seule forme de renvoi, entre parenthèses, sans « cf. » ni « par ex. » (relecture `plume`, 14/10/2026).
   return (
     text
       .split(/(?<=[.!?])(\s+)/)
@@ -287,7 +288,7 @@ export function refsToPeople(
         const cited = new Set(ids.map(personOf).filter(Boolean)).size
         // « Toutes les personnes qui en parlent », « la plupart » : la base est le motif entier.
         const universal = sizeOf && UNIVERSAL.test(sentence) ? Math.max(0, ...ids.map(sizeOf)) : 0
-        const tag = Math.max(claimedPeople(sentence), universal) > cited ? 'par ex.' : 'cf.'
+        const tag = Math.max(claimedPeople(sentence), universal) > cited ? 'notamment ' : ''
         return sentence.replace(REFS, (_, ids: string) => {
           const seen = new Map<string, Idea>()
           for (const id of ids.split(/\s*,\s*/)) {
@@ -296,13 +297,13 @@ export function refsToPeople(
           }
           if (!seen.size) return ''
           const people = [...seen].sort(([a], [b]) => a.localeCompare(b, 'fr', { numeric: true }))
-          return `(${tag} ${people.map(([who, idea]) => (link ? link(who, idea) : who)).join(', ')})`
+          return `(${tag}${people.map(([who, idea]) => (link ? link(who, idea) : who)).join(', ')})`
         })
       })
       .join('')
       .replace(/\s+([.,])/g, '$1')
       // Deux renvois identiques dans la même phrase : on ne garde que le dernier.
-      .replace(/\s*\((cf\.|par ex\.) ([^)]+)\)(?=[^.!?]*\(\1 \2\))/g, '')
+      .replace(/\s*\(((?:notamment )?)([^()]*P\d+[^()]*)\)(?=[^.!?]*\(\1\2\))/g, '')
   )
 }
 
