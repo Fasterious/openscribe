@@ -80,6 +80,22 @@ Données : dans l'Union européenne, en Suisse et au Royaume-Uni, les conditions
 payante s'appliquent aussi au quota gratuit (pas d'entraînement sur les données). Ailleurs,
 l'offre gratuite réutilise les données et des humains peuvent les relire.
 
+## Groq — 13/10/2026 (compte créé par Arnaud pendant le test)
+
+| # | Étape | Ce qui se passe | Blocage | Levé ? |
+|---|---|---|---|---|
+| 1 | console.groq.com/keys | « Create an account or login » (Google, GitHub, SSO, e-mail) | L'agent ne crée pas de compte : geste d'Arnaud | Oui (1 minute) |
+| 2 | Create API Key | Nom, expiration ; vérification Cloudflare validée seule ; « Copy » (affichée une fois) | — | Collée par Arnaud |
+| 3 | Settings › Limits | Gratuit : gpt-oss-120b, gpt-oss-20b, qwen3.8-27b à 30 demandes/min, 1 000/jour, **8 000 jetons/min, 200 000 jetons/jour** ; plus de Llama 3.3 | — | Liste des modèles mise à jour |
+| 4 | Demande de plus de 8 000 jetons | 413 « Request too large » | Nos demandes de regroupement dépassent | Méthode `groq` à petits lots ; réponse réservée selon la place restante |
+| 5 | Sans longueur demandée | Groq coupe la réponse vers 2 000 (Qwen) à 3 000 jetons (gpt-oss, qui réfléchit d'abord) | Extraction coupée | Longueur réservée explicitement, réflexion courte |
+| 6 | Synthèse ÉcoSol, gpt-oss-120b | 62 demandes en 25 minutes : extraction, regroupement, 9 synthèses de motif sur 32 ; 150 000 jetons consommés | Une synthèse entière : environ une heure, et plus que le quota du jour | **Non : abandonné** (décision d'Arnaud) |
+| 7 | Synthèse ÉcoSol, Qwen 3.8 27B | Arrêtée au 4e participant : 429 répétés (une demande de 7 000 jetons par minute au plus) | Même plafond | Non |
+
+Verdict : Groq est gratuit et sans carte, mais son offre gratuite ne permet pas une synthèse
+d'une vingtaine de participants dans un délai raisonnable. Il sort des offres recommandées
+pour démarrer et reste proposé pour de petites synthèses.
+
 ## Leçons pour tous les fournisseurs
 
 - **Une offre gratuite est un fait daté**, pas une propriété du fournisseur : la fiche
@@ -99,5 +115,8 @@ l'offre gratuite réutilise les données et des humains peuvent les relire.
   ne suffisent pas à une synthèse. La liste des modèles le dit avant le choix.
 - **Un test de connexion doit laisser parler un modèle qui réfléchit** : un plafond de
   jetons trop bas fait croire à une panne.
+- **« Gratuit » ne suffit pas : il faut le débit.** Un plafond de jetons par minute décide
+  de la durée d'une synthèse, plus que la vitesse du modèle. Mesurer le temps d'une synthèse
+  complète avant de recommander une offre.
 - **Un clic de mise à niveau est une transaction** : l'agent de test ne le fait jamais,
   même pour « voir » ; il lit les pages d'abonnement sans toucher aux boutons.

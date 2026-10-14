@@ -129,3 +129,9 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - **Bien marché** : changer une seule cause à la fois grâce au cache (P4 reprend le regroupement de P2 et ne fait varier que la rédaction) ; l'essai croisé tranché par les notes, sans débat ; relancer Ministral v3 depuis le cache en 20 secondes et sans appel.
 - **Coûté pour rien** : une analyse interrompue parce que j'ai modifié un document pendant qu'elle tournait (le serveur de développement recharge la page pour tout fichier) ; des essais d'API groupés trop longs qui ont figé l'onglet (les lancer en tâche de fond, puis relever).
 - **On change** : aucune écriture dans le dépôt pendant une analyse dans le navigateur (règle ajoutée) ; un apport d'une méthode n'est essayé ailleurs qu'une variable à la fois.
+
+## Groq (13/10, fin de soirée)
+
+- **Bien marché** : sonder l'API avant de lancer (liste des modèles, demande de 12 000 jetons, réponse sans longueur) a expliqué chaque arrêt en une minute ; lancer deux modèles en parallèle, chacun avec son quota.
+- **Coûté pour rien** : 25 minutes de synthèse avant de constater ce que le calcul disait déjà (8 000 jetons par minute pour plus de 200 000 jetons au total).
+- **On change** : avant de lancer une synthèse sur un nouveau fournisseur, estimer sa durée minimale à partir du quota par minute et des jetons d'une synthèse de référence (environ 215 000 pour ÉcoSol) ; si elle dépasse vingt minutes, on le dit avant de lancer.

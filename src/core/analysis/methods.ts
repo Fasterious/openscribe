@@ -11,14 +11,14 @@ import type { AnalysisSettings } from './types'
  * mal formées tolérées) restent communs : ils ne touchent qu'une réponse
  * défectueuse, et ont été rodés sans effet sur la référence.
  */
-export type MethodId = 'reference' | 'ministral' | 'gemini'
+export type MethodId = 'reference' | 'ministral' | 'gemini' | 'groq'
 
 export interface Method {
   id: MethodId
   /** Nom montré dans la Méthode du rapport. */
   label: string
   /** Taille des lots envoyés au modèle. */
-  batches: { grouping: number; assign: number; review: number; summary: number }
+  batches: { grouping: number; assign: number; review: number; summary: number; support: number; polish: number }
   /** Exemple de la règle 3 du regroupement (une cause, le problème et la solution vont ensemble). */
   groupingExample: string
   /** Citation dont le modèle a corrigé quelques fautes de frappe : rattachée au texte d'origine. */
@@ -32,7 +32,7 @@ export interface Method {
 const REFERENCE: Method = {
   id: 'reference',
   label: 'méthode de référence',
-  batches: { grouping: 350, assign: 200, review: 140, summary: 90 },
+  batches: { grouping: 350, assign: 200, review: 140, summary: 90, support: 220, polish: 12 },
   groupingExample: '« Démarrage tardif », « Communication de dernière minute », « Commencer un an avant » relèvent tous du calendrier',
   typoTolerantQuotes: false,
   attachSingles: false,
@@ -47,7 +47,7 @@ export const METHODS: Record<MethodId, Method> = {
     id: 'ministral',
     label: 'méthode pour modèle léger (Ministral)',
     // Un modèle léger range mal une longue liste d'un coup ; trop petit, il morcelle (passe 2 : 53 motifs).
-    batches: { grouping: 150, assign: 75, review: 60, summary: 40 },
+    batches: { grouping: 150, assign: 75, review: 60, summary: 40, support: 220, polish: 12 },
     // L'exemple de référence servait d'aimant à un modèle léger (un motif fourre-tout de 98 idées).
     groupingExample: "« Trop peu d'agents le samedi », « Longue file au guichet », « Ouvrir un second guichet » relèvent tous de l'attente au guichet",
     typoTolerantQuotes: true,
@@ -70,6 +70,14 @@ export const METHODS: Record<MethodId, Method> = {
       themes:
         "4. Chaque phrase se comprend seule : elle nomme son sujet et ne commence jamais par un pronom ou un connecteur (« Elles », « L'une d'elles », « À l'inverse », « Enfin »).",
     },
+  },
+  // Copie exacte de la référence (processus d'Arnaud) : on ne s'en écarte que si ÉcoSol le montre nécessaire.
+  groq: {
+    ...REFERENCE,
+    id: 'groq',
+    label: 'méthode Groq',
+    // Offre gratuite : une demande de plus de 8 000 jetons est refusée (413). Lots réduits pour rester sous ~6 000.
+    batches: { grouping: 60, assign: 60, review: 30, summary: 20, support: 40, polish: 4 },
   },
 }
 

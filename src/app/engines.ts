@@ -98,6 +98,9 @@ export function providerFor(engine: EngineConfig, retries = 4, onRetry?: LimitOp
     supportsJsonMode: preset?.supportsJsonMode ?? true,
     extraHeaders: preset?.extraHeaders,
     omitTemperature: preset?.omitTemperature,
+    maxOutputTokens: preset?.maxOutputTokens,
+    tokenBudget: preset?.tokenBudget,
+    extraBody: preset?.models?.find((m) => m.id === engine.model)?.extraBody,
   })
   return withLimits(base, { requestsPerMinute: engine.requestsPerMinute, concurrency: engine.concurrency, retries, onRetry })
 }

@@ -304,11 +304,13 @@ export function DropMenu({
   return (
     <div ref={ref} className="relative">
       {iconOnly ? (
-        <Button variant="ghost" size="icon" aria-label={ariaLabel} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <Button type="button" variant="ghost" size="icon" aria-label={ariaLabel} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
           {icon}
         </Button>
       ) : (
         <Button
+          // Dans un formulaire, ouvrir le menu ne doit jamais l'envoyer.
+          type="button"
           variant="outline"
           size="sm"
           aria-label={ariaLabel}

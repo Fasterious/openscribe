@@ -13,6 +13,12 @@ export interface OpenAiCompatibleConfig {
   extraHeaders?: Record<string, string>
   /** Ne pas envoyer de température (refusée par certains modèles). */
   omitTemperature?: boolean
+  /** Longueur de réponse à réserver quand la demande n'en fixe pas (un fournisseur qui en impose une trop courte par défaut). */
+  maxOutputTokens?: number
+  /** Plafond de jetons d'une demande, texte envoyé et réponse réservée compris (offre gratuite de Groq : 8 000). */
+  tokenBudget?: number
+  /** Paramètres propres au modèle, ajoutés à chaque demande (ex. `reasoning_effort`). */
+  extraBody?: Record<string, unknown>
   /** Délai maximal d'une demande, en millisecondes (180 s par défaut : un modèle qui réfléchit peut dépasser 90 s sur un long regroupement). */
   timeoutMs?: number
   /** Délai maximal du test de connexion (tâche « ping »), 20 s par défaut. */
@@ -108,6 +114,12 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
     }
     if (!config.omitTemperature) body.temperature = req.temperature
     if (req.maxTokens) body.max_tokens = req.maxTokens
+    else if (config.maxOutputTokens) {
+      // Sous un plafond par demande, la réponse réservée est ce qui reste une fois le texte envoyé compté (environ 3 caractères par jeton).
+      const sent = Math.ceil((req.system.length + req.user.length) / 3)
+      body.max_tokens = config.tokenBudget ? Math.max(800, Math.min(config.maxOutputTokens, config.tokenBudget - sent - 150)) : config.maxOutputTokens
+    }
+    if (config.extraBody) Object.assign(body, config.extraBody)
     if (allowSeed && req.seed !== undefined && config.seedParam) body[config.seedParam] = req.seed
     if (allowJsonMode && req.json) body.response_format = { type: 'json_object' }
     const headers: Record<string, string> = { 'Content-Type': 'application/json', ...config.extraHeaders }
@@ -163,11 +175,17 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
       if (!response.ok) {
         const detail = (await response.text()).slice(0, 400)
         const status = response.status
-        const fatal = status === 401 || status === 403 || status === 404
+        const fatal = status === 401 || status === 403 || status === 404 || status === 413 || (status === 429 && /per day|daily|TPD|RPD/i.test(detail))
         const tierRefused = status === 403 && /tier|subscription|plan/i.test(detail)
+        // Quota du jour épuisé : réessayer dans une minute ne sert à rien.
+        const dailyQuota = status === 429 && /per day|daily|TPD|RPD/i.test(detail)
         const message = tierRefused
           ? `Votre offre chez ${config.label} ne donne pas accès au modèle « ${config.model} » (erreur 403) : choisissez un autre modèle.`
-          : status === 401 || status === 403
+          : status === 413
+            ? `${config.label} refuse une demande trop longue pour votre offre (erreur 413, limite de jetons par minute) : choisissez un modèle ou une offre aux limites plus larges.`
+            : dailyQuota
+              ? `${config.label} : le quota du jour de votre offre est épuisé (erreur 429). Reprenez demain : ce qui a été fait est conservé.`
+              : status === 401 || status === 403
             ? `${config.label} refuse la clé d'accès (erreur ${status}) : vérifiez qu'elle a été copiée en entier, sans espace, et qu'elle est toujours active.`
             : status === 404
               ? `${config.label} ne trouve pas le modèle « ${config.model} » (erreur 404) : vérifiez le nom du modèle dans la configuration du moteur.`

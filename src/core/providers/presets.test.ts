@@ -71,3 +71,53 @@ describe('réponse coupée', () => {
     expect(err.fatal).toBe(true)
   })
 })
+
+describe('limites de l’offre', () => {
+  const provider = async (status: number, message: string) => {
+    const { createOpenAiCompatibleProvider } = await import('./openai-compatible')
+    return createOpenAiCompatibleProvider({
+      presetId: 'groq',
+      label: 'Groq',
+      baseUrl: 'https://exemple.test/v1',
+      model: 'm',
+      supportsJsonMode: false,
+      fetchImpl: async () => new Response(JSON.stringify({ error: { message } }), { status }),
+    })
+  }
+  const req = { task: 't', system: '', user: '', json: false, temperature: 0 }
+  it('une demande trop longue (413) est dite comme telle, sans nouvelle tentative', async () => {
+    const err = await (await provider(413, 'Request too large on tokens per minute (TPM)')).complete(req).catch((e) => e)
+    expect(err.message).toMatch(/trop longue pour votre offre/)
+    expect(err.fatal).toBe(true)
+  })
+  it('un quota du jour épuisé invite à reprendre demain, sans nouvelle tentative', async () => {
+    const err = await (await provider(429, 'Rate limit reached on tokens per day (TPD)')).complete(req).catch((e) => e)
+    expect(err.message).toMatch(/Reprenez demain/)
+    expect(err.fatal).toBe(true)
+  })
+})
+
+describe('plafond de jetons par demande', () => {
+  it('la réponse réservée est ce qui reste du plafond, jamais moins de 800', async () => {
+    const { createOpenAiCompatibleProvider } = await import('./openai-compatible')
+    const sent: number[] = []
+    const provider = createOpenAiCompatibleProvider({
+      presetId: 'groq',
+      label: 'Groq',
+      baseUrl: 'https://exemple.test/v1',
+      model: 'm',
+      supportsJsonMode: false,
+      maxOutputTokens: 4000,
+      tokenBudget: 8000,
+      fetchImpl: async (_url, init) => {
+        sent.push(JSON.parse(String(init?.body)).max_tokens)
+        return new Response(JSON.stringify({ choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }] }))
+      },
+    })
+    const req = (user: string) => ({ task: 't', system: '', user, json: false, temperature: 0 })
+    await provider.complete(req('court'))
+    await provider.complete(req('x'.repeat(15_000)))
+    await provider.complete(req('x'.repeat(30_000)))
+    expect(sent).toEqual([4000, 8000 - 5000 - 150, 800])
+  })
+})

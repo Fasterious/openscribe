@@ -28,6 +28,7 @@ avant d'être gardés : aucun effet sur une réponse saine.
 |---|---|---|---|
 | `reference` | Sonnet (et par défaut tous les autres) | — | 4,5 / 4 (B10) |
 | `ministral` | Ministral 3B, 8B, 14B (Mistral, offre gratuite) | lots 150/75/60/40 ; exemple de regroupement neutre ; citations aux fautes de frappe rattachées au texte d'origine | 3 / 3 (passe 3) |
+| `groq` | gpt-oss-120b, gpt-oss-20b, Qwen 3.8 27B (Groq, offre gratuite) | lots très réduits (60/60/30/20, vérification 40, relecture 4) pour tenir sous 8 000 jetons par demande | abandonné : synthèse trop longue (environ une heure) |
 | `gemini` | Gemini 3.5 et 3.1 Flash-Lite, 3.8 Flash (Google, offre gratuite) | rattachement des motifs isolés ; règles ajoutées : titres de motif sans « et » ni remplissage, « range d'abord », phrases autonomes, compte = personnes citées | 3,5 / 2,5 (passe 4) |
 
 ## Ministral 14B sur ÉcoSol — 13/10/2026

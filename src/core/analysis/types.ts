@@ -133,7 +133,7 @@ export interface AnalysisSettings {
   temperature: number
   seed: number
   /** Méthode propre à une famille de modèles (voir `methods.ts`), fixée d'après le modèle choisi. Par défaut : la référence. */
-  method?: 'reference' | 'ministral' | 'gemini'
+  method?: 'reference' | 'ministral' | 'gemini' | 'groq'
   /** Remplacé par `method` (analyses enregistrées avant les profils de méthode). */
   lightModel?: boolean
 }

@@ -251,6 +251,8 @@ test('moteurs d’IA : le modèle se choisit dans une liste expliquée, le recom
   const picker = dialog.getByRole('button', { name: 'Choisir le modèle' })
   await expect(picker).toContainText('Ministral 14B')
   await picker.click()
+  // Ouvrir la liste n'envoie pas le formulaire (pas de test de connexion lancé).
+  await expect(dialog.getByRole('button', { name: /Test en cours|Enregistrer quand même/ })).toHaveCount(0)
   await expect(dialog.getByRole('menuitemradio', { name: /Ministral 14B.*Recommandé/ })).toHaveAttribute('aria-checked', 'true')
   await expect(dialog.getByText('Avec le paiement à l’usage activé')).toBeVisible()
   await shot(page, '9b-modeles')

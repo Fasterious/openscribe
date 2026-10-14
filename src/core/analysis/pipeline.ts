@@ -1271,7 +1271,8 @@ async function polishTexts(state: AnalysisState, runner: LlmRunner, emit: () => 
 
   const stats = { checked: 0, changed: 0, refused: 0 }
   const batches: (typeof targets)[] = []
-  for (let i = 0; i < targets.length; i += POLISH_BATCH) batches.push(targets.slice(i, i + POLISH_BATCH))
+  const polishBatch = methodOf(state.settings).batches.polish
+  for (let i = 0; i < targets.length; i += polishBatch) batches.push(targets.slice(i, i + polishBatch))
   await Promise.all(
     batches.map(async (batch) => {
       const res = await runner.json(polishPrompt({ texts: batch.map((t) => ({ id: t.id, text: t.get() })) }, state.settings), polishSchema)
@@ -1484,7 +1485,7 @@ async function checkSupport(state: AnalysisState, runner: LlmRunner, emit: () =>
   const batches: Target[][] = []
   let cur: Target[] = []
   for (const t of targets) {
-    if (cur.length && cur.reduce((n, x) => n + x.allowed.length, 0) + t.allowed.length > SUPPORT_BATCH_IDEAS) {
+    if (cur.length && cur.reduce((n, x) => n + x.allowed.length, 0) + t.allowed.length > methodOf(state.settings).batches.support) {
       batches.push(cur)
       cur = []
     }

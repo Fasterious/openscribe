@@ -86,9 +86,11 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ✅ ÉcoSol avec Gemini 3.5 Flash-Lite en quatre passes : 3,5/5 (`methodologue`), 2,5/5 (`plume`) ; méthode `gemini` (`docs/METHODES.md`)
 - ✅ Essai croisé des règles Gemini sur Ministral : rejeté (note en baisse), Ministral garde sa v3
 - ✅ Filets communs (sans effet sur Sonnet B10) : phrase dépendante, phrase répétée, sujets qui divisent rétablis, renvoi mal formé ; une reprise efface l'erreur de l'étape ; une synthèse propose son dernier moteur
+- ✅ Parcours Groq réel : compte créé par Arnaud, clé par l'agent ; offre gratuite trop limitée pour une synthèse (8 000 jetons/min, 200 000/jour : environ une heure et plus que le quota) : abandonné, sorti des offres recommandées
+- ✅ Bug corrigé : ouvrir la liste des modèles envoyait le formulaire du moteur
 - ⏳ Stratégie « gratuit d'abord » (Arnaud) : un modèle plus fort plus tard, pour toute la synthèse (pas étape par étape)
 - ⏳ Méthode Ministral : phrase orpheline retirée avec sa phrase d'appui, un camp compté une fois, rangement guidé par la question, 6 à 8 thèmes
-- ⏳ Chantiers communs listés dans `docs/METHODES.md` (sujets qui divisent reformulés, consensus rétablis, comptes des intros de thème, renvois en double, motifs fourre-tout) ; message de délai dépassé qui accuse la connexion ; « Groq gratuit sans carte » pas encore vérifié dans sa console
+- ⏳ Chantiers communs listés dans `docs/METHODES.md` (sujets qui divisent reformulés, consensus rétablis, comptes des intros de thème, renvois en double, motifs fourre-tout) ; message de délai dépassé qui accuse la connexion
 
 ## Backlog (idées gardées, pas prioritaires)
 

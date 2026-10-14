@@ -130,3 +130,11 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 - **Essai croisé** : les règles de rédaction de Gemini font baisser Ministral (3 → 2) : rejeté, comme le prévoit le processus d'Arnaud.
 - **Stratégie d'Arnaud** : pousser d'abord le gratuit (horizontal) ; un modèle plus fort plus tard, et alors pour toute la synthèse, pas étape par étape (trop complexe à expliquer).
 - **Quatrième passe** au-delà de la règle des trois : demandée par Arnaud (« itérer au maximum »), justifiée parce qu'elle combinait deux résultats déjà mesurés.
+
+## 2026-10-13 — Groq abandonné pour les synthèses
+
+- **Parcours** : compte créé par Arnaud (l'agent n'en crée pas), clé créée par l'agent, collée par Arnaud. Offre gratuite : 8 000 jetons par minute et 200 000 par jour par modèle.
+- **Mesure** : gpt-oss-120b a fait la moitié d'ÉcoSol en 25 minutes et 150 000 jetons ; Qwen s'est arrêté sur des 429 répétés. Une synthèse entière demanderait environ une heure et dépasserait le quota du jour.
+- **Décision d'Arnaud** : on ne peut pas attendre une heure pour une analyse qui en prend dix ailleurs : Groq abandonné. Il reste proposé pour de petites synthèses, hors des offres recommandées.
+- **Gardé** : messages 413 (demande trop longue pour l'offre) et 429 « quota du jour » (reprendre demain), réponse réservée selon la place restante sous un plafond par demande, longueur de réponse imposée aux fournisseurs qui coupent trop court.
+- **Bug trouvé en route** : le bouton de la liste des modèles envoyait le formulaire (un `type="button"` manquant) ; le test de parcours le vérifie désormais.

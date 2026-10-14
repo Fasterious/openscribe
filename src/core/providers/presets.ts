@@ -42,6 +42,8 @@ export interface ModelChoice {
   recommended?: boolean
   /** Méthode d'analyse propre à ce modèle (voir src/core/analysis/methods.ts) ; à défaut, la référence. */
   method?: MethodId
+  /** Paramètres propres au modèle, ajoutés à chaque demande. */
+  extraBody?: Record<string, unknown>
 }
 
 export interface ProviderPreset {
@@ -75,6 +77,10 @@ export interface ProviderPreset {
   omitTemperature?: boolean
   /** Présenté en tête de son groupe. */
   featured?: boolean
+  /** Longueur de réponse réservée quand la demande n'en fixe pas. */
+  maxOutputTokens?: number
+  /** Plafond de jetons d'une demande (texte envoyé et réponse réservée). */
+  tokenBudget?: number
 }
 
 export const PROVIDER_PRESETS: ProviderPreset[] = [
@@ -136,27 +142,51 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     label: 'Groq',
     baseUrl: 'https://api.groq.com/openai/v1',
     defaultModel: 'openai/gpt-oss-120b',
-    suggestedModels: ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'llama-3.3-70b-versatile'],
+    suggestedModels: ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b'],
+    // Offre gratuite lue dans la console le 13/10/2026 : 30 demandes/min, 1 000/jour, 8 000 jetons/min, 200 000 jetons/jour.
+    models: [
+      {
+        id: 'openai/gpt-oss-120b',
+        label: 'GPT-OSS 120B',
+        hint: 'Le plus capable de l’offre gratuite.',
+        section: "Inclus dans l'offre gratuite",
+        recommended: true,
+        method: 'groq',
+        // Sa réflexion consomme la réponse : courte, pour laisser place au JSON.
+        extraBody: { reasoning_effort: 'low' },
+      },
+      { id: 'qwen/qwen3.8-27b', label: 'Qwen 3.8 27B', hint: 'Bon en français, mêmes limites.', section: "Inclus dans l'offre gratuite", method: 'groq' },
+      {
+        id: 'openai/gpt-oss-20b',
+        label: 'GPT-OSS 20B',
+        hint: 'Plus rapide, moins fin.',
+        section: "Inclus dans l'offre gratuite",
+        method: 'groq',
+        extraBody: { reasoning_effort: 'low' },
+      },
+    ],
+    // Sans longueur demandée, Groq coupe la réponse vers 2 000 à 3 000 jetons ; une demande ne dépasse pas 8 000 jetons en tout.
+    maxOutputTokens: 4000,
+    tokenBudget: 8000,
     needsKey: true,
     keyUrl: 'https://console.groq.com/keys',
     seedParam: 'seed',
     supportsJsonMode: true,
-    freeRequestsPerMinute: 20,
-    freeTier: 'Offre gratuite sans carte bancaire, limitée en nombre de demandes par jour.',
+    freeRequestsPerMinute: 3,
+    freeTier:
+      "Gratuit sans carte, mais trop limité pour une synthèse : 8 000 jetons par minute et 200 000 par jour. Une vingtaine de participants demande plus d'une heure et dépasse le quota du jour.",
     dataPolicy: 'check',
-    dataNote: "Vérifiez la politique de données de l'offre gratuite avant d'y envoyer des données de participants.",
-    family: 'free',
-    bestFor: 'Essayer gratuitement, avec des réponses très rapides.',
+    dataNote:
+      "Groq ne conserve pas vos demandes par défaut (sauf enquête sur un abus, 30 jours au plus) ; la réutilisation pour l'entraînement n'est pas précisée. Hébergement aux États-Unis.",
+    family: 'other',
+    bestFor: 'De petites synthèses (quelques participants), avec des réponses très rapides.',
     kind: 'host',
     steps: [
       {
-        text: 'Créez un compte gratuit chez Groq (adresse e-mail ou compte Google, pas de carte bancaire).',
-        link: { label: 'Ouvrir la console Groq', url: 'https://console.groq.com/' },
-      },
-      {
-        text: 'Dans « API Keys », cliquez sur « Create API Key » et copiez la clé.',
+        text: 'Connectez-vous à la console Groq (compte Google, GitHub ou adresse e-mail, pas de carte bancaire).',
         link: { label: 'Aller aux clés Groq', url: 'https://console.groq.com/keys' },
       },
+      { text: '« Create API Key », donnez-lui un nom, puis « Copy » : la clé ne s’affiche qu’une fois.' },
       { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
     ],
   },
