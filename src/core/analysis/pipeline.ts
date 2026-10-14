@@ -1008,12 +1008,18 @@ export function applyReview(
   const byTitle = new Map(out.map((g) => [g.title.trim().toLowerCase(), g]))
   const retoned: { id: string; from: IdeaCategory; to: IdeaCategory }[] = []
   const moved: { id: string; from: string; to: string }[] = []
-  const done = new Set<string>()
+  // Deux changements sur une même idée (un déplacement, puis une correction de ton) se cumulent : le premier de chaque sorte compte.
+  const merged = new Map<string, { id: string; to?: string; new?: string; category?: IdeaCategory }>()
   for (const c of changes) {
+    const m = merged.get(c.id) ?? { id: c.id }
+    if (!m.to && !m.new && (c.to || c.new)) Object.assign(m, c.to ? { to: c.to } : { new: c.new })
+    if (!m.category && c.category) m.category = c.category
+    merged.set(c.id, m)
+  }
+  for (const c of merged.values()) {
     const idea = byId.get(c.id)
     const from = home.get(c.id)
-    if (!idea || !from || done.has(c.id)) continue
-    done.add(c.id)
+    if (!idea || !from) continue
     if (c.category && c.category !== idea.category && IDEA_CATEGORIES.includes(c.category)) {
       retoned.push({ id: c.id, from: idea.category, to: c.category })
       idea.category = c.category

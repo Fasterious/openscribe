@@ -1066,6 +1066,20 @@ describe('relecture des motifs', () => {
     expect(r.retoned).toEqual([{ id: 'I4', from: 'positive', to: 'negative' }])
   })
 
+  it('un déplacement et une correction de ton donnés séparément pour la même idée se cumulent', () => {
+    const ideas = [idea('I1', 'P1', 'negative'), idea('I2', 'P2', 'positive')]
+    const groups = [
+      { id: 'G1', title: 'Bus', ideaIds: ['I1', 'I2'] },
+      { id: 'G2', title: 'Tram', ideaIds: [] },
+    ]
+    const r = applyReview(ideas, groups, [{ id: 'I1', to: 'G2' }, { id: 'I1', category: 'positive' }, { id: 'I1', to: 'G1' }])
+    expect(r.groups.map((g) => [g.title, g.ideaIds])).toEqual([
+      ['Bus', ['I2']],
+      ['Tram', ['I1']],
+    ])
+    expect(r.retoned).toEqual([{ id: 'I1', from: 'negative', to: 'positive' }])
+  })
+
   it('un identifiant de motif donné comme nouveau titre vaut déplacement, jamais un motif « G2 »', () => {
     const ideas = [idea('I1', 'P1', 'positive'), idea('I2', 'P2', 'positive')]
     const groups = [
