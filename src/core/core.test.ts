@@ -763,6 +763,33 @@ describe('chaîne complète (simulation)', () => {
     expect(r.moved).toEqual([{ id: 'I2', from: 'Attente', to: 'Accueil' }])
   })
 
+  it('méthode « contexte2 » : règles de découpage, verbatims au résumé ; la référence ne change pas', async () => {
+    const corpus = surveyCorpus()
+    const run = async (method?: 'contexte2') => {
+      const base = createSimulationProvider()
+      const seen: Record<string, string> = {}
+      const spy: LlmProvider = {
+        ...base,
+        fingerprint: base.fingerprint,
+        label: base.label,
+        async complete(req) {
+          seen[req.task] ??= req.user
+          return base.complete(req)
+        },
+      }
+      const state = await runAnalysis(corpus, await newAnalysis(corpus, { ...DEFAULT_SETTINGS, method }, spy), { provider: spy, cache: new MemoryCache() })
+      return { state, seen }
+    }
+    const ref = await run()
+    const v2 = await run('contexte2')
+    expect(v2.state.status).toBe('done')
+    expect(v2.seen.extract).toContain('Une critique formulée comme un manque')
+    expect(ref.seen.extract).not.toContain('Une critique formulée comme un manque')
+    expect(v2.seen.global).toContain('"example"')
+    expect(ref.seen.global).not.toContain('"example"')
+    expect(v2.seen.themes).toContain('écris le chiffre de ses')
+  })
+
   it("s'arrête proprement quand on annule", async () => {
     const corpus = surveyCorpus()
     const controller = new AbortController()

@@ -11,7 +11,7 @@ import type { AnalysisSettings } from './types'
  * mal formées tolérées) restent communs : ils ne touchent qu'une réponse
  * défectueuse, et ont été rodés sans effet sur la référence.
  */
-export type MethodId = 'reference' | 'ministral' | 'gemini' | 'groq' | 'gptoss' | 'gemma' | 'qwen' | 'lots' | 'contexte'
+export type MethodId = 'reference' | 'ministral' | 'gemini' | 'groq' | 'gptoss' | 'gemma' | 'qwen' | 'lots' | 'contexte' | 'contexte2'
 
 export interface Method {
   id: MethodId
@@ -27,11 +27,13 @@ export interface Method {
   /** Après la consolidation, chaque motif porté par une seule personne est proposé au rattachement à un motif existant (ou à aucun). */
   attachSingles: boolean
   /** Règles ajoutées à la fin des règles d'une consigne, pour cette méthode seulement (la référence n'en a aucune). */
-  extraRules: Partial<Record<'grouping' | 'summary' | 'themes' | 'global', string>>
+  extraRules: Partial<Record<'extract' | 'grouping' | 'summary' | 'themes' | 'global', string>>
   /** Au regroupement, chaque libellé arrive avec plusieurs verbatims et leur ton (la référence : un seul exemple). */
   groupingContext?: boolean
   /** Après la relecture, chaque motif unanime ou à large majorité est confronté aux idées de ton contraire rangées ailleurs. */
   unanimityReview?: boolean
+  /** Le résumé reçoit le verbatim de chaque proposition et de chaque question (la référence : le titre du motif et un compte). */
+  globalContext?: boolean
 }
 
 const REFERENCE: Method = {
@@ -43,6 +45,9 @@ const REFERENCE: Method = {
   attachSingles: false,
   extraRules: {},
 }
+
+const CONTEXT_GROUPING =
+  "6. Lis les verbatims et leur ton, pas seulement les libellés : deux libellés différents qui parlent du même objet vont dans le même groupe, quel que soit leur ton (« Personnel accueillant » et « Vendeurs introuvables » → « Accueil en magasin »). Un groupe où tout est positif ou tout est négatif est suspect : vérifie qu'aucune idée de ton contraire sur le même objet n'est partie ailleurs.\n7. Une appréciation générale sans objet précis (« tout était parfait », « bravo à toute l'équipe ») va dans un groupe « Appréciation d'ensemble » ; n'y range jamais une idée qui nomme un objet.\n8. Un même reproche fait à plusieurs supports (« site mis à jour trop tard », « affiches posées trop tard ») va dans un seul groupe qui nomme ce reproche (« Retard de la communication »)."
 
 const GEMINI_RULES: Method['extraRules'] = {
   grouping:
@@ -115,8 +120,26 @@ export const METHODS: Record<MethodId, Method> = {
     groupingContext: true,
     unanimityReview: true,
     extraRules: {
-      grouping:
-        "6. Lis les verbatims et leur ton, pas seulement les libellés : deux libellés différents qui parlent du même objet vont dans le même groupe, quel que soit leur ton (« Personnel accueillant » et « Vendeurs introuvables » → « Accueil en magasin »). Un groupe où tout est positif ou tout est négatif est suspect : vérifie qu'aucune idée de ton contraire sur le même objet n'est partie ailleurs.\n7. Une appréciation générale sans objet précis (« tout était parfait », « bravo à toute l'équipe ») va dans un groupe « Appréciation d'ensemble » ; n'y range jamais une idée qui nomme un objet.\n8. Un même reproche fait à plusieurs supports (« site mis à jour trop tard », « affiches posées trop tard ») va dans un seul groupe qui nomme ce reproche (« Retard de la communication »).",
+      grouping: CONTEXT_GROUPING,
+    },
+  },
+  // Chantiers du 14/10 sur la méthode « contexte » (défauts relevés par toutes les lectures) : ton au découpage,
+  // propositions d'une seule personne au résumé, chiffres au lieu de « la plupart » dans les thèmes.
+  contexte2: {
+    ...REFERENCE,
+    id: 'contexte2',
+    label: 'méthode de référence, regroupement en contexte (v2)',
+    groupingContext: true,
+    unanimityReview: true,
+    globalContext: true,
+    extraRules: {
+      extract:
+        "9. Une critique formulée comme un manque (« pas assez de places », « il manque un horaire du soir ») est \"negative\", même si elle sous-entend une solution. Un avis suivi d'une idée pour la suite (« les ateliers sont très utiles, il faudrait en faire un par mois ») donne DEUX idées : l'avis (\"positive\" ou \"negative\") et la proposition (\"suggestion\"), chacune avec son extrait.",
+      grouping: CONTEXT_GROUPING,
+      themes:
+        "4. Quand tu rapportes l'avis des personnes sur un groupe, écris le chiffre de ses \"facts\" (« 6 des 7 personnes qui en parlent ») plutôt que « la plupart » ou « toutes les personnes qui en parlent » : cette règle remplace ces formules de la règle 3. Un seul chiffre par phrase.",
+      global:
+        "7. Chaque ligne de \"proposals\" et de \"questions\" donne un \"example\" : rapporte ce qu'il dit, pas le titre du motif. Une ligne portée par une seule personne se dit « une personne propose » (ou « se demande ») ; ne réunis jamais dans une phrase des propositions de lignes différentes en les attribuant « aux participants ».",
     },
   },
   gemma: {
@@ -138,7 +161,10 @@ export const METHODS: Record<MethodId, Method> = {
 }
 
 /** Les règles propres à une méthode pour une consigne, prêtes à insérer (rien pour la référence). */
-export function methodRules(settings: Pick<AnalysisSettings, 'method'> & { lightModel?: boolean }, prompt: 'grouping' | 'summary' | 'themes' | 'global'): string {
+export function methodRules(
+  settings: Pick<AnalysisSettings, 'method'> & { lightModel?: boolean },
+  prompt: 'extract' | 'grouping' | 'summary' | 'themes' | 'global',
+): string {
   const r = methodOf(settings).extraRules[prompt]
   return r ? `${r}\n` : ''
 }

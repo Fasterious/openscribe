@@ -69,7 +69,7 @@ function requestId(task: string, system: string, user: string): string {
 }
 
 // Migration : rattache les réponses existantes au nouvel identifiant.
-for (const f of readdirSync(join(dir, 'requests'))) {
+for (const f of readdirSync(join(dir, 'requests')).filter((x) => x.endsWith('.json'))) {
   const r = JSON.parse(readFileSync(join(dir, 'requests', f), 'utf8'))
   const oldRes = join(dir, 'responses', f)
   const newRes = join(dir, 'responses', `${r.task}-${requestId(r.task, r.system, r.user)}.json`)
@@ -84,6 +84,10 @@ const bridge: LlmProvider = {
     const reqFile = join(dir, 'requests', `${req.task}-${id}.json`)
     const resFile = join(dir, 'responses', `${req.task}-${id}.json`)
     writeFileSync(reqFile, JSON.stringify({ task: req.task, system: req.system, user: req.user, responseFile: resolve(resFile) }, null, 1))
+    // Copie lisible pour le modèle joué par un sous-agent : la même demande, sur plusieurs lignes (données indentées).
+    const m = req.user.match(/<donnees>\n([\s\S]*)\n<\/donnees>/)
+    const readable = m ? req.user.replace(m[1], JSON.stringify(JSON.parse(m[1]), null, 1)) : req.user
+    writeFileSync(reqFile.replace(/\.json$/, '.txt'), `SYSTEM :\n${req.system}\n\nUSER :\n${readable}\n\nRéponse à écrire dans : ${resolve(resFile)}\n`)
     const deadline = Date.now() + 90 * 60_000
     while (Date.now() < deadline) {
       if (existsSync(resFile)) {
@@ -123,7 +127,7 @@ const title = opt('name') ?? `Analyse — ${basename(csvPath)}`
 writeFileSync(join(dir, 'rapport.md'), reportToMarkdown(state, corpus, title))
 writeFileSync(join(dir, 'rapport.html'), reportToHtml(state, corpus, title))
 console.log('Terminé :', state.status, state.error ?? '', `${state.ideas.length} idées, ${state.groups.length} groupes, ${state.themes.length} thèmes, ${state.rejected.length} citations écartées`)
-const pending = readdirSync(join(dir, 'requests')).filter((f) => !existsSync(join(dir, 'responses', f)))
+const pending = readdirSync(join(dir, 'requests')).filter((f) => f.endsWith('.json') && !existsSync(join(dir, 'responses', f)))
 console.log('Demandes sans réponse :', pending.length)
 
 // Export d'une étude complète (corpus, analyse, réponses), ouvrable dans l'application.
