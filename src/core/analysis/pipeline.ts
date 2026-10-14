@@ -765,55 +765,79 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       const prev = text.slice(Math.max(0, start - 160), start)
       return (start > 160 ? prev.slice(prev.indexOf(' ') + 1) : prev).trim() || undefined
     }
-    const titles = groups.map((g) => ({ id: g.id, title: g.title }))
-    const batches: Group[][] = []
-    let cur: Group[] = []
-    for (const g of groups) {
-      if (cur.length && cur.reduce((n, x) => n + x.ideaIds.length, 0) + g.ideaIds.length > batchSizes(state.settings).review) {
-        batches.push(cur)
-        cur = []
+    // Un tour de relecture sur les motifs donnés ; `arrived` : idées déplacées au tour précédent, à vérifier d'abord.
+    const reviewRound = async (scope: Group[], arrived?: Set<string>) => {
+      const titles = groups.map((g) => ({ id: g.id, title: g.title }))
+      const batches: Group[][] = []
+      let cur: Group[] = []
+      for (const g of scope) {
+        if (cur.length && cur.reduce((n, x) => n + x.ideaIds.length, 0) + g.ideaIds.length > batchSizes(state.settings).review) {
+          batches.push(cur)
+          cur = []
+        }
+        cur.push(g)
       }
-      cur.push(g)
+      if (cur.length) batches.push(cur)
+      const responses = await Promise.all(
+        batches.map((batch) =>
+          runner.json(
+            reviewPrompt(
+              {
+                titles,
+                groups: batch.map((g) => ({
+                  id: g.id,
+                  title: g.title,
+                  mixed: g.metrics.mixed,
+                  ideas: g.ideaIds.map((id) => {
+                    const i = ideaById.get(id)!
+                    return {
+                      id,
+                      participant: i.participantId,
+                      category: i.category,
+                      label: i.label,
+                      verbatim: shortExample(i.verbatim, 220),
+                      before: before(i),
+                      ...(arrived?.has(id) ? { arrived: true } : {}),
+                    }
+                  }),
+                })),
+              },
+              state.settings,
+            ),
+            reviewSchema,
+          ).catch((e: unknown) => {
+            // Une relecture qui boucle jusqu'à la limite de réponse (un modèle local qui répète les mêmes déplacements)
+            // est ignorée pour ce lot : le rangement d'avant reste, l'analyse continue.
+            if (e instanceof ProviderError && e.truncated) {
+              state.reviewSkipped = (state.reviewSkipped ?? 0) + 1
+              return { changes: [] }
+            }
+            throw e
+          }),
+        ),
+      )
+      return responses.flatMap((r) => r.changes)
     }
-    if (cur.length) batches.push(cur)
-    const responses = await Promise.all(
-      batches.map((batch) =>
-        runner.json(
-          reviewPrompt(
-            {
-              titles,
-              groups: batch.map((g) => ({
-                id: g.id,
-                title: g.title,
-                mixed: g.metrics.mixed,
-                ideas: g.ideaIds.map((id) => {
-                  const i = ideaById.get(id)!
-                  return { id, participant: i.participantId, category: i.category, label: i.label, verbatim: shortExample(i.verbatim, 220), before: before(i) }
-                }),
-              })),
-            },
-            state.settings,
-          ),
-          reviewSchema,
-        ).catch((e: unknown) => {
-          // Une relecture qui boucle jusqu'à la limite de réponse (un modèle local qui répète les mêmes déplacements)
-          // est ignorée pour ce lot : le rangement d'avant reste, l'analyse continue.
-          if (e instanceof ProviderError && e.truncated) {
-            state.reviewSkipped = (state.reviewSkipped ?? 0) + 1
-            return { changes: [] }
-          }
-          throw e
-        }),
-      ),
-    )
-    const reviewed = applyReview(
-      state.ideas,
-      groups,
-      responses.flatMap((r) => r.changes),
-    )
+    const reviewed = applyReview(state.ideas, groups, await reviewRound(groups))
     state.retoned = reviewed.retoned
     state.moved = reviewed.moved
     if (reviewed.retoned.length || reviewed.moved.length) groups = takeOffTopic(build(reviewed.groups))
+
+    // Méthode qui le demande : les motifs qui ont reçu une idée sont relus une seconde fois, avec la liste à jour des motifs.
+    // Au premier tour, chaque lot ne connaît que les motifs d'avant : un motif ouvert par un autre lot lui échappe,
+    // et l'idée part vers le motif voisin en gardant le ton jugé par rapport à son ancien motif.
+    if (methodOf(state.settings).arrivalReview && reviewed.moved.length) {
+      const arrived = arrivals(reviewed.moved)
+      const scope = groups.filter((g) => g.ideaIds.some((id) => arrived.has(id)))
+      if (scope.length) {
+        s.message = 'Seconde relecture des motifs'
+        await emit()
+        const second = applyReview(state.ideas, groups, keepForward(await reviewRound(scope, arrived), reviewed.moved, groups))
+        state.retoned = [...state.retoned, ...second.retoned]
+        state.moved = [...state.moved, ...second.moved]
+        if (second.retoned.length || second.moved.length) groups = takeOffTopic(build(second.groups))
+      }
+    }
     s.message = undefined
   }
 
@@ -904,6 +928,33 @@ export function checkOpposed(
       !seen.has(key)
     if (ok) seen.add(key)
     return ok
+  })
+}
+
+const sameTitle = (t: string) => t.trim().toLowerCase()
+
+/** Idées déplacées par la relecture (une idée partie « Hors question » n'est plus dans un motif). */
+export function arrivals(moved: { id: string; to: string }[]): Set<string> {
+  return new Set(moved.filter((m) => sameTitle(m.to) !== sameTitle(OFF_TOPIC)).map((m) => m.id))
+}
+
+/**
+ * Seconde relecture : une idée ne revient jamais au motif qu'elle a quitté au premier tour
+ * (le modèle trancherait deux fois la même question, sans fin). Les autres changements passent.
+ */
+export function keepForward(
+  changes: { id: string; to?: string; new?: string; category?: IdeaCategory }[],
+  moved: { id: string; from: string }[],
+  groups: { id: string; title: string }[],
+): { id: string; to?: string; new?: string; category?: IdeaCategory }[] {
+  const left = new Map(moved.map((m) => [m.id, sameTitle(m.from)]))
+  const titleOf = new Map(groups.map((g) => [g.id, sameTitle(g.title)]))
+  return changes.flatMap((c) => {
+    const back = left.get(c.id)
+    const dest = c.to ? titleOf.get(c.to) : c.new ? sameTitle(c.new) : undefined
+    if (!back || dest !== back) return [c]
+    // Le retour est refusé ; une correction de ton proposée avec lui reste valable.
+    return c.category ? [{ id: c.id, category: c.category }] : []
   })
 }
 

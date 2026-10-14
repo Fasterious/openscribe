@@ -376,7 +376,7 @@ export interface ReviewInput {
     title: string
     /** Personnes qui disent du bien ET du mal de ce motif : à vérifier en priorité. */
     mixed: string[]
-    ideas: { id: string; participant: string; category: IdeaCategory; label: string; verbatim: string; before?: string }[]
+    ideas: { id: string; participant: string; category: IdeaCategory; label: string; verbatim: string; before?: string; arrived?: boolean }[]
   }[]
 }
 
@@ -391,6 +391,12 @@ export const reviewSchema = z.object({
   ),
 })
 
+/** Seconde relecture : les idées marquées "arrived" viennent d'un autre motif, on les vérifie d'abord. */
+function arrivedRule(input: ReviewInput): string {
+  if (!input.groups.some((g) => g.ideas.some((i) => i.arrived))) return ''
+  return `Les idées marquées "arrived" viennent d'être déplacées dans ce motif, parfois faute de mieux : la liste des motifs a changé depuis. Vérifie chacune d'abord. Si elle parle d'un autre objet que celui du motif, déplace-la vers le motif de cet objet (existant ou nouveau). Si elle parle bien de l'objet du motif, juge son ton par rapport à lui : un éloge d'un autre objet n'est pas un avis positif sur celui-ci.\n`
+}
+
 export function reviewPrompt(input: ReviewInput, settings: AnalysisSettings) {
   return {
     task: 'review',
@@ -403,7 +409,7 @@ Règles :
 3. Si le ton d'une idée est faux par rapport à l'objet de son motif, corrige sa catégorie ({"id":"I0044","category":"negative"}) : dans « Prix de l'abonnement », « heureusement que la qualité suit » sous-entend que le prix est élevé. Une proposition est "suggestion".
 4. Un titre de nouveau motif nomme l'objet, jamais le jugement (pas « Points forts », « Critiques ») ; 2 à 6 mots, sans « et ». Réutilise le même titre pour plusieurs idées qui vont ensemble.
 5. Ne renvoie que les changements. Dans le doute, ne change rien : la plupart des idées sont bien rangées.
-${methodRules(settings, 'review')}${lang(settings)}
+${methodRules(settings, 'review')}${arrivedRule(input)}${lang(settings)}
 
 Réponds avec : {"changes":[…]}
 

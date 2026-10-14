@@ -15,6 +15,8 @@ import {
   acceptRewrite,
   applyMerges,
   applyReview,
+  arrivals,
+  keepForward,
   unanimityCheck,
   applySplits,
   applySupport,
@@ -47,7 +49,7 @@ import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtm
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
-import { groupingPrompt, groupSummaryPrompt, groupSummarySchema } from './analysis/prompts'
+import { groupingPrompt, groupSummaryPrompt, groupSummarySchema, reviewPrompt } from './analysis/prompts'
 import { methodRules } from './analysis/methods'
 import { activeParticipants, type Corpus } from './corpus'
 import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole } from './import/csv'
@@ -1058,6 +1060,41 @@ describe('relecture des motifs', () => {
       ['Tractage', ['I2']],
       ['Affiches', ['I1']],
     ])
+  })
+
+  it('seconde relecture : les idées arrivées sont vérifiées, jamais renvoyées au motif quitté', () => {
+    const moved = [
+      { id: 'I1', from: 'Horaires du bus', to: 'Pistes cyclables' },
+      { id: 'I2', from: 'Pistes cyclables', to: 'Hors question' },
+    ]
+    expect([...arrivals(moved)]).toEqual(['I1'])
+    const groups = [
+      { id: 'G1', title: 'Pistes cyclables' },
+      { id: 'G2', title: 'Horaires du bus' },
+      { id: 'G3', title: 'Covoiturage' },
+    ]
+    expect(
+      keepForward(
+        [
+          { id: 'I1', to: 'G2' }, // retour au motif quitté : refusé
+          { id: 'I1', new: 'horaires du bus', category: 'negative' }, // retour par le titre : refusé, le ton reste
+          { id: 'I1', to: 'G3' },
+          { id: 'I5', category: 'positive' },
+        ],
+        moved,
+        groups,
+      ),
+    ).toEqual([{ id: 'I1', category: 'negative' }, { id: 'I1', to: 'G3' }, { id: 'I5', category: 'positive' }])
+  })
+
+  it('la consigne de relecture ne parle des idées arrivées que s\'il y en a', () => {
+    const input = (arrived?: boolean) => ({
+      titles: [{ id: 'G1', title: 'Bus' }],
+      groups: [{ id: 'G1', title: 'Bus', mixed: [], ideas: [{ id: 'I1', participant: 'P1', category: 'positive' as const, label: 'Covoiturage pratique', verbatim: 'le covoiturage, c\'est pratique', ...(arrived ? { arrived } : {}) }] }],
+    })
+    const settings = { ...DEFAULT_SETTINGS, method: 'consultation' as const }
+    expect(reviewPrompt(input(), settings).user).not.toContain('"arrived"')
+    expect(reviewPrompt(input(true), settings).user).toContain('Les idées marquées "arrived"')
   })
 
   it('pistes opposées : deux propositions du motif, de deux personnes différentes', () => {

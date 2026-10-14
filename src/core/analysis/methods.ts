@@ -41,6 +41,8 @@ export interface Method {
   offTopic?: boolean
   /** Les lignes du résumé portent le mot de l'échelle d'avis à côté du chiffre (« unanime : les 24 participants qui donnent un avis »). */
   scaleInLines?: boolean
+  /** Après la relecture, les motifs qui ont reçu une idée sont relus une seconde fois, avec la liste à jour des motifs. */
+  arrivalReview?: boolean
 }
 
 const REFERENCE: Method = {
@@ -159,6 +161,8 @@ export const METHODS: Record<MethodId, Method> = {
     label: 'méthode de référence, adaptée aux consultations publiques',
     offTopic: true,
     scaleInLines: true,
+    // Passe 3 (15/10) : une idée déplacée vers un motif voisin faute de mieux (le bon motif était ouvert par un autre lot) y gardait son ton.
+    arrivalReview: true,
     extraRules: {
       grouping: `6. Une idée qui ne répond pas à l'objet de l'étude (elle parle d'un tout autre sujet) va dans le groupe « ${OFF_TOPIC} », sans autre titre : elle sera gardée et listée, mais ni comptée ni résumée. Une idée qui touche l'objet de l'étude, même de loin, n'y va jamais.
 7. Une idée qui critique un objet pour expliquer le recours à un autre (« faute de bus le soir, je prends la voiture ») juge le premier : elle va avec l'objet critiqué (le bus), pas avec l'objet choisi (la voiture). Range ensemble ce qui juge un même objet.`,
