@@ -2,6 +2,14 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-15 — Observatoire, première étude (école) : passes 3 à 7, non publiée (palier)
+
+- **Demande d'Arnaud** : finir la passe 3, publier à 3,5/5 au moins ; puis (même nuit) « aller au bout » de la méthode et du processus sans dégrader les autres modèles ni les autres études, et publier une fois le rapport à son meilleur. Les passes 4 à 7 dépassent donc la limite de trois passes, à sa demande.
+- **Résultat** : méthode 3/5 à chaque passe (plafond), moyennes 3,25 à 3,67 ; langue 3,5/5 stable. Le seuil n'est pas atteint, rien n'est publié. Détail et causes : `docs/METHODES.md`, section Observatoire.
+- **Ne pas dégrader les autres** : tout ce qui change une consigne passe par la méthode « consultation » ; la référence et les autres méthodes sont inchangées. Les seules corrections communes sont des filets (nombres composés lus en entier, compte réécrit accepté pour son premier renvoi, changements cumulés sur une même idée) et des phrases d'affichage (« fragile » seul, contre-courant dit par son camp) ; les caches ÉcoSol n'étant pas dans cette session, ces dernières sont à rejouer sur eux avant la prochaine certification.
+- **Outil de publication** : `scripts/observatoire/publier.ts` publie la fiche et le rapport (prénoms masqués) dans `public/observatoire/`, et la liste des études ; le fichier d'étude brut n'est jamais publié.
+- **Prochain levier** (passe 8) : le découpage, gardé du cache depuis la passe 1, absorbe des éloges dans la critique qui les suit quand elle porte sur un autre objet.
+
 ## 2026-10-13 — Retours d'Arnaud sur le rapport ÉcoSol : questions, échelle d'avis, restitution brute, sources multiples
 
 - **Cinq catégories d'idées** (remplace les quatre du 11/10) : positif, négatif, suggestion, **question**, constat. Les questionnements du groupe ouvrent des pistes au-delà des solutions proposées ; une question rhétorique qui juge garde sa polarité. « Constat » est gardé : indispensable en entretien (faits d'usage). Section calculée « Questions soulevées ».

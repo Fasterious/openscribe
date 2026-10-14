@@ -32,6 +32,7 @@ avant d'être gardés : aucun effet sur une réponse saine.
 | `gptoss` | gpt-oss 20B sur l'ordinateur (Ollama) | réflexion moyenne ; lots 100/50, synthèses par 10, relecture par 4 ; exemple neutre | arrêté : aucune synthèse complète sur un Mac de 24 Go |
 | `gemma` | Gemma 4 12B sur l'ordinateur (Ollama) | apports de Gemini (isolés rattachés, règles de titre et de rédaction), titres fourre-tout interdits, lots 150/75 | 3 / — (passe 2) ; sous le seuil, retiré des choix |
 | `gemini` | Gemini 3.5 et 3.1 Flash-Lite, 3.8 Flash (Google, offre gratuite) | rattachement des motifs isolés ; règles ajoutées : titres de motif sans « et » ni remplissage, « range d'abord », phrases autonomes, compte = personnes citées | 3,5 / 2,5 (passe 4) |
+| `consultation` | Opus 5.5 (Observatoire : consultations publiques, grand public) | « Hors question » ; ton jugé par rapport à l'objet du motif (raison d'un choix, comparaison, regret d'une limite) ; seconde relecture des motifs qui ont reçu une idée ; unanimités vérifiées (filtre lexical) ; relecture des tons des motifs du résumé ; résumé : équilibre des avis, 8 lignes, mot de l'échelle « de ceux qui en parlent », lignes oubliées signalées ; phrases du code en une phrase | École (Grand débat) : 3 / 3,5 (passes 3 à 7, plafond) |
 
 ## Ministral 14B sur ÉcoSol — 13/10/2026
 
@@ -321,3 +322,48 @@ hybride, lecture d'ensemble par le modèle et contrôles par le code, est la pis
    pour en juger le sens et le ton.
 
 À valider sur une passe ÉcoSol (Opus, méthode « contexte ») avant de conclure.
+
+## Méthode « consultation » sur l'Observatoire, école (Grand débat 2019) — 14-15/10/2026
+
+Première étude publique : 378 réponses tirées au sort parmi 21 868. Moteur Opus 5.5 joué par des
+sous-agents, une passe sans script ; deux lectures `methodologue` et une `plume` par passe (Opus).
+Le découpage est repris du cache jusqu'à la passe 7, pour ne faire varier que le reste.
+
+| Passe | Ce qui change | Méthode (moyenne) | Langue | Cause du plafond |
+|---|---|---|---|---|
+| 1 | référence | 3 | 3,5 | ton jugé hors de l'objet du motif |
+| 2 | méthode « consultation » | 3 (3,5) | 3,5 | éloge d'un autre objet compté dans un motif voisin |
+| 3 | relecture refaite | 3 (3,33) | 3,5 | idée déplacée vers un motif voisin faute de voir le bon (ouvert par un autre lot) |
+| 4 | seconde relecture des arrivées ; raison d'un choix et comparaison ; regret d'une limite | 3 (3,25) | 3,5 | motif dit unanime, ses critiques restées dans un motif voisin |
+| 5 | unanimités vérifiées ; un objet ne se découpe pas selon le jugement ; résumé contrôlé | 3 (3,42) | 3,5 | une demande de plus d'exigence comptée comme éloge |
+| 6 | « réclamer davantage » ; pas de « Choix de X » à côté de X | 3,5 et 3 (3,25 et 3,5) | 3,5 | lectures divergentes : regret qu'une règle manque compté contre elle |
+| 7 | relecture des tons des seuls motifs du résumé | 3 et 3 (3,33 et 3,67) | 3,5 | idem, et un principe général compté comme éloge |
+
+**Verdict à la passe 7 : palier, non publié.** La moyenne monte doucement (3,25 → 3,67) mais chaque
+passe bute sur une ou deux idées limites, différentes d'une passe à l'autre ; aucune n'a changé le sens
+du rapport, plusieurs ont changé une étiquette. Les deux lectures de la passe 7 désignent la même
+cause profonde, hors de portée des relectures : **le découpage**, gardé du cache, absorbe des éloges
+dans la critique qui les suit quand elle porte sur un autre objet. Prochain levier : le découpage
+lui-même (passe 8), puis le traitement des motifs qui portent sur une règle (regretter qu'elle manque
+ou ne soit pas appliquée lui est favorable).
+
+Ce qui reste acquis, utile à toutes les études de l'Observatoire :
+- **Relecture des motifs** : une idée ne voit pas toujours le bon motif au premier tour (lots parallèles) :
+  la seconde relecture des arrivées est indispensable ; deux changements sur une même idée se cumulent.
+- **Ton jugé par rapport à l'objet** : raison d'avoir choisi un autre objet, comparaison (chaque moitié
+  avec son objet), regret qu'une règle limite un objet apprécié, réclamer davantage de ce qu'on regrette.
+  Ces règles ont corrigé chaque fois le cas visé ; elles ne rattrapent pas une idée mal découpée.
+- **Phrases du code** (méthode « consultation ») : une seule phrase pour ce qui divise, titres sans
+  guillemets, propositions contraires nommées par leur objet ; communes : « fragile » seul, contre-courant
+  dit par son camp, nombres composés lus en entier, compte réécrit accepté pour son premier renvoi.
+- **Résumé** : l'équilibre des avis en personnes (avec total et recouvrement) ouvre le résumé ; le mot de
+  l'échelle s'entend « de ceux qui en parlent » ; les lignes oubliées et « fragile » sont signalés à la
+  vérification des renvois.
+
+Questions pour Arnaud (décisions de méthode) :
+- « Fragile » sur une unanimité de 20 personnes ou plus (une voix change l'étiquette, par construction) :
+  le `methodologue` propose de ne l'afficher que sous 10 avis environ. Règle de `CLAUDE.md`, non changée.
+- Le plafond « avis dans le mauvais camp sur un motif du résumé » s'applique-t-il quand l'étiquette ne
+  change pas ? Les lectures divergent (passe 6). La grille ne tranche pas ; non changée.
+- Contrôle « toutes les personnes » : il exige que tous soient cités, et la vérification des renvois
+  remplace alors un vrai « toutes » (motif unanime) par un sous-compte. À revoir pour les motifs unanimes.

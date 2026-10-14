@@ -2,6 +2,21 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-15 — Observatoire, école : passes 3 à 7
+
+**Ce qui a marché**
+- Remonter chaque plafond à l'étape qui l'a causé, en lisant la demande et la réponse brutes : la seconde relecture, la vérification des unanimités et la relecture des tons du résumé ont chacune corrigé le cas visé.
+- Faire valider chaque règle par le `methodologue` avant de la jouer : il a évité deux contresens (un service rare devenu un avis positif ; une comparaison déplacée vers l'objet loué).
+- Rejouer depuis le cache après un correctif du code : gratuit, et cela a montré deux défauts du code (compte réécrit refusé, « dix-huit » lu « huit ») sans rien demander au moteur.
+
+**Ce qui a coûté pour rien**
+- Garder le découpage du cache sept passes durant : chaque relecture rattrapait un cas et en laissait un autre, parce que la cause était en amont.
+- Une lecture unique par passe jusqu'à la passe 5 : les plafonds se jouent sur une idée limite, et une seconde lecture les contredit parfois (passe 6).
+
+**On change**
+- Quand deux passes de suite butent sur des idées limites différentes, on remonte à l'étape amont (le découpage) au lieu d'ajouter une règle en aval.
+- Deux lectures `methodologue` dès qu'une passe peut décider d'une publication.
+
 ## 2026-10-13 — Itération 7 : retours d'Arnaud (questions, échelle, une personne par ligne, sources multiples)
 
 **Ce qui a marché**
