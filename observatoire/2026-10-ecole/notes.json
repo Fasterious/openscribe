@@ -8,5 +8,51 @@
     "note_langue": 3.5,
     "publie": false,
     "raison": "Sous le seuil de 3,5 : ton du motif « Enseignement privé » jugé hors de son objet ; phrase du résumé injectée sans chiffres ni renvoi ; motifs hors question ; renvoi P3 erroné."
+  },
+  {
+    "date": "2026-10-14",
+    "run": "run-opus-2",
+    "methode": "consultation",
+    "modele": "claude-opus-5-5 (joué par sous-agents)",
+    "note_methode": 3,
+    "note_langue": 3.5,
+    "publie": false,
+    "raison": "Moyenne 3,5 mais plafond : « Place de l'école publique » compte des éloges du privé."
+  },
+  {
+    "date": "2026-10-15",
+    "run": "run-opus-3",
+    "methode": "consultation",
+    "modele": "claude-opus-5-5 (joué par sous-agents)",
+    "note_methode": 3,
+    "note_langue": 3.5,
+    "publie": false,
+    "criteres_methode": [
+      3.5,
+      3.5,
+      3.5,
+      3,
+      3.5,
+      3
+    ],
+    "raison": "Moyenne 3,33 (3,5 à l'arrondi) mais plafond : avis comptés dans le mauvais camp sur des motifs du résumé (I0556 dans « Place de l'école publique », déplacé là par la relecture faute de voir « Enseignement privé », ouvert par un autre lot ; I0677 « absence de grève » positif dans « Absences des enseignants » ; I0636 regret des quotas compté négatif dans « Enseignement privé »). Résumé ouvert sur un motif de 10 personnes, « aucune difficulté » non appuyé. Langue : « Des personnes… » ajouté par la relecture, intros de thèmes qui recopient les synthèses, phrases du code mécaniques."
+  },
+  {
+    "date": "2026-10-15",
+    "run": "run-opus-4",
+    "methode": "consultation (passe 4)",
+    "modele": "claude-opus-5-5 (joué par sous-agents)",
+    "note_methode": 3,
+    "note_langue": 3.5,
+    "publie": false,
+    "criteres_methode": [
+      3.5,
+      3.5,
+      3,
+      3,
+      3.5,
+      3
+    ],
+    "raison": "Moyenne 3,25 mais plafond : l'enseignement privé dit unanime, ses critiques étant restées dans « Place de l'école publique » (regroupement selon le jugement). Les trois idées mal classées de la passe 3 sont corrigées. Résumé : deux freins et « fragile » oubliés, exemple de la carte scolaire à contresens. Langue : une synthèse amputée de sa première phrase par le contrôle des comptes (corrigé dans le code)."
   }
 ]

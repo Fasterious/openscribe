@@ -1,0 +1,9 @@
+{"fixes":[
+{"text":"G:G11","n":1,"sentence":"La plupart des personnes qui en parlent constatent une baisse du niveau ou un manque d'exigence [I0017, I0111, I0218, I0306, I0488, I0541, I0601, I0610, I0862]."},
+{"text":"G:G12","n":1,"sentence":"La plupart des personnes qui en parlent jugent les classes surchargées, de la maternelle au lycée [I0022, I0041, I0065, I0129, I0333, I0433, I0587, I0672, I0708, I0729, I0757, I0852]."},
+{"text":"G:G13","n":1,"sentence":"La plupart des personnes qui en parlent jugent que l'école suit mal les élèves en difficulté [I0008, I0019, I0502, I0554, I0647, I0876]."},
+{"text":"G:G13","n":2,"sentence":"Trois personnes racontent un enfant mis de côté ou laissé sans aide, l'une ayant dû chercher seule des solutions [I0019, I0020, I0329, I0408, I0413, I0414], et cinq autres un suivi superficiel ou impossible, faute de moyens, de temps ou de dialogue avec les enseignants [I0008, I0266, I0647, I0709, I0876]."},
+{"text":"G:G17","n":1,"sentence":"La plupart des personnes qui donnent un avis estiment que l'école ne garantit plus l'égalité des chances [I0040, I0115, I0230, I0359, I0621, I0791]."},
+{"text":"G:G18","n":1,"sentence":"La plupart des personnes qui en parlent jugent l'administration de l'Éducation nationale lourde, rigide et éloignée des problèmes [I0102, I0339, I0631, I0632, I0854]."},
+{"text":"G:G19","n":1,"sentence":"La plupart des personnes qui donnent un avis jugent insuffisants les moyens des écoles, en budget comme en personnel [I0021, I0067, I0069, I0087, I0335, I0347, I0474, I0504, I0514, I0607, I0702, I0741, I0773, I0916]."}
+]}

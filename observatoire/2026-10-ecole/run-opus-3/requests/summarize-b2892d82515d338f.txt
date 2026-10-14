@@ -435,4 +435,4 @@ Réponds avec : {"groups":[{"id":"G1","summary":"…","opposed":[]}]}
 }
 </donnees>
 
-Réponse à écrire dans : observatoire/2026-10-ecole/run-opus-3/responses/summarize-b2892d82515d338f.json
+Réponse à écrire dans : /home/user/openscribe/fixtures/private/observatoire/2026-10-ecole/run-opus-3/responses/summarize-b2892d82515d338f.json
