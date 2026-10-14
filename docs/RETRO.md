@@ -147,3 +147,9 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - **Bien marché** : une règle chiffrée (3,5/5) se code en une donnée par modèle, et un test garantit qu'aucun moteur n'est proposé sans note ni écarté sans raison.
 - **Coûté pour rien** : un formateur lancé sans configuration du dépôt a réécrit deux fichiers entiers (annulé) ; ne formater qu'avec l'outil du projet.
 - **On change** : une note s'écrit toujours « 3,5/5 », dans les badges comme dans les phrases (relecture `plume`).
+
+## Regroupement en contexte (14/10, nuit)
+
+- **Bien marché** : reprendre le découpage du cache pour ne faire varier que le regroupement ; deux modèles et deux lectures chacun ont tranché sans débat (langue +0,5, méthode inchangée).
+- **Coûté pour rien** : une commande de push qui ne s'arrêtait pas sur l'échec du test de confidentialité. Les sous-agents qui jouent le modèle lisaient mal les demandes écrites sur une seule ligne de 80 000 caractères.
+- **On change** : le push est enchaîné au test de confidentialité par `&&`, jamais par `;`. Dans la documentation, un défaut se décrit sans citer le verbatim. Le pont de test écrira une copie lisible de chaque demande.
