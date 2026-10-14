@@ -1552,7 +1552,7 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
           lang === 'en'
             ? `On ${q(d.title)}, two proposals go in opposite directions: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
             : // L'objet du désaccord est nommé : « deux propositions s'opposent sur « X » : … » annonçait deux propositions sans les dire.
-              `Deux propositions vont en sens contraire sur ${d.opposed!.about} (${bare(d.title)}) [${d.opposed!.a}, ${d.opposed!.b}].`,
+              `Deux propositions vont en sens contraire sur ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`,
         ),
       ]
     : [
