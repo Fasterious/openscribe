@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { newAnalysis, runAnalysis } from '@/core/analysis/pipeline'
 import type { AnalysisSettings, AnalysisState } from '@/core/analysis/types'
 import { corpusForAnalysis, type Project } from '@/core/project'
+import { runsLocally } from '@/core/providers/location'
 import { methodForModel } from '@/core/providers/presets'
 import { getProject, listProjects, responseCache, saveProject } from './db'
 import { providerFor, type EngineConfig } from './engines'
@@ -121,6 +122,8 @@ export async function startAnalysis(
   resume?: AnalysisState,
 ): Promise<void> {
   if (running.has(projectId)) return
+  // Mode Confidentiel : le code refuse tout moteur en ligne, quoi qu'affiche l'écran.
+  if ((resume?.settings.confidential ?? settings.confidential) && !runsLocally(engine.baseUrl)) return
   const project = await getProject(projectId)
   if (!project) return
   const corpus = corpusForAnalysis(project)

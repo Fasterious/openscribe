@@ -36,6 +36,8 @@ export const SIMULATION_ENGINE: EngineConfig = {
 
 const KEY = 'engines'
 const DEFAULT_KEY = 'defaultEngine'
+/** Mode Confidentiel proposé d'office aux nouvelles synthèses. */
+const CONFIDENTIAL_KEY = 'confidentialDefault'
 
 type Listener = () => void
 const listeners = new Set<Listener>()
@@ -66,6 +68,11 @@ export async function removeEngine(id: string): Promise<void> {
 
 export async function setDefaultEngine(id: string): Promise<void> {
   await setSetting(DEFAULT_KEY, id)
+  notify()
+}
+
+export async function setConfidentialDefault(on: boolean): Promise<void> {
+  await setSetting(CONFIDENTIAL_KEY, on)
   notify()
 }
 
@@ -134,14 +141,16 @@ export async function testEngine(engine: EngineConfig): Promise<{ ok: boolean; m
 export function useEngines() {
   const [engines, setEngines] = useState<EngineConfig[]>([])
   const [defaultId, setDefaultId] = useState<string | undefined>()
+  const [confidentialDefault, setConfidential] = useState(false)
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     let alive = true
     const refresh = async () => {
-      const [all, def] = await Promise.all([loadEngines(), getSetting<string>(DEFAULT_KEY)])
+      const [all, def, conf] = await Promise.all([loadEngines(), getSetting<string>(DEFAULT_KEY), getSetting<boolean>(CONFIDENTIAL_KEY)])
       if (!alive) return
       setEngines(all)
       setDefaultId(def)
+      setConfidential(Boolean(conf))
       setLoaded(true)
     }
     refresh()
@@ -151,7 +160,7 @@ export function useEngines() {
       listeners.delete(refresh)
     }
   }, [])
-  return { engines, defaultId, loaded }
+  return { engines, defaultId, confidentialDefault, loaded }
 }
 
 export interface OllamaStatus {

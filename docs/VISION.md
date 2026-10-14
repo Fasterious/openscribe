@@ -88,6 +88,11 @@ bloqué sur ça. » Concrètement :
   seulement).
 - **Moteurs interchangeables**, choisis pour leur qualité et leur facilité ;
   avertir quand une offre gratuite réutilise les données.
+- **Un moteur par tâche (14/10)** : on choisit un moteur pour une tâche (analyser et
+  rédiger, transcrire, plus tard décrire des images), pas pour un module ; un choix par
+  défaut sur la page Moteurs d'IA, une dérogation dans chaque travail. Mode Confidentiel
+  (rien ne quitte l'ordinateur) par défaut ou par travail, appliqué par le code. La
+  préparation des médias (vidéo → audio, dans le navigateur) est une garantie, pas un moteur.
 - **Transcription** : un fournisseur en ligne asynchrone pour commencer ;
   transcription locale ensuite. La vidéo ne bouge jamais : on n'envoie que
   l'audio et des images clés.

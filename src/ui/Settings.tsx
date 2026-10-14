@@ -1,10 +1,11 @@
-import { ArrowLeft, Check, CheckCircle2, Copy, ExternalLink, HardDrive, Info, Loader2, RefreshCw, Sparkles, Trash2, Zap } from 'lucide-react'
+import { ArrowLeft, Check, CheckCircle2, Cloud, Copy, ExternalLink, HardDrive, Info, Loader2, Lock, RefreshCw, Sparkles, Trash2, Zap } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import {
   detectOllama,
   newEngineFromPreset,
   removeEngine,
   saveEngine,
+  setConfidentialDefault,
   setDefaultEngine,
   testEngine,
   useEngines,
@@ -12,8 +13,9 @@ import {
   type OllamaStatus,
 } from '@/app/engines'
 import { href } from '@/app/router'
+import { runsLocally } from '@/core/providers/location'
 import { PROVIDER_PRESETS, presetById, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
-import { Alert, Badge, Button, Card, CardContent, Dialog, DropMenu, Input, Label, MenuItem, MenuSection, Tooltip, cn } from './primitives'
+import { Alert, Badge, Button, Card, CardContent, Dialog, DropMenu, Input, Label, MenuItem, MenuSection, Select, Tooltip, cn } from './primitives'
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
   local: { label: 'Rien ne quitte votre ordinateur', tone: 'positive' },
@@ -61,7 +63,7 @@ function useOllama() {
 }
 
 export function SettingsPage({ back }: { back?: string }) {
-  const { engines, defaultId, loaded } = useEngines()
+  const { engines, defaultId, confidentialDefault, loaded } = useEngines()
   const [editing, setEditing] = useState<EngineConfig | null>(null)
   const ollama = useOllama()
   const backHref = back ? href({ name: 'project', id: back, tab: 'analysis' }) : null
@@ -102,6 +104,58 @@ export function SettingsPage({ back }: { back?: string }) {
       )}
 
       {engines.length > 0 && (
+        <section aria-labelledby="qui-fait-quoi" className="space-y-3">
+          <h2 id="qui-fait-quoi" className="text-lg font-semibold">
+            Moteur d'IA par tâche
+          </h2>
+          <Card>
+            <CardContent className="divide-y p-0">
+              <div className="grid gap-2 p-4 sm:grid-cols-[12rem_1fr_auto] sm:items-center">
+                <Label htmlFor="defaut-analyse" className="font-medium">
+                  Analyser et rédiger
+                </Label>
+                <Select id="defaut-analyse" value={defaultId ?? ''} onChange={(e) => setDefaultEngine(e.target.value)}>
+                  {!defaultId && <option value="">Choisir un moteur</option>}
+                  {engines.map((e) => (
+                    <option key={e.id} value={e.id} disabled={confidentialDefault && !runsLocally(e.baseUrl)}>
+                      {e.name} · {e.model}
+                      {confidentialDefault && !runsLocally(e.baseUrl) ? ' (en ligne)' : ''}
+                    </option>
+                  ))}
+                </Select>
+                {(() => {
+                  const d = engines.find((e) => e.id === defaultId)
+                  return d ? <Location local={runsLocally(d.baseUrl)} /> : null
+                })()}
+              </div>
+              <div className="grid gap-1 p-4 text-muted-foreground sm:grid-cols-[12rem_1fr] sm:items-center">
+                <span className="font-medium">Transcrire</span>
+                <span className="text-sm">Bientôt, avec le module Entretiens.</span>
+              </div>
+            </CardContent>
+          </Card>
+          <p className="text-xs text-muted-foreground">Ces choix s'appliquent aux nouvelles synthèses ; vous pourrez les changer dans chacune.</p>
+          <label className="flex items-start gap-3 rounded-lg border p-4">
+            <input
+              type="checkbox"
+              className="mt-1 size-4 accent-primary"
+              checked={confidentialDefault}
+              onChange={(e) => setConfidentialDefault(e.target.checked)}
+            />
+            <span>
+              <span className="flex items-center gap-1 font-medium">
+                <Lock className="size-4" /> Mode Confidentiel : rien ne quitte votre ordinateur
+              </span>
+              <span className="block text-sm text-muted-foreground">
+                Pour toute nouvelle synthèse, seuls les moteurs installés sur votre ordinateur (Ollama, LM Studio) sont proposés, et OpenScribe refuse
+                d'envoyer vos données ailleurs. Vous pourrez le désactiver pour une synthèse donnée.
+              </span>
+            </span>
+          </label>
+        </section>
+      )}
+
+      {engines.length > 0 && (
         <section aria-labelledby="mes-moteurs" className="space-y-3">
           <h2 id="mes-moteurs" className="text-lg font-semibold">
             Vos moteurs
@@ -118,6 +172,7 @@ export function SettingsPage({ back }: { back?: string }) {
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-medium">{e.name}</span>
                           {defaultId === e.id && <Badge tone="positive">Utilisé par défaut</Badge>}
+                          <Location local={runsLocally(e.baseUrl)} />
                           {e.verified === false && <Badge tone="warning">N'a pas répondu au test</Badge>}
                           <Badge tone={policy.tone}>{policy.label}</Badge>
                         </div>
@@ -127,11 +182,6 @@ export function SettingsPage({ back }: { back?: string }) {
                         </p>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {defaultId !== e.id && (
-                          <Button size="sm" variant="outline" onClick={() => setDefaultEngine(e.id)}>
-                            Utiliser par défaut
-                          </Button>
-                        )}
                         <Button size="sm" variant="outline" onClick={() => setEditing(e)}>
                           Modifier
                         </Button>
@@ -589,5 +639,18 @@ function ModelPicker({ choices, value, onChange }: { choices: ModelChoice[]; val
       )}
       {!custom && known?.hint && <p className="text-xs text-muted-foreground">{known.hint}</p>}
     </div>
+  )
+}
+
+/** Où vont les données : un mot et une icône, jamais la couleur seule. */
+function Location({ local }: { local: boolean }) {
+  return local ? (
+    <Badge tone="positive" className="gap-1 whitespace-nowrap">
+      <Lock className="size-3" /> Sur votre ordinateur
+    </Badge>
+  ) : (
+    <Badge tone="outline" className="gap-1 whitespace-nowrap">
+      <Cloud className="size-3" /> En ligne
+    </Badge>
   )
 }

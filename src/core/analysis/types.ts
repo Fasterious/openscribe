@@ -134,6 +134,8 @@ export interface AnalysisSettings {
   seed: number
   /** Méthode propre à une famille de modèles (voir `methods.ts`), fixée d'après le modèle choisi. Par défaut : la référence. */
   method?: 'reference' | 'ministral' | 'gemini' | 'groq'
+  /** Mode Confidentiel : rien ne quitte cet ordinateur (seuls les moteurs locaux sont acceptés, par le code). */
+  confidential?: boolean
   /** Remplacé par `method` (analyses enregistrées avant les profils de méthode). */
   lightModel?: boolean
 }

@@ -265,6 +265,31 @@ test('moteurs d’IA : le modèle se choisit dans une liste expliquée, le recom
   await expect(dialog.getByLabel('Nom du modèle')).toHaveValue('mon-modele-2027')
 })
 
+test('qui fait quoi et mode Confidentiel : un moteur en ligne est refusé, et l’écran dit quoi faire', async ({ page }) => {
+  // Un moteur en ligne, enregistré sans test réussi (pas de réseau ici).
+  await page.goto('/#/moteurs')
+  await page.getByRole('listitem').filter({ hasText: 'Mistral AI' }).getByRole('button', { name: 'Configurer' }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByLabel("Clé d'accès").fill('cle-de-test')
+  await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()
+  await dialog.getByRole('button', { name: 'Enregistrer quand même' }).click()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('heading', { name: "Moteur d'IA par tâche" })).toBeVisible()
+  await expect(page.getByText('En ligne').first()).toBeVisible()
+
+  await newStudy(page, 'Étude confidentielle')
+  await page.getByLabel('Fichier à importer').setInputFiles('fixtures/mediatheque.csv')
+  await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
+  await page.getByRole('tab', { name: /Analyse/ }).click()
+  await page.getByLabel("Moteur d'IA pour analyser et rédiger").selectOption({ label: 'Mistral AI · ministral-14b-2512' })
+  await expect(page.getByText(/En ligne · les réponses des participants sont envoyées à Mistral AI/)).toBeVisible()
+  await page.getByRole('checkbox', { name: /Confidentiel/ }).check()
+  await expect(page.getByText(/Aucun de vos moteurs d'IA n'est installé sur votre ordinateur/)).toBeVisible()
+  await expect(page.getByLabel("Moteur d'IA pour analyser et rédiger").locator('option', { hasText: 'Mistral AI' })).toBeDisabled()
+  await noHorizontalScroll(page)
+  await shot(page, '10-confidentiel')
+})
+
 test('Ollama absent : l’erreur dit quoi faire', async ({ page }) => {
   await page.goto('/#/moteurs')
   await page.getByRole('listitem').filter({ hasText: 'Ollama' }).getByRole('button', { name: 'Configurer' }).click()
@@ -344,7 +369,7 @@ test('un moteur qui n’a pas répondu au test n’est ni annoncé prêt ni choi
   await expect(page.getByText(/enregistré, mais il n'a pas répondu au test/)).toBeVisible()
   await expect(page.getByText('Votre moteur est prêt')).toHaveCount(0)
   await page.getByRole('link', { name: 'Revenir à votre synthèse' }).first().click()
-  await expect(page.getByLabel("Moteur d'IA")).toHaveValue('simulation')
+  await expect(page.getByLabel("Moteur d'IA pour analyser et rédiger")).toHaveValue('simulation')
 })
 
 test('vos études : renommer, dupliquer et supprimer depuis le menu d’une étude', async ({ page }) => {

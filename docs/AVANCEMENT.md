@@ -88,6 +88,9 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ✅ Filets communs (sans effet sur Sonnet B10) : phrase dépendante, phrase répétée, sujets qui divisent rétablis, renvoi mal formé ; une reprise efface l'erreur de l'étape ; une synthèse propose son dernier moteur
 - ✅ Parcours Groq réel : compte créé par Arnaud, clé par l'agent ; offre gratuite trop limitée pour une synthèse (8 000 jetons/min, 200 000/jour : environ une heure et plus que le quota) : abandonné, sorti des offres recommandées
 - ✅ Bug corrigé : ouvrir la liste des modèles envoyait le formulaire du moteur
+- ✅ Recherche des offres gratuites (14/10) : Cohere et Ollama à essayer ; Zhipu, GitHub Models, NVIDIA refusent le navigateur ; le reste trop limité ou payant
+- ✅ Moteur d'IA par tâche et mode Confidentiel (premier pas) : défaut « Analyser et rédiger » sur la page Moteurs, dérogation et mode Confidentiel par synthèse, refus des moteurs en ligne par le code, mention « Sur votre ordinateur » / « En ligne » ; relu par la `plume`, test de parcours
+- ⏳ Transcription (module Entretiens) : ligne « Transcrire » du choix par tâche, conversion vidéo → audio dans le navigateur, capacités par modèle éprouvées en vrai
 - ⏳ Stratégie « gratuit d'abord » (Arnaud) : un modèle plus fort plus tard, pour toute la synthèse (pas étape par étape)
 - ⏳ Méthode Ministral : phrase orpheline retirée avec sa phrase d'appui, un camp compté une fois, rangement guidé par la question, 6 à 8 thèmes
 - ⏳ Chantiers communs listés dans `docs/METHODES.md` (sujets qui divisent reformulés, consensus rétablis, comptes des intros de thème, renvois en double, motifs fourre-tout) ; message de délai dépassé qui accuse la connexion

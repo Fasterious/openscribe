@@ -121,3 +121,12 @@ describe('plafond de jetons par demande', () => {
     expect(sent).toEqual([4000, 8000 - 5000 - 150, 800])
   })
 })
+
+describe('où tourne un moteur', () => {
+  it('seule une adresse locale compte comme « sur votre ordinateur »', async () => {
+    const { runsLocally } = await import('./location')
+    for (const u of ['http://localhost:11434/v1', 'http://127.0.0.1:1234/v1', 'http://[::1]:8080/v1', 'local']) expect(runsLocally(u), u).toBe(true)
+    for (const u of ['https://api.mistral.ai/v1', 'http://192.168.1.20:11434/v1', 'https://localhost.example.com/v1', 'pas une adresse'])
+      expect(runsLocally(u), u).toBe(false)
+  })
+})

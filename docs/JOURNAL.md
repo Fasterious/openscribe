@@ -138,3 +138,10 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 - **Décision d'Arnaud** : on ne peut pas attendre une heure pour une analyse qui en prend dix ailleurs : Groq abandonné. Il reste proposé pour de petites synthèses, hors des offres recommandées.
 - **Gardé** : messages 413 (demande trop longue pour l'offre) et 429 « quota du jour » (reprendre demain), réponse réservée selon la place restante sous un plafond par demande, longueur de réponse imposée aux fournisseurs qui coupent trop court.
 - **Bug trouvé en route** : le bouton de la liste des modèles envoyait le formulaire (un `type="button"` manquant) ; le test de parcours le vérifie désormais.
+
+## 2026-10-14 — Un moteur par tâche, mode Confidentiel
+
+- **Demande d'Arnaud** : renseigner tous les moteurs en un endroit, puis choisir dans chaque module celui qu'on applique ; choisir ce qui se fait en local (transcription, conversion vidéo → audio avec FFmpeg).
+- **Proposition du `ux-designer`, retenue** : raisonner par tâche (une même tâche sert plusieurs modules), défaut sur la page Moteurs d'IA, dérogation dans le travail ; mode Confidentiel ; la conversion des médias comme garantie (toujours dans le navigateur), pas comme moteur.
+- **Premier pas livré** : « Moteur d'IA par tâche » (ligne « Analyser et rédiger », « Transcrire » annoncée), pastille « Sur votre ordinateur » / « En ligne » (seule une adresse locale compte), mode Confidentiel par défaut et par synthèse, appliqué par le code au lancement.
+- **Recherche des offres gratuites** : voir `docs/PARCOURS-FOURNISSEURS.md` (14/10).

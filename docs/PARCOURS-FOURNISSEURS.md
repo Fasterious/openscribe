@@ -96,6 +96,31 @@ Verdict : Groq est gratuit et sans carte, mais son offre gratuite ne permet pas 
 d'une vingtaine de participants dans un délai raisonnable. Il sort des offres recommandées
 pour démarrer et reste proposé pour de petites synthèses.
 
+## Recherche des autres offres gratuites — 14/10/2026
+
+Critères tirés des parcours réels : inscription sans carte, interface compatible OpenAI,
+appel possible depuis le navigateur (CORS, testé par une requête préalable le 14/10), débit
+suffisant pour une synthèse ÉcoSol (environ 215 000 jetons, 50 à 80 demandes, en une dizaine
+de minutes), politique de données claire. Sources : documentation officielle quand elle existe,
+sinon annuaires tiers (à revérifier dans la console avant toute annonce).
+
+| Fournisseur | Offre | Navigateur | Verdict |
+|---|---|---|---|
+| **Cohere** (Command A, Canada) | Clé d'essai gratuite : 1 000 demandes par mois, 20 par minute, sans plafond de jetons annoncé | Oui | **À essayer** : une quinzaine de synthèses par mois, modèle fort |
+| **Ollama** (sur l'ordinateur) | Gratuit, rien ne sort de la machine ; Mac M5, 24 Go : modèles de 12 à 24 milliards de paramètres | Oui (local) | **À essayer** : demande d'installer Ollama |
+| DeepSeek (Chine) | 5 millions de jetons à l'inscription, une fois, environ 30 jours, sans carte | Oui | Essai seulement ; hébergement en Chine : pas pour des données de participants sans accord |
+| Alibaba Qwen (Singapour) | 1 million de jetons par modèle, 90 jours ; carte probablement demandée à l'inscription | Oui | Essai seulement, à vérifier |
+| BytePlus (Doubao, ByteDance) | 500 000 jetons par modèle, une fois ; le reste est payant | Oui | Essai seulement |
+| SiliconFlow (Chine) | Petits modèles gratuits, mais vérification d'identité chinoise exigée ; exclu de l'UE selon une source | Oui | Écarté |
+| Zhipu / Z.ai (GLM Flash) | Modèles GLM Flash gratuits en permanence | **Non** (pas d'en-tête CORS) | Écarté tant qu'il refuse le navigateur |
+| GitHub Models | Gratuit avec un compte GitHub, petites demandes | **Non** | Écarté |
+| NVIDIA NIM | Crédits gratuits, 40 demandes par minute | **Non** | Écarté |
+| OVHcloud AI Endpoints (Europe) | Sans compte : 2 demandes par minute ; avec clé : moyen de paiement exigé | Oui | Trop lent sans clé (40 minutes par synthèse) |
+| LLM7.io | 1 million de jetons par jour, 100 demandes par heure | Oui | Écarté : opérateur et politique de données inconnus |
+| OpenRouter (modèles `:free`) | 50 demandes par jour sans achat | Oui | Écarté : moins qu'une synthèse |
+| SambaNova | 20 demandes par jour | — | Écarté |
+| Cerebras | Carte exigée depuis juillet 2026 | — | Écarté |
+
 ## Leçons pour tous les fournisseurs
 
 - **Une offre gratuite est un fait daté**, pas une propriété du fournisseur : la fiche

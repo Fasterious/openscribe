@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Circle, Loader2, Play, RotateCcw, Square, XCircle } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Circle, Cloud, Loader2, Lock, Play, RotateCcw, Square, XCircle } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SIMULATION_ENGINE, SIMULATION_ENGINE_ID, useEngines, type EngineConfig } from '@/app/engines'
 import { href, navigate } from '@/app/router'
@@ -6,6 +6,7 @@ import { cancelAnalysis, startAnalysis, useIsRunning, useRunNotice } from '@/app
 import { corpusHash } from '@/core/analysis/pipeline'
 import { DEFAULT_SETTINGS, type AnalysisSettings, type AnalysisState, type StepId } from '@/core/analysis/types'
 import { activeParticipants } from '@/core/corpus'
+import { runsLocally } from '@/core/providers/location'
 import { presetById } from '@/core/providers/presets'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { CATEGORY, formatDuration, plural } from '../format'
@@ -39,7 +40,7 @@ function estimate(project: Project, engine: EngineConfig | undefined) {
 
 export function AnalysisTab({ project }: { project: Project }) {
   const running = useIsRunning(project.id)
-  const { engines, defaultId, loaded } = useEngines()
+  const { engines, defaultId, confidentialDefault, loaded } = useEngines()
   const latest = project.analyses[0] as AnalysisState | undefined
   const [engineId, setEngineId] = useState<string>('')
   const [settings, setSettings] = useState<AnalysisSettings>({ ...DEFAULT_SETTINGS, ...latest?.settings })
@@ -47,12 +48,22 @@ export function AnalysisTab({ project }: { project: Project }) {
   const [hash, setHash] = useState<string | null>(null)
 
   const allEngines = useMemo(() => [...engines, SIMULATION_ENGINE], [engines])
+  // Une synthèse neuve reprend le mode Confidentiel par défaut ; une synthèse déjà analysée garde le sien.
+  useEffect(() => {
+    if (loaded && !latest && settings.confidential === undefined) setSettings((s) => ({ ...s, confidential: confidentialDefault }))
+  }, [loaded]) // eslint-disable-line react-hooks/exhaustive-deps
+  const allowed = (e: EngineConfig) => !settings.confidential || runsLocally(e.baseUrl)
   useEffect(() => {
     if (!loaded || engineId) return
     // Un moteur qui n'a pas répondu au test n'est jamais choisi d'office.
     const usable = engines.filter((e) => e.verified !== false || e.id === defaultId)
     // Une synthèse déjà analysée propose son dernier moteur : une relance ne change pas de moteur par mégarde.
     const previous = latest && usable.find((e) => e.presetId === latest.engine.presetId && e.model === latest.engine.model)
+    const local = settings.confidential ?? (latest ? false : confidentialDefault)
+    if (local && !previous) {
+      setEngineId(usable.find((e) => runsLocally(e.baseUrl))?.id ?? SIMULATION_ENGINE_ID)
+      return
+    }
     setEngineId(previous?.id ?? (defaultId && usable.some((e) => e.id === defaultId) ? defaultId : usable[0]?.id ?? SIMULATION_ENGINE_ID))
   }, [loaded, defaultId, engines, engineId])
   useEffect(() => {
@@ -65,6 +76,8 @@ export function AnalysisTab({ project }: { project: Project }) {
   const canResume = latest && !running && (latest.status === 'cancelled' || latest.status === 'error') && !outdated
   const preset = engine ? presetById(engine.presetId) : undefined
   const missingKey = engine && preset?.needsKey && preset.id !== 'custom' && !engine.apiKey
+  const blocked = Boolean(engine && !allowed(engine))
+  const noLocal = Boolean(settings.confidential) && !engines.some((e) => runsLocally(e.baseUrl))
 
   // Une analyse interrompue se reprend avec SON moteur : sinon le rapport mélangerait deux moteurs sous un seul nom.
   const resumeEngine = latest ? allEngines.find((e) => e.presetId === latest.engine.presetId && e.model === latest.engine.model) : undefined
@@ -125,15 +138,66 @@ export function AnalysisTab({ project }: { project: Project }) {
             </fieldset>
 
             <div className="space-y-2">
-              <Label htmlFor="moteur">Moteur d'IA</Label>
+              <Label htmlFor="moteur">Moteur d'IA pour analyser et rédiger</Label>
               <Select id="moteur" value={engineId} disabled={running} onChange={(e) => setEngineId(e.target.value)}>
                 {allEngines.map((e) => (
-                  <option key={e.id} value={e.id}>
+                  <option key={e.id} value={e.id} disabled={!allowed(e)}>
                     {e.name}
                     {e.presetId !== 'simulation' ? ` · ${e.model}` : ''}
+                    {!allowed(e) ? ' (en ligne)' : ''}
                   </option>
                 ))}
               </Select>
+              {engine && (
+                <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                  {runsLocally(engine.baseUrl) ? (
+                    <span className="inline-flex items-center gap-1">
+                      <Lock className="size-3" /> Sur votre ordinateur
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1">
+                      <Cloud className="size-3" /> En ligne · les réponses des participants sont envoyées à {presetById(engine.presetId)?.label ?? engine.name}
+                    </span>
+                  )}
+                  {engine.id === defaultId && <span>· Moteur par défaut</span>}
+                  <a className="underline-offset-4 hover:underline" href={href({ name: 'settings', back: project.id })}>
+                    Changer le moteur par défaut
+                  </a>
+                </p>
+              )}
+              <label className="flex items-start gap-2 pt-1 text-sm">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 size-4 accent-primary"
+                  disabled={running}
+                  checked={Boolean(settings.confidential)}
+                  onChange={(e) => {
+                    const on = e.target.checked
+                    setSettings({ ...settings, confidential: on })
+                    if (on && engine && !runsLocally(engine.baseUrl)) setEngineId(allEngines.find((x) => runsLocally(x.baseUrl) && x.id !== SIMULATION_ENGINE_ID)?.id ?? engineId)
+                  }}
+                />
+                <span>
+                  <span className="font-medium">
+                    <Lock className="mr-1 inline size-3.5 align-[-2px]" />
+                    Mode Confidentiel : rien ne quitte votre ordinateur
+                  </span>
+                  <span className="block text-xs text-muted-foreground">Seuls les moteurs d'IA installés sur votre ordinateur peuvent analyser cette synthèse.</span>
+                </span>
+              </label>
+              {(blocked || noLocal) && (
+                <Alert tone="warning" className="space-y-2">
+                  <p>
+                    Aucun de vos moteurs d'IA n'est installé sur votre ordinateur : en mode Confidentiel, impossible de lancer l'analyse. Ajoutez Ollama ou LM
+                    Studio, ou décochez « Mode Confidentiel » pour cette synthèse.
+                  </p>
+                  <a href={href({ name: 'settings', back: project.id })}>
+                    <Button size="sm" tabIndex={-1}>
+                      Ajouter un moteur sur votre ordinateur
+                    </Button>
+                  </a>
+                </Alert>
+              )}
               {engines.length === 0 && (
                 <Alert tone="info" className="space-y-2">
                   <p>Pour analyser vos données, branchez un moteur d'IA : une clé gratuite se crée en quelques minutes.</p>
@@ -144,7 +208,7 @@ export function AnalysisTab({ project }: { project: Project }) {
                   </a>
                 </Alert>
               )}
-              {engine?.verified === false && (
+              {engine?.verified === false && !blocked && (
                 <Alert tone="warning">
                   Ce moteur n'a pas répondu au dernier test de connexion.{' '}
                   <a className="font-medium underline" href={href({ name: 'settings', back: project.id })}>
@@ -217,7 +281,7 @@ export function AnalysisTab({ project }: { project: Project }) {
                 </Button>
               ) : (
                 <>
-                  <Button variant={latest?.status === 'done' ? 'outline' : 'default'} onClick={() => launch()} disabled={!engine || Boolean(missingKey) || (settings.mode === 'grid' && !gridText.trim())}>
+                  <Button variant={latest?.status === 'done' ? 'outline' : 'default'} onClick={() => launch()} disabled={!engine || blocked || Boolean(missingKey) || (settings.mode === 'grid' && !gridText.trim())}>
                     <Play /> {latest ? 'Relancer une analyse' : "Lancer l'analyse"}
                   </Button>
                   {project.analyses.some((a) => a.status === 'done') && (
