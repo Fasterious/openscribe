@@ -1,5 +1,8 @@
 import type { AnalysisSettings } from './types'
 
+/** Groupe des idées qui ne répondent pas à la question (méthodes qui le prévoient). */
+export const OFF_TOPIC = 'Hors question'
+
 /**
  * Une méthode par famille de modèles (décision d'Arnaud, 13/10/2026) : la méthode
  * de référence, certifiée avec Sonnet sur ÉcoSol, ne change pas quand on affine
@@ -11,7 +14,7 @@ import type { AnalysisSettings } from './types'
  * mal formées tolérées) restent communs : ils ne touchent qu'une réponse
  * défectueuse, et ont été rodés sans effet sur la référence.
  */
-export type MethodId = 'reference' | 'ministral' | 'gemini' | 'groq' | 'gptoss' | 'gemma' | 'qwen' | 'lots' | 'contexte' | 'contexte2'
+export type MethodId = 'reference' | 'ministral' | 'gemini' | 'groq' | 'gptoss' | 'gemma' | 'qwen' | 'lots' | 'contexte' | 'contexte2' | 'consultation'
 
 export interface Method {
   id: MethodId
@@ -27,13 +30,17 @@ export interface Method {
   /** Après la consolidation, chaque motif porté par une seule personne est proposé au rattachement à un motif existant (ou à aucun). */
   attachSingles: boolean
   /** Règles ajoutées à la fin des règles d'une consigne, pour cette méthode seulement (la référence n'en a aucune). */
-  extraRules: Partial<Record<'extract' | 'grouping' | 'summary' | 'themes' | 'global', string>>
+  extraRules: Partial<Record<'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global', string>>
   /** Au regroupement, chaque libellé arrive avec plusieurs verbatims et leur ton (la référence : un seul exemple). */
   groupingContext?: boolean
   /** Après la relecture, chaque motif unanime ou à large majorité est confronté aux idées de ton contraire rangées ailleurs. */
   unanimityReview?: boolean
   /** Le résumé reçoit le verbatim de chaque proposition et de chaque question (la référence : le titre du motif et un compte). */
   globalContext?: boolean
+  /** Les idées sans rapport avec la question vont dans « Hors question » : gardées et listées, jamais comptées dans un motif ni résumées. */
+  offTopic?: boolean
+  /** Les lignes du résumé portent le mot de l'échelle d'avis à côté du chiffre (« unanime : les 24 participants qui donnent un avis »). */
+  scaleInLines?: boolean
 }
 
 const REFERENCE: Method = {
@@ -142,6 +149,32 @@ export const METHODS: Record<MethodId, Method> = {
         "7. Chaque ligne de \"proposals\" et de \"questions\" donne un \"example\" : rapporte ce qu'il dit, pas le titre du motif. Une ligne portée par une seule personne se dit « une personne propose » (ou « se demande ») ; ne réunis jamais dans une phrase des propositions de lignes différentes en les attribuant « aux participants ».",
     },
   },
+  // Consultations publiques (Observatoire, 14/10) : une question, des centaines de réponses spontanées, dont certaines parlent
+  // d'autre chose. Défauts relevés par le methodologue sur la première étude (école, Grand débat 2019, 3/5) : idées sans rapport
+  // devenues des motifs, ton jugé hors de l'objet du motif (on critique un objet pour justifier le recours à un autre),
+  // comptabilité visible dans les synthèses, format de « opposed » deviné. Le découpage reste celui de la référence (cache gardé).
+  consultation: {
+    ...REFERENCE,
+    id: 'consultation',
+    label: 'méthode de référence, adaptée aux consultations publiques',
+    offTopic: true,
+    scaleInLines: true,
+    extraRules: {
+      grouping: `6. Une idée qui ne répond pas à l'objet de l'étude (elle parle d'un tout autre sujet) va dans le groupe « ${OFF_TOPIC} », sans autre titre : elle sera gardée et listée, mais ni comptée ni résumée. Une idée qui touche l'objet de l'étude, même de loin, n'y va jamais.
+7. Une idée qui critique un objet pour expliquer le recours à un autre (« faute de bus le soir, je prends la voiture ») juge le premier : elle va avec l'objet critiqué (le bus), pas avec l'objet choisi (la voiture). Range ensemble ce qui juge un même objet.`,
+      assign: `« ${OFF_TOPIC} » reçoit seulement les idées qui ne répondent pas à l'objet de l'étude. Une idée qui critique un objet pour expliquer le recours à un autre va avec l'objet critiqué.`,
+      review: `6. Le ton se juge par rapport à l'objet du motif, pas par rapport à la phrase. Dans « Voiture », « faute de bus le soir, je prends la voiture » critique le bus, pas la voiture : l'idée part dans un motif sur le bus (existant ou nouveau) et ne compte pas comme un avis négatif sur la voiture. De même, un éloge d'un autre objet n'est pas un avis positif sur l'objet du motif : dans « Bus », « le covoiturage, c'est très pratique » part avec le covoiturage.
+7. Un motif où les avis positifs et négatifs sont proches en nombre mêle souvent deux objets : lis ses avis camp par camp. Si les uns jugent un objet et les autres un objet voisin (« la gratuité du musée » et « le prix des expositions temporaires » ; « le stationnement payant » et « les contrôles qui ne sont jamais faits »), déplace l'un des deux camps vers un motif qui nomme son objet (existant ou nouveau). Regretter qu'une règle ne soit pas appliquée n'est pas critiquer la règle.
+8. Une idée qui ne répond pas à l'objet de l'étude part dans « ${OFF_TOPIC} » : {"id":"I0150","new":"${OFF_TOPIC}"}. Dans le doute, garde-la.`,
+      summary: `9. Format de "opposed" : [{"a":"I0012","b":"I0040","about":"le prix de l'adhésion"}], "a" et "b" étant les identifiants des deux propositions.
+10. Ne montre pas tes comptes : pas de « dont une des précédentes », « dont deux déjà citées », « parmi elles » (cette règle remplace l'exemple de la règle 7). Chaque affirmation donne son propre nombre de personnes ; le lecteur retrouve les personnes dans les renvois.
+11. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un motif (le lecteur comprendrait « la plupart des répondants ») ; écris « la plupart de ceux qui en parlent », ou le nombre de personnes. Nombres en chiffres, en lettres seulement en tête de phrase. Au plus un point-virgule par phrase.`,
+      themes: `4. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un groupe ; écris « la plupart de ceux qui en parlent », ou le nombre de personnes.`,
+      global: `7. Chaque ligne de "strengths" et "blockers" donne le mot de l'échelle d'avis (unanime, large majorité, majorité) : il ouvre la phrase et le chiffre suit entre parenthèses (« Une large majorité critique la carte de transport (29 des 35 participants qui donnent un avis) », « Tous ceux qui en parlent regrettent les retards (les 24 participants qui donnent un avis) »). « Unanime » s'entend de ceux qui donnent un avis : la règle 3 ne l'interdit pas ici, mais n'écris jamais « tout le monde ».
+8. Un motif d'appréciation d'ensemble (« Expérience globale », « Bilan ») ne recueille que des jugements généraux : n'ouvre pas le résumé sur lui et ne le présente pas comme l'avis de la plupart ; dis « N personnes disent n'avoir rencontré aucune difficulté ».
+9. Pour une proposition, nomme ce qu'elle vise, sans détail que porte une seule personne (« ouvrir le guichet le samedi » seulement si chaque personne comptée le propose). Une phrase d'annonce (« L'accès au service concentre les critiques : ») ne couvre que les motifs qu'elle annonce.`,
+    },
+  },
   gemma: {
     ...REFERENCE,
     id: 'gemma',
@@ -163,7 +196,7 @@ export const METHODS: Record<MethodId, Method> = {
 /** Les règles propres à une méthode pour une consigne, prêtes à insérer (rien pour la référence). */
 export function methodRules(
   settings: Pick<AnalysisSettings, 'method'> & { lightModel?: boolean },
-  prompt: 'extract' | 'grouping' | 'summary' | 'themes' | 'global',
+  prompt: 'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global',
 ): string {
   const r = methodOf(settings).extraRules[prompt]
   return r ? `${r}\n` : ''

@@ -192,6 +192,8 @@ export interface AnalysisState {
   merges?: Merge[]
   /** Idées dont le ton a été rejugé par rapport à l'objet de leur motif (personnes mitigées), avec leur catégorie d'origine. */
   retoned?: { id: string; from: IdeaCategory; to: IdeaCategory }[]
+  /** Idées qui ne répondent pas à la question (méthodes qui le prévoient) : gardées et listées, rangées dans aucun motif. */
+  offTopic?: string[]
   /** Idées déplacées par la relecture des motifs (titres du motif de départ et d'arrivée). */
   moved?: { id: string; from: string; to: string }[]
   /** Vérification des renvois : phrases relues, corrigées, retirées. */

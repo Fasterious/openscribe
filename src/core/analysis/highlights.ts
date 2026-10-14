@@ -23,6 +23,9 @@ export interface Highlight {
   ideaIds: string[]
   /** « Ce qui divise » : un constat partagé dont les pistes s'opposent (deux propositions et leur objet). */
   opposed?: { a: string; b: string; about: string }
+  /** Échelle d'avis du motif (« Ce qui a marché », « Ce qui bloque ») : le mot qui accompagne le chiffre. */
+  stance?: Group['metrics']['stance']
+  fragile?: boolean
 }
 
 export interface Highlights {
@@ -49,6 +52,8 @@ export function highlights(groups: Group[], ideas?: Map<string, Idea>): Highligh
         people: (side === 'positive' ? g.metrics.positiveOnly : g.metrics.negativeOnly).length,
         of: opinions(g),
         ideaIds: ofCategory(g, side),
+        stance: g.metrics.stance,
+        fragile: g.metrics.fragile,
       }))
       // À nombre égal, le motif le plus net d'abord (4 sur 4 avant 4 sur 5).
       .sort((a, b) => b.people - a.people || b.people / b.of - a.people / a.of || a.title.localeCompare(b.title))
@@ -78,8 +83,12 @@ export function highlights(groups: Group[], ideas?: Map<string, Idea>): Highligh
   return { strengths: consensus('positive'), blockers: consensus('negative'), divided, proposals: nonPolar('suggestion'), questions: nonPolar('question') }
 }
 
-/** Une ligne lisible pour le modèle : « Réservation en ligne : 4 des 5 participants qui donnent un avis ». */
-export function highlightLine(h: Highlight, kind: keyof Highlights, lang: 'fr' | 'en' = 'fr'): string {
+/**
+ * Une ligne lisible pour le modèle : « Réservation en ligne : 4 des 5 participants qui donnent un avis ».
+ * `scale` (méthodes qui le demandent) : le mot de l'échelle d'avis accompagne le chiffre, et un camp
+ * unanime se dit « les 24 participants », pas « 24 des 24 » (le modèle recopie la ligne).
+ */
+export function highlightLine(h: Highlight, kind: keyof Highlights, lang: 'fr' | 'en' = 'fr', scale = false): string {
   if (lang === 'en') {
     if (kind === 'proposals') return `${h.title}: ${h.people} ${h.people > 1 ? 'people' : 'person'} make proposals`
     if (kind === 'questions') return `${h.title}: ${h.people} ${h.people > 1 ? 'people' : 'person'} raise questions`
@@ -91,5 +100,10 @@ export function highlightLine(h: Highlight, kind: keyof Highlights, lang: 'fr' |
   if (kind === 'questions') return `${h.title} : ${h.people} participant${h.people > 1 ? 's' : ''} ${h.people > 1 ? 'se posent' : 'se pose'} des questions`
   if (kind === 'divided' && h.opposed) return `${h.title} : constat partagé, propositions opposées (${h.opposed.about})`
   if (kind === 'divided') return `${h.title} : avis partagés entre ${h.of} participants`
+  if (scale && (kind === 'strengths' || kind === 'blockers')) {
+    const word = h.stance === 'unanimous' ? 'unanime' : h.stance === 'consensus' ? 'large majorité' : h.stance === 'majority' ? 'majorité' : ''
+    const count = h.people === h.of ? `les ${h.of} participants qui donnent un avis` : `${h.people} des ${h.of} participants qui donnent un avis`
+    return `${h.title} : ${word ? `${word}${h.fragile ? ' (fragile)' : ''}, ` : ''}${count}`
+  }
   return `${h.title} : ${h.people} des ${h.of} participants qui donnent un avis`
 }

@@ -42,7 +42,7 @@ import { uncoveredPassages, uncoveredWithContext } from './analysis/coverage'
 import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
 import { emptyCorpus, promptsOf, removeSource, renameSource } from './corpus'
 import { maskNames, verifiedNames } from './analysis/names'
-import { highlights } from './analysis/highlights'
+import { highlightLine, highlights } from './analysis/highlights'
 import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext } from './analysis/report'
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
@@ -908,12 +908,84 @@ describe('méthodes par famille de modèles', () => {
   })
 
   it('la référence n’a aucune règle propre ; Gemini ajoute les siennes sans toucher le reste de la consigne', () => {
-    for (const k of ['grouping', 'summary', 'themes', 'global'] as const) expect(methodRules(DEFAULT_SETTINGS, k)).toBe('')
+    for (const k of ['grouping', 'assign', 'review', 'summary', 'themes', 'global'] as const) expect(methodRules(DEFAULT_SETTINGS, k)).toBe('')
     const input = { groups: [{ id: 'G1', title: 'x', facts: 'y', ideas: [] }] }
     const ref = groupSummaryPrompt(input, DEFAULT_SETTINGS).user
     const gem = groupSummaryPrompt(input, { ...DEFAULT_SETTINGS, method: 'gemini' }).user
     expect(gem).toContain('Chaque phrase se comprend seule')
     expect(gem.replace(/9\. Chaque phrase[^\n]*\n/, '')).toBe(ref)
+  })
+})
+
+describe('méthode « consultation » (Observatoire)', () => {
+  it('les idées hors question sortent des motifs, restent listées, et la référence ne change pas', async () => {
+    const corpus = surveyCorpus()
+    const run = async (method?: 'consultation') => {
+      const base = createSimulationProvider()
+      const seen: Record<string, string> = {}
+      const spy: LlmProvider = {
+        ...base,
+        fingerprint: base.fingerprint,
+        label: base.label,
+        async complete(req) {
+          seen[req.task] ??= req.user
+          const res = await base.complete(req)
+          // Le modèle range la première idée du premier groupe « Hors question ».
+          if (method && req.task === 'group') {
+            const out = JSON.parse(res.text) as { groups: { title: string; items: string[] }[] }
+            const first = out.groups[0].items.shift()!
+            out.groups.push({ title: 'Hors question', items: [first] })
+            return { ...res, text: JSON.stringify(out) }
+          }
+          return res
+        },
+      }
+      const state = await runAnalysis(corpus, await newAnalysis(corpus, { ...DEFAULT_SETTINGS, method }, spy), { provider: spy, cache: new MemoryCache() })
+      return { state, seen }
+    }
+    const ref = await run()
+    const c = await run('consultation')
+    expect(c.state.status).toBe('done')
+    expect(ref.state.offTopic ?? []).toEqual([])
+    expect(c.state.offTopic!.length).toBeGreaterThan(0)
+    const grouped = c.state.groups.flatMap((g) => g.ideaIds)
+    expect(new Set([...grouped, ...c.state.offTopic!])).toEqual(new Set(c.state.ideas.map((i) => i.id)))
+    for (const id of c.state.offTopic!) expect(grouped).not.toContain(id)
+    expect(c.state.groups.some((g) => g.title === 'Hors question')).toBe(false)
+    expect(reportToMarkdown(c.state, corpus, 'Test')).toContain('## Hors question')
+    expect(reportToMarkdown(ref.state, corpus, 'Test')).not.toContain('## Hors question')
+    // Règles propres à la méthode, absentes de la référence.
+    expect(c.seen.group).toContain('« Hors question »')
+    expect(ref.seen.group).not.toContain('Hors question')
+    expect(c.seen.review).toContain('critique le bus, pas la voiture')
+    expect(ref.seen.review).not.toContain('critique le bus')
+    expect(c.seen.summarize).toContain('Format de "opposed"')
+    expect(c.seen.summarize).toContain('Ne montre pas tes comptes')
+    expect(ref.seen.summarize).not.toContain('Ne montre pas tes comptes')
+    // Le découpage ne change pas : l'extraction déjà en cache reste valable.
+    expect(c.seen.extract).toBe(ref.seen.extract)
+  })
+
+  it('le mot de l’échelle accompagne le chiffre ; un camp unanime se dit « les 24 »', () => {
+    const h = { groupId: 'G1', title: 'Absences', people: 24, of: 24, ideaIds: [], stance: 'unanimous' as const }
+    expect(highlightLine(h, 'blockers')).toBe('Absences : 24 des 24 participants qui donnent un avis')
+    expect(highlightLine(h, 'blockers', 'fr', true)).toBe('Absences : unanime, les 24 participants qui donnent un avis')
+    expect(highlightLine({ ...h, people: 28, of: 33, stance: 'consensus', fragile: true }, 'blockers', 'fr', true)).toBe(
+      'Absences : large majorité (fragile), 28 des 33 participants qui donnent un avis',
+    )
+  })
+
+  it('« notamment » ne vient pas d’un « tous » qui ne compte pas des personnes ; un seul prénom s’accorde', () => {
+    const byId = new Map([{ id: 'I0001', participantId: 'P70', verbatim: 'v' } as Idea].map((i) => [i.id, i]))
+    expect(refsToPeople('Une personne, attachée à l’école pour tous, juge l’organisation inadaptée [I0001].', byId, undefined, () => 30)).toBe(
+      'Une personne, attachée à l’école pour tous, juge l’organisation inadaptée (P70).',
+    )
+    expect(refsToPeople('Une autre réclame des horaires adaptés à tous les âges [I0001].', byId, undefined, () => 30)).toBe(
+      'Une autre réclame des horaires adaptés à tous les âges (P70).',
+    )
+    expect(refsToPeople('Tous les participants qui en parlent le saluent [I0001].', byId, undefined, () => 30)).toBe(
+      'Tous les participants qui en parlent le saluent (notamment P70).',
+    )
   })
 })
 
@@ -1115,16 +1187,39 @@ describe('contrôles ajoutés à la certification B9', () => {
         opposed,
         metrics: { stance, positiveOnly: ['a', 'b'], negativeOnly: ['c', 'd'], mixed: [], participantsByCategory: {} },
       }) as unknown as Group
-    const out = withDivided('Ce qui a marché.\n\nCe qui a bloqué.\n\nCe que demandent les participants.', [
-      g('G1', 'Prise de décision', 'divided'),
-      g('G2', 'Positionnement', 'consensus', [{ a: 'I0001', b: 'I0002', about: 'afficher ou non une étiquette' }]),
-    ])
+    const divided = { ...g('G1', 'Prise de décision', 'divided'), ideaIds: ['I0003', 'I0004', 'I0005'] }
+    const ideas = new Map(
+      (
+        [
+          ['I0003', 'suggestion'],
+          ['I0004', 'negative'],
+          ['I0005', 'positive'],
+        ] as const
+      ).map(([id, category]) => [id, { id, category } as Idea]),
+    )
+    const out = withDivided(
+      'Ce qui a marché.\n\nCe qui a bloqué.\n\nCe que demandent les participants.',
+      [divided, g('G2', 'Positionnement', 'consensus', [{ a: 'I0001', b: 'I0002', about: 'afficher ou non une étiquette' }])],
+      'fr',
+      false,
+      ideas,
+    )
+    // Le mot de l'échelle, les chiffres et un renvoi par camp (positif d'abord) : la phrase du code se vérifie comme les autres.
     expect(out.split('\n\n')[1]).toBe(
-      'Ce qui a bloqué. Les avis s’opposent sur « Prise de décision ». Sur « Positionnement », les pistes proposées s’opposent : afficher ou non une étiquette [I0001, I0002].'.replace(
+      'Ce qui a bloqué. Les avis sont partagés sur « Prise de décision » : 2 positifs et 2 négatifs parmi les 4 participants qui en donnent un [I0005, I0004]. Deux propositions s’opposent sur « Positionnement » : afficher ou non une étiquette [I0001, I0002].'.replace(
         /’/g,
         "'",
       ),
     )
+  })
+  it('au-delà de trois sujets partagés, la phrase du code renvoie à « Ce qui divise »', () => {
+    const g = (id: string, title: string) =>
+      ({ id, title, ideaIds: [], summary: '', metrics: { stance: 'divided', positiveOnly: ['a', 'b'], negativeOnly: ['c', 'd'], mixed: [], participantsByCategory: {} } }) as unknown as Group
+    const out = withDivided('A.\n\nB.', [g('G1', 'Un'), g('G2', 'Deux'), g('G3', 'Trois'), g('G4', 'Quatre'), g('G5', 'Cinq')])
+    // À nombre égal, ordre alphabétique : Cinq, Deux, Quatre.
+    expect(out).toContain('Ils le sont aussi sur « Quatre »')
+    expect(out).not.toContain('« Trois »')
+    expect(out.endsWith('Ils le sont encore sur 2 autres sujets (voir « Ce qui divise »).')).toBe(true)
   })
   it('un nombre en tête de phrase s’écrit en lettres', () => {
     expect(spellLeadingNumbers('3 personnes regrettent X. Puis 4 autres.\n\n2 personnes proposent Y.')).toBe(

@@ -259,7 +259,7 @@ export function assignPrompt(input: AssignInput, settings: AnalysisSettings) {
     system: SYSTEM,
     user: `${context(settings)}Range chaque idée dans le groupe existant qui traite le même motif : même objet, quel que soit le ton ; un problème et la solution proposée pour ce problème vont ensemble.${input.allowNew ? ' Si aucun ne traite ce sujet précis, crée un nouveau groupe avec un titre court (2 à 6 mots) plutôt que de la ranger dans un groupe voisin.' : ' Si aucun ne convient, utilise « Hors grille ».'}
 Chaque identifiant doit recevoir exactement un groupe. Recopie les titres existants à l'identique.
-${lang(settings)}
+${methodRules(settings, 'assign')}${lang(settings)}
 
 Réponds avec : {"assignments":[{"item":"L12","group":"…"}]}
 
@@ -403,7 +403,7 @@ Règles :
 3. Si le ton d'une idée est faux par rapport à l'objet de son motif, corrige sa catégorie ({"id":"I0044","category":"negative"}) : dans « Prix de l'abonnement », « heureusement que la qualité suit » sous-entend que le prix est élevé. Une proposition est "suggestion".
 4. Un titre de nouveau motif nomme l'objet, jamais le jugement (pas « Points forts », « Critiques ») ; 2 à 6 mots, sans « et ». Réutilise le même titre pour plusieurs idées qui vont ensemble.
 5. Ne renvoie que les changements. Dans le doute, ne change rien : la plupart des idées sont bien rangées.
-${lang(settings)}
+${methodRules(settings, 'review')}${lang(settings)}
 
 Réponds avec : {"changes":[…]}
 

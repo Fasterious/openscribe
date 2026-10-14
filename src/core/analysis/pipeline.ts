@@ -56,7 +56,7 @@ import {
   vaguePlurals,
 } from './numbers'
 import type { AnalysisSettings, AnalysisState, Group, Idea, IdeaCategory, Merge, Metrics, RejectedIdea, StepId, Theme } from './types'
-import { methodOf } from './methods'
+import { methodOf, OFF_TOPIC } from './methods'
 import { explainMiss, locateQuote, quoteText, withAntecedent } from './verbatim'
 
 /** Au-delà, le regroupement se fait par lots : un premier lot fonde les groupes, les suivants s'y rangent. */
@@ -178,8 +178,8 @@ export async function runAnalysis(corpus: Corpus, initial: AnalysisState, option
     await checkSupport(state, runner, emit)
     verifyNumbers(corpus, state)
     ensureCamps(state)
-    // La phrase du code sur les sujets qui divisent peut tomber à la vérification des renvois : on la rétablit pour ceux qui manquent.
-    state.globalSummary = withDivided(state.globalSummary ?? '', state.groups, state.settings.language, true)
+    // La phrase du code sur les sujets qui divisent, avec leurs chiffres et un renvoi par camp.
+    state.globalSummary = withDivided(state.globalSummary ?? '', state.groups, state.settings.language, false, new Map(state.ideas.map((i) => [i.id, i])))
     state.status = 'done'
     await emit()
     return state
@@ -486,6 +486,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   }
   state.retoned = []
   state.moved = []
+  state.offTopic = []
   s.state = 'running'
   s.done = 0
   await emit()
@@ -539,6 +540,9 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     return canonical.get(k)!
   }
   grid.forEach(addTitle)
+  // Méthode qui le prévoit : une case pour les idées sans rapport avec la question, connue dès le premier rangement.
+  const offTopic = !grid.length && methodOf(state.settings).offTopic === true
+  if (offTopic) addTitle(OFF_TOPIC)
 
   // Titres écartés parce qu'ils définissaient un motif par son ton : le modèle ne peut pas y revenir.
   const banned = new Set<string>()
@@ -595,6 +599,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   if (!grid.length) {
     const ideaCat = new Map(state.ideas.map((i) => [i.id, i.category]))
     for (const title of [...titles]) {
+      if (offTopic && title === OFF_TOPIC) continue
       const its = items.filter((i) => assigned.get(i.id) === title)
       if (
         !isToneDefined(
@@ -654,7 +659,16 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       .sort((a, b) => b.metrics.participants - a.metrics.participants || b.metrics.mentions - a.metrics.mentions || a.title.localeCompare(b.title))
       .map((g, i) => ({ ...g, id: `G${i + 1}` }))
 
-  let groups = build(titles.map((title) => ({ title, ideaIds: items.filter((i) => assigned.get(i.id) === title).flatMap((i) => i.ideaIds) })))
+  // Les idées « hors question » sortent des motifs : ni consolidées, ni comptées, ni résumées ; le rapport les liste.
+  const takeOffTopic = (list: Group[]): Group[] => {
+    const out = list.filter((g) => titleKey(g.title) === titleKey(OFF_TOPIC))
+    if (!offTopic || !out.length) return list
+    state.offTopic = [...(state.offTopic ?? []), ...out.flatMap((g) => g.ideaIds)].sort()
+    return build(list.filter((g) => !out.includes(g)))
+  }
+  let groups = takeOffTopic(
+    build(titles.map((title) => ({ title, ideaIds: items.filter((i) => assigned.get(i.id) === title).flatMap((i) => i.ideaIds) }))),
+  )
   state.merges = []
   // En mode grille, les titres sont imposés : pas de consolidation.
   const respondents = new Set(state.ideas.map((i) => i.participantId)).size
@@ -799,7 +813,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     )
     state.retoned = reviewed.retoned
     state.moved = reviewed.moved
-    if (reviewed.retoned.length || reviewed.moved.length) groups = build(reviewed.groups)
+    if (reviewed.retoned.length || reviewed.moved.length) groups = takeOffTopic(build(reviewed.groups))
     s.message = undefined
   }
 
@@ -1326,7 +1340,8 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
     state.globalSummary = ''
     return
   }
-  const lines = (kind: keyof typeof h, list = h[kind].slice(0, 6)) => list.map((x) => ({ text: highlightLine(x, kind, lang), ref: x.ideaIds[0] }))
+  const scale = methodOf(state.settings).scaleInLines === true
+  const lines = (kind: keyof typeof h, list = h[kind].slice(0, 6)) => list.map((x) => ({ text: highlightLine(x, kind, lang, scale), ref: x.ideaIds[0] }))
   // Méthode qui le demande : le verbatim de chaque proposition et question, pour rapporter ce qu'elle dit et non le titre du motif.
   const ideaText = new Map(state.ideas.map((i) => [i.id, i.verbatim]))
   const withExample = (list: { text: string; ref: string }[]) =>
@@ -1346,35 +1361,65 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
     ),
     globalSchema,
   )
-  state.globalSummary = withDivided(sanitizeCitations(res.summary, new Set(state.ideas.map((i) => i.id))), state.groups, lang)
+  // La phrase sur ce qui divise est ajoutée par le code à la toute fin (voir `runAnalysis`) : écrite avec les chiffres du code,
+  // elle ne passe ni par la relecture de la langue ni par les contrôles, qui la récrivaient ou la retiraient.
+  state.globalSummary = sanitizeCitations(res.summary, new Set(state.ideas.map((i) => i.id)))
 }
 
 /**
  * La phrase du résumé sur ce qui divise est écrite par le code, à partir de la
- * liste calculée : tous les sujets y sont nommés, une seule fois, et une
- * critique partagée aux remèdes opposés cite ses deux propositions.
+ * liste calculée : tous les sujets y sont nommés, une seule fois, avec le mot
+ * de l'échelle, leurs chiffres et un renvoi par camp ; une critique partagée
+ * aux remèdes opposés cite ses deux propositions.
  */
-export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' = 'fr', onlyMissing = false): string {
+export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' = 'fr', onlyMissing = false, ideas?: Map<string, Idea>): string {
   const named = summary.toLowerCase()
-  // Rattrapage final : la relecture de la langue remplace souvent les titres entre guillemets par des mots ordinaires.
   // Une phrase qui dit déjà ce qui divise suffit : on ne la répète pas.
-  if (onlyMissing && /(avis s['’]opposent|opinions are split|pistes proposées s['’]opposent|proposals diverge)/i.test(summary)) return summary
+  if (onlyMissing && /(avis s['’]opposent|avis sont partagés|opinions are split|propositions s['’]opposent|pistes proposées s['’]opposent|proposals diverge)/i.test(summary)) return summary
   const divided = highlights(groups).divided.filter((d) => !onlyMissing || !named.includes(d.title.toLowerCase()))
   if (!divided.length || !summary.trim()) return summary
-  const list = (titles: string[]) =>
-    titles.length > 1 ? `${titles.slice(0, -1).join(', ')} ${lang === 'en' ? 'and' : 'et'} ${titles[titles.length - 1]}` : titles[0]
+  const groupById = new Map(groups.map((g) => [g.id, g]))
   const q = (t: string) => (lang === 'en' ? `“${t}”` : `« ${t} »`)
-  const split = divided.filter((d) => !d.opposed)
+  // « Qualité de l'accueil » : 20 positifs, 12 négatifs et 1 mitigé parmi les 33 participants qui en donnent un [I0004, I0011].
+  // Un renvoi par camp (le premier positif, le premier négatif) : la phrase se vérifie comme les autres.
+  const figures = (d: (typeof divided)[number]) => {
+    const m = groupById.get(d.groupId)!.metrics
+    const [pos, neg, mix] = [m.positiveOnly.length, m.negativeOnly.length, m.mixed.length]
+    const first = (side: 'positive' | 'negative') => groupById.get(d.groupId)!.ideaIds.find((id) => ideas?.get(id)?.category === side)
+    const refs = [first('positive'), first('negative')].filter(Boolean)
+    const camps =
+      lang === 'en'
+        ? [`${pos} positive`, `${neg} negative`, ...(mix ? [`${mix} mixed`] : [])]
+        : [`${pos} positif${pos > 1 ? 's' : ''}`, `${neg} négatif${neg > 1 ? 's' : ''}`, ...(mix ? [`${mix} mitigé${mix > 1 ? 's' : ''}`] : [])]
+    const and = lang === 'en' ? 'and' : 'et'
+    const counts = `${camps.slice(0, -1).join(', ')} ${and} ${camps[camps.length - 1]}`
+    const among = lang === 'en' ? `among the ${d.of} people who give one` : `parmi les ${d.of} participants qui en donnent un`
+    return `${q(d.title)}${lang === 'en' ? ':' : ' :'} ${counts} ${among}${refs.length ? ` [${refs.join(', ')}]` : ''}`
+  }
+  // Une phrase par sujet, trois au plus : au-delà, la liste « Ce qui divise » les donne tous.
+  const MAX = 3
+  const split = divided.filter((d) => !d.opposed || groupById.get(d.groupId)!.metrics.stance === 'divided')
   const opposed = divided.filter((d) => d.opposed)
+  const shownSplit = split.slice(0, MAX)
+  const rest = split.length - shownSplit.length
   const sentences = [
-    ...(split.length
-      ? [lang === 'en' ? `Opinions are split on ${list(split.map((d) => q(d.title)))}.` : `Les avis s'opposent sur ${list(split.map((d) => q(d.title)))}.`]
+    ...shownSplit.map((d, i) =>
+      lang === 'en'
+        ? `${i ? 'Opinions are also split on' : 'Opinions are split on'} ${figures(d)}.`
+        : `${i ? 'Ils le sont aussi sur' : 'Les avis sont partagés sur'} ${figures(d)}.`,
+    ),
+    ...(rest > 0
+      ? [
+          lang === 'en'
+            ? `They are split on ${rest} other ${rest > 1 ? 'topics' : 'topic'} too (see “What divides”).`
+            : `Ils le sont encore sur ${rest} autre${rest > 1 ? 's' : ''} sujet${rest > 1 ? 's' : ''} (voir « Ce qui divise »).`,
+        ]
       : []),
     ...opposed.map((d) =>
       lang === 'en'
-        ? `On ${q(d.title)}, the proposals diverge: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
+        ? `Two proposals diverge on ${q(d.title)}: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
         : // « Les critiques se rejoignent » affirmait un accord sur le constat que les données ne montrent pas toujours.
-          `Sur ${q(d.title)}, les pistes proposées s'opposent : ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`,
+          `Deux propositions s'opposent sur ${q(d.title)} : ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`,
     ),
   ]
   const paragraphs = summary.trim().split(/\n\s*\n/)

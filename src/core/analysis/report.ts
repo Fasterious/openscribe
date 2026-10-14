@@ -52,6 +52,11 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     `Idées retenues : ${state.ideas.length} (verbatims vérifiés mot pour mot dans les réponses). Verbatims écartés car introuvables tels quels : ${state.rejected.length || 'aucun'}.`,
     `Motifs : ${state.groups.length}${state.themes.length ? `, regroupés en ${state.themes.length} thèmes` : ''} ; ${single ? `${single} ${single > 1 ? 'reposent' : 'repose'} sur un seul participant (signaux isolés, pas des tendances)` : 'aucun ne repose sur un seul participant'}.${state.merges?.length ? ` La passe de consolidation a fusionné ${state.merges.length} ensembles de motifs qui traitaient le même objet.` : ''}`,
   ]
+  const off = offTopicLines(state)
+  if (off.ideas)
+    lines.push(
+      `Hors question : ${off.ideas} idée${off.ideas > 1 ? 's' : ''} de ${off.people} participant${off.people > 1 ? 's' : ''} ne répond${off.ideas > 1 ? 'ent' : ''} pas à la question posée. Elles sont listées en fin de rapport, mais ne comptent dans aucun motif et ne sont pas résumées.`,
+    )
   if (state.ideas.length >= 30 && perPerson.length > 5)
     lines.push(
       `Les trois participants les plus prolixes portent ${Math.round((top3 / state.ideas.length) * 100)} % des idées : les chiffres comptent des personnes, mais les synthèses citent davantage ceux qui ont beaucoup écrit.`,
@@ -91,7 +96,9 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   )
   if (!state.settings.maskNames && state.names?.length)
     lines.push(
-      `Ce rapport contient ${state.names.length} prénom${state.names.length > 1 ? 's' : ''} de personnes citées dans les réponses : à anonymiser avant une diffusion si besoin (OpenScribe permet de les masquer).`,
+      state.names.length > 1
+        ? `Ce rapport contient ${state.names.length} prénoms de personnes citées dans les réponses : à anonymiser avant une diffusion si besoin (OpenScribe permet de les masquer).`
+        : "Ce rapport contient le prénom d'une personne citée dans les réponses : à anonymiser avant une diffusion si besoin (OpenScribe permet de le masquer).",
     )
   const questions = questionCodes(corpus)
   if (questions.size > 1)
@@ -107,6 +114,16 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   )
   return lines
 }
+
+/** Les idées « hors question », par participant : gardées et montrées, jamais comptées dans un motif. */
+function offTopicLines(state: AnalysisState): { ideas: number; people: number; lines: { participantId: string; ideas: Idea[] }[] } {
+  const byId = new Map(state.ideas.map((i) => [i.id, i]))
+  const ideas = (state.offTopic ?? []).map((id) => byId.get(id)).filter((i): i is Idea => !!i)
+  const lines = personLines(ideas)
+  return { ideas: ideas.length, people: lines.length, lines }
+}
+
+const OFF_TOPIC_INTRO = 'Ces idées ne répondent pas à la question posée : gardées pour la transparence, elles ne comptent dans aucun motif.'
 
 function ideasOf(group: Group, byId: Map<string, Idea>): Idea[] {
   return group.ideaIds.map((id) => byId.get(id)!).filter(Boolean)
@@ -307,7 +324,9 @@ export function refsToPeople(
   )
 }
 
-const UNIVERSAL = /(?<![\p{L}])(tous|toutes|la plupart|la majorité|les personnes qui|les participants qui|celles et ceux qui)(?![\p{L}])/iu
+// « Tous » ne compte des personnes qu'en sujet ou devant elles (« toutes les personnes qui en parlent ») : « pour tous », « par tous les moyens » n'en comptent pas.
+const UNIVERSAL =
+  /(?<![\p{L}])((?:tous|toutes)\s+(?:les\s+)?(?:\d+\s+)?(?:personnes|participants?|répondants?|ceux|celles)|^\s*(?:tous|toutes)(?![\p{L}])|la plupart|la majorité|les personnes qui|les participants qui|celles et ceux qui)(?![\p{L}])/iu
 
 const NUMBER_WORDS: Record<string, number> = {
   deux: 2,
@@ -676,6 +695,12 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
   } else {
     for (const g of state.groups) writeGroup(g, '##')
   }
+  const off = offTopicLines(state)
+  if (off.ideas) {
+    out.push('## Hors question', '', `*${OFF_TOPIC_INTRO}*`, '')
+    for (const line of off.lines) out.push(`- **${line.participantId}** — ${line.ideas.map((i) => `« ${v.text(i.verbatim).replace(/\s*\n+\s*/g, ' / ')} »`).join(' ; ')}`)
+    out.push('')
+  }
   out.push('## Méthode', '', ...methodNote(state, corpus).map((l) => `- ${l}`), '')
   return out.join('\n')
 }
@@ -774,6 +799,13 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
   } else {
     parts.push(...state.groups.map((g) => groupHtml(g, 'h2')))
   }
+  const off = offTopicLines(state)
+  if (off.ideas)
+    parts.push(
+      `<section class="group"><h2>Hors question</h2><p class="facts">${e(OFF_TOPIC_INTRO)}</p><ul>${off.lines
+        .map((l) => `<li class="neutral"><span class="who">${e(l.participantId)}</span> ${l.ideas.map((i) => `<span id="${e(i.id)}">« ${e(v.text(i.verbatim))} »</span>`).join(' ; ')}</li>`)
+        .join('')}</ul></section>`,
+    )
   parts.push(
     `<h2>Méthode</h2><ul>${methodNote(state, corpus)
       .map((l) => `<li>${e(l)}</li>`)

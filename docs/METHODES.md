@@ -320,20 +320,4 @@ hybride, lecture d'ensemble par le modèle et contrôles par le code, est la pis
 3. **Couverture** : chaque passage non couvert arrive avec ce qui le précède dans la réponse (`before`),
    pour en juger le sens et le ton.
 
-**Validé sur ÉcoSol (Opus 5.5, méthode « contexte », 14/10, nuit)** : méthode **3,5 · 3,5 sans plafond**
-(avant les corrections : 3 · 3,5, l'une plafonnée), langue 4, relecture humaine 45 min à 1 h. Premier
-résultat de la méthode en plusieurs étapes au niveau du grand prompt (3,5 · 3,5, langue 4), avec en
-plus les contrôles du code (citations exactes, comptes, couverture). La phrase « Les avis s'opposent »
-n'est plus répétée.
-
-Défauts qui restent, presque tous dans le code :
-1. La phrase de camp ajoutée par le code (« Quatre personnes portent un avis positif sur… ») compte les
-   mitigés avec les positifs et contredit l'en-tête (« 2 positifs, 2 mitigés ») : préciser « dont deux
-   mitigées » ou ne compter que le camp.
-2. Reprise orpheline en « Celle qui… », « Celui qui… » après un retrait : à ajouter aux reprises.
-3. Renvoi orphelin « (P13, P14) » en fin de résumé : retirer une « phrase » faite d'un seul crochet.
-4. Une intro de thème ne peut pas citer une idée d'un motif rangé dans un autre thème : deux propositions
-   opposées rangées dans deux thèmes perdent leur face-à-face.
-5. Trois alertes « À vérifier : « Deux personnes » » jugées fausses par les deux lectures : à rejouer.
-6. Vérification des unanimités : n'envoyer que le ton majoritaire d'un motif empêche le modèle de voir
-   les avis contraires déjà présents.
+À valider sur une passe ÉcoSol (Opus, méthode « contexte ») avant de conclure.
