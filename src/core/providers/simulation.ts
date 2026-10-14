@@ -121,6 +121,7 @@ export function createSimulationProvider(faults: SimulationFaults = {}): LlmProv
         return { decisions: input.groups.map((g) => ({ group: g.id, objects: 1 })) }
       }
       case 'review':
+      case 'unanimity':
         // La simulation garde le rangement et le ton du regroupement.
         return { changes: [] }
       case 'support':

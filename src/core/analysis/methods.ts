@@ -11,7 +11,7 @@ import type { AnalysisSettings } from './types'
  * mal formées tolérées) restent communs : ils ne touchent qu'une réponse
  * défectueuse, et ont été rodés sans effet sur la référence.
  */
-export type MethodId = 'reference' | 'ministral' | 'gemini' | 'groq' | 'gptoss' | 'gemma' | 'qwen' | 'lots'
+export type MethodId = 'reference' | 'ministral' | 'gemini' | 'groq' | 'gptoss' | 'gemma' | 'qwen' | 'lots' | 'contexte'
 
 export interface Method {
   id: MethodId
@@ -28,6 +28,10 @@ export interface Method {
   attachSingles: boolean
   /** Règles ajoutées à la fin des règles d'une consigne, pour cette méthode seulement (la référence n'en a aucune). */
   extraRules: Partial<Record<'grouping' | 'summary' | 'themes' | 'global', string>>
+  /** Au regroupement, chaque libellé arrive avec plusieurs verbatims et leur ton (la référence : un seul exemple). */
+  groupingContext?: boolean
+  /** Après la relecture, chaque motif unanime ou à large majorité est confronté aux idées de ton contraire rangées ailleurs. */
+  unanimityReview?: boolean
 }
 
 const REFERENCE: Method = {
@@ -100,6 +104,20 @@ export const METHODS: Record<MethodId, Method> = {
     id: 'lots',
     label: 'méthode de référence, découpage par lots de personnes',
     batches: { ...REFERENCE.batches, extract: 10 },
+  },
+  // Candidate à remplacer la référence (14/10) : les défauts qui la plafonnent (unanimité fabriquée, fourre-tout d'éloges,
+  // reproche dispersé) viennent du regroupement, qui ne voyait qu'un libellé et un exemple. Gardée seulement si la note monte
+  // sur Opus et sur Sonnet (deux lectures chacun).
+  contexte: {
+    ...REFERENCE,
+    id: 'contexte',
+    label: 'méthode de référence, regroupement en contexte',
+    groupingContext: true,
+    unanimityReview: true,
+    extraRules: {
+      grouping:
+        "6. Lis les verbatims et leur ton, pas seulement les libellés : deux libellés différents qui parlent du même objet vont dans le même groupe, quel que soit leur ton (« Personnel accueillant » et « Vendeurs introuvables » → « Accueil en magasin »). Un groupe où tout est positif ou tout est négatif est suspect : vérifie qu'aucune idée de ton contraire sur le même objet n'est partie ailleurs.\n7. Une appréciation générale sans objet précis (« tout était parfait », « bravo à toute l'équipe ») va dans un groupe « Appréciation d'ensemble » ; n'y range jamais une idée qui nomme un objet.\n8. Un même reproche fait à plusieurs supports (« site mis à jour trop tard », « affiches posées trop tard ») va dans un seul groupe qui nomme ce reproche (« Retard de la communication »).",
+    },
   },
   gemma: {
     ...REFERENCE,

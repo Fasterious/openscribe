@@ -32,6 +32,8 @@ import {
   themePrompt,
   themeSchema,
   reviewPrompt,
+  unanimityPrompt,
+  type UnanimityInput,
   reviewSchema,
   supportPrompt,
   supportSchema,
@@ -491,6 +493,11 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   // Les libellés identiques sont envoyés une seule fois, avec leur nombre de mentions.
   const contributionById = new Map(corpus.contributions.map((c) => [c.id, c]))
   const items: { id: string; label: string; ideaIds: string[]; example: string; question?: string }[] = []
+  // Méthode « en contexte » : jusqu'à quatre verbatims par libellé, avec leur ton.
+  const withContext = methodOf(state.settings).groupingContext === true
+  const ideaOf = new Map(state.ideas.map((i) => [i.id, i]))
+  const examplesOf = (it: { ideaIds: string[] }) =>
+    withContext ? it.ideaIds.slice(0, 4).map((id) => ({ text: shortExample(ideaOf.get(id)!.verbatim, 160), tone: ideaOf.get(id)!.category })) : undefined
   const byLabel = new Map<string, (typeof items)[number]>()
   for (const idea of state.ideas) {
     const k = normLabel(idea.label)
@@ -551,7 +558,13 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   )
   const firstSpec = groupingPrompt(
     {
-      items: first.map((i) => ({ id: i.id, label: i.label, count: i.ideaIds.length, example: i.example, question: i.question })),
+      items: first.map((i) => ({
+        id: i.id,
+        label: i.label,
+        count: i.ideaIds.length,
+        ...(withContext ? { examples: examplesOf(i) } : { example: i.example }),
+        question: i.question,
+      })),
       grid: grid.length ? grid : undefined,
     },
     state.settings,
@@ -603,7 +616,11 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     for (let i = 0; i < left.length; i += batchSizes(state.settings).assign) {
       const batch = left.slice(i, i + batchSizes(state.settings).assign)
       const assignSpec = assignPrompt(
-        { groups: [...titles], items: batch.map((b) => ({ id: b.id, label: b.label, example: b.example })), allowNew: !grid.length },
+        {
+          groups: [...titles],
+          items: batch.map((b) => ({ id: b.id, label: b.label, ...(withContext ? { examples: examplesOf(b) } : { example: b.example }) })),
+          allowNew: !grid.length,
+        },
         state.settings,
       )
       let res = await runner.json(assignSpec, assignSchema)
@@ -786,10 +803,56 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     s.message = undefined
   }
 
+  // Méthode qui le demande : un motif unanime (ou presque) est confronté aux idées de ton contraire rangées ailleurs.
+  if (!grid.length && methodOf(state.settings).unanimityReview && groups.length > 1) {
+    const motifs = unanimityCheck(groups, state.ideas)
+    if (motifs.length) {
+      s.message = 'Vérification des unanimités'
+      await emit()
+      const res = await runner.json(unanimityPrompt({ motifs }, state.settings), reviewSchema)
+      // Seuls les déplacements proposés vers un motif vérifié, d'une idée qui figurait parmi ses candidates, sont appliqués.
+      const allowed = new Map(motifs.map((m) => [m.id, new Set(m.candidates.map((c) => c.id))]))
+      const moves = res.changes.filter((c) => c.to && allowed.get(c.to)?.has(c.id)).map((c) => ({ id: c.id, to: c.to }))
+      const checked = applyReview(state.ideas, groups, moves)
+      state.moved = [...(state.moved ?? []), ...checked.moved]
+      if (checked.moved.length) groups = build(checked.groups)
+      s.message = undefined
+    }
+  }
+
   state.groups = groups
   s.done = items.length
   s.state = 'done'
   await emit()
+}
+
+/**
+ * Motifs unanimes ou à large majorité (au moins 3 avis), chacun avec les idées de ton contraire rangées
+ * dans d'autres motifs : le moteur dira lesquelles jugent le même objet (méthode « contexte »).
+ */
+export function unanimityCheck(groups: Group[], ideas: Idea[]): UnanimityInput['motifs'] {
+  const byId = new Map(ideas.map((i) => [i.id, i]))
+  const home = new Map(groups.flatMap((g) => g.ideaIds.map((id) => [id, g] as const)))
+  const opinions = (g: Group) => g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
+  return groups
+    .filter((g) => (g.metrics.stance === 'unanimous' || g.metrics.stance === 'consensus') && opinions(g) >= 3)
+    .map((g) => {
+      const side: 'positive' | 'negative' = g.metrics.positiveOnly.length >= g.metrics.negativeOnly.length ? 'positive' : 'negative'
+      const opposite = side === 'positive' ? 'negative' : 'positive'
+      return {
+        id: g.id,
+        title: g.title,
+        side,
+        ideas: g.ideaIds
+          .map((id) => byId.get(id)!)
+          .filter((i) => i.category === side)
+          .map((i) => ({ id: i.id, label: i.label, verbatim: shortExample(i.verbatim, 160) })),
+        candidates: ideas
+          .filter((i) => i.category === opposite && home.get(i.id) && home.get(i.id) !== g)
+          .map((i) => ({ id: i.id, motif: home.get(i.id)!.title, label: i.label, verbatim: shortExample(i.verbatim, 160) })),
+      }
+    })
+    .filter((m) => m.candidates.length > 0)
 }
 
 /**

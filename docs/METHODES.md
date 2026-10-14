@@ -232,3 +232,40 @@ moins de demandes. Pas d'effet sur la note, puisque le défaut qui plafonne se j
 La méthode `lots` reste disponible pour un moteur dont le quota de demandes est serré ; elle n'entre
 pas dans la référence. Le gain de qualité est ailleurs : dans ce que le modèle voit quand il regroupe
 (le grand prompt lit tout le corpus d'un coup).
+
+## Méthode candidate « contexte » (14/10/2026, nuit)
+
+Changements, sur la seule étape de regroupement (découpage repris du cache, pour isoler l'effet) :
+verbatims et ton de chaque libellé au regroupement ; règles « l'éloge et la critique d'un même objet
+vont ensemble », « appréciation d'ensemble » à part, « un même reproche ne se disperse pas » ;
+vérification des unanimités (idées de ton contraire rangées ailleurs).
+
+| Moteur | Méthode : référence → contexte | Langue : référence → contexte |
+|---|---|---|
+| Opus 5.5 | 3 · 3,5 → 3 · 3,5 | 3,5 → 4 |
+| Sonnet | 3 · 3 · 3 → 3 · 3 | 3 → 3,5 |
+
+**Verdict : pas adoptée comme référence** (la note de méthode ne monte pas, règle du processus).
+Elle reste disponible comme candidate. Ce qu'elle a appris :
+- Opus a bien réuni ce que la consigne visait (choix opposés dans un même motif,
+  reproches de retard rassemblés, avis positif sur la façon de débattre rangé avec les désaccords) :
+  chez Opus, **le plafond ne vient plus du regroupement**, mais d'avis positifs codés « suggestion »
+  au découpage (un avis positif sur une action de terrain, suivi d'une idée pour la suite).
+- Sonnet garde l'ambiance et les tensions dans deux motifs, et sa vérification des unanimités ne
+  déplace rien : la consigne ne suffit pas à un modèle moins fort.
+- Le motif « Appréciation d'ensemble » est jugé fourre-tout par les évaluateurs : à retirer.
+- La demande de vérification des unanimités répète les candidates pour chaque motif (221 000
+  caractères) : à alléger (une seule liste de candidates).
+
+Défauts qui reviennent dans toutes les lectures, toutes méthodes (prochains chantiers, par ordre) :
+1. **Découpage** : une critique formulée comme un manque (« pas assez de… ») est codée « suggestion » ;
+   un avis positif suivi d'une proposition n'est codé que « suggestion ». Règle à ajouter au découpage
+   (exemple neutre, hors corpus).
+2. **Personne prolixe** : le résumé présente trois propositions d'une seule personne comme celles
+   « des participants ». Le code connaît l'auteur : lui faire écrire « une personne propose ».
+3. **« la plupart » au lieu du chiffre** dans les intros de thème : la consigne des thèmes l'impose ;
+   la remplacer par le compte calculé.
+4. **Phrase orpheline** après un retrait par le code (une reprise qui renvoie à une phrase retirée) : retirer aussi
+   la phrase qui en dépend (filet déjà présent pour les connecteurs, à étendre aux reprises).
+5. **« (notamment P5) »** pour une seule personne citée : écrire le renvoi sans « notamment » quand un
+   seul participant est cité, et compter correctement.

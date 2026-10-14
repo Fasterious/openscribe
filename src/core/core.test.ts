@@ -15,6 +15,7 @@ import {
   acceptRewrite,
   applyMerges,
   applyReview,
+  unanimityCheck,
   applySplits,
   applySupport,
   dropUnreferenced,
@@ -706,6 +707,60 @@ describe('chaîne complète (simulation)', () => {
     const key = (s: AnalysisState) => s.ideas.map((i) => `${i.participantId}|${i.verbatim}`).sort()
     expect(key(batched)).toEqual(key(one))
     expect(batched.calls.total).toBeLessThan(one.calls.total)
+  })
+
+  it('méthode « contexte » : le regroupement reçoit les verbatims et leur ton, les unanimités sont vérifiées, l’analyse va au bout', async () => {
+    const corpus = surveyCorpus()
+    const base = createSimulationProvider()
+    const seen: string[] = []
+    const spy: LlmProvider = {
+      ...base,
+      fingerprint: base.fingerprint,
+      label: base.label,
+      async complete(req) {
+        if (req.task === 'group') seen.push(req.user.includes('"examples"') && req.user.includes('"tone"') ? 'contexte' : 'sans')
+        if (req.task === 'unanimity') seen.push('unanimité')
+        return base.complete(req)
+      },
+    }
+    const state = await runAnalysis(corpus, await newAnalysis(corpus, { ...DEFAULT_SETTINGS, method: 'contexte' }, spy), { provider: spy, cache: new MemoryCache() })
+    expect(state.status).toBe('done')
+    expect(seen[0]).toBe('contexte')
+    // La vérification n'a lieu que s'il existe un motif unanime (au moins 3 avis) et une idée de ton contraire ailleurs.
+    const opinions = (g: Group) => g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
+    const eligible = state.groups.some((g) => (g.metrics.stance === 'unanimous' || g.metrics.stance === 'consensus') && opinions(g) >= 3)
+    expect(seen.includes('unanimité')).toBe(eligible)
+  })
+
+  it('vérification des unanimités : un motif unanime d’au moins 3 avis reçoit les idées de ton contraire rangées ailleurs', () => {
+    const idea = (id: string, p: string, category: IdeaCategory) => ({ id, participantId: p, category, label: id, verbatim: `texte ${id}` }) as unknown as Idea
+    const ideas = [
+      idea('I1', 'P1', 'positive'),
+      idea('I2', 'P2', 'positive'),
+      idea('I3', 'P3', 'positive'),
+      idea('I6', 'P6', 'positive'),
+      idea('I4', 'P4', 'negative'),
+      idea('I5', 'P5', 'suggestion'),
+    ]
+    const group = (id: string, ids: string[]): Group => ({ id, title: id, ideaIds: ids, summary: '', metrics: computeMetrics(ids.map((x) => ideas.find((i) => i.id === x)!)) })
+    const check = unanimityCheck([group('G1', ['I1', 'I2', 'I3', 'I6']), group('G2', ['I4', 'I5'])], ideas)
+    expect(check.map((m) => [m.id, m.side, m.candidates.map((c) => c.id)])).toEqual([['G1', 'positive', ['I4']]])
+    // Trop peu d'avis pour parler d'unanimité : pas de vérification.
+    expect(unanimityCheck([group('G1', ['I1', 'I2']), group('G2', ['I4'])], ideas)).toEqual([])
+  })
+
+  it('vérification des unanimités : seul un déplacement vers le motif vérifié, d’une de ses candidates, est appliqué', () => {
+    const ideas = [
+      { id: 'I1', participantId: 'P1', category: 'positive' },
+      { id: 'I2', participantId: 'P2', category: 'negative' },
+      { id: 'I3', participantId: 'P3', category: 'negative' },
+    ] as unknown as Idea[]
+    const groups = [
+      { id: 'G1', title: 'Accueil', ideaIds: ['I1'] },
+      { id: 'G2', title: 'Attente', ideaIds: ['I2', 'I3'] },
+    ]
+    const r = applyReview(ideas, groups, [{ id: 'I2', to: 'G1' }])
+    expect(r.moved).toEqual([{ id: 'I2', from: 'Attente', to: 'Accueil' }])
   })
 
   it("s'arrête proprement quand on annule", async () => {

@@ -142,6 +142,11 @@ Nouvelles pistes vérifiées le 14/10 : Cloudflare Workers AI refuse l'appel dep
 par jour) ne sert que de petits modèles : à ne regarder qu'après Cohere. Prochaine évaluation
 gratuite possible : Cohere (Arnaud crée le compte). Les autres demandent une clé payante.
 
+**Hugging Face (14/10/2026)** : appel depuis le navigateur vérifié, 120 modèles ouverts (DeepSeek V4,
+Kimi K3, GLM 5.3, Qwen 3.8), hébergés hors de Chine. Crédit gratuit : 0,10 $ par mois, environ une
+synthèse ; PRO (environ 9 $ par mois) : 2 $ inclus. **Mis de côté par Arnaud** : l'offre gratuite ne
+suffit pas. Piste à rouvrir pour des modèles ouverts payants peu chers.
+
 ## Leçons pour tous les fournisseurs
 
 - **Une offre gratuite est un fait daté**, pas une propriété du fournisseur : la fiche

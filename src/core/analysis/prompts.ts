@@ -207,7 +207,7 @@ ${dataBlock(input)}`,
 
 export interface GroupingInput {
   /** Libellé, nombre de mentions, un verbatim d'exemple et la question d'origine : le libellé seul ne suffit pas à juger le sens. */
-  items: { id: string; label: string; count: number; example?: string; question?: string }[]
+  items: { id: string; label: string; count: number; example?: string; question?: string; examples?: { text: string; tone: IdeaCategory }[] }[]
   /** Mode grille : les seuls titres autorisés (plus « Hors grille »). */
   grid?: string[]
 }
@@ -243,7 +243,7 @@ ${dataBlock(input)}`,
 
 export interface AssignInput {
   groups: string[]
-  items: { id: string; label: string; example?: string }[]
+  items: { id: string; label: string; example?: string; examples?: { text: string; tone: IdeaCategory }[] }[]
   allowNew: boolean
 }
 
@@ -404,6 +404,39 @@ Règles :
 ${lang(settings)}
 
 Réponds avec : {"changes":[…]}
+
+${dataBlock(input)}`,
+    json: true,
+  }
+}
+
+// ─── Unanimités : un avis contraire sur le même objet est-il rangé ailleurs ? ──
+
+export interface UnanimityInput {
+  motifs: {
+    id: string
+    title: string
+    /** Le ton qui fait l'unanimité (ou la large majorité). */
+    side: 'positive' | 'negative'
+    ideas: { id: string; label: string; verbatim: string }[]
+    /** Idées de ton contraire rangées dans d'autres motifs. */
+    candidates: { id: string; motif: string; label: string; verbatim: string }[]
+  }[]
+}
+
+export function unanimityPrompt(input: UnanimityInput, settings: AnalysisSettings) {
+  return {
+    task: 'unanimity',
+    system: SYSTEM,
+    user: `${context(settings)}Chaque motif ci-dessous paraît unanime (ou presque) : toutes ses idées vont dans le même sens. Vérifie que ce n'est pas un effet du rangement : un avis contraire sur le MÊME objet a pu être rangé dans un motif voisin.
+
+Règles :
+1. Pour chaque motif, lis ses idées pour comprendre son objet, puis les "candidates" : des idées de ton contraire rangées ailleurs.
+2. Déplace vers le motif ({"id":"I0042","to":"G3"}) une candidate seulement si elle juge le même objet que ce motif, au point qu'on ne pourrait pas annoncer l'unanimité sans mentir. Exemple : dans « Accueil en magasin » (tout positif), « personne ne vient vous voir quand on entre » est une critique du même objet ; « les prix ont augmenté » ne l'est pas.
+3. Un objet voisin n'est pas le même objet : dans le doute, ne déplace rien. La plupart des candidates restent où elles sont.
+${lang(settings)}
+
+Réponds avec : {"changes":[{"id":"I0042","to":"G3"}]}
 
 ${dataBlock(input)}`,
     json: true,
