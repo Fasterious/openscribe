@@ -1499,7 +1499,11 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
   const figures = (d: (typeof divided)[number], first: boolean) => {
     const m = groupById.get(d.groupId)!.metrics
     const [pos, neg, mix] = [m.positiveOnly.length, m.negativeOnly.length, m.mixed.length]
-    const firstOf = (side: 'positive' | 'negative') => groupById.get(d.groupId)!.ideaIds.find((id) => ideas?.get(id)?.category === side)
+    // Méthode « consultation » : l'exemple d'un camp est d'abord une idée que la synthèse du motif cite (la plus petite par numéro tombait sur un avis atypique).
+    const cited = compact ? (groupById.get(d.groupId)!.summary.match(/I\d{4,}/g) ?? []) : []
+    const firstOf = (side: 'positive' | 'negative') =>
+      cited.find((id) => ideas?.get(id)?.category === side && groupById.get(d.groupId)!.ideaIds.includes(id)) ??
+      groupById.get(d.groupId)!.ideaIds.find((id) => ideas?.get(id)?.category === side)
     const refs = [firstOf('positive'), firstOf('negative')].filter(Boolean)
     const camps =
       lang === 'en'
