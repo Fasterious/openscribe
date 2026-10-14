@@ -54,5 +54,43 @@
       3
     ],
     "raison": "Moyenne 3,25 mais plafond : l'enseignement privé dit unanime, ses critiques étant restées dans « Place de l'école publique » (regroupement selon le jugement). Les trois idées mal classées de la passe 3 sont corrigées. Résumé : deux freins et « fragile » oubliés, exemple de la carte scolaire à contresens. Langue : une synthèse amputée de sa première phrase par le contrôle des comptes (corrigé dans le code)."
+  },
+  {
+    "date": "2026-10-15",
+    "run": "run-opus-5r",
+    "methode": "consultation (passe 5, rejouée avec les correctifs du code)",
+    "modele": "claude-opus-5-5 (joué par sous-agents)",
+    "note_methode": 3,
+    "note_langue": 3.5,
+    "publie": false,
+    "criteres_methode": [
+      3.5,
+      3.5,
+      3,
+      3.5,
+      3.5,
+      3.5
+    ],
+    "raison": "Moyenne 3,42 mais plafond : un faux mitigé sur « Niveau d'exigence scolaire » (une demande de plus d'exigence comptée comme éloge). Plafond du privé levé (11 sur 12)."
+  },
+  {
+    "date": "2026-10-15",
+    "run": "run-opus-6",
+    "methode": "consultation (passe 6)",
+    "modele": "claude-opus-5-5 (joué par sous-agents)",
+    "note_methode": "3,5 (lecture 1, moyenne 3,25, sans plafond) / 3 (lecture 2, moyenne 3,5, plafond)",
+    "note_langue": 3.5,
+    "publie": false,
+    "raison": "Les deux lectures divergent : la seconde plafonne pour un regret de la disparition de la carte scolaire compté comme critique. Décision non confirmée par deux lectures."
+  },
+  {
+    "date": "2026-10-15",
+    "run": "run-opus-7",
+    "methode": "consultation (passe 7, relecture des tons des motifs du résumé)",
+    "modele": "claude-opus-5-5 (joué par sous-agents)",
+    "note_methode": "3 / 3 (moyennes 3,33 et 3,67, plafond dans les deux lectures)",
+    "note_langue": 3.5,
+    "publie": false,
+    "raison": "Plafond : avis comptés dans le mauvais camp sur un motif du résumé (carte scolaire : regretter que la règle manque compté contre elle ; un principe général compté comme éloge de l'école publique). Les deux lectures désignent la même cause profonde : le découpage (éloges absorbés par une critique sur un autre objet), gardé du cache depuis la passe 1."
   }
 ]

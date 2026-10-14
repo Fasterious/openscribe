@@ -2,6 +2,8 @@
 
 ## À REGARDER
 
+- 2026-10-15 · École : passes 3 à 7 faites (méthode « consultation » affinée, voir docs/METHODES.md). Toujours 3/5 avec plafond, langue 3,5. Le plafond tombe chaque fois sur une ou deux idées limites, différentes d'une passe à l'autre ; la cause commune est le découpage, gardé du cache. Passe 8 : découpage refait (lots de 10 personnes). Avant toute publication : régénérer le résumé de fiche.json avec les chiffres de la passe retenue (il date de la passe 1).
+
 - 2026-10-14 · École (Grand débat 2019) **non publiée** : note méthode 3/5 (seuil 3,5). À corriger dans le moteur, pas dans le rapport :
   1. ton jugé par rapport à l'objet du motif (« Enseignement privé » : les critiques du public comptées contre le privé) ;
   2. gabarit du résumé : phrase « Les avis s'opposent… » sans chiffres ni renvoi, mot de l'échelle absent à côté des chiffres, « 24 des 24 » ;
@@ -14,7 +16,7 @@
 
 | Date | Sujet d'actualité | Source | Échantillon | Notes (méthode / langue) | Publié |
 |---|---|---|---|---|---|
-| 2026-10-14 | Mobilisation lycéenne et étudiante | Grand débat 2019, « Organisation de l'État et des services publics », question scolarisation | 378 / 21 868 (± 5 pts) | 3 / 3,5 | Non |
+| 2026-10-14/15 | Mobilisation lycéenne et étudiante | Grand débat 2019, « Organisation de l'État et des services publics », question scolarisation | 378 / 21 868 (± 5 pts) | 3 / 3,5 (passes 1 à 7, plafond ; moyennes 3,25 à 3,67) | Non |
 
 ## Consultations repérées pour plus tard
 
