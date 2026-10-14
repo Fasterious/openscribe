@@ -773,7 +773,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       return (start > 160 ? prev.slice(prev.indexOf(' ') + 1) : prev).trim() || undefined
     }
     // Un tour de relecture sur les motifs donnés ; `arrived` : idées déplacées au tour précédent, à vérifier d'abord.
-    const reviewRound = async (scope: Group[], arrived?: Set<string>) => {
+    const reviewRound = async (scope: Group[], arrived?: Set<string>, toneFocus = false) => {
       const titles = groups.map((g) => ({ id: g.id, title: g.title }))
       const batches: Group[][] = []
       let cur: Group[] = []
@@ -791,6 +791,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
             reviewPrompt(
               {
                 titles,
+                ...(toneFocus ? { toneFocus } : {}),
                 groups: batch.map((g) => ({
                   id: g.id,
                   title: g.title,
@@ -843,6 +844,24 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
         state.retoned = [...state.retoned, ...second.retoned]
         state.moved = [...state.moved, ...second.moved]
         if (second.retoned.length || second.moved.length) groups = takeOffTopic(build(second.groups))
+      }
+    }
+
+    // Méthode qui le demande : les motifs qui porteront le résumé (forces, freins, ce qui divise) sont relus pour le seul ton,
+    // idée par idée, par rapport à leur objet. Une erreur de ton y change une conclusion ; ailleurs, elle ne change qu'un détail.
+    if (methodOf(state.settings).summaryToneReview) {
+      const lines = methodOf(state.settings).summaryLines ?? 6
+      const h = highlights(groups, ideaById)
+      const ids = new Set([...h.strengths.slice(0, lines), ...h.blockers.slice(0, lines), ...h.divided.slice(0, 3)].map((x) => x.groupId))
+      const scope = groups.filter((g) => ids.has(g.id))
+      if (scope.length) {
+        s.message = 'Relecture des tons des motifs du résumé'
+        await emit()
+        // Seules les corrections de ton passent : le rangement a déjà été relu deux fois.
+        const tones = (await reviewRound(scope, undefined, true)).filter((c) => c.category).map((c) => ({ id: c.id, category: c.category }))
+        const toned = applyReview(state.ideas, groups, tones)
+        state.retoned = [...(state.retoned ?? []), ...toned.retoned]
+        if (toned.retoned.length) groups = takeOffTopic(build(toned.groups))
       }
     }
     s.message = undefined
