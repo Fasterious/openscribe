@@ -225,9 +225,18 @@ async function extractAll(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   const concurrency = Math.max(1, options.concurrency ?? 2)
   const perRequest = Math.max(1, methodOf(state.settings).batches.extract ?? 1)
   const textsOf = (id: string) => contributionsOf(corpus, id).filter((c) => c.text.trim())
-  for (let i = 0; i < pending.length; i += concurrency * perRequest) {
-    const groups: (typeof pending)[] = []
-    for (let j = i; j < Math.min(pending.length, i + concurrency * perRequest); j += perRequest) groups.push(pending.slice(j, j + perRequest))
+  // Méthode qui le demande : un lot ne dépasse pas aussi un nombre de caractères (une très longue réponse n'écrase pas ses voisines).
+  const maxChars = methodOf(state.settings).batches.extractChars
+  const size = (p: (typeof pending)[number]) => textsOf(p.id).reduce((n, c) => n + c.text.length, 0)
+  const lots: (typeof pending)[] = []
+  for (const p of pending) {
+    const last = lots[lots.length - 1]
+    const full = !last || last.length >= perRequest || (maxChars !== undefined && last.reduce((n, x) => n + size(x), 0) + size(p) > maxChars)
+    if (full) lots.push([p])
+    else last.push(p)
+  }
+  for (let i = 0; i < lots.length; i += concurrency) {
+    const groups = lots.slice(i, i + concurrency)
     const results = (
       await Promise.all(
         groups.map((g) =>
@@ -397,13 +406,18 @@ export async function extractParticipant(
       ? 0
       : segs(a).reduce((n, p) => n + segs(b).reduce((m, q) => m + Math.max(0, Math.min(p.end, q.end) - Math.max(p.start, q.start)), 0), 0)
   const dropped = new Set<Omit<Idea, 'id'>>()
+  const keepOpposed = methodOf(settings).keepOpposedOverlaps === true
   const bySize = [...ideas].sort((a, b) => len(b) - len(a) || ideas.indexOf(a) - ideas.indexOf(b))
   for (const [k, a] of bySize.entries()) {
     if (dropped.has(a)) continue
     for (const b of bySize.slice(k + 1)) {
       // Une même citation pour deux objets d'une énumération (« le programme et l'équipe », même ton, libellés différents) : deux idées légitimes.
       const enumeration = a.category === b.category && a.span.start === b.span.start && a.span.end === b.span.end && normLabel(a.label) !== normLabel(b.label)
-      if (!dropped.has(b) && !enumeration && overlap(a, b) >= 0.5 * len(b)) dropped.add(b)
+      // Méthode qui le demande : un éloge et une critique qui se recouvrent (« X est bien, mais Y… » cité en entier pour la critique)
+      // sont deux avis, pas un doublon. Retirer l'éloge le faisait disparaître des comptes (methodologue, passe 7).
+      const polar = (c: IdeaCategory) => c === 'positive' || c === 'negative'
+      const opposite = keepOpposed && polar(a.category) && polar(b.category) && a.category !== b.category
+      if (!dropped.has(b) && !enumeration && !opposite && overlap(a, b) >= 0.5 * len(b)) dropped.add(b)
     }
   }
   const kept = ideas.filter((i) => !dropped.has(i))

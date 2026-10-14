@@ -22,7 +22,8 @@ export interface Method {
   label: string
   /** Taille des lots envoyés au modèle. */
   /** `extract` : personnes découpées par demande (1 par défaut). */
-  batches: { grouping: number; assign: number; review: number; summary: number; support: number; polish: number; extract?: number }
+  /** `extractChars` : au plus tant de caractères de réponses par demande de découpage (une très longue réponse part seule). */
+  batches: { grouping: number; assign: number; review: number; summary: number; support: number; polish: number; extract?: number; extractChars?: number }
   /** Exemple de la règle 3 du regroupement (une cause, le problème et la solution vont ensemble). */
   groupingExample: string
   /** Citation dont le modèle a corrigé quelques fautes de frappe : rattachée au texte d'origine. */
@@ -53,6 +54,8 @@ export interface Method {
   summaryChecks?: boolean
   /** Après le rangement, les motifs qui porteront le résumé sont relus pour le seul ton, idée par idée. */
   summaryToneReview?: boolean
+  /** Au découpage, un éloge et une critique qui se recouvrent sont gardés tous les deux (la référence garde la plus longue). */
+  keepOpposedOverlaps?: boolean
 }
 
 const REFERENCE: Method = {
@@ -169,6 +172,9 @@ export const METHODS: Record<MethodId, Method> = {
     ...REFERENCE,
     id: 'consultation',
     label: 'méthode de référence, adaptée aux consultations publiques',
+    // Passe 8 (15/10) : découpage refait, par lots de 10 personnes (même note que la référence sur Opus, méthode « lots »).
+    batches: { ...REFERENCE.batches, extract: 10, extractChars: 6000 },
+    keepOpposedOverlaps: true,
     offTopic: true,
     scaleInLines: true,
     // Passe 3 (15/10) : une idée déplacée vers un motif voisin faute de mieux (le bon motif était ouvert par un autre lot) y gardait son ton.
@@ -185,8 +191,14 @@ export const METHODS: Record<MethodId, Method> = {
     // Methodologue, passe 6 : un regret de la disparition d'un objet compté contre lui, sur un motif du résumé (plafond).
     summaryToneReview: true,
     extraRules: {
+      // Methodologue, passes 6 et 7 : des éloges absorbés par la critique qui suit, sur un autre objet ; des jugements partiels
+      // comptés comme bilans ; un regret qu'une règle manque compté contre elle. Causes en amont de toute relecture.
+      extract: `9. Une condition ou une limite (« seulement si », « sauf », « en partie ») reste avec ce qu'elle nuance. Un éloge suivi d'une critique, ou l'inverse, donne toujours deux idées, même objet ou non, chacune avec son propre extrait : « Les chauffeurs sont aimables, mais les bus sont toujours en retard » donne « Les chauffeurs sont aimables » ("positive") et « les bus sont toujours en retard » ("negative").
+10. Un jugement d'ensemble limité à une période, un lieu ou une personne (« le premier mois de travaux s'est bien passé ») garde sa limite dans le libellé (« Premier mois de travaux sans difficulté ») : ce n'est pas un bilan de l'ensemble.
+11. Regretter qu'une règle ou un service manque, disparaisse ou ne soit pas appliqué (« depuis la suppression de la ligne 12, plus moyen d'aller au marché ») est un manque : "negative" sur la situation, ou "suggestion" si la personne demande son retour ; le libellé nomme l'objet regretté (« Regret de la ligne 12 supprimée »).`,
       grouping: `6. Une idée qui ne répond pas à l'objet de l'étude (elle parle d'un tout autre sujet) va dans le groupe « ${OFF_TOPIC} », sans autre titre : elle sera gardée et listée, mais ni comptée ni résumée. Une idée qui touche l'objet de l'étude, même de loin, n'y va jamais.
-7. Une idée qui critique un objet pour expliquer le recours à un autre (« faute de bus le soir, je prends la voiture ») juge le premier : elle va avec l'objet critiqué (le bus), pas avec l'objet choisi (la voiture). Range ensemble ce qui juge un même objet.`,
+7. Une idée qui critique un objet pour expliquer le recours à un autre (« faute de bus le soir, je prends la voiture ») juge le premier : elle va avec l'objet critiqué (le bus), pas avec l'objet choisi (la voiture). Range ensemble ce qui juge un même objet.
+8. Un motif qui porte sur une règle (« Stationnement résidentiel ») range ceux qui la défendent et ceux qui la combattent ; regretter qu'elle manque ou ne soit pas appliquée la défend.`,
       assign: `« ${OFF_TOPIC} » reçoit seulement les idées qui ne répondent pas à l'objet de l'étude. Une idée qui critique un objet pour expliquer le recours à un autre va avec l'objet critiqué.`,
       review: `6. Le ton se juge par rapport à l'objet du motif, pas par rapport à la phrase. Dans « Voiture », « faute de bus le soir, je prends la voiture » critique le bus, pas la voiture : l'idée part dans un motif sur le bus (existant ou nouveau) et ne compte pas comme un avis négatif sur la voiture. De même, un éloge d'un autre objet n'est pas un avis positif sur l'objet du motif : dans « Bus », « le covoiturage, c'est très pratique » part avec le covoiturage.
 7. Un motif où les avis positifs et négatifs sont proches en nombre mêle souvent deux objets : lis ses avis camp par camp. Si les uns jugent un objet et les autres un objet voisin (« la gratuité du musée » et « le prix des expositions temporaires » ; « le stationnement payant » et « les contrôles qui ne sont jamais faits »), déplace l'un des deux camps vers un motif qui nomme son objet (existant ou nouveau). Regretter qu'une règle ne soit pas appliquée n'est pas critiquer la règle.
