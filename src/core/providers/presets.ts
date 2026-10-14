@@ -44,6 +44,12 @@ export interface ModelChoice {
   method?: MethodId
   /** Paramètres propres au modèle, ajoutés à chaque demande. */
   extraBody?: Record<string, unknown>
+  /** Note du `methodologue` sur le corpus réel (ÉcoSol), au moins QUALITY_THRESHOLD : le modèle est proposé. */
+  validated?: { score: number; date: string }
+  /** Pourquoi le modèle est encore à l'étude (sinon, la raison du fournisseur). */
+  study?: string
+  /** Secondes par demande, mesurées sur une synthèse réelle (temps écoulé ÷ demandes, avec le parallélisme par défaut). */
+  secondsPerCall?: number
 }
 
 export interface ProviderPreset {
@@ -85,15 +91,41 @@ export interface ProviderPreset {
   modelExtraBody?: { match: string; body: Record<string, unknown> }[]
   /** Méthode d'analyse des modèles installés dont le nom contient `match`. */
   modelMethods?: { match: string; method: MethodId }[]
+  /** Pourquoi le fournisseur est encore à l'étude, quand aucun de ses modèles n'est validé. */
+  study?: string
+  /** Secondes par demande mesurées pour les modèles dont le nom contient `match` (modèles installés, hors liste). */
+  modelSeconds?: { match: string; secondsPerCall: number }[]
 }
 
 /**
- * Moteurs installés sur l'ordinateur (Ollama, LM Studio) : retirés des choix proposés le 14/10/2026.
- * Sur un Mac de 24 Go, ni gpt-oss 20B ni Gemma 4 12B n'atteignent le seuil de qualité (3,5/5 sur ÉcoSol,
- * le niveau de l'offre gratuite de Gemini) : synthèses morcelées, réponses qui bouclent, 40 minutes et plus
- * (docs/METHODES.md). Le code reste prêt : un moteur local déjà enregistré continue de fonctionner, avec le mode Confidentiel.
+ * Seuil de qualité (décision d'Arnaud, 14/10/2026) : un moteur n'est proposé qu'à 3,5/5 au moins
+ * (note du `methodologue` sur le corpus réel ÉcoSol), le niveau de l'offre gratuite de Gemini ; idéalement 4.
+ * En dessous, ou pas encore évalué, il reste visible « à l'étude », avec la raison.
  */
-export const LOCAL_ENGINES_OFFERED = false
+export const QUALITY_THRESHOLD = 3.5
+
+const NOT_EVALUATED =
+  "Pas encore évalué sur un corpus réel : OpenScribe ne propose un moteur d'IA qu'après une synthèse notée au moins 3,5/5."
+
+/** Un fournisseur est proposé quand au moins un de ses modèles est validé. */
+export function presetStudy(preset: ProviderPreset): string | undefined {
+  return preset.models?.some((m) => m.validated) ? undefined : (preset.study ?? NOT_EVALUATED)
+}
+
+/** Pourquoi ce modèle est à l'étude, ou `undefined` s'il est validé. */
+export function modelStudy(presetId: string, model: string): string | undefined {
+  const p = presetById(presetId)
+  if (!p) return NOT_EVALUATED
+  const choice = p.models?.find((m) => m.id === model)
+  if (choice?.validated) return undefined
+  return choice?.study ?? p.study ?? NOT_EVALUATED
+}
+
+/** Secondes par demande mesurées sur une synthèse réelle pour ce modèle, si on les connaît. */
+export function typicalSecondsPerCall(presetId: string, model: string): number | undefined {
+  const p = presetById(presetId)
+  return p?.models?.find((m) => m.id === model)?.secondsPerCall ?? p?.modelSeconds?.find((m) => model.includes(m.match))?.secondsPerCall
+}
 
 export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
@@ -111,6 +143,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         section: "Inclus dans l'offre gratuite",
         recommended: true,
         method: 'ministral',
+        study: 'Noté 3/5 sur un corpus réel (13/10/2026), sous le seuil de 3,5/5.',
+        secondsPerCall: 10,
       },
       { id: 'ministral-8b-2512', label: 'Ministral 8B', hint: 'Plus rapide, des idées moins fines.', section: "Inclus dans l'offre gratuite", method: 'ministral' },
       { id: 'ministral-3b-2512', label: 'Ministral 3B', hint: 'Très rapide, pour un essai seulement.', section: "Inclus dans l'offre gratuite", method: 'ministral' },
@@ -129,6 +163,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     ],
     needsKey: true,
     keyUrl: 'https://admin.mistral.ai/organization/api-keys',
+    study:
+      "Ministral 14B, le meilleur modèle de l'offre gratuite, est noté 3/5 sur un corpus réel, sous le seuil de 3,5/5. Mistral Small et Medium (payants) restent à évaluer.",
     seedParam: 'random_seed',
     supportsJsonMode: true,
     freeRequestsPerMinute: 20,
@@ -152,6 +188,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
     id: 'groq',
     label: 'Groq',
+    study: "Offre gratuite trop limitée : environ une heure pour une synthèse d'une vingtaine de participants, et un quota quotidien vite épuisé (constaté le 13/10/2026).",
     baseUrl: 'https://api.groq.com/openai/v1',
     defaultModel: 'openai/gpt-oss-120b',
     suggestedModels: ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b'],
@@ -217,6 +254,9 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         section: "Inclus dans l'offre gratuite",
         recommended: true,
         method: 'gemini',
+        validated: { score: 3.5, date: '2026-10-13' },
+        // ÉcoSol : 2 à 6 minutes pour 50 à 80 demandes.
+        secondsPerCall: 5,
       },
       {
         id: 'gemini-3.1-flash-lite',
@@ -231,6 +271,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         hint: 'Plus fin, mais 20 demandes par jour en gratuit : une synthèse n’y tient pas.',
         section: 'Avec la facturation activée',
         method: 'gemini',
+        study: 'Payant : pas encore évalué sur un corpus réel.',
       },
     ],
     needsKey: true,
@@ -281,6 +322,13 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
     id: 'ollama',
     label: 'Ollama (sur votre ordinateur)',
+    study:
+      'Essayé sur un ordinateur doté de 24 Go de mémoire (14/10/2026) : 3/5 au mieux, sous le seuil de 3,5/5, et 40 minutes ou plus par synthèse. À revoir avec des modèles locaux plus solides.',
+    // Mesuré sur ÉcoSol (Mac M5, 24 Go) : Gemma 4 12B environ 50 s par demande, gpt-oss 20B plusieurs minutes.
+    modelSeconds: [
+      { match: 'gemma', secondsPerCall: 50 },
+      { match: 'gpt-oss', secondsPerCall: 150 },
+    ],
     baseUrl: 'http://localhost:11434/v1',
     defaultModel: 'gpt-oss:20b',
     suggestedModels: ['gpt-oss:20b', 'gemma4:12b', 'qwen3:8b'],
@@ -330,6 +378,17 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     baseUrl: 'https://api.anthropic.com/v1',
     defaultModel: 'claude-sonnet-5-5',
     suggestedModels: ['claude-sonnet-5-5', 'claude-opus-5-5', 'claude-haiku-5-5'],
+    models: [
+      {
+        id: 'claude-sonnet-5-5',
+        label: 'Claude Sonnet 5.5',
+        hint: 'La référence : la synthèse la mieux notée sur un corpus réel.',
+        recommended: true,
+        validated: { score: 4.5, date: '2026-10-13' },
+      },
+      { id: 'claude-opus-5-5', label: 'Claude Opus 5.5', hint: 'Le plus puissant, plus cher.', study: 'Pas encore évalué sur un corpus réel.' },
+      { id: 'claude-haiku-5-5', label: 'Claude Haiku 5.5', hint: 'Rapide et économique.', study: 'Pas encore évalué sur un corpus réel.' },
+    ],
     needsKey: true,
     keyUrl: 'https://platform.claude.com/settings/keys',
     supportsJsonMode: false,
@@ -401,6 +460,30 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         text: 'Créez un compte sur la console xAI, ajoutez un crédit, puis créez une clé.',
         link: { label: 'Ouvrir la console xAI', url: 'https://console.x.ai/' },
       },
+      { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
+    ],
+  },
+  {
+    id: 'cohere',
+    label: 'Cohere',
+    baseUrl: 'https://api.cohere.ai/compatibility/v1',
+    defaultModel: 'command-a-03-2025',
+    suggestedModels: ['command-a-03-2025'],
+    needsKey: true,
+    keyUrl: 'https://dashboard.cohere.com/api-keys',
+    study:
+      "Clé d'essai gratuite, sans carte : 1 000 demandes par mois, de quoi faire une quinzaine de synthèses. Fonctionne depuis le navigateur (vérifié le 14/10/2026) ; qualité pas encore évaluée.",
+    seedParam: 'seed',
+    supportsJsonMode: true,
+    freeRequestsPerMinute: 20,
+    freeTier: "Clé d'essai gratuite, sans carte : 1 000 demandes par mois, pour évaluer seulement (pas pour un usage commercial).",
+    dataPolicy: 'check',
+    dataNote: 'Entreprise canadienne ; vérifiez dans la console si les demandes de la clé d’essai peuvent servir à améliorer les modèles.',
+    family: 'other',
+    bestFor: 'Une offre d’essai gratuite avec un modèle de taille professionnelle.',
+    kind: 'direct',
+    steps: [
+      { text: 'Créez un compte Cohere : une clé d’essai est créée d’office.', link: { label: 'Aller aux clés Cohere', url: 'https://dashboard.cohere.com/api-keys' } },
       { text: 'Collez la clé ci-dessous, puis cliquez sur « Enregistrer et tester ».' },
     ],
   },
@@ -603,6 +686,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
     id: 'lmstudio',
     label: 'LM Studio (sur votre ordinateur)',
+    study: 'Mêmes modèles que sur Ollama : sous le seuil de 3,5/5 sur un ordinateur doté de 24 Go de mémoire (14/10/2026).',
     baseUrl: 'http://localhost:1234/v1',
     defaultModel: '',
     suggestedModels: [],

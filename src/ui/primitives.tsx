@@ -353,6 +353,7 @@ export function MenuItem({
   checked,
   onSelect,
   danger = false,
+  disabled = false,
 }: {
   label: React.ReactNode
   hint?: React.ReactNode
@@ -361,15 +362,19 @@ export function MenuItem({
   onSelect: () => void
   /** Action destructrice (supprimer) : en rouge. */
   danger?: boolean
+  /** Visible mais impossible à choisir (la raison va dans `hint`). */
+  disabled?: boolean
 }) {
   return (
     <button
       type="button"
       role={checked === undefined ? 'menuitem' : 'menuitemradio'}
       aria-checked={checked}
+      disabled={disabled}
       className={cn(
         'flex w-full cursor-pointer items-start gap-2 rounded-md px-2.5 py-2 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none',
         danger && 'text-negative hover:bg-negative/10',
+        disabled && 'cursor-not-allowed opacity-60 hover:bg-transparent',
       )}
       onClick={onSelect}
     >

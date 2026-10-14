@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { PROVIDER_PRESETS } from './presets'
+import { blendSpeed, estimateDuration, observedSecondsPerCall, predictedCalls } from '../analysis/estimate'
+import { PROVIDER_PRESETS, QUALITY_THRESHOLD, modelStudy, presetStudy, typicalSecondsPerCall } from './presets'
 
 describe('fiches des fournisseurs', () => {
   it('le modèle par défaut est le seul recommandé de sa liste expliquée', () => {
@@ -138,5 +139,58 @@ describe('méthode des modèles installés', () => {
     expect(methodForModel('ollama', 'gemma4:12b')).toBe('gemma')
     expect(methodForModel('ollama', 'llama3.1:8b')).toBe('reference')
     expect(methodForModel('mistral', 'ministral-14b-2512')).toBe('ministral')
+  })
+})
+
+describe('seuil de qualité : un moteur est validé ou à l’étude, jamais entre les deux', () => {
+  it('un modèle validé a une note au moins égale au seuil, et rien d’autre n’est proposé sans raison', () => {
+    for (const p of PROVIDER_PRESETS) {
+      for (const m of p.models ?? []) {
+        if (m.validated) expect(m.validated.score, `${p.id} ${m.id}`).toBeGreaterThanOrEqual(QUALITY_THRESHOLD)
+        expect(Boolean(m.validated) !== Boolean(modelStudy(p.id, m.id)), `${p.id} ${m.id}`).toBe(true)
+      }
+      if (presetStudy(p)) expect(presetStudy(p)!.length, p.id).toBeGreaterThan(20)
+    }
+  })
+
+  it('aujourd’hui : Gemini 3.5 Flash-Lite et Claude Sonnet validés ; Mistral, Groq et les moteurs locaux à l’étude', () => {
+    expect(modelStudy('gemini', 'gemini-3.5-flash-lite')).toBeUndefined()
+    expect(modelStudy('anthropic', 'claude-sonnet-5-5')).toBeUndefined()
+    expect(modelStudy('gemini', 'gemini-3.8-flash')).toMatch(/pas encore évalué/)
+    expect(modelStudy('mistral', 'ministral-14b-2512')).toMatch(/3\/5/)
+    expect(modelStudy('ollama', 'gemma4:12b')).toMatch(/24 Go/)
+    expect(modelStudy('openai', 'gpt-5')).toMatch(/Pas encore évalué/)
+    const study = (id: string) => presetStudy(PROVIDER_PRESETS.find((p) => p.id === id)!)
+    expect(study('gemini')).toBeUndefined()
+    for (const id of ['mistral', 'groq', 'ollama', 'lmstudio', 'cohere', 'custom']) expect(study(id), id).toBeDefined()
+  })
+})
+
+describe('durée estimée d’une synthèse', () => {
+  it('prévoit le nombre de demandes d’ÉcoSol (20 participants, 90 réponses : 44 à 54 mesurées)', () => {
+    expect(predictedCalls(20, 90)).toBeGreaterThanOrEqual(44)
+    expect(predictedCalls(20, 90)).toBeLessThanOrEqual(56)
+  })
+
+  it('préfère la vitesse mesurée, puis celle de référence, puis une estimation grossière ; le débit autorisé reste un plancher', () => {
+    expect(estimateDuration(50, { measured: 6, reference: 5, requestsPerMinute: 60, concurrency: 2 })).toEqual({ calls: 50, seconds: 300, basis: 'measured' })
+    expect(estimateDuration(50, { reference: 5, requestsPerMinute: 60, concurrency: 2 }).basis).toBe('reference')
+    expect(estimateDuration(50, { requestsPerMinute: 60, concurrency: 2 })).toEqual({ calls: 50, seconds: 500, basis: 'rough' })
+    // Groq : 3 demandes par minute, plus lent que la vitesse de réponse.
+    expect(estimateDuration(50, { reference: 5, requestsPerMinute: 3, concurrency: 1 }).seconds).toBeCloseTo(1000)
+  })
+
+  it('mesure la vitesse sur les seules demandes envoyées, et lisse sur les dernières synthèses', () => {
+    expect(observedSecondsPerCall(300_000, 60)).toBe(5)
+    expect(observedSecondsPerCall(300_000, 3)).toBeUndefined()
+    expect(blendSpeed(undefined, 5)).toEqual({ secondsPerCall: 5, runs: 1 })
+    expect(blendSpeed({ secondsPerCall: 5, runs: 1 }, 7)).toEqual({ secondsPerCall: 6, runs: 2 })
+    expect(blendSpeed({ secondsPerCall: 10, runs: 9 }, 5).runs).toBe(5)
+  })
+
+  it('connaît la vitesse de référence des modèles mesurés sur un corpus réel', () => {
+    expect(typicalSecondsPerCall('gemini', 'gemini-3.5-flash-lite')).toBe(5)
+    expect(typicalSecondsPerCall('ollama', 'gemma4:12b-32k')).toBe(50)
+    expect(typicalSecondsPerCall('openai', 'gpt-5')).toBeUndefined()
   })
 })

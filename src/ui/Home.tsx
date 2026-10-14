@@ -105,7 +105,7 @@ export function Home() {
             l'aperçu avant de lancer quoi que ce soit.
           </Step>
           <Step n={2} icon={<KeyRound />} title="Branchez un moteur d'IA">
-            Une clé gratuite Mistral ou Google Gemini se crée en quelques minutes.{' '}
+            Une clé gratuite Google Gemini se crée en quelques minutes.{' '}
             <a className="text-primary underline-offset-4 hover:underline" href={href({ name: 'settings' })}>
               Choisir un moteur
             </a>
@@ -199,8 +199,9 @@ export function Home() {
             un autre ordinateur.
           </Feature>
           <Feature icon={<KeyRound />} title="Vous choisissez votre moteur d'IA">
-            Avec votre propre clé (Mistral, Google Gemini, OpenRouter…). Les verbatims partent directement de votre navigateur vers le moteur choisi, sans
-            passer par nous.
+            Avec votre propre clé (Google Gemini, Claude d'Anthropic…). OpenScribe ne propose que les moteurs dont la qualité a été vérifiée sur un
+            corpus réel ; les autres sont signalés « à l'étude ». Les verbatims partent directement de votre navigateur vers le moteur choisi,
+            sans passer par nous.
           </Feature>
           <Feature icon={<ShieldCheck />} title="Lisez les conditions des offres gratuites">
             Certaines offres gratuites peuvent réutiliser les données qu'on leur envoie. Pour des données sensibles, préférez une offre qui exclut cette
@@ -254,7 +255,7 @@ const FAQ: [string, string][] = [
   ],
   [
     'Combien ça coûte ?',
-    'OpenScribe est gratuit et son code est libre (AGPL-3.0). Mistral et Google Gemini proposent des offres gratuites sans carte bancaire. Sur une offre payante, une synthèse de quelques dizaines de participants coûte en général quelques centimes, payés directement au fournisseur. OpenScribe ne prend rien au passage.',
+    'OpenScribe est gratuit et son code est libre (AGPL-3.0). Google Gemini propose une offre gratuite sans carte bancaire. Sur une offre payante, une synthèse de quelques dizaines de participants coûte en général quelques centimes, payés directement au fournisseur. OpenScribe ne prend rien au passage.',
   ],
   ['Faut-il créer un compte ?', 'Non, ni inscription ni adresse e-mail. Pour retrouver une synthèse ailleurs, sauvegardez-la dans un fichier et rouvrez-la.'],
   [
@@ -263,7 +264,7 @@ const FAQ: [string, string][] = [
   ],
   [
     "Quel moteur d'IA choisir ?",
-    "Pour démarrer, prenez Mistral ou Google Gemini : c'est gratuit et la clé se crée en quelques minutes. Pour des données sensibles, prenez une offre qui ne réutilise pas vos données. Vous pouvez en changer à tout moment.",
+    "Pour démarrer, prenez Google Gemini : c'est gratuit et la clé se crée en quelques minutes. Pour un rapport à diffuser ou des données sensibles, prenez Claude (Anthropic) : il est payant, mais c'est la meilleure qualité vérifiée et vos données ne servent pas à entraîner ses modèles. Vous pouvez en changer à tout moment.",
   ],
   ['Et après ?', 'Les modules « Entretiens et tests » et « Personas » sont en préparation. Voir « Ce qui arrive » ci-dessous.'],
 ]

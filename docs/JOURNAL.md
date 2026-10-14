@@ -152,3 +152,9 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 - **Seuil fixé par Arnaud** : un moteur n'est proposé qu'à 3,5/5 au moins sur ÉcoSol (le niveau de l'offre gratuite de Gemini), idéalement 4, et s'il n'est pas pénible à utiliser. Les entretiens alourdiront les données : un moteur limite aujourd'hui sera pire demain.
 - **Décision** (laissée à l'orchestrateur par Arnaud) : Ollama et LM Studio ne sont plus proposés, l'accueil n'en parle plus, le mode Confidentiel ne s'affiche qu'à qui a déjà un moteur local. Le code reste en place derrière un seul réglage.
 - **Gardé** : délai de 30 minutes par demande en local ; un regroupement dégénéré redemandé une fois ; une relecture qui boucle ignorée pour son lot ; écrire un export ou une note ne recharge plus la page pendant une analyse.
+
+## 2026-10-14 (soir) — Moteurs validés ou à l'étude ; durée estimée par moteur
+
+- **Demande d'Arnaud** : une qualité minimale est essentielle ; les moteurs dont on n'est pas sûr restent dans la liste, désactivés, avec la raison (« à l'étude »).
+- **Fait** : statut par modèle (`validated` avec la note, ou `study` avec la raison) ; seuls Gemini 3.5 Flash-Lite (3,5/5) et Claude Sonnet (4,5/5) se configurent. Mistral passe à l'étude (3/5). L'accueil ne recommande plus que Gemini (gratuit) et Claude (payant).
+- **Durée estimée** : vitesse mesurée à la fin de chaque synthèse (temps écoulé ÷ demandes envoyées, moyenne des dernières), sinon vitesse de référence mesurée sur ÉcoSol, sinon estimation grossière ; le débit autorisé reste un plancher. L'écran dit d'où vient la durée.

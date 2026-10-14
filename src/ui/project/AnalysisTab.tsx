@@ -3,11 +3,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { SIMULATION_ENGINE, SIMULATION_ENGINE_ID, useEngines, type EngineConfig } from '@/app/engines'
 import { href, navigate } from '@/app/router'
 import { cancelAnalysis, startAnalysis, useIsRunning, useRunNotice } from '@/app/store'
+import { estimateDuration, predictedCalls, type EstimateBasis } from '@/core/analysis/estimate'
 import { corpusHash } from '@/core/analysis/pipeline'
 import { DEFAULT_SETTINGS, type AnalysisSettings, type AnalysisState, type StepId } from '@/core/analysis/types'
 import { activeParticipants } from '@/core/corpus'
 import { runsLocally } from '@/core/providers/location'
-import { presetById } from '@/core/providers/presets'
+import { modelStudy, presetById, typicalSecondsPerCall } from '@/core/providers/presets'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { CATEGORY, formatDuration, plural } from '../format'
 import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Disclosure, Input, Label, Progress, Select, Textarea } from '../primitives'
@@ -30,12 +31,23 @@ const STEP_LABEL: Record<StepId, { title: string; help: string }> = {
 function estimate(project: Project, engine: EngineConfig | undefined) {
   const corpus = corpusForAnalysis(project)
   const people = activeParticipants(corpus).length
-  const ideas = Math.round(corpus.contributions.filter((c) => c.text.trim()).length * 2.5)
-  // Calé sur ÉcoSol (20 participants, 90 réponses) : 44 à 49 demandes, une vingtaine de secondes chacune avec un modèle léger.
-  const calls = Math.round(people * 1.2 + ideas / 10 + 8)
-  const rpm = engine?.requestsPerMinute ?? 10
-  const seconds = Math.max((calls / rpm) * 60, (calls * 20) / Math.max(1, engine?.concurrency ?? 1))
-  return { people, calls, seconds }
+  const calls = predictedCalls(people, corpus.contributions.filter((c) => c.text.trim()).length)
+  const measured = engine?.speed?.model === engine?.model ? engine?.speed?.secondsPerCall : undefined
+  return {
+    people,
+    ...estimateDuration(calls, {
+      measured,
+      reference: engine ? typicalSecondsPerCall(engine.presetId, engine.model) : undefined,
+      requestsPerMinute: engine?.requestsPerMinute ?? 10,
+      concurrency: engine?.concurrency ?? 1,
+    }),
+  }
+}
+
+const BASIS: Record<EstimateBasis, string> = {
+  measured: 'durée mesurée sur vos synthèses avec ce moteur',
+  reference: 'durée mesurée avec ce moteur d’IA sur un corpus réel',
+  rough: 'estimation approximative : la vitesse de ce moteur n’a pas encore été mesurée',
 }
 
 export function AnalysisTab({ project }: { project: Project }) {
@@ -145,6 +157,7 @@ export function AnalysisTab({ project }: { project: Project }) {
                     {e.name}
                     {e.presetId !== 'simulation' ? ` · ${e.model}` : ''}
                     {!allowed(e) ? ' (en ligne)' : ''}
+                    {e.presetId !== 'simulation' && allowed(e) && modelStudy(e.presetId, e.model) ? " (à l'étude)" : ''}
                   </option>
                 ))}
               </Select>
@@ -164,6 +177,11 @@ export function AnalysisTab({ project }: { project: Project }) {
                     Changer le moteur par défaut
                   </a>
                 </p>
+              )}
+              {engine && engine.presetId !== SIMULATION_ENGINE_ID && modelStudy(engine.presetId, engine.model) && (
+                <Alert tone="warning">
+                  Ce moteur est à l'étude. {modelStudy(engine.presetId, engine.model)} Relisez le rapport avec attention.
+                </Alert>
               )}
               {(settings.confidential || engines.some((e) => runsLocally(e.baseUrl))) && (
                 <label className="flex items-start gap-2 pt-1 text-sm">
@@ -272,8 +290,8 @@ export function AnalysisTab({ project }: { project: Project }) {
 
             <p className="text-xs text-muted-foreground">
               Environ {est.calls} demandes au moteur d'IA
-              {engine && engine.presetId !== 'simulation' ? `, soit ${formatDuration(est.seconds)} à la vitesse autorisée par ce moteur` : ''}. Les demandes
-              déjà faites ne sont jamais refaites.
+              {engine && engine.presetId !== 'simulation' ? `, soit ${formatDuration(est.seconds)} (${BASIS[est.basis]})` : ''}. Les
+              demandes déjà faites ne sont jamais refaites.
             </p>
 
             <div className="flex flex-wrap gap-2">

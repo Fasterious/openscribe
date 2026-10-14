@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, CheckCircle2, Cloud, Copy, ExternalLink, HardDrive, Info, Loader2, Lock, RefreshCw, Sparkles, Trash2, Zap } from 'lucide-react'
+import { ArrowLeft, BadgeCheck, Check, CheckCircle2, Cloud, Copy, ExternalLink, FlaskConical, HardDrive, Info, Loader2, Lock, RefreshCw, Sparkles, Trash2, Zap } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import {
   detectOllama,
@@ -14,7 +14,7 @@ import {
 } from '@/app/engines'
 import { href } from '@/app/router'
 import { runsLocally } from '@/core/providers/location'
-import { LOCAL_ENGINES_OFFERED, PROVIDER_PRESETS, presetById, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
+import { PROVIDER_PRESETS, presetById, presetStudy, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
 import { Alert, Badge, Button, Card, CardContent, Dialog, DropMenu, Input, Label, MenuItem, MenuSection, Select, Tooltip, cn } from './primitives'
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
@@ -64,7 +64,7 @@ function useOllama() {
 
 export function SettingsPage({ back }: { back?: string }) {
   const { engines, defaultId, confidentialDefault, loaded } = useEngines()
-  // Mode Confidentiel et moteurs locaux : montrés seulement à qui en a déjà un (LOCAL_ENGINES_OFFERED).
+  // Mode Confidentiel : montré seulement à qui a déjà un moteur sur son ordinateur (les moteurs locaux sont à l'étude).
   const hasLocal = engines.some((e) => runsLocally(e.baseUrl))
   const [editing, setEditing] = useState<EngineConfig | null>(null)
   const ollama = useOllama()
@@ -206,15 +206,15 @@ export function SettingsPage({ back }: { back?: string }) {
         <h2 id="choisir" className="text-lg font-semibold">
           {engines.length ? 'Ajouter un autre moteur' : 'Choisissez votre moteur'}
         </h2>
-        {FAMILIES.filter((f) => f.id !== 'local' || LOCAL_ENGINES_OFFERED || hasLocal).map((f) => (
+        {FAMILIES.map((f) => (
           <div key={f.id} className="space-y-3">
             <h3 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground [&_svg]:size-4">
               {f.icon} {f.title}
             </h3>
             {(f.id === 'other' ? KINDS : [{ id: null, title: '', hint: '' }]).map((k) => {
-              const presets = PROVIDER_PRESETS.filter((p) => p.family === f.id && (k.id === null || p.kind === k.id)).sort(
-                (a, b) => Number(!!b.featured) - Number(!!a.featured),
-              )
+              // Les moteurs validés d'abord, puis ceux à l'étude.
+              const rank = (p: ProviderPreset) => (presetStudy(p) ? 0 : 2) + Number(!!p.featured)
+              const presets = PROVIDER_PRESETS.filter((p) => p.family === f.id && (k.id === null || p.kind === k.id)).sort((a, b) => rank(b) - rank(a))
               if (!presets.length) return null
               return (
                 <div key={k.id ?? f.id} className="space-y-2">
@@ -276,26 +276,50 @@ function ProviderCard({
   onSetup: () => void
 }) {
   const policy = POLICY[preset.dataPolicy]
+  const study = presetStudy(preset)
+  const best = preset.models?.filter((m) => m.validated).sort((a, b) => b.validated!.score - a.validated!.score)[0]
   return (
-    <Card className={cn('flex h-full flex-col p-4', configured && 'border-positive/60')}>
+    <Card className={cn('flex h-full flex-col p-4', configured && 'border-positive/60', study && !configured && 'bg-muted/40')}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="font-semibold">{preset.label.replace(/ \(.*\)$/, '')}</span>
-        {configured ? (
-          <Badge tone="positive">
-            <Check className="size-3" /> Configuré
-          </Badge>
-        ) : (
-          preset.family === 'free' && <Badge tone="default">Gratuit, sans carte</Badge>
-        )}
+        <span className={cn('font-semibold', study && !configured && 'text-muted-foreground')}>{preset.label.replace(/ \(.*\)$/, '')}</span>
+        <span className="flex flex-wrap gap-1">
+          {configured && (
+            <Badge tone="positive">
+              <Check className="size-3" /> Configuré
+            </Badge>
+          )}
+          {study ? (
+            <Badge tone="outline" className="gap-1">
+              <FlaskConical className="size-3" /> À l'étude
+            </Badge>
+          ) : (
+            <>
+              <Badge tone="positive" className="gap-1">
+                <BadgeCheck className="size-3" /> Qualité vérifiée{best ? ` · ${String(best.validated!.score).replace('.', ',')}/5` : ''}
+              </Badge>
+              {!configured && preset.family === 'free' && <Badge tone="default">Gratuit, sans carte</Badge>}
+            </>
+          )}
+        </span>
       </div>
       <p className="mt-2 text-sm">{preset.bestFor}</p>
-      {!compact && <p className="mt-1 text-xs text-muted-foreground">{preset.freeTier}</p>}
+      {study ? (
+        <p className="mt-1 text-xs text-muted-foreground">{study}</p>
+      ) : (
+        !compact && <p className="mt-1 text-xs text-muted-foreground">{preset.freeTier}</p>
+      )}
       {ollama !== undefined && <OllamaLine status={ollama} />}
       <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
         {!compact ? <Badge tone={policy.tone}>{policy.label}</Badge> : <span />}
-        <Button size="sm" variant={configured ? 'outline' : 'default'} onClick={onSetup}>
-          {configured ? 'Modifier' : 'Configurer'}
-        </Button>
+        {study && !configured ? (
+          <Button size="sm" variant="outline" disabled aria-label={`Configurer ${preset.label} : à l'étude`}>
+            Non proposé
+          </Button>
+        ) : (
+          <Button size="sm" variant={configured ? 'outline' : 'default'} onClick={onSetup}>
+            {configured ? 'Modifier' : 'Configurer'}
+          </Button>
+        )}
       </div>
     </Card>
   )
@@ -593,10 +617,16 @@ function ModelPicker({ choices, value, onChange }: { choices: ModelChoice[]; val
                       <MenuItem
                         key={c.id}
                         checked={!custom && c.id === value}
+                        disabled={!c.validated && c.id !== value}
                         label={
                           <>
                             {c.label}
-                            {c.recommended && (
+                            {!c.validated && (
+                              <Badge tone="outline" className="ml-2 align-middle">
+                                À l'étude
+                              </Badge>
+                            )}
+                            {c.validated && c.recommended && (
                               <Badge tone="default" className="ml-2 align-middle">
                                 Recommandé
                               </Badge>
@@ -605,7 +635,7 @@ function ModelPicker({ choices, value, onChange }: { choices: ModelChoice[]; val
                         }
                         hint={
                           <>
-                            {c.hint}
+                            {c.validated ? c.hint : (c.study ?? c.hint)}
                             {c.label !== c.id && <span className="block font-mono text-[11px]">{c.id}</span>}
                           </>
                         }

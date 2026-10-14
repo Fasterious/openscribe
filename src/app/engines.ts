@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { blendSpeed } from '@/core/analysis/estimate'
 import { randomId } from '@/core/ids'
 import { withLimits, type LimitOptions } from '@/core/providers/limits'
 import { createOpenAiCompatibleProvider } from '@/core/providers/openai-compatible'
@@ -19,6 +20,8 @@ export interface EngineConfig {
   concurrency: number
   /** false : enregistré alors que le test de connexion a échoué. On ne le choisit pas d'office. */
   verified?: boolean
+  /** Vitesse mesurée lors des synthèses terminées avec ce modèle (secondes par demande envoyée). */
+  speed?: { model: string; secondsPerCall: number; runs: number }
 }
 
 export const SIMULATION_ENGINE_ID = 'simulation'
@@ -54,6 +57,16 @@ export async function saveEngine(engine: EngineConfig): Promise<void> {
   else all.push(engine)
   await setSetting(KEY, all)
   if (engine.verified !== false && !(await getSetting<string>(DEFAULT_KEY))) await setSetting(DEFAULT_KEY, engine.id)
+  notify()
+}
+
+/** Enregistre la vitesse observée sur une synthèse terminée, pour les prochaines estimations de durée. */
+export async function recordSpeed(engineId: string, model: string, secondsPerCall: number): Promise<void> {
+  const all = await loadEngines()
+  const e = all.find((x) => x.id === engineId)
+  if (!e || e.model !== model) return
+  e.speed = { model, ...blendSpeed(e.speed?.model === model ? e.speed : undefined, secondsPerCall) }
+  await setSetting(KEY, all)
   notify()
 }
 

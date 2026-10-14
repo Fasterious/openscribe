@@ -115,5 +115,7 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ✅ Une méthode par famille de modèles (`docs/METHODES.md`), la référence Sonnet inchangée
 - ✅ Moteur d'IA par tâche, pastille « Sur votre ordinateur » / « En ligne », mode Confidentiel (gardé pour qui a un moteur local)
 - ✅ Groq abandonné (une heure par synthèse) ; Ollama essayé (gpt-oss 20B, Gemma 4 12B) puis retiré des choix : sous le seuil de 3,5/5
-- ⏳ Estimation de durée fondée sur la vitesse mesurée de chaque moteur
+- ✅ Estimation de durée fondée sur la vitesse mesurée de chaque moteur (puis sur vos propres synthèses)
+- ✅ Statut de qualité par moteur : validé (note) ou à l'étude (raison), seuil de 3,5/5
+- ⏳ Évaluer Cohere (clé d'essai gratuite) et, avec une clé payante, Mistral Small, Claude Opus et Haiku
 - ⏳ Réglages propres au fournisseur (réflexion) à inclure dans la clé du cache

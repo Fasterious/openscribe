@@ -223,16 +223,21 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
 
   // Les fournisseurs sont visibles d'emblée, sans clic préalable.
   await expect(page.getByRole('heading', { name: "Moteurs d'IA" })).toBeVisible()
-  for (const name of ['Mistral AI', 'Google Gemini', 'Groq']) await expect(page.getByText(name, { exact: true }).first()).toBeVisible()
-  // Moteurs sur l'ordinateur : retirés des choix tant qu'aucun n'atteint le seuil de qualité (docs/METHODES.md).
-  await expect(page.getByText('Ollama (sur votre ordinateur)')).toHaveCount(0)
+  for (const name of ['Mistral AI', 'Google Gemini', 'Groq', 'Ollama']) await expect(page.getByText(name, { exact: true }).first()).toBeVisible()
+  // Seuil de qualité : Gemini est vérifié ; Mistral et Ollama restent visibles, à l'étude, avec la raison, et ne se configurent pas.
+  const card = (name: string) => page.getByRole('listitem').filter({ hasText: name })
+  await expect(card('Google Gemini')).toContainText('Qualité vérifiée · 3,5/5')
+  await expect(card('Mistral AI')).toContainText("À l'étude")
+  await expect(card('Mistral AI')).toContainText('noté 3/5')
+  await expect(card('Mistral AI').getByRole('button', { name: /à l'étude/ })).toBeDisabled()
+  await expect(card('Ollama').first()).toContainText('24 Go')
   await noHorizontalScroll(page)
   await shot(page, '8-moteurs')
 
-  // Le guide Groq mène directement à la page des clés.
-  await page.getByRole('listitem').filter({ hasText: 'Groq' }).getByRole('button', { name: 'Configurer' }).click()
+  // Le guide Gemini mène directement à la page des clés.
+  await card('Google Gemini').getByRole('button', { name: 'Configurer' }).click()
   const dialog = page.getByRole('dialog')
-  await expect(dialog.getByRole('link', { name: /Aller aux clés Groq/ })).toHaveAttribute('href', 'https://console.groq.com/keys')
+  await expect(dialog.getByRole('link', { name: /Ouvrir Google AI Studio/ })).toHaveAttribute('href', 'https://aistudio.google.com/api-keys')
   await dialog.getByLabel("Clé d'accès").fill('cle-de-test')
   await shot(page, '9-guide')
   // Le test échoue (fausse clé, pas de réseau) : on peut quand même enregistrer.
@@ -247,25 +252,24 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Étude moteur')
   await page.goto('/#/moteurs')
   await expect(page.getByRole('heading', { name: 'Vos moteurs' })).toBeVisible()
-  await expect(page.getByText(/Modèle : openai\/gpt-oss-120b/)).toBeVisible()
+  await expect(page.getByText(/Modèle : gemini-3.5-flash-lite/)).toBeVisible()
 })
 
 test('moteurs d’IA : le modèle se choisit dans une liste expliquée, le recommandé en tête', async ({ page }) => {
   await page.goto('/#/moteurs')
-  await page.getByRole('listitem').filter({ hasText: 'Mistral AI' }).getByRole('button', { name: 'Configurer' }).click()
+  await page.getByRole('listitem').filter({ hasText: 'Google Gemini' }).getByRole('button', { name: 'Configurer' }).click()
   const dialog = page.getByRole('dialog')
   const picker = dialog.getByRole('button', { name: 'Choisir le modèle' })
-  await expect(picker).toContainText('Ministral 14B')
+  await expect(picker).toContainText('Gemini 3.5 Flash-Lite')
   await picker.click()
   // Ouvrir la liste n'envoie pas le formulaire (pas de test de connexion lancé).
   await expect(dialog.getByRole('button', { name: /Test en cours|Enregistrer quand même/ })).toHaveCount(0)
-  await expect(dialog.getByRole('menuitemradio', { name: /Ministral 14B.*Recommandé/ })).toHaveAttribute('aria-checked', 'true')
-  await expect(dialog.getByText('Avec le paiement à l’usage activé')).toBeVisible()
+  await expect(dialog.getByRole('menuitemradio', { name: /Gemini 3.5 Flash-Lite.*Recommandé/ })).toHaveAttribute('aria-checked', 'true')
+  await expect(dialog.getByText('Avec la facturation activée')).toBeVisible()
+  // Un modèle pas encore évalué est visible, avec la raison, mais ne se choisit pas.
+  await expect(dialog.getByRole('menuitemradio', { name: /Gemini 3.8 Flash.*À l'étude/ })).toBeDisabled()
   await shot(page, '9b-modeles')
-  await dialog.getByRole('menuitemradio', { name: /Ministral 8B/ }).click()
-  await expect(picker).toContainText('Ministral 8B')
   // Un modèle absent de la liste se saisit librement.
-  await picker.click()
   await dialog.getByRole('menuitemradio', { name: /Autre modèle/ }).click()
   await dialog.getByLabel('Nom du modèle').fill('mon-modele-2027')
   await expect(dialog.getByLabel('Nom du modèle')).toHaveValue('mon-modele-2027')
@@ -274,7 +278,7 @@ test('moteurs d’IA : le modèle se choisit dans une liste expliquée, le recom
 test('qui fait quoi : le moteur en ligne est annoncé, et le mode Confidentiel ne s’affiche pas sans moteur local', async ({ page }) => {
   // Un moteur en ligne, enregistré sans test réussi (pas de réseau ici).
   await page.goto('/#/moteurs')
-  await page.getByRole('listitem').filter({ hasText: 'Mistral AI' }).getByRole('button', { name: 'Configurer' }).click()
+  await page.getByRole('listitem').filter({ hasText: 'Google Gemini' }).getByRole('button', { name: 'Configurer' }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel("Clé d'accès").fill('cle-de-test')
   await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()
@@ -288,8 +292,8 @@ test('qui fait quoi : le moteur en ligne est annoncé, et le mode Confidentiel n
   await page.getByLabel('Fichier à importer').setInputFiles('fixtures/mediatheque.csv')
   await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
   await page.getByRole('tab', { name: /Analyse/ }).click()
-  await page.getByLabel("Moteur d'IA pour analyser et rédiger").selectOption({ label: 'Mistral AI · ministral-14b-2512' })
-  await expect(page.getByText(/En ligne · les réponses des participants sont envoyées à Mistral AI/)).toBeVisible()
+  await page.getByLabel("Moteur d'IA pour analyser et rédiger").selectOption({ label: 'Google Gemini · gemini-3.5-flash-lite' })
+  await expect(page.getByText(/En ligne · les réponses des participants sont envoyées à Google Gemini/)).toBeVisible()
   await expect(page.getByRole('checkbox', { name: /Confidentiel/ })).toHaveCount(0)
   await noHorizontalScroll(page)
   await shot(page, '10-en-ligne')
@@ -355,7 +359,7 @@ test('un moteur qui n’a pas répondu au test n’est ni annoncé prêt ni choi
   await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
   await page.getByRole('tab', { name: /Analyse/ }).click()
   await page.getByRole('link', { name: 'Choisir un moteur' }).click()
-  await page.getByRole('listitem').filter({ hasText: 'Mistral AI' }).getByRole('button', { name: 'Configurer' }).click()
+  await page.getByRole('listitem').filter({ hasText: 'Google Gemini' }).getByRole('button', { name: 'Configurer' }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel("Clé d'accès").fill('cle-de-test')
   await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()

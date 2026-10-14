@@ -141,3 +141,9 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - **Bien marché** : capturer dans la page la demande fautive (un mouchard sur les appels) a montré en une minute la boucle de Gemma (27 déplacements répétés 590 fois) ; le seuil chiffré d'Arnaud a rendu la décision simple.
 - **Coûté pour rien** : environ 4 heures sur gpt-oss avant de conclure ; deux guetteurs qui ont cru l'analyse finie (le journal du moteur reste muet pendant la réflexion, ou jusqu'à la fin d'une demande) ; un export dans `fixtures/` qui a rechargé la page et annulé une analyse.
 - **On change** : un modèle local se juge d'abord sur une passe complète ; deux passes sans synthèse complète, on arrête. Une analyse se suit par la charge du processus du moteur ou par l'état dans la page, jamais par son journal. `docs/` et `fixtures/` sont ignorés par le serveur de développement.
+
+## Moteurs validés ou à l'étude (14/10, soir)
+
+- **Bien marché** : une règle chiffrée (3,5/5) se code en une donnée par modèle, et un test garantit qu'aucun moteur n'est proposé sans note ni écarté sans raison.
+- **Coûté pour rien** : un formateur lancé sans configuration du dépôt a réécrit deux fichiers entiers (annulé) ; ne formater qu'avec l'outil du projet.
+- **On change** : une note s'écrit toujours « 3,5/5 », dans les badges comme dans les phrases (relecture `plume`).

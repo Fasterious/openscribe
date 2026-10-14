@@ -121,6 +121,27 @@ sinon annuaires tiers (à revérifier dans la console avant toute annonce).
 | SambaNova | 20 demandes par jour | — | Écarté |
 | Cerebras | Carte exigée depuis juillet 2026 | — | Écarté |
 
+### Mise à jour du 14/10/2026 (soir) : statut de chaque moteur
+
+Règle d'Arnaud : un moteur n'est proposé qu'à 3,5/5 au moins sur ÉcoSol (`methodologue`), idéalement 4.
+Les autres restent dans la liste, « À l'étude », avec la raison, sans pouvoir être configurés
+(un moteur déjà configuré continue de marcher, avec un avertissement).
+
+| Moteur | Statut | Raison |
+|---|---|---|
+| Google Gemini 3.5 Flash-Lite (gratuit) | **Validé, 3,5/5** | passe 4, 13/10 |
+| Claude Sonnet (Anthropic, payant) | **Validé, 4,5/5** | référence B10 |
+| Mistral (Ministral 14B gratuit ; Small et Medium payants) | À l'étude | 3/5, sous le seuil ; modèles payants pas encore évalués |
+| Groq | À l'étude | une heure par synthèse sur l'offre gratuite |
+| Ollama, LM Studio | À l'étude | 3/5 au mieux et 40 min ou plus sur 24 Go |
+| Cohere (ajouté) | À l'étude | clé d'essai gratuite (1 000 demandes par mois), appel depuis le navigateur vérifié ; Command A peut-être absent de l'essai |
+| Tous les autres (payants) | À l'étude | pas encore évalués, faute de clé |
+
+Nouvelles pistes vérifiées le 14/10 : Cloudflare Workers AI refuse l'appel depuis le navigateur
+(écarté) ; Requesty (plateforme multi-fournisseurs) l'accepte, mais son offre gratuite (200 demandes
+par jour) ne sert que de petits modèles : à ne regarder qu'après Cohere. Prochaine évaluation
+gratuite possible : Cohere (Arnaud crée le compte). Les autres demandent une clé payante.
+
 ## Leçons pour tous les fournisseurs
 
 - **Une offre gratuite est un fait daté**, pas une propriété du fournisseur : la fiche

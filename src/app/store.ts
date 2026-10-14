@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
+import { observedSecondsPerCall } from '@/core/analysis/estimate'
 import { newAnalysis, runAnalysis } from '@/core/analysis/pipeline'
 import type { AnalysisSettings, AnalysisState } from '@/core/analysis/types'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { runsLocally } from '@/core/providers/location'
 import { methodForModel } from '@/core/providers/presets'
 import { getProject, listProjects, responseCache, saveProject } from './db'
-import { providerFor, type EngineConfig } from './engines'
+import { providerFor, recordSpeed, type EngineConfig } from './engines'
 
 /**
  * Petit magasin d'état : les écrans s'abonnent aux changements d'un projet.
@@ -150,15 +151,20 @@ export async function startAnalysis(
     })
   }
 
+  const sentBefore = initial.calls.total - initial.calls.cached
+  const startedAt = Date.now()
   try {
     await store({ ...initial, status: 'running' })
-    await runAnalysis(corpus, initial, {
+    const final = await runAnalysis(corpus, initial, {
       provider,
       cache: responseCache,
       signal: controller.signal,
       concurrency: engine.concurrency,
       onUpdate: (s) => store(s).then(() => undefined),
     })
+    // Vitesse réelle de ce moteur, pour estimer la durée des prochaines synthèses.
+    const perCall = final.status === 'done' ? observedSecondsPerCall(Date.now() - startedAt, final.calls.total - final.calls.cached - sentBefore) : undefined
+    if (perCall !== undefined) await recordSpeed(engine.id, engine.model, perCall)
   } finally {
     running.delete(projectId)
     notices.delete(projectId)
