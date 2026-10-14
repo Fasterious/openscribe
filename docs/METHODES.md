@@ -305,3 +305,19 @@ changent d'une passe à l'autre (jugements de ton et de rangement au cas par cas
 Conclusion : les consignes ne feront plus monter la note de méthode ; les gains restants sont dans le
 code (points 1 à 3) et dans la structure (le grand prompt, qui lit tout, reste devant : une synthèse
 hybride, lecture d'ensemble par le modèle et contrôles par le code, est la piste suivante).
+
+### Corrections dans le code (14/10/2026, nuit) — communes à toutes les méthodes
+
+1. **Contrôle des comptes** : « presque toutes les personnes » n'est plus lu comme « toutes » (contrôlé
+   comme « la plupart », trois personnes citées) ; un pluriel dans un propos rapporté (« relève que certains
+   colistiers… ») n'est plus pris pour un compte, sauf après « tandis que » ou « alors que ». Les autres
+   alertes jugées fausses par les modèles se sont révélées justes une fois rejouées avec les vraies
+   personnes (deux idées de la même personne comptées pour deux).
+2. **Phrases du code** : le rattrapage final n'ajoute plus une seconde phrase « Les avis s'opposent sur… »
+   quand la relecture a reformulé les titres ; « les critiques se rejoignent mais les remèdes s'opposent »
+   devient « les pistes proposées s'opposent » (on n'affirme plus un constat commun) ; une reprise
+   (« Cette dernière », « La seconde »…) part avec la phrase qu'elle reprend.
+3. **Couverture** : chaque passage non couvert arrive avec ce qui le précède dans la réponse (`before`),
+   pour en juger le sens et le ton.
+
+À valider sur une passe ÉcoSol (Opus, méthode « contexte ») avant de conclure.

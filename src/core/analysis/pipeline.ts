@@ -3,7 +3,7 @@ import { activeParticipants, contributionsOf } from '../corpus'
 import { randomId, sha256, stableStringify } from '../ids'
 import { ProviderError, type LlmProvider } from '../providers/types'
 import { computeMetrics, sortIds } from './metrics'
-import { uncoveredPassages } from './coverage'
+import { uncoveredWithContext } from './coverage'
 import { highlightLine, highlights } from './highlights'
 import { verifiedNames } from './names'
 import {
@@ -357,10 +357,10 @@ export async function extractParticipant(
 
   // Couverture : les passages assez longs qu'aucune idée ne couvre sont relus une fois.
   const passages = refs.flatMap((r) =>
-    uncoveredPassages(
+    uncoveredWithContext(
       r.c.text,
       ideas.filter((i) => i.contributionId === r.c.id).flatMap((i) => i.parts ?? [i.span]),
-    ).map((text) => ({ ref: r.ref, question: r.c.prompt, text })),
+    ).map((p) => ({ ref: r.ref, question: r.c.prompt, ...p })),
   )
   if (passages.length) {
     const more = await runner.json(coveragePrompt({ passages }, settings), coverageSchema)
@@ -1356,6 +1356,9 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
  */
 export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' = 'fr', onlyMissing = false): string {
   const named = summary.toLowerCase()
+  // Rattrapage final : la relecture de la langue remplace souvent les titres entre guillemets par des mots ordinaires.
+  // Une phrase qui dit déjà ce qui divise suffit : on ne la répète pas.
+  if (onlyMissing && /(avis s['’]opposent|opinions are split|pistes proposées s['’]opposent|proposals diverge)/i.test(summary)) return summary
   const divided = highlights(groups).divided.filter((d) => !onlyMissing || !named.includes(d.title.toLowerCase()))
   if (!divided.length || !summary.trim()) return summary
   const list = (titles: string[]) =>
@@ -1369,8 +1372,9 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
       : []),
     ...opposed.map((d) =>
       lang === 'en'
-        ? `On ${q(d.title)}, the criticism is shared but the proposals diverge: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
-        : `Sur ${q(d.title)}, les critiques se rejoignent mais les remèdes proposés s'opposent : ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`,
+        ? `On ${q(d.title)}, the proposals diverge: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
+        : // « Les critiques se rejoignent » affirmait un accord sur le constat que les données ne montrent pas toujours.
+          `Sur ${q(d.title)}, les pistes proposées s'opposent : ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`,
     ),
   ]
   const paragraphs = summary.trim().split(/\n\s*\n/)
@@ -1832,7 +1836,7 @@ export function spellLeadingNumbers(text: string): string {
  * « Une troisième… », « Six dénoncent en revanche… ») : retirée avec elle, sinon elle ne renvoie plus à rien.
  */
 const DEPENDENT =
-  /^(?:Elles?|Ils|Celles?-ci|Ceux-ci|Celui-ci|L['’]une|L['’]un|Une autre|Un autre|D['’]autres|Les autres|Une (?:deuxième|seconde|troisième|quatrième)|Un (?:deuxième|second|troisième)|À l['’]inverse|Au contraire|En revanche|Enfin|Aussi|De plus|En outre|Toutefois|Cependant|Pourtant|Par ailleurs|Mais|Néanmoins|De même)(?![\p{L}])|^(?:\S+\s+){1,3}(?:en revanche|à l['’]inverse|quant à elles?|quant à eux)(?![\p{L}])/iu
+  /^(?:Elles?|Ils|Celles?-ci|Ceux-ci|Celui-ci|Cette dernière|Ce dernier|Ces derniers|Ces dernières|Cette personne|Celle-là|Celui-là|La seconde|Le second|La première|Le premier|L['’]une|L['’]un|Une autre|Un autre|D['’]autres|Les autres|Une (?:deuxième|seconde|troisième|quatrième)|Un (?:deuxième|second|troisième)|À l['’]inverse|Au contraire|En revanche|Enfin|Aussi|De plus|En outre|Toutefois|Cependant|Pourtant|Par ailleurs|Mais|Néanmoins|De même)(?![\p{L}])|^(?:\S+\s+){1,3}(?:en revanche|à l['’]inverse|quant à elles?|quant à eux)(?![\p{L}])/iu
 function dropWithDependents(sentences: string[], drop: (s: string) => boolean): string[] {
   const out: string[] = []
   let previousDropped = false

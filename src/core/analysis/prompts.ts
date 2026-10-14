@@ -149,7 +149,8 @@ ${dataBlock(input)}`,
 export interface CoverageInput {
   /** Passages qu'aucune idée extraite ne couvre. */
   /** La question posée donne le sens d'un passage court : elle l'accompagne. */
-  passages: { ref: string; question?: string; text: string }[]
+  /** `before` : ce qui précède le passage dans la réponse, pour en juger le sens et le ton (rien n'en est extrait). */
+  passages: { ref: string; question?: string; before?: string; text: string }[]
 }
 
 export const coverageSchema = z.object({ ideas: z.array(ideaItem) })
@@ -159,6 +160,7 @@ export function coveragePrompt(input: CoverageInput, settings: AnalysisSettings)
     task: 'complete',
     system: SYSTEM,
     user: `${context(settings)}Ces passages viennent des réponses d'UNE personne, et aucune idée n'en a encore été tirée. Relis-les : s'ils contiennent des idées, extrais-les ; s'ils n'en contiennent pas (phrase de liaison, remerciement, répétition d'une idée déjà dite), réponds avec une liste vide.
+"before" donne ce qui précède le passage dans la réponse : lis-le pour juger le sens et le ton du passage (une liste d'exemples peut illustrer une critique : « on n'ouvre aucune perspective, par exemple… »), mais n'en extrais rien.
 
 ${EXTRACTION_RULES}
 ${CATEGORY_RULES_FR}

@@ -171,10 +171,13 @@ export function undercitedPeople(text: string, personOf: (ideaId: string) => str
  */
 export function vaguePlurals(text: string, personOf: (ideaId: string) => string | undefined, motifSize?: (ideaId: string) => number): string[] {
   const out: string[] = []
-  const VAGUE = /(?<![\p{L}])(certains|certaines|d'autres|d’autres|plusieurs|la plupart|les uns)(?![\p{L}])(?:\s+(?:d'entre eux\s+|des\s+)?([\p{L}'’]+))?/giu
+  const VAGUE =
+    /(?<![\p{L}])(certains|certaines|d'autres|d’autres|plusieurs|la plupart|les uns|presque toutes|presque tous)(?![\p{L}])(?:\s+(?:d'entre eux\s+|des\s+|les\s+)?([\p{L}'’]+))?/giu
   // Le pluriel annonce un compte quand il est sujet (« d'autres regrettent », « selon plusieurs personnes ») ;
-  // « reprises par d'autres » ou « a vu plusieurs personnes partir » rapportent ce qu'une personne a dit.
-  const asSubject = (before: string) => /(^|[,;:(]|\b(et|mais|que|qu['’]|selon|pour|chez|dont))\s*$/i.test(before)
+  // « reprises par d'autres », « a vu plusieurs personnes partir » ou « relève que certains colistiers… » rapportent
+  // ce qu'une personne a dit. Après « que », seul un « que » qui oppose deux voix (« tandis que », « alors que ») ouvre un compte.
+  const asSubject = (before: string) =>
+    /(^|[,;:(]|\b(et|mais|selon|pour|chez|dont)|\b(tandis|alors|bien|si bien)\s+qu(e|['’]))\s*$/i.test(before)
   // « Certains points » ne parle pas de personnes : il faut un nom de personne, un pronom ou un verbe ensuite.
   const aboutPeople = (next?: string) =>
     !!next &&
@@ -195,7 +198,7 @@ export function vaguePlurals(text: string, personOf: (ideaId: string) => string 
       for (const v of clause.matchAll(VAGUE)) {
         const isSubject = asSubject(clause.slice(0, v.index)) || /^(selon|pour|chez)$/i.test(clause.slice(0, v.index).trim().split(/\s+/).pop() ?? '')
         if (!isSubject || !aboutPeople(v[2])) continue
-        const need = /plusieurs|plupart/i.test(v[1]) ? 3 : 2
+        const need = /plusieurs|plupart|presque/i.test(v[1]) ? 3 : 2
         if (people > 0 && backing < need) out.push(v[1])
       }
     })
@@ -286,6 +289,8 @@ export function allClaims(text: string, personOf: (ideaId: string) => string | u
   const RE = /(?<![\p{L}])(toutes les personnes|tous les participants|toutes celles|tous ceux|toutes les participantes)(?![\p{L}])/giu
   for (const sentence of text.split(/(?<=[.!?])\s+/)) {
     for (const m of sentence.matchAll(RE)) {
+      // « Presque toutes les personnes » ne dit pas « toutes » : c'est une large majorité, contrôlée avec les pluriels vagues.
+      if (/presque\s+$/i.test(sentence.slice(0, m.index))) continue
       const people = peopleIn(countSpan(sentence, m.index ?? 0), personOf)
       if (people > 0 && people < everyone) out.push(m[1])
     }

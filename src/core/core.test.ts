@@ -38,7 +38,7 @@ import {
   dropInventedQuotes,
   applyAttachments,
 } from './analysis/pipeline'
-import { uncoveredPassages } from './analysis/coverage'
+import { uncoveredPassages, uncoveredWithContext } from './analysis/coverage'
 import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
 import { emptyCorpus, promptsOf, removeSource, renameSource } from './corpus'
 import { maskNames, verifiedNames } from './analysis/names'
@@ -435,6 +435,17 @@ describe('couverture des longues réponses', () => {
       'On pourrait aussi parler du parking, qui reste introuvable pour la plupart des clients du samedi. Merci !',
     ])
     expect(uncoveredPassages(text, [{ start: 0, end: 132 }])).toEqual([])
+  })
+
+  it('donne avec chaque passage ce qui le précède : une liste d’exemples peut illustrer une critique', () => {
+    const text = "Le bilan est décevant : la lettre aux adhérents n'ouvre aucune perspective concrète. Par exemple les horaires d'ouverture, le prix des abonnements, la navette du samedi ou la salle de lecture."
+    const critique = text.indexOf('Par exemple')
+    expect(uncoveredWithContext(text, [{ start: 0, end: critique - 1 }])).toEqual([
+      {
+        text: "Par exemple les horaires d'ouverture, le prix des abonnements, la navette du samedi ou la salle de lecture.",
+        before: "Le bilan est décevant : la lettre aux adhérents n'ouvre aucune perspective concrète.",
+      },
+    ])
   })
 })
 
@@ -843,6 +854,10 @@ describe('phrase qui dépend d’une phrase retirée', () => {
     )
     expect(dropUnreferenced('Le tri plaît. Six critiquent en revanche le délai [I0001]. Le site est lent [I0002].').text).toBe('Le site est lent [I0002].')
     expect(dropUnreferenced('Le tri plaît [I0001]. Elles soulignent la rapidité [I0002].').text).toBe('Le tri plaît [I0001]. Elles soulignent la rapidité [I0002].')
+    // Une reprise (« Cette dernière », « La seconde ») part avec la phrase qu'elle reprend.
+    expect(dropUnreferenced('Une personne juge le site lent. Cette dernière propose un mode hors ligne [I0001]. Le tri plaît [I0002].').text).toBe(
+      'Le tri plaît [I0002].',
+    )
   })
 })
 
@@ -1087,6 +1102,8 @@ describe('contrôles ajoutés à la certification B9', () => {
   it('« toutes les personnes » couvre chaque personne qui donne un avis', () => {
     expect(allClaims('Toutes les personnes qui en parlent le jugent tardif [I0001, I0002].', person, 3)).toEqual(['Toutes les personnes'])
     expect(allClaims('Toutes les personnes qui en parlent le jugent tardif [I0001, I0002, I0003].', person, 3)).toEqual([])
+    // « Presque toutes » ne dit pas « toutes » (contrôlé comme un pluriel vague).
+    expect(allClaims('Presque toutes les personnes qui en parlent le jugent tardif [I0001, I0002].', person, 3)).toEqual([])
   })
   it('les sujets qui divisent sont nommés une fois, par le code', () => {
     const g = (id: string, title: string, stance: string, opposed?: { a: string; b: string; about: string }[]) =>
@@ -1103,7 +1120,7 @@ describe('contrôles ajoutés à la certification B9', () => {
       g('G2', 'Positionnement', 'consensus', [{ a: 'I0001', b: 'I0002', about: 'afficher ou non une étiquette' }]),
     ])
     expect(out.split('\n\n')[1]).toBe(
-      'Ce qui a bloqué. Les avis s’opposent sur « Prise de décision ». Sur « Positionnement », les critiques se rejoignent mais les remèdes proposés s’opposent : afficher ou non une étiquette [I0001, I0002].'.replace(
+      'Ce qui a bloqué. Les avis s’opposent sur « Prise de décision ». Sur « Positionnement », les pistes proposées s’opposent : afficher ou non une étiquette [I0001, I0002].'.replace(
         /’/g,
         "'",
       ),
@@ -1113,6 +1130,14 @@ describe('contrôles ajoutés à la certification B9', () => {
     expect(spellLeadingNumbers('3 personnes regrettent X. Puis 4 autres.\n\n2 personnes proposent Y.')).toBe(
       'Trois personnes regrettent X. Puis 4 autres.\n\nDeux personnes proposent Y.',
     )
+  })
+})
+
+describe('phrases écrites par le code', () => {
+  it('le rattrapage final ne répète pas « Les avis s’opposent » quand la relecture a reformulé les titres', () => {
+    const g = { id: 'G1', title: 'Prise de décision', ideaIds: [], summary: '', metrics: { stance: 'divided', positiveOnly: ['a', 'b'], negativeOnly: ['c', 'd'], mixed: [], participantsByCategory: {} } } as unknown as Group
+    const polished = "Ce qui a marché.\n\nCe qui a bloqué. Les avis s'opposent sur la prise de décision collective.\n\nLa suite."
+    expect(withDivided(polished, [g], 'fr', true)).toBe(polished)
   })
 })
 
@@ -1132,6 +1157,12 @@ describe('pluriels vagues', () => {
     expect(vaguePlurals('Certains regrettent le calendrier [I0129].', person, () => 6)).toEqual([])
     // « Certains points » ne parle pas de personnes.
     expect(vaguePlurals('Une personne juge certains points flous [I0129].', person)).toEqual([])
+    // Propos rapporté : « relève que certains colistiers… » ; mais « tandis que d'autres » oppose bien deux voix.
+    expect(vaguePlurals("Une personne relève que certains colistiers n'étaient pas venus [I0129].", person)).toEqual([])
+    expect(vaguePlurals("Trois l'apprécient [I0010, I0011, I0012], tandis que d'autres le critiquent [I0129].", person)).toEqual(["d'autres"])
+    // « Presque toutes les personnes » : une large majorité, au moins trois personnes citées.
+    expect(vaguePlurals('Presque toutes les personnes qui en parlent le saluent [I0010, I0011, I0012].', person)).toEqual([])
+    expect(vaguePlurals('Presque toutes les personnes qui en parlent le saluent [I0010, I0011].', person)).toEqual(['Presque toutes'])
   })
 })
 
