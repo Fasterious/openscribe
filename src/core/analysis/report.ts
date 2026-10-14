@@ -171,7 +171,8 @@ export function metricsLine(m: Metrics): string {
   if (m.minority && m.stance !== 'divided') {
     const k = m.minority.participantIds.length
     parts.push(
-      `à contre-courant : ${n(k, 'participant')} ${m.minority.side === 'positive' ? (k > 1 ? "l'apprécient" : "l'apprécie") : k > 1 ? 'le critiquent' : 'le critique'}`,
+      // « l'apprécient » se lisait à contresens quand l'objet du motif est déjà négatif (« Fermetures de classes ») : on dit le camp.
+      `à contre-courant : ${n(k, m.minority.side === 'positive' ? 'avis positif' : 'avis négatif')}`,
     )
   }
   return parts.join(' · ')
@@ -187,7 +188,8 @@ export function scaleWords(m: Metrics, ratio: string): string[] {
   else if (m.stance === 'majority') out.push(`majorité ${fem} ${ratio}`)
   else if (m.stance === 'lean') out.push(`pas de majorité, penche ${neg ? 'vers le négatif' : 'vers le positif'} ${ratio}`)
   else if (m.stance === 'divided') out.push('avis partagés')
-  if (m.fragile) out.push("fragile : une seule voix changerait l'étiquette")
+  // Le mot seul : la Méthode du rapport l'explique (plume, 15/10 : la définition répétée sur chaque motif alourdissait).
+  if (m.fragile) out.push('fragile')
   return out
 }
 
@@ -545,7 +547,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
           const total = g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
           return {
             title: x.title,
-            detail: `${n} avis ${side}${n > 1 ? 's' : ''} sur ${total}, mais deux pistes opposées : ${x.opposed.about}`,
+            detail: `${n} avis ${side}${n > 1 ? 's' : ''} sur ${total}, mais deux propositions s'opposent sur ${x.opposed.about}`,
             quotes: [quote(x.opposed.a), quote(x.opposed.b)],
           }
         }

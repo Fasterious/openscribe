@@ -1490,6 +1490,9 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
   if (!divided.length || !summary.trim()) return summary
   const groupById = new Map(groups.map((g) => [g.id, g]))
   const q = (t: string) => (lang === 'en' ? `“${t}”` : `« ${t} »`)
+  // Méthode « consultation » : un titre de motif dans une phrase n'est pas une citation, il perd ses « » et sa majuscule
+  // (sauf un sigle : « CAF… »). Il suit un deux-points, ce qui évite d'avoir à choisir son article.
+  const bare = (t: string) => (lang === 'en' ? q(t) : t.length > 1 && t[1] === t[1].toLowerCase() ? t[0].toLowerCase() + t.slice(1) : t)
   // « Qualité de l'accueil » : 20 positifs, 12 négatifs et 1 mitigé parmi les 33 participants qui en donnent un [I0004, I0011].
   // Un renvoi par camp (le premier positif, le premier négatif) : la phrase se vérifie comme les autres.
   // Le premier sujet donne la base (« parmi les 33 participants qui en donnent un »), les suivants leurs seuls camps.
@@ -1506,7 +1509,7 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
     const counts = `${camps.slice(0, -1).join(', ')} ${and} ${camps[camps.length - 1]}`
     const among = compact && !first ? '' : lang === 'en' ? ` among the ${d.of} people who give one` : ` parmi les ${d.of} participants qui en donnent un`
     const r = refs.length ? ` [${refs.join(', ')}]` : ''
-    return compact ? `${q(d.title)} (${counts}${among})${r}` : `${q(d.title)}${lang === 'en' ? ':' : ' :'} ${counts}${among}${r}`
+    return compact ? `${bare(d.title)} (${counts}${among})${r}` : `${q(d.title)}${lang === 'en' ? ':' : ' :'} ${counts}${among}${r}`
   }
   const list = (items: string[]) => {
     const and = lang === 'en' ? 'and' : 'et'
@@ -1521,7 +1524,13 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
   const shown = list(shownSplit.map((d, i) => figures(d, i === 0)))
   const sentences = compact
     ? [
-        ...(shownSplit.length ? [lang === 'en' ? `Opinions are split on ${shown}.` : `Les avis sont partagés sur ${shown}.`] : []),
+        ...(shownSplit.length
+          ? [
+              lang === 'en'
+                ? `Opinions are split on ${shown}.`
+                : `Les avis sont partagés sur ${shownSplit.length > 1 ? `${NUMBER_WORDS_FR[shownSplit.length]} sujets` : 'un sujet'} : ${shown}.`,
+            ]
+          : []),
         ...(rest > 0
           ? [
               lang === 'en'
@@ -1533,7 +1542,7 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
           lang === 'en'
             ? `On ${q(d.title)}, two proposals go in opposite directions: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
             : // L'objet du désaccord est nommé : « deux propositions s'opposent sur « X » : … » annonçait deux propositions sans les dire.
-              `Sur ${q(d.title)}, ${d.opposed!.about} fait l'objet de deux propositions contraires [${d.opposed!.a}, ${d.opposed!.b}].`,
+              `Deux propositions vont en sens contraire sur ${d.opposed!.about} (${bare(d.title)}) [${d.opposed!.a}, ${d.opposed!.b}].`,
         ),
       ]
     : [

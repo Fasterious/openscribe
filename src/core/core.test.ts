@@ -1298,7 +1298,7 @@ describe('contrôles ajoutés à la certification B9', () => {
     expect(out.endsWith('Ils le sont encore sur 2 autres sujets (voir « Ce qui divise »).')).toBe(true)
     // Méthode « consultation » : une seule phrase, la base au premier sujet, les camps seuls ensuite.
     const compact = withDivided('A.\n\nB.', [g('G1', 'Un'), g('G2', 'Deux'), g('G3', 'Trois'), g('G4', 'Quatre'), g('G5', 'Cinq')], 'fr', false, undefined, true)
-    expect(compact).toContain('Les avis sont partagés sur « Cinq » (2 positifs et 2 négatifs parmi les 4 participants qui en donnent un), « Deux » (2 positifs et 2 négatifs) et « Quatre » (2 positifs et 2 négatifs).')
+    expect(compact).toContain('Les avis sont partagés sur trois sujets : cinq (2 positifs et 2 négatifs parmi les 4 participants qui en donnent un), deux (2 positifs et 2 négatifs) et quatre (2 positifs et 2 négatifs).')
     expect(compact.endsWith('Deux autres sujets divisent aussi (voir « Ce qui divise »).')).toBe(true)
   })
   it('un nombre en tête de phrase s’écrit en lettres', () => {
