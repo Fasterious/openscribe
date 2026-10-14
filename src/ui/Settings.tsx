@@ -80,8 +80,8 @@ export function SettingsPage({ back }: { back?: string }) {
         )}
         <h1 className="text-3xl font-bold tracking-tight">Moteurs d'IA</h1>
         <p className="max-w-2xl text-muted-foreground">
-          Le moteur d'IA lit les verbatims et rédige ; OpenScribe vérifie les verbatims cités et fait les comptes. Pour commencer, créez une clé gratuite Mistral ou Google Gemini
-          en quelques minutes. Pour que rien ne quitte votre ordinateur, choisissez Ollama.
+          Le moteur d'IA lit et rédige ; OpenScribe vérifie les citations et fait les comptes. Seuls les moteurs dont la qualité a été vérifiée sont
+          proposés : les autres restent à l'étude.
         </p>
       </header>
 

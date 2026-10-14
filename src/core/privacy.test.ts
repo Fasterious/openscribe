@@ -29,9 +29,16 @@ const walk = (d: string): string[] =>
   existsSync(d) ? readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : [join(d, f)])) : []
 
 /** Les réponses des corpus privés, sans les en-têtes : les questions d'un questionnaire ne sont pas des données de participants. */
+// Au-delà, un export brut (ex. une consultation publique de plusieurs centaines de Mo) dépasse ce que le test peut indexer :
+// il est écarté et nommé, pour qu'on sache ce qui n'est pas contrôlé.
+const MAX_BYTES = 20 * 1024 * 1024
+
 function privateAnswers(): string[] {
-  return walk(PRIVATE)
-    .filter((f) => f.endsWith('.csv'))
+  const csv = walk(PRIVATE).filter((f) => f.endsWith('.csv'))
+  const tooBig = csv.filter((f) => statSync(f).size > MAX_BYTES)
+  if (tooBig.length) console.warn(`Confidentialité : fichiers trop gros, non contrôlés : ${tooBig.join(', ')}`)
+  return csv
+    .filter((f) => !tooBig.includes(f))
     .flatMap((f) => analyzeCsv(readFileSync(f, 'utf8')).table.rows.flat())
     .filter((cell) => words(cell).length >= N)
 }

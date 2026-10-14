@@ -269,3 +269,39 @@ Défauts qui reviennent dans toutes les lectures, toutes méthodes (prochains ch
    la phrase qui en dépend (filet déjà présent pour les connecteurs, à étendre aux reprises).
 5. **« (notamment P5) »** pour une seule personne citée : écrire le renvoi sans « notamment » quand un
    seul participant est cité, et compter correctement.
+6. **Couverture des longues réponses** : le passage non couvert est renvoyé seul, sans la phrase qui le
+   précède ; une liste d'exemples qui illustre une critique (« on n'ouvre aucune perspective, par exemple… »)
+   est alors lue comme des avis positifs. Donner au modèle le texte qui précède le passage (comme `before`
+   à la relecture des motifs). Vu deux fois sur ÉcoSol (Sonnet, découpage de référence et v2).
+
+## Chantiers 1 à 3 : méthode candidate « contexte2 » (14/10/2026, nuit)
+
+Sur la base de « contexte » : règle de ton au découpage (une critique formulée comme un manque est
+négative ; un avis suivi d'une proposition donne deux idées), verbatims des propositions et questions
+au résumé avec « une personne propose », chiffre du motif au lieu de « la plupart » dans les thèmes.
+Passes complètes (découpage compris).
+
+| Méthode | Opus : méthode · langue | Sonnet : méthode · langue |
+|---|---|---|
+| Référence | 3 · 3,5 — 3,5 | 3 · 3 · 3 — 3 |
+| contexte | 3 · 3,5 — 4 | 3 · 3 — 3,5 |
+| contexte2 | 3,5 · 3 — 4 | 3 · 3 — 3,5 |
+| Grand prompt (une demande, Opus) | 3,5 · 3,5 — 4 | — |
+
+**Verdict : palier.** Trois variantes de la méthode en plusieurs étapes donnent la même note de méthode
+(3 à 3,5 chez Opus, 3 chez Sonnet), à l'intérieur du bruit de l'évaluateur. La langue gagne un
+demi-point avec « contexte », sur les deux modèles, sans perte de méthode. Les défauts qui restent
+changent d'une passe à l'autre (jugements de ton et de rangement au cas par cas) ou viennent du code :
+
+1. Couverture des longues réponses sans contexte : ton inversé (vu sur les deux modèles).
+2. Phrase de code « Les avis s'opposent sur… » répétée dans le résumé, et phrase orpheline (« Cette
+   dernière… ») quand le code retire celle qui la précède.
+3. Contrôle des comptes : plusieurs fausses alertes par passe, qui font récrire des phrases justes.
+4. Effet de bord de la règle « une personne propose » : le résumé met en avant des pistes isolées au
+   lieu de la plus partagée ; et « écris le chiffre » rend les intros de thème répétitives. Règles à
+   retirer de la v2.
+5. La règle de ton au découpage ne prend qu'en partie (éloges encore codés « suggestion »).
+
+Conclusion : les consignes ne feront plus monter la note de méthode ; les gains restants sont dans le
+code (points 1 à 3) et dans la structure (le grand prompt, qui lit tout, reste devant : une synthèse
+hybride, lecture d'ensemble par le modèle et contrôles par le code, est la piste suivante).

@@ -809,7 +809,12 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     if (motifs.length) {
       s.message = 'Vérification des unanimités'
       await emit()
-      const res = await runner.json(unanimityPrompt({ motifs }, state.settings), reviewSchema)
+      // Chaque candidate n'est envoyée qu'une fois : un motif ne liste que leurs identifiants.
+      const pool = [...new Map(motifs.flatMap((m) => m.candidates).map((c) => [c.id, c])).values()]
+      const res = await runner.json(
+        unanimityPrompt({ motifs: motifs.map((m) => ({ ...m, candidates: m.candidates.map((c) => c.id) })), pool }, state.settings),
+        reviewSchema,
+      )
       // Seuls les déplacements proposés vers un motif vérifié, d'une idée qui figurait parmi ses candidates, sont appliqués.
       const allowed = new Map(motifs.map((m) => [m.id, new Set(m.candidates.map((c) => c.id))]))
       const moves = res.changes.filter((c) => c.to && allowed.get(c.to)?.has(c.id)).map((c) => ({ id: c.id, to: c.to }))
@@ -830,7 +835,10 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
  * Motifs unanimes ou à large majorité (au moins 3 avis), chacun avec les idées de ton contraire rangées
  * dans d'autres motifs : le moteur dira lesquelles jugent le même objet (méthode « contexte »).
  */
-export function unanimityCheck(groups: Group[], ideas: Idea[]): UnanimityInput['motifs'] {
+export function unanimityCheck(
+  groups: Group[],
+  ideas: Idea[],
+): (Omit<UnanimityInput['motifs'][number], 'candidates'> & { candidates: UnanimityInput['pool'] })[] {
   const byId = new Map(ideas.map((i) => [i.id, i]))
   const home = new Map(groups.flatMap((g) => g.ideaIds.map((id) => [id, g] as const)))
   const opinions = (g: Group) => g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
@@ -838,7 +846,7 @@ export function unanimityCheck(groups: Group[], ideas: Idea[]): UnanimityInput['
     .filter((g) => (g.metrics.stance === 'unanimous' || g.metrics.stance === 'consensus') && opinions(g) >= 3)
     .map((g) => {
       const side: 'positive' | 'negative' = g.metrics.positiveOnly.length >= g.metrics.negativeOnly.length ? 'positive' : 'negative'
-      const opposite = side === 'positive' ? 'negative' : 'positive'
+      const opposite: 'positive' | 'negative' = side === 'positive' ? 'negative' : 'positive'
       return {
         id: g.id,
         title: g.title,
@@ -849,7 +857,7 @@ export function unanimityCheck(groups: Group[], ideas: Idea[]): UnanimityInput['
           .map((i) => ({ id: i.id, label: i.label, verbatim: shortExample(i.verbatim, 160) })),
         candidates: ideas
           .filter((i) => i.category === opposite && home.get(i.id) && home.get(i.id) !== g)
-          .map((i) => ({ id: i.id, motif: home.get(i.id)!.title, label: i.label, verbatim: shortExample(i.verbatim, 160) })),
+          .map((i) => ({ id: i.id, motif: home.get(i.id)!.title, tone: opposite, label: i.label, verbatim: shortExample(i.verbatim, 160) })),
       }
     })
     .filter((m) => m.candidates.length > 0)
@@ -1319,6 +1327,10 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
     return
   }
   const lines = (kind: keyof typeof h, list = h[kind].slice(0, 6)) => list.map((x) => ({ text: highlightLine(x, kind, lang), ref: x.ideaIds[0] }))
+  // Méthode qui le demande : le verbatim de chaque proposition et question, pour rapporter ce qu'elle dit et non le titre du motif.
+  const ideaText = new Map(state.ideas.map((i) => [i.id, i.verbatim]))
+  const withExample = (list: { text: string; ref: string }[]) =>
+    methodOf(state.settings).globalContext ? list.map((l) => ({ ...l, example: shortExample(ideaText.get(l.ref) ?? '', 220) })) : list
   const res = await runner.json(
     globalPrompt(
       {
@@ -1326,8 +1338,8 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
         strengths: lines('strengths'),
         blockers: lines('blockers'),
         divided: lines('divided'),
-        proposals: lines('proposals', h.proposals.slice(0, 8)),
-        questions: lines('questions', h.questions.slice(0, 6)),
+        proposals: withExample(lines('proposals', h.proposals.slice(0, 8))),
+        questions: withExample(lines('questions', h.questions.slice(0, 6))),
         sections,
       },
       state.settings,

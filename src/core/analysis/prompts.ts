@@ -135,7 +135,7 @@ export function extractionPrompt(input: ExtractionInput, settings: AnalysisSetti
 ${EXTRACTION_RULES}
 8. "names" : les prénoms ou noms de particuliers cités dans le texte (membres, collègues, proches), tels qu'ils sont écrits. N'y mets pas les personnalités publiques (élus, candidats, dirigeants connus), les organisations ni les lieux. Liste vide s'il n'y en a pas.
 ${CATEGORY_RULES_FR}
-${lang(settings)}
+${methodRules(settings, 'extract')}${lang(settings)}
 
 Réponds avec : {"ideas":[{"ref":"C1","label":"…","verbatim":"…","category":"positive|negative|suggestion|question|neutral"}],"names":["…"]}
 
@@ -419,9 +419,11 @@ export interface UnanimityInput {
     /** Le ton qui fait l'unanimité (ou la large majorité). */
     side: 'positive' | 'negative'
     ideas: { id: string; label: string; verbatim: string }[]
-    /** Idées de ton contraire rangées dans d'autres motifs. */
-    candidates: { id: string; motif: string; label: string; verbatim: string }[]
+    /** Identifiants des idées de ton contraire rangées dans d'autres motifs (leur texte est dans `pool`). */
+    candidates: string[]
   }[]
+  /** Chaque idée candidate une seule fois, avec le motif où elle est rangée. */
+  pool: { id: string; motif: string; tone: 'positive' | 'negative'; label: string; verbatim: string }[]
 }
 
 export function unanimityPrompt(input: UnanimityInput, settings: AnalysisSettings) {
@@ -431,7 +433,7 @@ export function unanimityPrompt(input: UnanimityInput, settings: AnalysisSetting
     user: `${context(settings)}Chaque motif ci-dessous paraît unanime (ou presque) : toutes ses idées vont dans le même sens. Vérifie que ce n'est pas un effet du rangement : un avis contraire sur le MÊME objet a pu être rangé dans un motif voisin.
 
 Règles :
-1. Pour chaque motif, lis ses idées pour comprendre son objet, puis les "candidates" : des idées de ton contraire rangées ailleurs.
+1. Pour chaque motif, lis ses idées pour comprendre son objet, puis ses "candidates" : des idées de ton contraire rangées ailleurs, dont le texte figure une seule fois dans "pool".
 2. Déplace vers le motif ({"id":"I0042","to":"G3"}) une candidate seulement si elle juge le même objet que ce motif, au point qu'on ne pourrait pas annoncer l'unanimité sans mentir. Exemple : dans « Accueil en magasin » (tout positif), « personne ne vient vous voir quand on entre » est une critique du même objet ; « les prix ont augmenté » ne l'est pas.
 3. Un objet voisin n'est pas le même objet : dans le doute, ne déplace rien. La plupart des candidates restent où elles sont.
 ${lang(settings)}
@@ -535,8 +537,9 @@ export interface GlobalInput {
   strengths: { text: string; ref: string }[]
   blockers: { text: string; ref: string }[]
   divided: { text: string; ref: string }[]
-  proposals: { text: string; ref: string }[]
-  questions: { text: string; ref: string }[]
+  /** `example` : le verbatim de l'idée citée (méthodes qui le donnent). */
+  proposals: { text: string; ref: string; example?: string }[]
+  questions: { text: string; ref: string; example?: string }[]
   sections: { title: string; facts: string; summary: string }[]
 }
 
