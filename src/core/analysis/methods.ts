@@ -30,7 +30,7 @@ export interface Method {
   /** Après la consolidation, chaque motif porté par une seule personne est proposé au rattachement à un motif existant (ou à aucun). */
   attachSingles: boolean
   /** Règles ajoutées à la fin des règles d'une consigne, pour cette méthode seulement (la référence n'en a aucune). */
-  extraRules: Partial<Record<'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global', string>>
+  extraRules: Partial<Record<'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish', string>>
   /** Au regroupement, chaque libellé arrive avec plusieurs verbatims et leur ton (la référence : un seul exemple). */
   groupingContext?: boolean
   /** Après la relecture, chaque motif unanime ou à large majorité est confronté aux idées de ton contraire rangées ailleurs. */
@@ -43,6 +43,10 @@ export interface Method {
   scaleInLines?: boolean
   /** Après la relecture, les motifs qui ont reçu une idée sont relus une seconde fois, avec la liste à jour des motifs. */
   arrivalReview?: boolean
+  /** La phrase du code sur ce qui divise : une seule phrase, la base au premier sujet, l'objet des propositions contraires nommé. */
+  compactDivided?: boolean
+  /** Lignes de "strengths" et de "blockers" données au résumé (6 par défaut). */
+  summaryLines?: number
 }
 
 const REFERENCE: Method = {
@@ -163,20 +167,30 @@ export const METHODS: Record<MethodId, Method> = {
     scaleInLines: true,
     // Passe 3 (15/10) : une idée déplacée vers un motif voisin faute de mieux (le bon motif était ouvert par un autre lot) y gardait son ton.
     arrivalReview: true,
+    // Plume, passe 3 : « Ils le sont aussi sur… Ils le sont encore sur… » se lisait comme une liste mécanique.
+    compactDivided: true,
+    // Methodologue, passe 3 : propositions du résumé réduites à des rubriques ; un sujet unanime de 19 personnes absent du résumé.
+    globalContext: true,
+    summaryLines: 8,
     extraRules: {
       grouping: `6. Une idée qui ne répond pas à l'objet de l'étude (elle parle d'un tout autre sujet) va dans le groupe « ${OFF_TOPIC} », sans autre titre : elle sera gardée et listée, mais ni comptée ni résumée. Une idée qui touche l'objet de l'étude, même de loin, n'y va jamais.
 7. Une idée qui critique un objet pour expliquer le recours à un autre (« faute de bus le soir, je prends la voiture ») juge le premier : elle va avec l'objet critiqué (le bus), pas avec l'objet choisi (la voiture). Range ensemble ce qui juge un même objet.`,
       assign: `« ${OFF_TOPIC} » reçoit seulement les idées qui ne répondent pas à l'objet de l'étude. Une idée qui critique un objet pour expliquer le recours à un autre va avec l'objet critiqué.`,
       review: `6. Le ton se juge par rapport à l'objet du motif, pas par rapport à la phrase. Dans « Voiture », « faute de bus le soir, je prends la voiture » critique le bus, pas la voiture : l'idée part dans un motif sur le bus (existant ou nouveau) et ne compte pas comme un avis négatif sur la voiture. De même, un éloge d'un autre objet n'est pas un avis positif sur l'objet du motif : dans « Bus », « le covoiturage, c'est très pratique » part avec le covoiturage.
 7. Un motif où les avis positifs et négatifs sont proches en nombre mêle souvent deux objets : lis ses avis camp par camp. Si les uns jugent un objet et les autres un objet voisin (« la gratuité du musée » et « le prix des expositions temporaires » ; « le stationnement payant » et « les contrôles qui ne sont jamais faits »), déplace l'un des deux camps vers un motif qui nomme son objet (existant ou nouveau). Regretter qu'une règle ne soit pas appliquée n'est pas critiquer la règle.
-8. Une idée qui ne répond pas à l'objet de l'étude part dans « ${OFF_TOPIC} » : {"id":"I0150","new":"${OFF_TOPIC}"}. Dans le doute, garde-la.`,
+8. Une idée qui ne répond pas à l'objet de l'étude part dans « ${OFF_TOPIC} » : {"id":"I0150","new":"${OFF_TOPIC}"}. Dans le doute, garde-la.
+9. Une raison d'avoir choisi un objet plutôt qu'un autre, même en liste (« j'ai pris le train pour : pas de bouchons, des horaires fiables ») : lis "before". Une qualité prêtée à l'objet choisi va avec lui (« pas de bouchons » vante le train : l'idée part avec le train, elle n'est pas un avis positif dans un motif sur la route) ; un défaut nommé de l'autre objet va avec l'autre (règle 6). Dans une comparaison (« le bus est toujours en retard, alors que le tram est à l'heure »), chaque moitié va avec son objet : l'éloge du tram avec le tram, la critique du bus avec le bus.
+10. Quand une personne apprécie un objet (lis "before") et regrette qu'une règle ou un tiers le limite (« j'adore ce conservatoire, dommage que les quotas empêchent d'y inscrire tous les enfants »), ce regret est favorable à l'objet : "positive". Un service jugé rare ou insuffisant (« dommage qu'il y ait si peu de bus le soir ») reste une critique de ce service. Une réserve qui nuance une critique (« heureusement, la plupart des chauffeurs sont aimables », après un reproche aux chauffeurs) va dans le motif de cette critique.`,
       summary: `9. Format de "opposed" : [{"a":"I0012","b":"I0040","about":"le prix de l'adhésion"}], "a" et "b" étant les identifiants des deux propositions.
 10. Ne montre pas tes comptes : pas de « dont une des précédentes », « dont deux déjà citées », « parmi elles » (cette règle remplace l'exemple de la règle 7). Chaque affirmation donne son propre nombre de personnes ; le lecteur retrouve les personnes dans les renvois.
-11. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un motif (le lecteur comprendrait « la plupart des répondants ») ; écris « la plupart de ceux qui en parlent », ou le nombre de personnes. Nombres en chiffres, en lettres seulement en tête de phrase. Au plus un point-virgule par phrase.`,
-      themes: `4. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un groupe ; écris « la plupart de ceux qui en parlent », ou le nombre de personnes.`,
-      global: `7. Chaque ligne de "strengths" et "blockers" donne le mot de l'échelle d'avis (unanime, large majorité, majorité) : il ouvre la phrase et le chiffre suit entre parenthèses (« Une large majorité critique la carte de transport (29 des 35 participants qui donnent un avis) », « Tous ceux qui en parlent regrettent les retards (les 24 participants qui donnent un avis) »). « Unanime » s'entend de ceux qui donnent un avis : la règle 3 ne l'interdit pas ici, mais n'écris jamais « tout le monde ».
-8. Un motif d'appréciation d'ensemble (« Expérience globale », « Bilan ») ne recueille que des jugements généraux : n'ouvre pas le résumé sur lui et ne le présente pas comme l'avis de la plupart ; dis « N personnes disent n'avoir rencontré aucune difficulté ».
-9. Pour une proposition, nomme ce qu'elle vise, sans détail que porte une seule personne (« ouvrir le guichet le samedi » seulement si chaque personne comptée le propose). Une phrase d'annonce (« L'accès au service concentre les critiques : ») ne couvre que les motifs qu'elle annonce.`,
+11. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un motif (le lecteur comprendrait « la plupart des répondants ») ; écris le nombre de personnes, ou « la plupart de ceux qui en parlent » quand l'objet est nommé plus tôt dans la même phrase (sinon « la plupart de ceux qui parlent des horaires »). Jamais « des personnes » ni « beaucoup » : un nombre ou un mot de l'échelle. Nombres en chiffres, en lettres seulement en tête de phrase. Au plus un point-virgule par phrase.
+12. Un motif d'une seule personne se dit en une phrase, avec un seul renvoi (cette règle remplace « 2 à 4 phrases »).`,
+      themes: `4. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un groupe ; écris le nombre de personnes, ou « la plupart de ceux qui parlent de… » avec l'objet nommé dans la phrase.
+5. La synthèse du thème relie ses groupes : ce qu'ils ont en commun, ce qui les distingue. Elle ne recopie aucune phrase d'une synthèse de groupe, même reformulée de près : le lecteur les lit juste en dessous. Aucun lien de cause que les participants n'ont pas formulé.`,
+      polish: `7. Cette règle remplace l'exemple de la règle 5. Pour attribuer un constat, ne remplace jamais un nombre ou un mot de l'échelle déjà écrit, et n'écris pas « des personnes » : reprends le sujet déjà nommé dans le texte (« ces 6 personnes », « ceux qui parlent des horaires »). « Ceux qui en parlent » suppose l'objet nommé plus tôt dans la phrase.`,
+      global: `7. Chaque ligne de "strengths" et "blockers" donne le mot de l'échelle d'avis (unanime, large majorité, majorité) : il ouvre la phrase et le chiffre suit entre parenthèses (« Une large majorité de ceux qui en parlent critique la carte de transport (29 des 35 participants qui donnent un avis) », « Tous ceux qui en parlent regrettent les retards (les 24 participants qui donnent un avis) »). Le mot de l'échelle s'entend de ceux qui parlent du motif : écris « une large majorité de ceux qui en parlent », jamais « une large majorité » seul, que le grand public lirait comme la majorité des répondants. « Unanime » ne l'est que parmi eux : la règle 3 ne l'interdit pas ici, mais n'écris jamais « tout le monde ». Deux lignes voisines peuvent partager une phrase, chacune avec son objet nommé, son mot et son chiffre (la limite d'un chiffre par phrase de la règle 1 ne s'applique pas à elles ; le reste de la règle 1 s'applique) : le résumé peut alors compter jusqu'à 12 phrases.
+8. Un motif d'appréciation d'ensemble (« Expérience globale », « Bilan ») ne recueille que des jugements généraux, parfois de personnes qui décrivent ailleurs des difficultés : ne le présente pas comme l'avis de la plupart, ni par le mot de l'échelle ; dis « N personnes se disent satisfaites dans l'ensemble », jamais « aucune difficulté ». Il n'ouvre pas le résumé : il vient après la première force qui nomme un objet.
+9. Pour une proposition, nomme ce que proposent toutes les personnes comptées ("example" n'est que le verbatim de l'une d'elles), sans détail que porte une seule personne (« ouvrir le guichet le samedi » seulement si chaque personne comptée le propose). Une raison ou une précision (« pour son prix ou ses horaires ») n'accompagne le chiffre d'un motif que si chaque personne comptée la donne. Une phrase d'annonce (« L'accès au service concentre les critiques : ») ne couvre que les motifs qu'elle annonce.`,
     },
   },
   gemma: {
@@ -200,7 +214,7 @@ export const METHODS: Record<MethodId, Method> = {
 /** Les règles propres à une méthode pour une consigne, prêtes à insérer (rien pour la référence). */
 export function methodRules(
   settings: Pick<AnalysisSettings, 'method'> & { lightModel?: boolean },
-  prompt: 'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global',
+  prompt: 'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish',
 ): string {
   const r = methodOf(settings).extraRules[prompt]
   return r ? `${r}\n` : ''

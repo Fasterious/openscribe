@@ -1257,6 +1257,10 @@ describe('contrôles ajoutés à la certification B9', () => {
     expect(out).toContain('Ils le sont aussi sur « Quatre »')
     expect(out).not.toContain('« Trois »')
     expect(out.endsWith('Ils le sont encore sur 2 autres sujets (voir « Ce qui divise »).')).toBe(true)
+    // Méthode « consultation » : une seule phrase, la base au premier sujet, les camps seuls ensuite.
+    const compact = withDivided('A.\n\nB.', [g('G1', 'Un'), g('G2', 'Deux'), g('G3', 'Trois'), g('G4', 'Quatre'), g('G5', 'Cinq')], 'fr', false, undefined, true)
+    expect(compact).toContain('Les avis sont partagés sur « Cinq » (2 positifs et 2 négatifs parmi les 4 participants qui en donnent un), « Deux » (2 positifs et 2 négatifs) et « Quatre » (2 positifs et 2 négatifs).')
+    expect(compact.endsWith('2 autres sujets divisent aussi (voir « Ce qui divise »).')).toBe(true)
   })
   it('un nombre en tête de phrase s’écrit en lettres', () => {
     expect(spellLeadingNumbers('3 personnes regrettent X. Puis 4 autres.\n\n2 personnes proposent Y.')).toBe(
@@ -1266,6 +1270,14 @@ describe('contrôles ajoutés à la certification B9', () => {
 })
 
 describe('phrases écrites par le code', () => {
+  it('un renvoi qui suit un chiffre entre parenthèses entre dans la même parenthèse', () => {
+    const byId = new Map(['I0001', 'I0002'].map((id, k) => [id, { id, participantId: `P${k + 1}` } as Idea]))
+    expect(refsToPeople('Une large majorité critique les horaires (9 des 10 participants qui donnent un avis) [I0001, I0002].', byId)).toBe(
+      'Une large majorité critique les horaires (9 des 10 participants qui donnent un avis ; notamment P1, P2).',
+    )
+    // Deux renvois de suite ne fusionnent pas.
+    expect(refsToPeople('Deux personnes le disent [I0001] [I0002].', byId)).toBe('Deux personnes le disent (P1) (P2).')
+  })
   it('le rattrapage final ne répète pas « Les avis s’opposent » quand la relecture a reformulé les titres', () => {
     const g = { id: 'G1', title: 'Prise de décision', ideaIds: [], summary: '', metrics: { stance: 'divided', positiveOnly: ['a', 'b'], negativeOnly: ['c', 'd'], mixed: [], participantsByCategory: {} } } as unknown as Group
     const polished = "Ce qui a marché.\n\nCe qui a bloqué. Les avis s'opposent sur la prise de décision collective.\n\nLa suite."

@@ -321,6 +321,10 @@ export function refsToPeople(
       .replace(/\s+([.,])/g, '$1')
       // Deux renvois identiques dans la même phrase : on ne garde que le dernier.
       .replace(/\s*\(((?:notamment )?)([^()]*P\d+[^()]*)\)(?=[^.!?]*\(\1\2\))/g, '')
+      // Un renvoi qui suit un chiffre entre parenthèses entre dans la même parenthèse : « (29 des 34 participants ; notamment P13) ».
+      .replace(/\(([^()]*\d[^()]*)\)\s*\(((?:notamment )?[^()]*P\d+[^()]*)\)/g, (all, figure: string, refs: string) =>
+        /P\d+/.test(figure) ? all : `(${figure} ; ${refs})`,
+      )
   )
 }
 

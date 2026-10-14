@@ -638,7 +638,7 @@ Règles absolues :
 4. N'utilise aucune information absente du texte relu, même si un autre texte du lot la contient.
 5. Un constat présenté comme un fait doit être attribué (« des personnes estiment que… ») sans ajouter de chiffre. Ne change pas qui fait l'action (le collectif, l'équipe, les participants…), même pour corriger un accord.
 6. Si un texte est déjà bon, renvoie-le tel quel. Ne réécris pas pour le plaisir.
-${lang(settings)}
+${methodRules(settings, 'polish')}${lang(settings)}
 ${STYLE[settings.language]}
 
 Réponds avec : {"texts":[{"id":"S1","text":"…"}]}, un élément par texte reçu.

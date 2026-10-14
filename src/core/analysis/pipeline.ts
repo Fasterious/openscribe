@@ -179,7 +179,14 @@ export async function runAnalysis(corpus: Corpus, initial: AnalysisState, option
     verifyNumbers(corpus, state)
     ensureCamps(state)
     // La phrase du code sur les sujets qui divisent, avec leurs chiffres et un renvoi par camp.
-    state.globalSummary = withDivided(state.globalSummary ?? '', state.groups, state.settings.language, false, new Map(state.ideas.map((i) => [i.id, i])))
+    state.globalSummary = withDivided(
+      state.globalSummary ?? '',
+      state.groups,
+      state.settings.language,
+      false,
+      new Map(state.ideas.map((i) => [i.id, i])),
+      methodOf(state.settings).compactDivided === true,
+    )
     state.status = 'done'
     await emit()
     return state
@@ -1392,7 +1399,7 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
     return
   }
   const scale = methodOf(state.settings).scaleInLines === true
-  const lines = (kind: keyof typeof h, list = h[kind].slice(0, 6)) => list.map((x) => ({ text: highlightLine(x, kind, lang, scale), ref: x.ideaIds[0] }))
+  const lines = (kind: keyof typeof h, list = h[kind].slice(0, methodOf(state.settings).summaryLines ?? 6)) => list.map((x) => ({ text: highlightLine(x, kind, lang, scale), ref: x.ideaIds[0] }))
   // Méthode qui le demande : le verbatim de chaque proposition et question, pour rapporter ce qu'elle dit et non le titre du motif.
   const ideaText = new Map(state.ideas.map((i) => [i.id, i.verbatim]))
   const withExample = (list: { text: string; ref: string }[]) =>
@@ -1423,56 +1430,84 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
  * de l'échelle, leurs chiffres et un renvoi par camp ; une critique partagée
  * aux remèdes opposés cite ses deux propositions.
  */
-export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' = 'fr', onlyMissing = false, ideas?: Map<string, Idea>): string {
+/**
+ * `compact` (méthode « consultation ») : une seule phrase pour les sujets partagés, la base au premier seulement,
+ * et l'objet des propositions contraires nommé. Sinon, la phrase de référence, inchangée.
+ */
+export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' = 'fr', onlyMissing = false, ideas?: Map<string, Idea>, compact = false): string {
   const named = summary.toLowerCase()
   // Une phrase qui dit déjà ce qui divise suffit : on ne la répète pas.
-  if (onlyMissing && /(avis s['’]opposent|avis sont partagés|opinions are split|propositions s['’]opposent|pistes proposées s['’]opposent|proposals diverge)/i.test(summary)) return summary
+  if (onlyMissing && /(avis s['’]opposent|avis sont partagés|opinions are split|propositions s['’]opposent|propositions contraires|pistes proposées s['’]opposent|proposals diverge|opposite directions)/i.test(summary)) return summary
   const divided = highlights(groups).divided.filter((d) => !onlyMissing || !named.includes(d.title.toLowerCase()))
   if (!divided.length || !summary.trim()) return summary
   const groupById = new Map(groups.map((g) => [g.id, g]))
   const q = (t: string) => (lang === 'en' ? `“${t}”` : `« ${t} »`)
   // « Qualité de l'accueil » : 20 positifs, 12 négatifs et 1 mitigé parmi les 33 participants qui en donnent un [I0004, I0011].
   // Un renvoi par camp (le premier positif, le premier négatif) : la phrase se vérifie comme les autres.
-  const figures = (d: (typeof divided)[number]) => {
+  // Le premier sujet donne la base (« parmi les 33 participants qui en donnent un »), les suivants leurs seuls camps.
+  const figures = (d: (typeof divided)[number], first: boolean) => {
     const m = groupById.get(d.groupId)!.metrics
     const [pos, neg, mix] = [m.positiveOnly.length, m.negativeOnly.length, m.mixed.length]
-    const first = (side: 'positive' | 'negative') => groupById.get(d.groupId)!.ideaIds.find((id) => ideas?.get(id)?.category === side)
-    const refs = [first('positive'), first('negative')].filter(Boolean)
+    const firstOf = (side: 'positive' | 'negative') => groupById.get(d.groupId)!.ideaIds.find((id) => ideas?.get(id)?.category === side)
+    const refs = [firstOf('positive'), firstOf('negative')].filter(Boolean)
     const camps =
       lang === 'en'
         ? [`${pos} positive`, `${neg} negative`, ...(mix ? [`${mix} mixed`] : [])]
         : [`${pos} positif${pos > 1 ? 's' : ''}`, `${neg} négatif${neg > 1 ? 's' : ''}`, ...(mix ? [`${mix} mitigé${mix > 1 ? 's' : ''}`] : [])]
     const and = lang === 'en' ? 'and' : 'et'
     const counts = `${camps.slice(0, -1).join(', ')} ${and} ${camps[camps.length - 1]}`
-    const among = lang === 'en' ? `among the ${d.of} people who give one` : `parmi les ${d.of} participants qui en donnent un`
-    return `${q(d.title)}${lang === 'en' ? ':' : ' :'} ${counts} ${among}${refs.length ? ` [${refs.join(', ')}]` : ''}`
+    const among = compact && !first ? '' : lang === 'en' ? ` among the ${d.of} people who give one` : ` parmi les ${d.of} participants qui en donnent un`
+    const r = refs.length ? ` [${refs.join(', ')}]` : ''
+    return compact ? `${q(d.title)} (${counts}${among})${r}` : `${q(d.title)}${lang === 'en' ? ':' : ' :'} ${counts}${among}${r}`
   }
-  // Une phrase par sujet, trois au plus : au-delà, la liste « Ce qui divise » les donne tous.
+  const list = (items: string[]) => {
+    const and = lang === 'en' ? 'and' : 'et'
+    return items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} ${and} ${items[items.length - 1]}`
+  }
+  // Une seule phrase pour tous les sujets partagés, trois au plus : au-delà, la liste « Ce qui divise » les donne tous.
   const MAX = 3
   const split = divided.filter((d) => !d.opposed || groupById.get(d.groupId)!.metrics.stance === 'divided')
   const opposed = divided.filter((d) => d.opposed)
   const shownSplit = split.slice(0, MAX)
   const rest = split.length - shownSplit.length
-  const sentences = [
-    ...shownSplit.map((d, i) =>
-      lang === 'en'
-        ? `${i ? 'Opinions are also split on' : 'Opinions are split on'} ${figures(d)}.`
-        : `${i ? 'Ils le sont aussi sur' : 'Les avis sont partagés sur'} ${figures(d)}.`,
-    ),
-    ...(rest > 0
-      ? [
+  const shown = list(shownSplit.map((d, i) => figures(d, i === 0)))
+  const sentences = compact
+    ? [
+        ...(shownSplit.length ? [lang === 'en' ? `Opinions are split on ${shown}.` : `Les avis sont partagés sur ${shown}.`] : []),
+        ...(rest > 0
+          ? [
+              lang === 'en'
+                ? `${rest > 1 ? `${rest} other topics divide` : 'One other topic divides'} too (see “What divides”).`
+                : `${rest > 1 ? `${rest} autres sujets divisent` : 'Un autre sujet divise'} aussi (voir « Ce qui divise »).`,
+            ]
+          : []),
+        ...opposed.map((d) =>
           lang === 'en'
-            ? `They are split on ${rest} other ${rest > 1 ? 'topics' : 'topic'} too (see “What divides”).`
-            : `Ils le sont encore sur ${rest} autre${rest > 1 ? 's' : ''} sujet${rest > 1 ? 's' : ''} (voir « Ce qui divise »).`,
-        ]
-      : []),
-    ...opposed.map((d) =>
-      lang === 'en'
-        ? `Two proposals diverge on ${q(d.title)}: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
-        : // « Les critiques se rejoignent » affirmait un accord sur le constat que les données ne montrent pas toujours.
-          `Deux propositions s'opposent sur ${q(d.title)} : ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`,
-    ),
-  ]
+            ? `On ${q(d.title)}, two proposals go in opposite directions: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
+            : // L'objet du désaccord est nommé : « deux propositions s'opposent sur « X » : … » annonçait deux propositions sans les dire.
+              `Sur ${q(d.title)}, ${d.opposed!.about} fait l'objet de deux propositions contraires [${d.opposed!.a}, ${d.opposed!.b}].`,
+        ),
+      ]
+    : [
+        ...shownSplit.map((d, i) =>
+          lang === 'en'
+            ? `${i ? 'Opinions are also split on' : 'Opinions are split on'} ${figures(d, true)}.`
+            : `${i ? 'Ils le sont aussi sur' : 'Les avis sont partagés sur'} ${figures(d, true)}.`,
+        ),
+        ...(rest > 0
+          ? [
+              lang === 'en'
+                ? `They are split on ${rest} other ${rest > 1 ? 'topics' : 'topic'} too (see “What divides”).`
+                : `Ils le sont encore sur ${rest} autre${rest > 1 ? 's' : ''} sujet${rest > 1 ? 's' : ''} (voir « Ce qui divise »).`,
+            ]
+          : []),
+        ...opposed.map((d) =>
+          lang === 'en'
+            ? `Two proposals diverge on ${q(d.title)}: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
+            : // « Les critiques se rejoignent » affirmait un accord sur le constat que les données ne montrent pas toujours.
+              `Deux propositions s'opposent sur ${q(d.title)} : ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`,
+        ),
+      ]
   const paragraphs = summary.trim().split(/\n\s*\n/)
   const at = paragraphs.length > 1 ? 1 : paragraphs.length - 1
   paragraphs[at] = `${paragraphs[at].trim()} ${sentences.join(' ')}`

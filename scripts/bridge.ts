@@ -105,7 +105,13 @@ const roles: Record<number, ColumnRole> = Object.fromEntries(csv.columns.map((c)
 console.log('Colonnes :', csv.columns.map((c) => `${c.header.slice(0, 40)} → ${c.suggestedRole}`).join(' | '))
 const corpus = csvToCorpus(csv.table, { roles, sourceName: basename(csvPath) })
 // --method lots : essai d'une méthode (voir src/core/analysis/methods.ts) ; par défaut, la référence.
-const settings = { ...DEFAULT_SETTINGS, researchQuestion: opt('question') ?? '', ...(opt('method') ? { method: opt('method') as MethodId } : {}) }
+// --mask-names : les prénoms de particuliers sont masqués dans le rapport (publication grand public).
+const settings = {
+  ...DEFAULT_SETTINGS,
+  researchQuestion: opt('question') ?? '',
+  ...(opt('method') ? { method: opt('method') as MethodId } : {}),
+  ...(rest.includes('--mask-names') ? { maskNames: true } : {}),
+}
 
 const statePath = join(dir, 'state.json')
 const initial = existsSync(statePath)
