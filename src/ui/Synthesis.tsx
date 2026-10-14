@@ -53,6 +53,29 @@ export function openExample(projects: Project[] | null): Promise<void> {
   return openingExample
 }
 
+let openingPublished: Promise<void> | null = null
+
+/**
+ * Ouvre une synthèse publiée (Observatoire) dans l'application. Comme pour
+ * l'exemple : créée la première fois, remplacée si une version plus récente est
+ * publiée, jamais en double.
+ */
+export function openPublished(url: string, projects: Project[] | null): Promise<void> {
+  openingPublished ??= (async () => {
+    const { project, responses } = importProject(await (await fetch(url)).text())
+    const existing = projects?.find((p) => p.name === project.name && p.description === project.description)
+    if (existing && existing.analyses[0]?.updatedAt === project.analyses[0]?.updatedAt) {
+      window.location.hash = projectHref(existing)
+      return
+    }
+    if (existing) await deleteProject(existing.id)
+    await putResponses(responses)
+    await createProject(project)
+    navigate({ name: 'project', id: project.id, tab: 'report' })
+  })().finally(() => (openingPublished = null))
+  return openingPublished
+}
+
 /** Nouvelle synthèse, ouverture d'un fichier : les actions de création, partagées par l'accueil et l'espace Synthèse. */
 export function useStudyActions() {
   const [creating, setCreating] = useState(false)

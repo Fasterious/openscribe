@@ -1,0 +1,45 @@
+name: "Proposer une amélioration / Suggest an improvement"
+description: "Une idée précise pour OpenScribe. / A concrete idea for OpenScribe."
+labels: ["idée", "à trier"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Une idée encore floue, une envie d'en discuter ? Commencez par les [Discussions](https://github.com/Fasterious/openscribe/discussions). Ce formulaire sert aux propositions précises.
+        *English is welcome.*
+  - type: textarea
+    id: need
+    attributes:
+      label: "Le besoin / The need"
+      description: "Qui en a besoin, dans quelle situation, et ce qui coince aujourd'hui. Partez de la recherche, pas de la solution."
+      placeholder: "Quand je compare les réponses de deux groupes de participants, je dois…"
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "Ce que vous proposez / What you suggest"
+    validations:
+      required: true
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: "Principes du projet / Project principles"
+      description: "Voir CONTRIBUTING.md. Une proposition qui en contredit un sera refusée."
+      options:
+        - label: "L'IA propose, le code vérifie : aucun chiffre n'est laissé au moteur d'IA. / The AI proposes, the code checks."
+          required: true
+        - label: "Les données et les clés restent chez l'utilisateur. / Data and keys stay with the user."
+          required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Autres pistes envisagées / Alternatives considered"
+  - type: dropdown
+    id: help
+    attributes:
+      label: "Souhaitez-vous la réaliser ? / Would you like to build it?"
+      options:
+        - "Oui / Yes"
+        - "Avec de l'aide / With some help"
+        - "Non / No"

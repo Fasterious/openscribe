@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react'
 export type Route =
   | { name: 'home' }
   | { name: 'synthesis' }
+  /** L'Observatoire : analyses publiques de consultations ouvertes ; `slug` ouvre l'une d'elles. */
+  | { name: 'observatory'; slug?: string }
   /** `back` : l'étude d'où l'on vient, pour y revenir après avoir configuré un moteur. */
   | { name: 'settings'; back?: string }
   | { name: 'project'; id: string; tab: 'data' | 'analysis' | 'report' }
@@ -17,6 +19,8 @@ export function parseRoute(hash: string): Route {
   const params = new URLSearchParams(query)
   if (path === '/' || path === '') return { name: 'home' }
   if (path === '/synthese') return { name: 'synthesis' }
+  const o = path.match(/^\/observatoire(?:\/([a-z0-9-]+))?$/)
+  if (o) return { name: 'observatory', slug: o[1] }
   if (path === '/moteurs' || path === '/reglages') return { name: 'settings', back: params.get('retour') ?? undefined }
   const m = path.match(/^\/etude\/([^/]+)(?:\/(donnees|analyse|rapport))?$/)
   if (m) {
@@ -32,6 +36,8 @@ export function href(route: Route): string {
       return '#/'
     case 'synthesis':
       return '#/synthese'
+    case 'observatory':
+      return route.slug ? `#/observatoire/${route.slug}` : '#/observatoire'
     case 'settings':
       return route.back ? `#/moteurs?retour=${encodeURIComponent(route.back)}` : '#/moteurs'
     case 'project':

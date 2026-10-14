@@ -393,3 +393,30 @@ test('vos études : renommer, dupliquer et supprimer depuis le menu d’une étu
   await expect(page.getByRole('link', { name: /Étude rangée \(copie\)/ })).toHaveCount(0)
   await expect(page.getByRole('link', { name: /Étude rangée/ })).toBeVisible()
 })
+
+test("Observatoire : liste des synthèses publiques, rapport lisible et retour, exploration dans l'application", async ({ page }) => {
+  const index = JSON.parse(readFileSync('public/observatoire/index.json', 'utf8')) as { studies: { title: string; page: string }[] }
+  const first = index.studies[0]
+  await page.goto('/')
+  await page.getByRole('link', { name: /Observatoire/ }).first().click()
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Ce que disent les citoyens')
+  await expect(page.getByRole('heading', { level: 2, name: first.title })).toBeVisible()
+  await noHorizontalScroll(page)
+  await shot(page, 'observatoire')
+
+  // Le rapport statique se lit sans l'application et ramène à l'Observatoire.
+  await page.getByRole('link', { name: 'Lire le rapport' }).first().click()
+  await expect(page).toHaveURL(new RegExp(`/observatoire/${first.page}$`))
+  await expect(page.getByText('À lire avant')).toBeVisible()
+  await noHorizontalScroll(page)
+  await page.getByRole('link', { name: '← Observatoire OpenScribe' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Ce que disent les citoyens')
+
+  // Explorer : la synthèse s'ouvre dans l'application, une seule fois même si on y revient.
+  await page.getByRole('button', { name: /Explorer les verbatims/ }).first().click()
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(first.title)
+  await page.goto('/#/observatoire')
+  await page.getByRole('button', { name: /Explorer les verbatims/ }).first().click()
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(first.title)
+  expect(await projectCount(page)).toBe(1)
+})

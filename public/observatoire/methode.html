@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Méthode détaillée de l'Observatoire · OpenScribe</title>
+<meta name="description" content="Comment l'Observatoire OpenScribe choisit, tire au sort et analyse les réponses des consultations citoyennes : formules, marge d'erreur, méthodes possibles et limites.">
+<link rel="canonical" href="https://openscribe.fr/observatoire/methode.html">
+<style>
+:root{--ink:#1d1f2b;--muted:#5b6078;--line:#e3e5f5;--brand:#2F40C2;--card:#f7f8fd}
+body{font-family:Geist,system-ui,-apple-system,"Segoe UI",sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem;line-height:1.65;color:var(--ink);background:#fff}
+h1{color:var(--brand);font-size:1.9rem;line-height:1.25}h2{margin-top:2.4rem;border-bottom:2px solid var(--line);padding-bottom:.3rem}h3{margin-top:1.6rem}
+a{color:var(--brand)}.muted{color:var(--muted)}
+.formula{background:var(--card);border:1px solid var(--line);border-radius:.5rem;padding:.8rem 1rem;margin:1rem 0;font-size:1.08rem;overflow-x:auto}
+.formula math{font-size:1.15rem}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.95rem;display:block;overflow-x:auto}th,td{border-bottom:1px solid var(--line);padding:.45rem .6rem;text-align:left;vertical-align:top}th{background:var(--card)}
+td.n{text-align:right;white-space:nowrap}
+.choice{border-left:4px solid var(--brand);padding:.2rem 0 .2rem .9rem;margin:1rem 0}
+footer{margin-top:3rem;border-top:1px solid var(--line);padding-top:1rem;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<nav style="font-size:.9rem;margin-bottom:1rem"><a href="/#/observatoire">← Observatoire OpenScribe</a></nav>
+<h1>Méthode détaillée de l'Observatoire</h1>
+<p class="muted">Pour les curieux : comment on passe de dizaines de milliers de réponses à un rapport dont chaque chiffre se vérifie. Chaque synthèse rappelle en tête ses propres chiffres (taille, tirage, marge) ; cette page explique d'où ils viennent.</p>
+
+<h2>1. Du sujet d'actualité à la consultation</h2>
+<p>Chaque semaine, l'actualité choisit le <em>sujet</em>, jamais la <em>réponse</em>. Nous cherchons une consultation publique sous licence ouverte (data.gouv.fr, données ouvertes des villes, Grand débat national…) qui pose une question ouverte et équilibrée sur ce sujet. Nous écrivons pourquoi elle a été retenue, et alternons sujets et sources pour rester impartial.</p>
+<p>La question donnée à l'analyse reprend celle de la consultation, sans citer l'actualité : nous ne soufflons pas la réponse.</p>
+
+<h2>2. Nettoyer avant de tirer au sort</h2>
+<ul>
+<li><strong>Réponses vides</strong> (moins de 15 caractères : « non », « RAS ») : retirées et comptées. Nous ne coupons pas plus haut : les satisfactions sont souvent brèves, et un seuil élevé gonflerait artificiellement les critiques.</li>
+<li><strong>Copier-coller</strong> : un même texte déposé plusieurs fois (souvent par une campagne organisée) n'est analysé qu'une fois, et le nombre de doublons retirés est publié : une campagne pèse alors comme une seule voix. C'est un choix assumé.</li>
+<li><strong>Réponses longues</strong> : gardées entières. Couper ferait taire les plus engagés ; comme on compte des personnes, un contributeur bavard ne pèse pas plus qu'un autre.</li>
+</ul>
+<p>Ce qui reste forme la <strong>population</strong> notée <var>N</var> : l'ensemble des réponses analysables.</p>
+
+<h2>3. Tout lire, ou tirer au sort ?</h2>
+<p>Si <var>N</var> est petit, nous analysons tout. Sinon, faire lire chaque réponse par un moteur d'IA coûte cher et n'apporte presque rien : un échantillon bien tiré donne les mêmes grandes proportions, à une marge d'erreur près qu'on sait calculer.</p>
+
+<h3>La marge d'erreur et l'intervalle de confiance</h3>
+<p>On veut estimer des <strong>proportions</strong> : « combien de contributeurs évoquent les remplacements d'enseignants ? ». Autrement dit : <em>si on avait lu les <var>N</var> réponses, à quelle distance serait-on du chiffre trouvé dans l'échantillon ?</em></p>
+<p>Pour une proportion <var>p</var> mesurée sur <var>n</var> réponses tirées au hasard, la marge d'erreur <var>e</var> vaut :</p>
+<div class="formula"><math display="block"><mi>e</mi><mo>=</mo><mi>z</mi><mo>·</mo><msqrt><mfrac><mrow><mi>p</mi><mo>(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo>)</mo></mrow><mi>n</mi></mfrac></msqrt><mo>·</mo><msqrt><mfrac><mrow><mi>N</mi><mo>−</mo><mi>n</mi></mrow><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></mfrac></msqrt></math></div>
+<ul>
+<li><var>z</var> traduit le niveau de confiance : 1,960 pour 95 %, 2,5758 pour 99 %, 2,8070 pour 99,5 %.</li>
+<li>Le second facteur, sous la racine, est la <strong>correction pour population finie</strong> : quand on tire une part notable de la population, l'incertitude diminue.</li>
+</ul>
+<p><strong>« 95 % de confiance »</strong> veut dire : si l'on refaisait 100 tirages différents, environ 95 donneraient un intervalle qui contient la vraie valeur. La méthode garde donc un risque <var>α</var> = 0,05, une chance sur vingt, de produire un intervalle qui manque la vraie valeur ; pour un tirage donné, on ne sait pas dans lequel des deux cas on se trouve.</p>
+
+<h3>Combien tirer ?</h3>
+<p>On renverse la formule. On fixe la marge voulue (<var>e</var> = 5 points) et on se place dans le cas le plus défavorable, <var>p</var> = 0,5, celui qui demande le plus de réponses. Sans correction :</p>
+<div class="formula"><math display="block"><msub><mi>n</mi><mn>0</mn></msub><mo>=</mo><mfrac><mrow><msup><mi>z</mi><mn>2</mn></msup><mo>·</mo><mi>p</mi><mo>(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo>)</mo></mrow><msup><mi>e</mi><mn>2</mn></msup></mfrac><mo>=</mo><mfrac><mrow><msup><mn>1,96</mn><mn>2</mn></msup><mo>×</mo><mn>0,25</mn></mrow><msup><mn>0,05</mn><mn>2</mn></msup></mfrac><mo>≈</mo><mn>384</mn></math></div>
+<p>Puis on corrige pour la taille de la population :</p>
+<div class="formula"><math display="block"><mi>n</mi><mo>=</mo><mfrac><msub><mi>n</mi><mn>0</mn></msub><mrow><mn>1</mn><mo>+</mo><mfrac><mrow><msub><mi>n</mi><mn>0</mn></msub><mo>−</mo><mn>1</mn></mrow><mi>N</mi></mfrac></mrow></mfrac></math></div>
+<p>Exemple, pour le Grand débat (<var>N</var> = 21 868) : <var>n</var> = 384,1 / (1 + 383,1 / 21 868) ≈ <strong>378</strong>.</p>
+<p><strong>Ce qui surprend</strong> : la précision dépend de la taille de l'échantillon, presque pas de celle de la population. 378 réponses sur 21 868, ou 384 sur 60 millions, donnent la même marge. C'est ce qui permet aux sondages nationaux de travailler sur un millier de personnes.</p>
+
+<h3>Pourquoi 95 % et ± 5 points, et pas plus strict ?</h3>
+<table>
+<thead><tr><th>Confiance</th><th>Risque α</th><th>Marge</th><th>Tirages (N = 21 868)</th></tr></thead>
+<tbody>
+<tr><td>95 % (usage des sondages)</td><td>0,05</td><td>± 5 points</td><td class="n">378</td></tr>
+<tr><td>99 %</td><td>0,01</td><td>± 5 points</td><td class="n">644</td></tr>
+<tr><td>99,5 %</td><td>0,005</td><td>± 5 points</td><td class="n">761</td></tr>
+<tr><td>95 %</td><td>0,05</td><td>± 3 points</td><td class="n">1 018</td></tr>
+</tbody>
+</table>
+<div class="choice"><p>Nous gardons <strong>95 % et ± 5 points</strong>. La limite principale de ces données n'est pas le hasard du tirage, c'est <strong>qui a répondu</strong> : les contributeurs d'une consultation se sont portés volontaires (plus âgés, plus diplômés, plus engagés que la moyenne). Tirer deux fois plus de réponses rendrait les chiffres plus précis <em>sur ces contributeurs</em>, sans les rendre plus représentatifs de la population. Nous préférons dire clairement cette limite que d'afficher une fausse précision.</p></div>
+<p>Pour une idée rare, la marge est plus étroite en points (± 2,2 points pour une idée exprimée par 5 % des contributeurs) mais l'effectif reste petit (une vingtaine de personnes) : nous la signalons comme <strong>fragile</strong> et ne la comparons pas d'un groupe à l'autre.</p>
+<p>Cette marge vaut pour la part des contributeurs qui évoquent un sujet. Les étiquettes de l'échelle d'avis (« majorité »…) se calculent sur les seules personnes qui donnent un avis sur un motif, souvent quelques dizaines : leur incertitude est bien plus large, d'où la mention « fragile ». La marge ne couvre pas non plus les erreurs de lecture du moteur d'IA.</p>
+
+<h3>Et la fameuse « valeur p » ?</h3>
+<p>La valeur <var>p</var> (seuil usuel 0,05 ; 0,005 est parfois proposé pour plus d'exigence) répond à une autre question : <em>une différence entre deux groupes peut-elle s'expliquer par le hasard ?</em> Elle sert à <strong>comparer</strong> (traitement contre placebo, région A contre région B). L'Observatoire, lui, <strong>estime</strong> des proportions : il utilise donc l'intervalle de confiance. La logique est la même : pour un test bilatéral, le seuil <var>α</var> = 0,05 correspond à un niveau de confiance de 95 %. Nous ne publions pas de comparaison entre régions ou groupes : les effectifs par groupe seraient trop petits pour être solides.</p>
+
+<h2>4. Les autres façons de tirer un échantillon</h2>
+<table>
+<thead><tr><th>Méthode</th><th>Principe</th><th>Pourquoi pas ici (ou pas encore)</th></tr></thead>
+<tbody>
+<tr><td><strong>Aléatoire simple</strong> (retenue)</td><td>Chaque réponse a la même chance d'être tirée.</td><td>C'est la base de la formule ci-dessus, et le tirage est reproductible (graine publiée).</td></tr>
+<tr><td>Stratifiée</td><td>On découpe la population en groupes (régions, âges) et on tire dans chacun, proportionnellement.</td><td>Utile si l'on veut comparer des groupes. Avec quelques centaines de réponses réparties sur 13 régions, chaque groupe resterait trop petit pour une comparaison fiable.</td></tr>
+<tr><td>Systématique</td><td>Une réponse toutes les <var>k</var> dans l'ordre du fichier.</td><td>Risque de biais si le fichier suit un ordre caché (date de dépôt, vagues de campagne).</td></tr>
+<tr><td>Par grappes</td><td>On tire des groupes entiers (des communes, des réunions).</td><td>Utile pour une enquête sur le terrain ; ici, chaque réponse est déjà accessible une à une.</td></tr>
+<tr><td>Par quotas</td><td>On fixe la composition voulue (âge, sexe…) et on remplit les cases.</td><td>Les consultations ne renseignent pas ces caractéristiques ; et sans hasard, pas de marge d'erreur calculable.</td></tr>
+<tr><td>Jusqu'à saturation (recherche qualitative)</td><td>On lit des réponses jusqu'à ce qu'aucune idée nouvelle n'apparaisse.</td><td>Pertinente pour découvrir les idées, mais elle ne permet pas de compter qui dit quoi. Nous voulons les deux : les idées et les effectifs.</td></tr>
+</tbody>
+</table>
+
+<h2>5. De l'échantillon au rapport</h2>
+<ol>
+<li><strong>Idées atomiques</strong> : l'IA découpe chaque réponse en idées (un sujet, un ton) et recopie la citation exacte. Le code retrouve chaque citation dans la réponse d'origine ; celle qui n'y est pas est écartée. Seuls la casse, les accents, la ponctuation et de rares fautes de frappe sont tolérés, et le texte affiché reste celui du contributeur.</li>
+<li><strong>Motifs et thèmes</strong> : l'IA regroupe les idées qui parlent du même objet, puis rapproche les motifs en thèmes. Le code vérifie que chaque idée est rangée une seule fois.</li>
+<li><strong>Chiffres</strong> : tous calculés par le code, jamais par l'IA. On compte des <strong>personnes</strong>, pas des mentions : un contributeur qui revient trois fois sur le même point compte pour un.</li>
+<li><strong>Échelle d'avis</strong> : unanime, large majorité, majorité, pas de majorité, avis partagés, peu d'avis, toujours avec le chiffre à côté. « Fragile » quand une seule voix changerait l'étiquette.</li>
+<li><strong>Rédaction</strong> : l'IA rédige les synthèses ; chaque phrase renvoie aux personnes citées, et le code signale tout chiffre d'une synthèse qui ne correspond à aucun chiffre calculé.</li>
+<li><strong>Relecture</strong> : un relecteur de méthode et un relecteur de langue notent le rapport sur une grille écrite ; en dessous du seuil, il n'est pas publié.</li>
+</ol>
+<p>Tout est traçable : rapport → thème → motif → idée → citation exacte → contributeur (pseudonyme). Ouvrez une synthèse dans OpenScribe pour remonter vous-même de n'importe quelle phrase jusqu'aux réponses.</p>
+
+<h2>6. Ce qu'on ne peut pas conclure</h2>
+<ul>
+<li>Les chiffres décrivent les <strong>contributeurs de l'échantillon</strong>, pas « les Français ».</li>
+<li>Les réponses ont une date : une consultation de 2019 ne dit rien de la situation d'aujourd'hui, elle éclaire ce qui se disait alors.</li>
+<li>Une idée absente n'est pas une idée que personne n'a : c'est une idée que personne n'a écrite en réponse à cette question.</li>
+</ul>
+
+<h2>7. Reproductible</h2>
+<p>Le tirage utilise un générateur pseudo-aléatoire à graine publiée : la même graine redonne exactement le même échantillon. Les réponses de l'IA sont gardées en cache : relancer l'analyse sur les mêmes données donne le même rapport, mot pour mot. Le code est libre : <a href="https://github.com/Fasterious/openscribe">github.com/Fasterious/openscribe</a>.</p>
+
+<footer>OpenScribe, logiciel libre de recherche utilisateur (AGPL-3.0). Une erreur, une consultation à proposer ? <a href="https://github.com/Fasterious/openscribe/discussions">Dites-le-nous</a>.</footer>
+</body>
+</html>

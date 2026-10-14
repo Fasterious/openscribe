@@ -1,0 +1,60 @@
+name: "Signaler un défaut / Report a bug"
+description: "Quelque chose ne marche pas comme prévu. / Something does not work as expected."
+labels: ["bug", "à trier"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de prendre le temps de signaler ce défaut. Une question ? Passez plutôt par les [Discussions](https://github.com/Fasterious/openscribe/discussions).
+        *English is welcome.*
+
+        **Ne collez aucune réponse réelle de participant, ni aucune clé d'API.** Si le défaut dépend des données, reproduisez-le avec quelques réponses inventées.
+        **Do not paste real participant responses or API keys.** Reproduce with made-up data.
+  - type: textarea
+    id: what
+    attributes:
+      label: "Ce qui se passe / What happens"
+      description: "Ce que vous avez vu, message d'erreur compris (copié tel quel)."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Ce que vous attendiez / What you expected"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Pour reproduire / Steps to reproduce"
+      placeholder: |
+        1. Ouvrir « Voir un exemple de rapport »
+        2. Cliquer sur…
+        3. …
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: "Où / Where"
+      options:
+        - "Site en ligne (openscribe.fr)"
+        - "Installation locale (npm run dev)"
+        - "Autre / Other"
+    validations:
+      required: true
+  - type: input
+    id: engine
+    attributes:
+      label: "Moteur d'IA et modèle / AI engine and model"
+      description: "Ex. : Google Gemini, gemini-3.5-flash-lite ; ou Simulation. Jamais la clé."
+  - type: input
+    id: browser
+    attributes:
+      label: "Navigateur et appareil / Browser and device"
+      placeholder: "Ex. : Firefox 140, ordinateur ; Safari, iPhone"
+  - type: textarea
+    id: extra
+    attributes:
+      label: "Capture ou détails / Screenshot or details"
+      description: "Une capture aide beaucoup. Masquez tout verbatim réel."

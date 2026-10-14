@@ -1,7 +1,8 @@
-import { FlaskConical, House, KeyRound, Mic, PenTool, UserRound } from 'lucide-react'
+import { FlaskConical, House, KeyRound, Mic, Newspaper, PenTool, UserRound } from 'lucide-react'
 import { useEngines } from '@/app/engines'
 import { href, useRoute } from '@/app/router'
 import { Home } from './Home'
+import { ObservatoryPage } from './Observatory'
 import { cn, Tooltip } from './primitives'
 import { ProjectPage } from './project/ProjectPage'
 import { SettingsPage } from './Settings'
@@ -29,6 +30,9 @@ export function App() {
             </NavLink>
             <NavLink href={href({ name: 'synthesis' })} active={inSynthesis}>
               <FlaskConical className="size-4" /> Synthèse
+            </NavLink>
+            <NavLink href={href({ name: 'observatory' })} active={route.name === 'observatory'}>
+              <Newspaper className="size-4" /> <span className="hidden sm:inline">Observatoire</span>
             </NavLink>
             <SoonLink icon={<Mic className="size-4" />} label="Entretiens" />
             <SoonLink icon={<UserRound className="size-4" />} label="Personas" />
@@ -59,6 +63,7 @@ export function App() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-10">
         {route.name === 'home' && <Home />}
         {route.name === 'synthesis' && <SynthesisPage />}
+        {route.name === 'observatory' && <ObservatoryPage slug={route.slug} />}
         {route.name === 'settings' && <SettingsPage back={route.back} />}
         {route.name === 'project' && <ProjectPage id={route.id} tab={route.tab} />}
         {route.name === 'not-found' && (

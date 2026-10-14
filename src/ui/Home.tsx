@@ -16,6 +16,7 @@ import {
   UserRoundSearch,
   Users,
   Video,
+  Newspaper,
 } from 'lucide-react'
 import { useState } from 'react'
 import { href } from '@/app/router'
@@ -23,6 +24,7 @@ import { useProjects } from '@/app/store'
 import { formatDate } from './format'
 import { Alert, Badge, Button, Card, cn } from './primitives'
 import { isExample, openExample, projectHref, useStudyActions } from './Synthesis'
+import { usePublicStudies } from './Observatory'
 
 /**
  * Page d'accueil : elle présente le produit au visiteur et ramène au travail
@@ -96,6 +98,8 @@ export function Home() {
           <ProofDemo />
         </section>
       </div>
+
+      <LatestPublicStudy />
 
       <section aria-labelledby="comment" className="space-y-6">
         <SectionTitle id="comment" title="Comment ça marche" />
@@ -333,6 +337,27 @@ function ProofDemo() {
         <p className="mt-3 text-xs text-muted-foreground">Cliquez sur la pastille pour voir les verbatims.</p>
       )}
     </Card>
+  )
+}
+
+/** La dernière synthèse de l'Observatoire : la preuve sur de vraies données publiques. */
+function LatestPublicStudy() {
+  const { studies } = usePublicStudies()
+  const s = studies?.[0]
+  if (!s) return null
+  return (
+    <section aria-labelledby="observatoire" className="rounded-xl border bg-card p-5 shadow-sm sm:p-6">
+      <p className="flex items-center gap-2 text-sm font-medium text-primary">
+        <Newspaper className="size-4" /> Observatoire · {s.news}
+      </p>
+      <h2 id="observatoire" className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+        {s.title}
+      </h2>
+      <p className="mt-2 max-w-3xl text-muted-foreground">{s.summary.split('\n')[0]}</p>
+      <a href={href({ name: 'observatory' })} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary underline">
+        Voir les synthèses de l'Observatoire <ArrowRight className="size-4" />
+      </a>
+    </section>
   )
 }
 
