@@ -1478,7 +1478,7 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
           ? [
               lang === 'en'
                 ? `${rest > 1 ? `${rest} other topics divide` : 'One other topic divides'} too (see “What divides”).`
-                : `${rest > 1 ? `${rest} autres sujets divisent` : 'Un autre sujet divise'} aussi (voir « Ce qui divise »).`,
+                : spellLeadingNumbers(`${rest > 1 ? `${rest} autres sujets divisent` : 'Un autre sujet divise'} aussi (voir « Ce qui divise »).`),
             ]
           : []),
         ...opposed.map((d) =>
