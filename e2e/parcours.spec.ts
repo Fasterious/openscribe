@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 const shot = (page: Page, name: string) => page.screenshot({ path: `e2e/screenshots/${test.info().project.name}-${name}.png`, fullPage: true })
 
@@ -395,6 +395,7 @@ test('vos études : renommer, dupliquer et supprimer depuis le menu d’une étu
 })
 
 test("Observatoire : liste des synthèses publiques, rapport lisible et retour, exploration dans l'application", async ({ page }) => {
+  test.skip(!existsSync('public/observatoire/index.json'), 'Aucune synthèse publiée pour le moment')
   const index = JSON.parse(readFileSync('public/observatoire/index.json', 'utf8')) as { studies: { title: string; page: string }[] }
   const first = index.studies[0]
   await page.goto('/')
