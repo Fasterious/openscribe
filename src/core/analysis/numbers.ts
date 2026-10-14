@@ -29,6 +29,21 @@ const WORDS: Record<string, number> = {
   quinze: 15,
   seize: 16,
   vingt: 20,
+  // Nombres composés : « dix-huit » ne doit pas se lire « huit ».
+  'dix-sept': 17,
+  'dix-huit': 18,
+  'dix-neuf': 19,
+  'vingt et un': 21,
+  'vingt et une': 21,
+  'vingt-deux': 22,
+  'vingt-trois': 23,
+  'vingt-quatre': 24,
+  'vingt-cinq': 25,
+  'vingt-six': 26,
+  'vingt-sept': 27,
+  'vingt-huit': 28,
+  'vingt-neuf': 29,
+  trente: 30,
   one: 1,
   two: 2,
   three: 3,
@@ -49,9 +64,11 @@ const WORDS: Record<string, number> = {
 // "six" est commun aux deux langues.
 
 const PEOPLE = '(?:personnes?|participant(?:e|s|es)?|répondant(?:e|s|es)?|membres?|mentions?|people|persons?|respondents?|members?|participants?)'
-const WORD_RE = new RegExp(`\\b(${Object.keys(WORDS).join('|')})\\s+(?:autres?\\s+|other\\s+)?${PEOPLE}\\b`, 'gi')
-const SUR_RE = new RegExp(`\\b(${Object.keys(WORDS).join('|')})\\s+(?:sur|out of)\\s+`, 'gi')
-const SUR_AFTER_RE = new RegExp(`\\b(?:sur|out of)\\s+(${Object.keys(WORDS).join('|')})\\b`, 'gi')
+// Les plus longs d'abord, et jamais au milieu d'un mot composé (« dix-huit » n'est pas « huit »).
+const WORD_KEYS = Object.keys(WORDS).sort((a, b) => b.length - a.length).join('|')
+const WORD_RE = new RegExp(`(?<![\\p{L}-])(${WORD_KEYS})\\s+(?:autres?\\s+|other\\s+)?${PEOPLE}\\b`, 'giu')
+const SUR_RE = new RegExp(`(?<![\\p{L}-])(${WORD_KEYS})\\s+(?:sur|out of)\\s+`, 'giu')
+const SUR_AFTER_RE = new RegExp(`\\b(?:sur|out of)\\s+(${WORD_KEYS})(?![\\p{L}-])`, 'giu')
 
 export interface FoundNumber {
   raw: string
@@ -237,7 +254,7 @@ export function impliedOthers(text: string, personOf: (ideaId: string) => string
   return [...new Set(out)]
 }
 
-const COUNT_WORDS: Record<string, number> = { deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10, onze: 11, douze: 12 }
+const COUNT_WORDS: Record<string, number> = Object.fromEntries(Object.entries(WORDS).filter(([, n]) => n >= 2))
 /** Ce qui ouvre une autre voix dans la phrase : le compte qui précède s'arrête là. */
 const NEXT_VOICE =
   /(?<![\p{L}])(une autre|un autre|l['’]autre|une troisième|un troisième|deux autres|trois autres|tandis que|alors que|à l['’]inverse)(?![\p{L}])|;/iu
@@ -263,7 +280,7 @@ export function countSpan(sentence: string, at: number): string {
 export function clauseCounts(text: string, personOf: (ideaId: string) => string | undefined): string[] {
   const out: string[] = []
   const RE = new RegExp(
-    String.raw`(?<![\p{L}\d])(\d+|${Object.keys(COUNT_WORDS).join('|')})\s+(?:autres\s+)?(personnes|participants|participantes)(?![\p{L}])`,
+    String.raw`(?<![\p{L}\d-])(\d+|${Object.keys(COUNT_WORDS).sort((a, b) => b.length - a.length).join('|')})\s+(?:autres\s+)?(personnes|participants|participantes)(?![\p{L}])`,
     'giu',
   )
   for (const sentence of text.split(/(?<=[.!?])\s+/)) {

@@ -6,6 +6,7 @@ import {
   allowedNumbers,
   clauseCounts,
   impliedOthers,
+  numbersIn,
   overcountedPeople,
   undercitedPeople,
   unverifiedNumbers,
@@ -1183,6 +1184,16 @@ describe('vérification des renvois', () => {
     expect(fix('Deux personnes critiquent les horaires [I0001, I0002], et 2 regrettent le prix [I0003, I0004].')).toBe(1)
     // Trois ne compte ni le premier renvoi (2) ni le passage (4) : refusé.
     expect(fix('Trois personnes critiquent les horaires [I0001, I0002], et 2 regrettent le prix [I0003, I0004].')).toBe(0)
+  })
+})
+
+describe('nombres composés', () => {
+  it('« dix-huit » se lit 18, jamais « huit »', () => {
+    expect(numbersIn('Dix-huit personnes saluent les enseignants.').map((n) => n.value)).toEqual([18])
+    expect(numbersIn('Vingt-deux personnes regrettent les classes chargées.').map((n) => n.value)).toEqual([22])
+    const person = (id: string) => `P${id.slice(1)}`
+    const ids = Array.from({ length: 18 }, (_, k) => `I${String(k + 1).padStart(4, '0')}`)
+    expect(clauseCounts(`Dix-huit personnes saluent les enseignants [${ids.join(', ')}].`, person)).toEqual([])
   })
 })
 
