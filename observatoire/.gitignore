@@ -1,0 +1,4 @@
+# Fichiers d origine trop lourds pour GitHub : on garde URL + empreinte + colonnes utiles
+raw/*.csv
+!raw/*.colonnes.csv
+.DS_Store
