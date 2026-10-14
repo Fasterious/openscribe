@@ -42,11 +42,14 @@ export class ProviderError extends Error {
   readonly retryAfterMs?: number
   /** Faute de configuration (clé invalide, modèle inconnu) : inutile de réessayer. */
   readonly fatal: boolean
-  constructor(message: string, opts: { status?: number; retryAfterMs?: number; fatal?: boolean } = {}) {
+  /** Réponse coupée par la limite de longueur (souvent un modèle qui boucle). */
+  readonly truncated: boolean
+  constructor(message: string, opts: { status?: number; retryAfterMs?: number; fatal?: boolean; truncated?: boolean } = {}) {
     super(message)
     this.name = 'ProviderError'
     this.status = opts.status
     this.retryAfterMs = opts.retryAfterMs
     this.fatal = opts.fatal ?? false
+    this.truncated = opts.truncated ?? false
   }
 }

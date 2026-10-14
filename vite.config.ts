@@ -16,7 +16,11 @@ export default defineConfig({
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
-  server: { headers: isolationHeaders },
+  server: {
+    headers: isolationHeaders,
+    // Les exports, rapports et notes écrits pendant une analyse ne rechargent pas la page (sinon l'analyse s'arrête).
+    watch: { ignored: ['**/fixtures/**', '**/docs/**', '**/e2e/**', '**/*.md'] },
+  },
   preview: { headers: isolationHeaders },
   test: {
     include: ['src/**/*.test.ts'],

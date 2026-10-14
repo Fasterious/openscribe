@@ -145,3 +145,10 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 - **Proposition du `ux-designer`, retenue** : raisonner par tâche (une même tâche sert plusieurs modules), défaut sur la page Moteurs d'IA, dérogation dans le travail ; mode Confidentiel ; la conversion des médias comme garantie (toujours dans le navigateur), pas comme moteur.
 - **Premier pas livré** : « Moteur d'IA par tâche » (ligne « Analyser et rédiger », « Transcrire » annoncée), pastille « Sur votre ordinateur » / « En ligne » (seule une adresse locale compte), mode Confidentiel par défaut et par synthèse, appliqué par le code au lancement.
 - **Recherche des offres gratuites** : voir `docs/PARCOURS-FOURNISSEURS.md` (14/10).
+
+## 2026-10-14 — Modèles locaux : essayés, puis retirés des choix
+
+- **Essai** : Ollama installé sur le Mac d'Arnaud (M5, 24 Go). gpt-oss 20B : quatre passes, aucune synthèse complète (réflexion qui boucle au-delà de 16 000 jetons, jusqu'à 27 minutes par demande). Gemma 4 12B : trois passes de 40 minutes, meilleure note 3/5 (méthode), puis 151 motifs à la passe 3.
+- **Seuil fixé par Arnaud** : un moteur n'est proposé qu'à 3,5/5 au moins sur ÉcoSol (le niveau de l'offre gratuite de Gemini), idéalement 4, et s'il n'est pas pénible à utiliser. Les entretiens alourdiront les données : un moteur limite aujourd'hui sera pire demain.
+- **Décision** (laissée à l'orchestrateur par Arnaud) : Ollama et LM Studio ne sont plus proposés, l'accueil n'en parle plus, le mode Confidentiel ne s'affiche qu'à qui a déjà un moteur local. Le code reste en place derrière un seul réglage.
+- **Gardé** : délai de 30 minutes par demande en local ; un regroupement dégénéré redemandé une fois ; une relecture qui boucle ignorée pour son lot ; écrire un export ou une note ne recharge plus la page pendant une analyse.

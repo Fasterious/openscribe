@@ -29,6 +29,8 @@ avant d'être gardés : aucun effet sur une réponse saine.
 | `reference` | Sonnet (et par défaut tous les autres) | — | 4,5 / 4 (B10) |
 | `ministral` | Ministral 3B, 8B, 14B (Mistral, offre gratuite) | lots 150/75/60/40 ; exemple de regroupement neutre ; citations aux fautes de frappe rattachées au texte d'origine | 3 / 3 (passe 3) |
 | `groq` | gpt-oss-120b, gpt-oss-20b, Qwen 3.8 27B (Groq, offre gratuite) | lots très réduits (60/60/30/20, vérification 40, relecture 4) pour tenir sous 8 000 jetons par demande | abandonné : synthèse trop longue (environ une heure) |
+| `gptoss` | gpt-oss 20B sur l'ordinateur (Ollama) | réflexion moyenne ; lots 100/50, synthèses par 10, relecture par 4 ; exemple neutre | arrêté : aucune synthèse complète sur un Mac de 24 Go |
+| `gemma` | Gemma 4 12B sur l'ordinateur (Ollama) | apports de Gemini (isolés rattachés, règles de titre et de rédaction), titres fourre-tout interdits, lots 150/75 | 3 / — (passe 2) ; sous le seuil, retiré des choix |
 | `gemini` | Gemini 3.5 et 3.1 Flash-Lite, 3.8 Flash (Google, offre gratuite) | rattachement des motifs isolés ; règles ajoutées : titres de motif sans « et » ni remplissage, « range d'abord », phrases autonomes, compte = personnes citées | 3,5 / 2,5 (passe 4) |
 
 ## Ministral 14B sur ÉcoSol — 13/10/2026
@@ -91,12 +93,52 @@ Leçons :
 - Rattacher les motifs isolés un par un (« même objet qu'un motif existant, ou aucun ? »)
   marche mieux qu'une consolidation libre sur une longue liste pour un modèle léger.
 
+## gpt-oss 20B sur l'ordinateur (Ollama, Mac 24 Go) — 14/10/2026
+
+| | P1 (référence) | P2 | P3 | P4 |
+|---|---|---|---|---|
+| Changement | — | lots et exemple de Ministral | regroupement raté redemandé (filet commun) | réflexion moyenne, lots 100/50 |
+| Motifs | 1 fourre-tout de 264 idées | 15 (237 idées dans un) | 1 groupe malgré la relance | 41, regroupement correct |
+| Fin | synthèse qui boucle | complète, ~38 min | — | réponses coupées à l'écriture (synthèses par 40, puis relecture par 12 et par 4) |
+
+Environ 4 heures pour aucune synthèse complète notée. Une demande d'écriture prend jusqu'à
+27 minutes : la réflexion de gpt-oss boucle au-delà de 16 000 jetons, même sur 4 textes.
+Les titres des grands motifs sortent en anglais malgré la consigne. Verdict : plafond du
+modèle sur cette machine, on arrête (décision d'Arnaud, 14/10).
+
+Acquis communs : filet du regroupement dégénéré ; délai de 30 minutes par demande en local ;
+écrire dans `docs/` ou `fixtures/` ne recharge plus la page pendant une analyse.
+
+## Gemma 4 12B sur l'ordinateur (Ollama, Mac 24 Go) — 14/10/2026
+
+| | P1 (référence) | P2 | P3 | Sonnet B10 |
+|---|---|---|---|---|
+| Changement | — | apports de Gemini, titres fourre-tout interdits, lots 150/75 | lots 250/120 | — |
+| Motifs (à une personne) | 34 | 74 (43) | 151 (117) | 32 |
+| Défauts d'audit | 3 | 1 | 2 | 0 |
+| Note `methodologue` | 2,5 | **3** | non notée (structure inutilisable) | 4,5 |
+| Note `plume` | 3 | — | — | 4 |
+
+Environ 40 minutes par passe. Gemma va au bout sans réflexion, mais boucle sur une longue
+réponse (regroupement de 295 idées, relecture répétant 27 déplacements 590 fois) et morcelle
+dès qu'on réduit les lots. Le découpage coupe des réserves de ce qu'elles nuancent malgré la consigne.
+
+**Verdict (14/10) : modèles locaux retirés des choix proposés.** Seuil fixé par Arnaud : un moteur
+n'est proposé qu'à 3,5/5 au moins (le niveau de Gemini Flash-Lite), idéalement 4, et sans
+être pénible à utiliser ; les entretiens alourdiront encore les données. Le code reste prêt
+(`LOCAL_ENGINES_OFFERED` dans `src/core/providers/presets.ts`) : à rouvrir avec un modèle local
+plus solide ou une machine plus grosse.
+
+Acquis communs : une relecture des motifs qui boucle est ignorée pour son lot ; la phrase de
+camp ajoutée par le code nomme le motif au lieu de « le critiquent ».
+
 ### Essais croisés (étape 3 du processus)
 
 | Apport | Essayé sur | Résultat | Décision |
 |---|---|---|---|
 | Règles de rédaction de Gemini (phrases autonomes, compte = personnes citées) | Ministral | methodologue 3 → 2, plume 3 → 3 ; 12 phrases de thème sans renvoi | **Rejeté**, Ministral garde sa v3 |
 | Rattachement des motifs isolés | Ministral | non essayé : Ministral n'a que 4 motifs isolés | — |
+| Apports de Gemini (isolés, titres, rédaction) | Gemma | methodologue 2,5 → 3 ; mais 74 motifs dont 43 à une personne | Gardé (Gemma retiré ensuite) |
 | Tout apport | Référence | non essayé : la référence n'a aucun des défauts visés (avis du `methodologue`) | — |
 
 ### Chantiers communs (toutes méthodes, à roder sur les caches dont Sonnet B10)

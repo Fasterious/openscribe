@@ -107,7 +107,7 @@ sinon annuaires tiers (à revérifier dans la console avant toute annonce).
 | Fournisseur | Offre | Navigateur | Verdict |
 |---|---|---|---|
 | **Cohere** (Command A, Canada) | Clé d'essai gratuite : 1 000 demandes par mois, 20 par minute, sans plafond de jetons annoncé | Oui | **À essayer** : une quinzaine de synthèses par mois, modèle fort |
-| **Ollama** (sur l'ordinateur) | Gratuit, rien ne sort de la machine ; Mac M5, 24 Go : modèles de 12 à 24 milliards de paramètres | Oui (local) | **À essayer** : demande d'installer Ollama |
+| **Ollama** (sur l'ordinateur) | Gratuit, rien ne sort de la machine ; Mac M5, 24 Go : modèles de 12 à 24 milliards de paramètres | Oui (local) | **Essayé le 14/10, retiré** : gpt-oss 20B sans synthèse complète, Gemma 4 12B à 3/5 au mieux (`docs/METHODES.md`) |
 | DeepSeek (Chine) | 5 millions de jetons à l'inscription, une fois, environ 30 jours, sans carte | Oui | Essai seulement ; hébergement en Chine : pas pour des données de participants sans accord |
 | Alibaba Qwen (Singapour) | 1 million de jetons par modèle, 90 jours ; carte probablement demandée à l'inscription | Oui | Essai seulement, à vérifier |
 | BytePlus (Doubao, ByteDance) | 500 000 jetons par modèle, une fois ; le reste est payant | Oui | Essai seulement |

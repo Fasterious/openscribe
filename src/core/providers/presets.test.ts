@@ -130,3 +130,13 @@ describe('où tourne un moteur', () => {
       expect(runsLocally(u), u).toBe(false)
   })
 })
+
+describe('méthode des modèles installés', () => {
+  it('un modèle Ollama reçoit la méthode de sa famille, sinon la référence', async () => {
+    const { methodForModel } = await import('./presets')
+    expect(methodForModel('ollama', 'gpt-oss:20b-32k')).toBe('gptoss')
+    expect(methodForModel('ollama', 'gemma4:12b')).toBe('gemma')
+    expect(methodForModel('ollama', 'llama3.1:8b')).toBe('reference')
+    expect(methodForModel('mistral', 'ministral-14b-2512')).toBe('ministral')
+  })
+})

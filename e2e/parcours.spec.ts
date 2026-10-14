@@ -25,6 +25,11 @@ async function projectCount(page: Page): Promise<number> {
   )
 }
 
+// Les parcours ne dépendent pas de la machine : Ollama est réputé absent, même s'il tourne ici.
+test.beforeEach(async ({ page }) => {
+  await page.route(/localhost:11434|127\.0\.0\.1:11434/, (route) => route.abort())
+})
+
 async function newStudy(page: Page, name: string) {
   await page.goto('/#/synthese')
   await page.getByRole('button', { name: 'Nouvelle synthèse' }).click()
@@ -218,8 +223,9 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
 
   // Les fournisseurs sont visibles d'emblée, sans clic préalable.
   await expect(page.getByRole('heading', { name: "Moteurs d'IA" })).toBeVisible()
-  for (const name of ['Mistral AI', 'Groq', 'Ollama']) await expect(page.getByText(name, { exact: true }).first()).toBeVisible()
-  await expect(page.getByText(/Pas encore installé ou pas ouvert/)).toBeVisible()
+  for (const name of ['Mistral AI', 'Google Gemini', 'Groq']) await expect(page.getByText(name, { exact: true }).first()).toBeVisible()
+  // Moteurs sur l'ordinateur : retirés des choix tant qu'aucun n'atteint le seuil de qualité (docs/METHODES.md).
+  await expect(page.getByText('Ollama (sur votre ordinateur)')).toHaveCount(0)
   await noHorizontalScroll(page)
   await shot(page, '8-moteurs')
 
@@ -265,7 +271,7 @@ test('moteurs d’IA : le modèle se choisit dans une liste expliquée, le recom
   await expect(dialog.getByLabel('Nom du modèle')).toHaveValue('mon-modele-2027')
 })
 
-test('qui fait quoi et mode Confidentiel : un moteur en ligne est refusé, et l’écran dit quoi faire', async ({ page }) => {
+test('qui fait quoi : le moteur en ligne est annoncé, et le mode Confidentiel ne s’affiche pas sans moteur local', async ({ page }) => {
   // Un moteur en ligne, enregistré sans test réussi (pas de réseau ici).
   await page.goto('/#/moteurs')
   await page.getByRole('listitem').filter({ hasText: 'Mistral AI' }).getByRole('button', { name: 'Configurer' }).click()
@@ -276,29 +282,17 @@ test('qui fait quoi et mode Confidentiel : un moteur en ligne est refusé, et l�
   await page.keyboard.press('Escape')
   await expect(page.getByRole('heading', { name: "Moteur d'IA par tâche" })).toBeVisible()
   await expect(page.getByText('En ligne').first()).toBeVisible()
+  await expect(page.getByRole('checkbox', { name: /Confidentiel/ })).toHaveCount(0)
 
-  await newStudy(page, 'Étude confidentielle')
+  await newStudy(page, 'Étude en ligne')
   await page.getByLabel('Fichier à importer').setInputFiles('fixtures/mediatheque.csv')
   await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
   await page.getByRole('tab', { name: /Analyse/ }).click()
   await page.getByLabel("Moteur d'IA pour analyser et rédiger").selectOption({ label: 'Mistral AI · ministral-14b-2512' })
   await expect(page.getByText(/En ligne · les réponses des participants sont envoyées à Mistral AI/)).toBeVisible()
-  await page.getByRole('checkbox', { name: /Confidentiel/ }).check()
-  await expect(page.getByText(/Aucun de vos moteurs d'IA n'est installé sur votre ordinateur/)).toBeVisible()
-  await expect(page.getByLabel("Moteur d'IA pour analyser et rédiger").locator('option', { hasText: 'Mistral AI' })).toBeDisabled()
+  await expect(page.getByRole('checkbox', { name: /Confidentiel/ })).toHaveCount(0)
   await noHorizontalScroll(page)
-  await shot(page, '10-confidentiel')
-})
-
-test('Ollama absent : l’erreur dit quoi faire', async ({ page }) => {
-  await page.goto('/#/moteurs')
-  await page.getByRole('listitem').filter({ hasText: 'Ollama' }).getByRole('button', { name: 'Configurer' }).click()
-  const dialog = page.getByRole('dialog')
-  await expect(dialog.getByRole('link', { name: /Télécharger Ollama/ })).toBeVisible()
-  await expect(dialog.getByText('ollama pull qwen3:8b')).toBeVisible()
-  await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()
-  await expect(dialog.getByText(/ne répond pas sur cet ordinateur/)).toBeVisible()
-  await expect(dialog.getByText(/Suivez les étapes 1 et 2/)).toBeVisible()
+  await shot(page, '10-en-ligne')
 })
 
 test('étude : sauvegarder puis rouvrir avec son rapport', async ({ page }) => {
@@ -361,8 +355,9 @@ test('un moteur qui n’a pas répondu au test n’est ni annoncé prêt ni choi
   await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
   await page.getByRole('tab', { name: /Analyse/ }).click()
   await page.getByRole('link', { name: 'Choisir un moteur' }).click()
-  await page.getByRole('listitem').filter({ hasText: 'Ollama' }).getByRole('button', { name: 'Configurer' }).click()
+  await page.getByRole('listitem').filter({ hasText: 'Mistral AI' }).getByRole('button', { name: 'Configurer' }).click()
   const dialog = page.getByRole('dialog')
+  await dialog.getByLabel("Clé d'accès").fill('cle-de-test')
   await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()
   await dialog.getByRole('button', { name: 'Enregistrer quand même' }).click()
   await expect(page.getByText("N'a pas répondu au test", { exact: true })).toBeVisible()

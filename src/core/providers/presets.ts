@@ -81,7 +81,19 @@ export interface ProviderPreset {
   maxOutputTokens?: number
   /** Plafond de jetons d'une demande (texte envoyé et réponse réservée). */
   tokenBudget?: number
+  /** Paramètres ajoutés pour les modèles dont le nom contient `match` (modèles installés, hors liste). */
+  modelExtraBody?: { match: string; body: Record<string, unknown> }[]
+  /** Méthode d'analyse des modèles installés dont le nom contient `match`. */
+  modelMethods?: { match: string; method: MethodId }[]
 }
+
+/**
+ * Moteurs installés sur l'ordinateur (Ollama, LM Studio) : retirés des choix proposés le 14/10/2026.
+ * Sur un Mac de 24 Go, ni gpt-oss 20B ni Gemma 4 12B n'atteignent le seuil de qualité (3,5/5 sur ÉcoSol,
+ * le niveau de l'offre gratuite de Gemini) : synthèses morcelées, réponses qui bouclent, 40 minutes et plus
+ * (docs/METHODES.md). Le code reste prêt : un moteur local déjà enregistré continue de fonctionner, avec le mode Confidentiel.
+ */
+export const LOCAL_ENGINES_OFFERED = false
 
 export const PROVIDER_PRESETS: ProviderPreset[] = [
   {
@@ -270,9 +282,24 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     id: 'ollama',
     label: 'Ollama (sur votre ordinateur)',
     baseUrl: 'http://localhost:11434/v1',
-    defaultModel: 'qwen3:8b',
-    suggestedModels: ['qwen3:8b', 'mistral-small3.2', 'gemma3:12b'],
+    defaultModel: 'gpt-oss:20b',
+    suggestedModels: ['gpt-oss:20b', 'gemma4:12b', 'qwen3:8b'],
+    // Une boucle de répétition ne doit pas tourner sans fin (vu le 14/10 : 18 000 jetons sur une seule réponse) ;
+    // 8 192 coupait la relecture des motifs avec une réflexion moyenne. Le contexte de 32k laisse la place.
+    maxOutputTokens: 16384,
     needsKey: false,
+    // gpt-oss réfléchit avant de répondre : courte, la réflexion laisse place au JSON (mesuré le 14/10 sur un Mac M5).
+    // Gemma 4 : sans réflexion (12 jetons au lieu de 218 sur une question simple).
+    modelExtraBody: [
+      // Réflexion moyenne : en courte, gpt-oss met toute une liste dans un seul groupe (14/10) ; en local, le temps n'est pas compté.
+      { match: 'gpt-oss', body: { reasoning_effort: 'medium' } },
+      { match: 'gemma', body: { reasoning_effort: 'none' } },
+    ],
+    modelMethods: [
+      { match: 'gpt-oss', method: 'gptoss' },
+      { match: 'gemma', method: 'gemma' },
+      { match: 'qwen', method: 'qwen' },
+    ],
     seedParam: 'seed',
     supportsJsonMode: true,
     freeRequestsPerMinute: 60,
@@ -288,8 +315,11 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         link: { label: 'Télécharger Ollama', url: 'https://ollama.com/download' },
       },
       {
-        text: "Sur Mac, ouvrez le Terminal (sur Windows, l'invite de commandes) et téléchargez un modèle (environ 5 Go, une seule fois) :",
-        code: 'ollama pull qwen3:8b',
+        text: "Sur Mac, ouvrez le Terminal (sur Windows, l'invite de commandes) et téléchargez un modèle (environ 13 Go, une seule fois) :",
+        code: 'ollama pull gpt-oss:20b',
+      },
+      {
+        text: "Dans les réglages d'Ollama, portez la longueur de contexte à 32k : sinon Ollama coupe en silence les longues demandes d'une synthèse.",
       },
       { text: 'Revenez ici : OpenScribe détecte Ollama et ses modèles tout seul. Cliquez sur « Enregistrer et tester ».' },
     ],
@@ -620,5 +650,6 @@ export function presetById(id: string): ProviderPreset | undefined {
 
 /** La méthode d'analyse à suivre pour ce modèle : la sienne si elle existe, sinon la référence. */
 export function methodForModel(presetId: string, model: string): MethodId {
-  return presetById(presetId)?.models?.find((m) => m.id === model)?.method ?? 'reference'
+  const preset = presetById(presetId)
+  return preset?.models?.find((m) => m.id === model)?.method ?? preset?.modelMethods?.find((x) => model.includes(x.match))?.method ?? 'reference'
 }

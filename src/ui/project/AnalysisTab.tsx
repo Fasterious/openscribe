@@ -165,26 +165,28 @@ export function AnalysisTab({ project }: { project: Project }) {
                   </a>
                 </p>
               )}
-              <label className="flex items-start gap-2 pt-1 text-sm">
-                <input
-                  type="checkbox"
-                  className="mt-0.5 size-4 accent-primary"
-                  disabled={running}
-                  checked={Boolean(settings.confidential)}
-                  onChange={(e) => {
-                    const on = e.target.checked
-                    setSettings({ ...settings, confidential: on })
-                    if (on && engine && !runsLocally(engine.baseUrl)) setEngineId(allEngines.find((x) => runsLocally(x.baseUrl) && x.id !== SIMULATION_ENGINE_ID)?.id ?? engineId)
-                  }}
-                />
-                <span>
-                  <span className="font-medium">
-                    <Lock className="mr-1 inline size-3.5 align-[-2px]" />
-                    Mode Confidentiel : rien ne quitte votre ordinateur
+              {(settings.confidential || engines.some((e) => runsLocally(e.baseUrl))) && (
+                <label className="flex items-start gap-2 pt-1 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 size-4 accent-primary"
+                    disabled={running}
+                    checked={Boolean(settings.confidential)}
+                    onChange={(e) => {
+                      const on = e.target.checked
+                      setSettings({ ...settings, confidential: on })
+                      if (on && engine && !runsLocally(engine.baseUrl)) setEngineId(allEngines.find((x) => runsLocally(x.baseUrl) && x.id !== SIMULATION_ENGINE_ID)?.id ?? engineId)
+                    }}
+                  />
+                  <span>
+                    <span className="font-medium">
+                      <Lock className="mr-1 inline size-3.5 align-[-2px]" />
+                      Mode Confidentiel : rien ne quitte votre ordinateur
+                    </span>
+                    <span className="block text-xs text-muted-foreground">Seuls les moteurs d'IA installés sur votre ordinateur peuvent analyser cette synthèse.</span>
                   </span>
-                  <span className="block text-xs text-muted-foreground">Seuls les moteurs d'IA installés sur votre ordinateur peuvent analyser cette synthèse.</span>
-                </span>
-              </label>
+                </label>
+              )}
               {(blocked || noLocal) && (
                 <Alert tone="warning" className="space-y-2">
                   <p>

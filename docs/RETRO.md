@@ -135,3 +135,9 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - **Bien marché** : sonder l'API avant de lancer (liste des modèles, demande de 12 000 jetons, réponse sans longueur) a expliqué chaque arrêt en une minute ; lancer deux modèles en parallèle, chacun avec son quota.
 - **Coûté pour rien** : 25 minutes de synthèse avant de constater ce que le calcul disait déjà (8 000 jetons par minute pour plus de 200 000 jetons au total).
 - **On change** : avant de lancer une synthèse sur un nouveau fournisseur, estimer sa durée minimale à partir du quota par minute et des jetons d'une synthèse de référence (environ 215 000 pour ÉcoSol) ; si elle dépasse vingt minutes, on le dit avant de lancer.
+
+## Modèles locaux (14/10)
+
+- **Bien marché** : capturer dans la page la demande fautive (un mouchard sur les appels) a montré en une minute la boucle de Gemma (27 déplacements répétés 590 fois) ; le seuil chiffré d'Arnaud a rendu la décision simple.
+- **Coûté pour rien** : environ 4 heures sur gpt-oss avant de conclure ; deux guetteurs qui ont cru l'analyse finie (le journal du moteur reste muet pendant la réflexion, ou jusqu'à la fin d'une demande) ; un export dans `fixtures/` qui a rechargé la page et annulé une analyse.
+- **On change** : un modèle local se juge d'abord sur une passe complète ; deux passes sans synthèse complète, on arrête. Une analyse se suit par la charge du processus du moteur ou par l'état dans la page, jamais par son journal. `docs/` et `fixtures/` sont ignorés par le serveur de développement.

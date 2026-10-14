@@ -19,6 +19,7 @@ import {
   applySupport,
   dropUnreferenced,
   dropNearDuplicates,
+  degenerateGrouping,
   checkOpposed,
   spellLeadingNumbers,
   withDivided,
@@ -676,6 +677,23 @@ describe('chaîne complète (simulation)', () => {
     expect(done.ideas).toEqual(fresh.ideas)
   })
 
+  it('une relecture des motifs qui boucle jusqu\'à la limite est ignorée, l\'analyse continue', async () => {
+    const corpus = surveyCorpus()
+    const base = createSimulationProvider()
+    const looping: LlmProvider = {
+      ...base,
+      fingerprint: base.fingerprint,
+      label: base.label,
+      async complete(req) {
+        if (req.task === 'review') throw new ProviderError('coupée', { fatal: true, truncated: true })
+        return base.complete(req)
+      },
+    }
+    const state = await runAnalysis(corpus, await newAnalysis(corpus, DEFAULT_SETTINGS, looping), { provider: looping, cache: new MemoryCache(), concurrency: 1 })
+    expect(state.status).toBe('done')
+    expect(state.reviewSkipped).toBeGreaterThan(0)
+  })
+
   it("s'arrête proprement quand on annule", async () => {
     const corpus = surveyCorpus()
     const controller = new AbortController()
@@ -737,6 +755,15 @@ describe('phrase répétée', () => {
     const t =
       'Quatre personnes jugent les affiches trop rares dans les quartiers [I0001]. Le tractage plaît [I0002]. Quatre personnes jugent les affiches beaucoup trop rares dans les quartiers [I0003].'
     expect(dropNearDuplicates(t)).toEqual({ text: 'Quatre personnes jugent les affiches trop rares dans les quartiers [I0001]. Le tractage plaît [I0002].', removed: 1 })
+  })
+})
+
+describe('regroupement dégénéré', () => {
+  it('un ou deux groupes pour une longue liste est redemandé ; une réponse saine ne l’est pas', () => {
+    expect(degenerateGrouping(1, 150, 14)).toBe(true)
+    expect(degenerateGrouping(5, 150, 14)).toBe(true)
+    expect(degenerateGrouping(18, 284, 18)).toBe(false)
+    expect(degenerateGrouping(2, 12, 3)).toBe(false) // liste courte : rien à redire
   })
 })
 

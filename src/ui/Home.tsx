@@ -105,7 +105,7 @@ export function Home() {
             l'aperçu avant de lancer quoi que ce soit.
           </Step>
           <Step n={2} icon={<KeyRound />} title="Branchez un moteur d'IA">
-            Une clé gratuite Mistral ou Google Gemini se crée en quelques minutes. Vous pouvez aussi faire tourner Ollama sur votre ordinateur.{' '}
+            Une clé gratuite Mistral ou Google Gemini se crée en quelques minutes.{' '}
             <a className="text-primary underline-offset-4 hover:underline" href={href({ name: 'settings' })}>
               Choisir un moteur
             </a>
@@ -199,12 +199,12 @@ export function Home() {
             un autre ordinateur.
           </Feature>
           <Feature icon={<KeyRound />} title="Vous choisissez votre moteur d'IA">
-            Dans le cloud, avec votre propre clé (Groq, Mistral, Google Gemini, OpenRouter), ou sur votre ordinateur avec Ollama, et rien ne quitte votre
-            machine. Les verbatims partent directement de votre navigateur vers le moteur choisi.
+            Avec votre propre clé (Mistral, Google Gemini, OpenRouter…). Les verbatims partent directement de votre navigateur vers le moteur choisi, sans
+            passer par nous.
           </Feature>
           <Feature icon={<ShieldCheck />} title="Lisez les conditions des offres gratuites">
             Certaines offres gratuites peuvent réutiliser les données qu'on leur envoie. Pour des données sensibles, préférez une offre qui exclut cette
-            réutilisation, ou Ollama.
+            réutilisation.
           </Feature>
         </div>
       </section>
@@ -250,7 +250,7 @@ export function Home() {
 const FAQ: [string, string][] = [
   [
     'Faut-il installer quelque chose ?',
-    "Non, OpenScribe s'ouvre dans votre navigateur. Seule exception, facultative : Ollama, si vous voulez que l'IA tourne sur votre ordinateur.",
+    "Non, OpenScribe s'ouvre dans votre navigateur.",
   ],
   [
     'Combien ça coûte ?',
@@ -259,11 +259,11 @@ const FAQ: [string, string][] = [
   ['Faut-il créer un compte ?', 'Non, ni inscription ni adresse e-mail. Pour retrouver une synthèse ailleurs, sauvegardez-la dans un fichier et rouvrez-la.'],
   [
     'Où vont mes données ?',
-    "Nulle part chez nous. Elles restent dans votre navigateur. Pour l'analyse, les verbatims partent uniquement vers le moteur d'IA que vous avez choisi, accompagnés d'un pseudonyme (P1, P2…), jamais de noms ni d'adresses. Avec Ollama, ils ne quittent pas votre ordinateur.",
+    "Nulle part chez nous. Elles restent dans votre navigateur. Pour l'analyse, les verbatims partent uniquement vers le moteur d'IA que vous avez choisi, accompagnés d'un pseudonyme (P1, P2…), jamais de noms ni d'adresses.",
   ],
   [
     "Quel moteur d'IA choisir ?",
-    "Pour démarrer, prenez Mistral ou Google Gemini : c'est gratuit et la clé se crée en quelques minutes. Pour des données sensibles, prenez Ollama sur votre ordinateur, ou une offre qui ne réutilise pas vos données. Vous pouvez en changer à tout moment.",
+    "Pour démarrer, prenez Mistral ou Google Gemini : c'est gratuit et la clé se crée en quelques minutes. Pour des données sensibles, prenez une offre qui ne réutilise pas vos données. Vous pouvez en changer à tout moment.",
   ],
   ['Et après ?', 'Les modules « Entretiens et tests » et « Personas » sont en préparation. Voir « Ce qui arrive » ci-dessous.'],
 ]

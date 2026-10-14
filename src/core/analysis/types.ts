@@ -133,7 +133,7 @@ export interface AnalysisSettings {
   temperature: number
   seed: number
   /** Méthode propre à une famille de modèles (voir `methods.ts`), fixée d'après le modèle choisi. Par défaut : la référence. */
-  method?: 'reference' | 'ministral' | 'gemini' | 'groq'
+  method?: 'reference' | 'ministral' | 'gemini' | 'groq' | 'gptoss' | 'gemma' | 'qwen'
   /** Mode Confidentiel : rien ne quitte cet ordinateur (seuls les moteurs locaux sont acceptés, par le code). */
   confidential?: boolean
   /** Remplacé par `method` (analyses enregistrées avant les profils de méthode). */
@@ -198,6 +198,8 @@ export interface AnalysisState {
   support?: { checked: number; fixed: number; dropped: number; added?: number }
   /** Phrases écrites par le code pour qu'aucun camp d'avis compté ne manque à la synthèse de son motif. */
   campsAdded?: number
+  /** Lots de relecture des motifs ignorés : la réponse bouclait jusqu'à la limite de longueur. */
+  reviewSkipped?: number
   /** Phrases retirées des synthèses parce qu'elles citaient un nombre introuvable. */
   removedSentences?: number
   /** Bilan de la relecture : textes relus, modifiés, et réécritures refusées par le contrôle. */

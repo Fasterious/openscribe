@@ -1,3 +1,4 @@
+import { runsLocally } from './location'
 import { ProviderError, type ChatRequest, type ChatResult, type LlmProvider } from './types'
 import type { ProviderPreset } from './presets'
 
@@ -28,6 +29,7 @@ export interface OpenAiCompatibleConfig {
 }
 
 const DEFAULT_TIMEOUT_MS = 180_000
+const LOCAL_TIMEOUT_MS = 30 * 60_000
 const DEFAULT_PING_TIMEOUT_MS = 20_000
 
 class TimeoutError extends Error {}
@@ -125,7 +127,8 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
     const headers: Record<string, string> = { 'Content-Type': 'application/json', ...config.extraHeaders }
     if (config.apiKey) headers.Authorization = `Bearer ${config.apiKey}`
     // Le test de connexion (tâche « ping ») doit échouer vite.
-    const ms = req.task === 'ping' ? (config.pingTimeoutMs ?? DEFAULT_PING_TIMEOUT_MS) : (config.timeoutMs ?? DEFAULT_TIMEOUT_MS)
+    // Sur l'ordinateur, pas de délai court : la confidentialité vaut l'attente (décision d'Arnaud, 14/10).
+    const ms = req.task === 'ping' ? (config.pingTimeoutMs ?? DEFAULT_PING_TIMEOUT_MS) : (config.timeoutMs ?? (runsLocally(base) ? LOCAL_TIMEOUT_MS : DEFAULT_TIMEOUT_MS))
     const limit = withTimeout(req.signal, ms)
     try {
       const response = await fetchImpl(`${base}/chat/completions`, {
@@ -140,7 +143,11 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
       return new Response(nullBody ? null : text, { status: response.status, statusText: response.statusText, headers: response.headers })
     } catch (e) {
       if (limit.timedOut()) {
-        throw new ProviderError(`${config.label} ne répond pas (délai dépassé). Vérifiez votre connexion ; un réseau d'entreprise peut bloquer ce service.`, {
+        throw new ProviderError(
+          runsLocally(base)
+            ? `${config.label} n'a pas fini sa réponse dans le délai prévu : votre ordinateur est peut-être très occupé, ou le modèle trop gros pour lui. Reprenez l'analyse : ce qui a été fait est conservé.`
+            : `${config.label} ne répond pas (délai dépassé). Vérifiez votre connexion ; un réseau d'entreprise peut bloquer ce service.`,
+          {
           status: 0,
         })
       }
@@ -208,7 +215,7 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
       if (data.choices?.[0]?.finish_reason === 'length' && !req.maxTokens)
         throw new ProviderError(
           `${config.label} a coupé sa réponse avant la fin : le modèle « ${config.model} » ne peut pas écrire une réponse aussi longue. Choisissez un modèle plus grand.`,
-          { status: response.status, fatal: true },
+          { status: response.status, fatal: true, truncated: true },
         )
       const text = extractContent(data.choices?.[0]?.message?.content)
       if (!text)

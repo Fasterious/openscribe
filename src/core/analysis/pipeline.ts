@@ -1,7 +1,7 @@
 import type { Contribution, Corpus } from '../corpus'
 import { activeParticipants, contributionsOf } from '../corpus'
 import { randomId, sha256, stableStringify } from '../ids'
-import type { LlmProvider } from '../providers/types'
+import { ProviderError, type LlmProvider } from '../providers/types'
 import { computeMetrics, sortIds } from './metrics'
 import { uncoveredPassages } from './coverage'
 import { highlightLine, highlights } from './highlights'
@@ -68,6 +68,11 @@ export const SUPPORT_BATCH_IDEAS = 220
 export const SUMMARY_BATCH_IDEAS = 90
 function batchSizes(settings: AnalysisSettings) {
   return methodOf(settings).batches
+}
+
+/** Un premier regroupement est dégénéré quand il rend bien moins de groupes que la cible pour une longue liste. */
+export function degenerateGrouping(groups: number, items: number, targetMin: number): boolean {
+  return items >= 30 && groups < Math.max(3, Math.floor(targetMin / 2))
 }
 
 /** Au-delà de ce nombre de groupes, on ajoute un niveau de thèmes (le rapprochement des sujets voisins). */
@@ -498,20 +503,29 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
 
   // Premier lot : fonde les groupes.
   const first = items.slice(0, batchSizes(state.settings).grouping)
-  const grouped = await runner.json(
-    groupingPrompt(
-      {
-        items: first.map((i) => ({ id: i.id, label: i.label, count: i.ideaIds.length, example: i.example, question: i.question })),
-        grid: grid.length ? grid : undefined,
-      },
-      state.settings,
-      groupTarget(
-        first.reduce((n, i) => n + i.ideaIds.length, 0),
-        new Set(state.ideas.map((i) => i.participantId)).size,
-      ),
-    ),
-    groupingSchema,
+  const target = groupTarget(
+    first.reduce((n, i) => n + i.ideaIds.length, 0),
+    new Set(state.ideas.map((i) => i.participantId)).size,
   )
+  const firstSpec = groupingPrompt(
+    {
+      items: first.map((i) => ({ id: i.id, label: i.label, count: i.ideaIds.length, example: i.example, question: i.question })),
+      grid: grid.length ? grid : undefined,
+    },
+    state.settings,
+    target,
+  )
+  let grouped = await runner.json(firstSpec, groupingSchema)
+  // Regroupement dégénéré (un modèle léger met tout dans un ou deux groupes) : le code le voit et redemande une fois.
+  if (!grid.length && degenerateGrouping(grouped.groups.length, first.length, target.min)) {
+    grouped = await runner.json(
+      {
+        ...firstSpec,
+        user: `${firstSpec.user}\n\nATTENTION : ta réponse précédente ne formait que ${grouped.groups.length} groupe(s) pour ${first.length} idées. Un groupe = UN objet ; on attend entre ${target.min} et ${target.max} groupes. Recommence.`,
+      },
+      groupingSchema,
+    )
+  }
   for (const g of grouped.groups) {
     const title = allowedTitle(g.title)
     if (!title) continue
@@ -546,13 +560,21 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     if (!left.length) break
     for (let i = 0; i < left.length; i += batchSizes(state.settings).assign) {
       const batch = left.slice(i, i + batchSizes(state.settings).assign)
-      const res = await runner.json(
-        assignPrompt(
-          { groups: [...titles], items: batch.map((b) => ({ id: b.id, label: b.label, example: b.example })), allowNew: !grid.length },
-          state.settings,
-        ),
-        assignSchema,
+      const assignSpec = assignPrompt(
+        { groups: [...titles], items: batch.map((b) => ({ id: b.id, label: b.label, example: b.example })), allowNew: !grid.length },
+        state.settings,
       )
+      let res = await runner.json(assignSpec, assignSchema)
+      // Tout un lot rangé dans un seul groupe alors qu'il en existe plusieurs : redemandé une fois.
+      if (!grid.length && titles.length >= 4 && batch.length >= 20 && new Set(res.assignments.map((a) => a.group)).size === 1) {
+        res = await runner.json(
+          {
+            ...assignSpec,
+            user: `${assignSpec.user}\n\nATTENTION : ta réponse précédente rangeait les ${batch.length} idées dans un seul groupe. Range chacune selon son objet ; crée un groupe si aucun ne convient.`,
+          },
+          assignSchema,
+        )
+      }
       for (const a of res.assignments) {
         const title = allowedTitle(a.group) ?? (grid.length ? addTitle(OUTSIDE) : null)
         if (title && known.has(a.item) && !assigned.has(a.item)) assigned.set(a.item, title)
@@ -700,7 +722,15 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
             state.settings,
           ),
           reviewSchema,
-        ),
+        ).catch((e: unknown) => {
+          // Une relecture qui boucle jusqu'à la limite de réponse (un modèle local qui répète les mêmes déplacements)
+          // est ignorée pour ce lot : le rangement d'avant reste, l'analyse continue.
+          if (e instanceof ProviderError && e.truncated) {
+            state.reviewSkipped = (state.reviewSkipped ?? 0) + 1
+            return { changes: [] }
+          }
+          throw e
+        }),
       ),
     )
     const reviewed = applyReview(
@@ -1550,7 +1580,8 @@ function ensureCamps(state: AnalysisState) {
     for (const c of missingCamps(g, ideaById)) {
       const n = c.people.length
       const who = n > 1 ? `${NUMBER_WORDS_FR[n] ?? n} personnes` : 'Une personne'
-      const verb = c.side === 'positive' ? (n > 1 ? "l'apprécient" : "l'apprécie") : n > 1 ? 'le critiquent' : 'le critique'
+      // L'objet est nommé : ajoutée en fin de texte, « le critiquent » n'a pas d'antécédent sûr.
+      const verb = `${n > 1 ? 'portent' : 'porte'} un avis ${c.side === 'positive' ? 'positif' : 'critique'} sur « ${g.title} »`
       const sentence = `${who.charAt(0).toUpperCase()}${who.slice(1)} ${verb} [${c.ideaIds.join(', ')}].`
       g.summary = `${g.summary.trim()} ${sentence}`
       state.campsAdded = (state.campsAdded ?? 0) + 1

@@ -14,7 +14,7 @@ import {
 } from '@/app/engines'
 import { href } from '@/app/router'
 import { runsLocally } from '@/core/providers/location'
-import { PROVIDER_PRESETS, presetById, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
+import { LOCAL_ENGINES_OFFERED, PROVIDER_PRESETS, presetById, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
 import { Alert, Badge, Button, Card, CardContent, Dialog, DropMenu, Input, Label, MenuItem, MenuSection, Select, Tooltip, cn } from './primitives'
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
@@ -64,6 +64,8 @@ function useOllama() {
 
 export function SettingsPage({ back }: { back?: string }) {
   const { engines, defaultId, confidentialDefault, loaded } = useEngines()
+  // Mode Confidentiel et moteurs locaux : montrés seulement à qui en a déjà un (LOCAL_ENGINES_OFFERED).
+  const hasLocal = engines.some((e) => runsLocally(e.baseUrl))
   const [editing, setEditing] = useState<EngineConfig | null>(null)
   const ollama = useOllama()
   const backHref = back ? href({ name: 'project', id: back, tab: 'analysis' }) : null
@@ -135,23 +137,25 @@ export function SettingsPage({ back }: { back?: string }) {
             </CardContent>
           </Card>
           <p className="text-xs text-muted-foreground">Ces choix s'appliquent aux nouvelles synthèses ; vous pourrez les changer dans chacune.</p>
-          <label className="flex items-start gap-3 rounded-lg border p-4">
-            <input
-              type="checkbox"
-              className="mt-1 size-4 accent-primary"
-              checked={confidentialDefault}
-              onChange={(e) => setConfidentialDefault(e.target.checked)}
-            />
-            <span>
-              <span className="flex items-center gap-1 font-medium">
-                <Lock className="size-4" /> Mode Confidentiel : rien ne quitte votre ordinateur
+          {(hasLocal || confidentialDefault) && (
+            <label className="flex items-start gap-3 rounded-lg border p-4">
+              <input
+                type="checkbox"
+                className="mt-1 size-4 accent-primary"
+                checked={confidentialDefault}
+                onChange={(e) => setConfidentialDefault(e.target.checked)}
+              />
+              <span>
+                <span className="flex items-center gap-1 font-medium">
+                  <Lock className="size-4" /> Mode Confidentiel : rien ne quitte votre ordinateur
+                </span>
+                <span className="block text-sm text-muted-foreground">
+                  Pour toute nouvelle synthèse, seuls les moteurs installés sur votre ordinateur (Ollama, LM Studio) sont proposés, et OpenScribe refuse
+                  d'envoyer vos données ailleurs. Vous pourrez le désactiver pour une synthèse donnée.
+                </span>
               </span>
-              <span className="block text-sm text-muted-foreground">
-                Pour toute nouvelle synthèse, seuls les moteurs installés sur votre ordinateur (Ollama, LM Studio) sont proposés, et OpenScribe refuse
-                d'envoyer vos données ailleurs. Vous pourrez le désactiver pour une synthèse donnée.
-              </span>
-            </span>
-          </label>
+            </label>
+          )}
         </section>
       )}
 
@@ -202,7 +206,7 @@ export function SettingsPage({ back }: { back?: string }) {
         <h2 id="choisir" className="text-lg font-semibold">
           {engines.length ? 'Ajouter un autre moteur' : 'Choisissez votre moteur'}
         </h2>
-        {FAMILIES.map((f) => (
+        {FAMILIES.filter((f) => f.id !== 'local' || LOCAL_ENGINES_OFFERED || hasLocal).map((f) => (
           <div key={f.id} className="space-y-3">
             <h3 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground [&_svg]:size-4">
               {f.icon} {f.title}
@@ -435,7 +439,7 @@ function SetupDialog({
                         {s.link.label} <ExternalLink className="size-3" />
                       </a>
                     )}
-                    {s.code && <CopyCode code={isOllama ? `ollama pull ${draft.model || 'qwen3:8b'}` : s.code} />}
+                    {s.code && <CopyCode code={isOllama ? `ollama pull ${draft.model || 'gpt-oss:20b'}` : s.code} />}
                   </div>
                 </li>
               ))}

@@ -107,7 +107,8 @@ export function providerFor(engine: EngineConfig, retries = 4, onRetry?: LimitOp
     omitTemperature: preset?.omitTemperature,
     maxOutputTokens: preset?.maxOutputTokens,
     tokenBudget: preset?.tokenBudget,
-    extraBody: preset?.models?.find((m) => m.id === engine.model)?.extraBody,
+    extraBody:
+      preset?.models?.find((m) => m.id === engine.model)?.extraBody ?? preset?.modelExtraBody?.find((x) => engine.model.includes(x.match))?.body,
   })
   return withLimits(base, { requestsPerMinute: engine.requestsPerMinute, concurrency: engine.concurrency, retries, onRetry })
 }

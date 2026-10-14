@@ -108,3 +108,12 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Mise en ligne (hébergement statique)
 - ⏳ Module Entretiens et tests (transcription, vidéo synchronisée), puis Personas
 - ⏳ Stratégie d'acquisition (une fois l'expérience validée)
+
+## Itération 7 — Offres gratuites et modèles locaux (13-14/10)
+
+- ✅ Mistral (Ministral 14B, 3/5) et Google Gemini (3.5 Flash-Lite, 3,5/5) gratuits, sans carte, parcours réels consignés
+- ✅ Une méthode par famille de modèles (`docs/METHODES.md`), la référence Sonnet inchangée
+- ✅ Moteur d'IA par tâche, pastille « Sur votre ordinateur » / « En ligne », mode Confidentiel (gardé pour qui a un moteur local)
+- ✅ Groq abandonné (une heure par synthèse) ; Ollama essayé (gpt-oss 20B, Gemma 4 12B) puis retiré des choix : sous le seuil de 3,5/5
+- ⏳ Estimation de durée fondée sur la vitesse mesurée de chaque moteur
+- ⏳ Réglages propres au fournisseur (réflexion) à inclure dans la clé du cache
