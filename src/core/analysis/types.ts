@@ -202,6 +202,8 @@ export interface AnalysisState {
   campsAdded?: number
   /** Lots de relecture des motifs ignorés : la réponse bouclait jusqu'à la limite de longueur. */
   reviewSkipped?: number
+  /** Motifs unanimes dont le titre n'a aucun mot distinctif : leur unanimité n'a pas été confrontée aux idées rangées ailleurs. */
+  unanimityUnchecked?: string[]
   /** Phrases retirées des synthèses parce qu'elles citaient un nombre introuvable. */
   removedSentences?: number
   /** Bilan de la relecture : textes relus, modifiés, et réécritures refusées par le contrôle. */

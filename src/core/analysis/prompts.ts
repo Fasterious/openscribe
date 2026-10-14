@@ -444,7 +444,7 @@ Règles :
 1. Pour chaque motif, lis ses idées pour comprendre son objet, puis ses "candidates" : des idées de ton contraire rangées ailleurs, dont le texte figure une seule fois dans "pool".
 2. Déplace vers le motif ({"id":"I0042","to":"G3"}) une candidate seulement si elle juge le même objet que ce motif, au point qu'on ne pourrait pas annoncer l'unanimité sans mentir. Exemple : dans « Accueil en magasin » (tout positif), « personne ne vient vous voir quand on entre » est une critique du même objet ; « les prix ont augmenté » ne l'est pas.
 3. Un objet voisin n'est pas le même objet : dans le doute, ne déplace rien. La plupart des candidates restent où elles sont.
-${lang(settings)}
+${methodRules(settings, 'unanimity')}${lang(settings)}
 
 Réponds avec : {"changes":[{"id":"I0042","to":"G3"}]}
 

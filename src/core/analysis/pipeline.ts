@@ -850,7 +850,9 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
 
   // Méthode qui le demande : un motif unanime (ou presque) est confronté aux idées de ton contraire rangées ailleurs.
   if (!grid.length && methodOf(state.settings).unanimityReview && groups.length > 1) {
-    const motifs = unanimityCheck(groups, state.ideas)
+    const unchecked: string[] = []
+    const motifs = unanimityCheck(groups, state.ideas, methodOf(state.settings).unanimityLexical === true, unchecked)
+    if (unchecked.length) state.unanimityUnchecked = unchecked
     if (motifs.length) {
       s.message = 'Vérification des unanimités'
       await emit()
@@ -883,8 +885,24 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
 export function unanimityCheck(
   groups: Group[],
   ideas: Idea[],
+  lexical = false,
+  /** Rempli des titres de motifs que le filtre lexical n'a pas pu vérifier (aucun mot distinctif). */
+  unchecked: string[] = [],
 ): (Omit<UnanimityInput['motifs'][number], 'candidates'> & { candidates: UnanimityInput['pool'] })[] {
   const byId = new Map(ideas.map((i) => [i.id, i]))
+  // `lexical` : une candidate doit nommer un mot distinctif du titre (« privé » dans « Enseignement privé ») ; un mot que portent
+  // plus de 7 % des idées (« enseignement ») ne distingue rien. Sans mot distinctif, le motif n'est pas vérifié.
+  const fold = (t: string) => t.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+  const texts = new Map(ideas.map((i) => [i.id, fold(`${i.label} ${i.verbatim}`)]))
+  // En début de mot : « privé » ne doit pas répondre à « on nous prive ».
+  const startsWord = (t: string, st: string) => new RegExp(`(?<![\\p{L}])${st}`, 'u').test(t)
+  const stems = (title: string) =>
+    (fold(title).match(/\p{L}{4,}/gu) ?? [])
+      .map((w) => w.slice(0, 6))
+      .filter((st) => [...texts.values()].filter((t) => startsWord(t, st)).length <= ideas.length * 0.07)
+  const ownStems = new Map(lexical ? groups.map((g) => [g.id, stems(g.title)] as const) : [])
+  if (lexical) for (const g of groups) if (!ownStems.get(g.id)?.length && (g.metrics.stance === 'unanimous' || g.metrics.stance === 'consensus')) unchecked.push(g.title)
+  const names = (g: Group, i: Idea) => !lexical || (ownStems.get(g.id) ?? []).some((st) => startsWord(texts.get(i.id)!, st))
   const home = new Map(groups.flatMap((g) => g.ideaIds.map((id) => [id, g] as const)))
   const opinions = (g: Group) => g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
   return groups
@@ -901,7 +919,7 @@ export function unanimityCheck(
           .filter((i) => i.category === side)
           .map((i) => ({ id: i.id, label: i.label, verbatim: shortExample(i.verbatim, 160) })),
         candidates: ideas
-          .filter((i) => i.category === opposite && home.get(i.id) && home.get(i.id) !== g)
+          .filter((i) => i.category === opposite && home.get(i.id) && home.get(i.id) !== g && names(g, i))
           .map((i) => ({ id: i.id, motif: home.get(i.id)!.title, tone: opposite, label: i.label, verbatim: shortExample(i.verbatim, 160) })),
       }
     })
@@ -1375,14 +1393,43 @@ async function buildThemes(state: AnalysisState, runner: LlmRunner, emit: () => 
 
 // ─── Étape 5 ─────────────────────────────────────────────────────────────────
 
+/** L'équilibre des avis, en personnes, hors des idées « hors question » : qui critique, qui se dit satisfait, qui fait les deux. */
+export function opinionBalance(state: Pick<AnalysisState, 'ideas' | 'offTopic'>): { speakers: number; critics: number; satisfied: number; both: number } {
+  const offTopic = new Set(state.offTopic ?? [])
+  const ideas = state.ideas.filter((i) => !offTopic.has(i.id))
+  const who = (cat: Idea['category']) => new Set(ideas.filter((i) => i.category === cat).map((i) => i.participantId))
+  const [critics, satisfied] = [who('negative'), who('positive')]
+  return {
+    speakers: new Set(ideas.map((i) => i.participantId)).size,
+    critics: critics.size,
+    satisfied: satisfied.size,
+    both: [...critics].filter((p) => satisfied.has(p)).length,
+  }
+}
+
 async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: LlmRunner) {
   const all = computeMetrics(state.ideas)
   const respondents = activeParticipants(corpus).length
   const lang = state.settings.language
+  const checks = methodOf(state.settings).summaryChecks === true
+  // Méthode qui le demande : l'équilibre des avis, compté en personnes, pour que le résumé ne s'ouvre pas sur une force isolée.
+  const b = opinionBalance(state)
+  const balance = checks
+    ? lang === 'en'
+      ? ` Of ${b.speakers} people, ${b.critics} voice at least one criticism, ${b.satisfied} at least one satisfaction, ${b.both} both.`
+      : ` Sur ${b.speakers} participants, ${b.critics} expriment au moins une critique, ${b.satisfied} au moins une satisfaction, ${b.both} les deux.`
+    : ''
   const facts =
-    lang === 'en' ? `${all.participants} people out of ${respondents} who answered.` : `${all.participants} participants sur ${respondents} ayant répondu.`
+    (lang === 'en' ? `${all.participants} people out of ${respondents} who answered.` : `${all.participants} participants sur ${respondents} ayant répondu.`) + balance
   const h = highlights(state.groups, new Map(state.ideas.map((i) => [i.id, i])))
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
+  // Méthode qui le demande : l'exemple d'une ligne est la première idée de son camp citée par la synthèse du motif
+  // (la première par identifiant tombait parfois sur un avis atypique du camp).
+  const refOf = (x: (typeof h)['strengths'][number]) => {
+    if (!checks) return x.ideaIds[0]
+    const side = new Set(x.ideaIds)
+    return (groupById.get(x.groupId)?.summary.match(/I\d{4,}/g) ?? []).find((id) => side.has(id)) ?? x.ideaIds[0]
+  }
   const sections = state.themes.length
     ? state.themes.map((t) => ({
         title: t.title,
@@ -1399,7 +1446,8 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
     return
   }
   const scale = methodOf(state.settings).scaleInLines === true
-  const lines = (kind: keyof typeof h, list = h[kind].slice(0, methodOf(state.settings).summaryLines ?? 6)) => list.map((x) => ({ text: highlightLine(x, kind, lang, scale), ref: x.ideaIds[0] }))
+  const lines = (kind: keyof typeof h, list = h[kind].slice(0, methodOf(state.settings).summaryLines ?? 6)) =>
+    list.map((x) => ({ text: highlightLine(x, kind, lang, scale), ref: kind === 'strengths' || kind === 'blockers' ? refOf(x) : x.ideaIds[0] }))
   // Méthode qui le demande : le verbatim de chaque proposition et question, pour rapporter ce qu'elle dit et non le titre du motif.
   const ideaText = new Map(state.ideas.map((i) => [i.id, i.verbatim]))
   const withExample = (list: { text: string; ref: string }[]) =>
@@ -1636,7 +1684,12 @@ export function applySupport(
       if (before.has(x.value) || x.value === cited) return true
       if (!personOf) return false
       const at = r.indexOf(x.raw)
-      return at >= 0 && new Set((countSpan(r, at).match(/I\d{4,}/g) ?? []).map(personOf).filter(Boolean)).size === x.value
+      if (at < 0) return false
+      const peopleOf = (passage: string) => new Set((passage.match(/I\d{4,}/g) ?? []).map(personOf).filter(Boolean)).size
+      // « Six personnes dénoncent X [6 renvois], et 9 reprochent Y [9 renvois] » : le compte vaut aussi pour son premier renvoi.
+      const span = countSpan(r, at)
+      const firstRef = span.slice(0, span.indexOf(']') + 1)
+      return peopleOf(span) === x.value || (firstRef !== '' && peopleOf(firstRef) === x.value)
     }
     const ok = ids.length > 0 && ids.every((id) => allowed.has(id)) && numbersIn(r).every(covers) && r.length <= original.length * 1.5
     if (ok) result.set(f.n, r)
@@ -1758,7 +1811,27 @@ async function checkSupport(state: AnalysisState, runner: LlmRunner, emit: () =>
       n,
       problem: `compte ou nombre sans appui (${state.globalUnverified!.map((b) => `« ${b} »`).join(', ')})`,
     }))
-    targets.push({ id: 'R', get: () => state.globalSummary, set: (t) => (state.globalSummary = t), allowed, flags, addTo: 'second' })
+    // Méthode qui le demande : une ligne de forces ou de freins absente du résumé est signalée (ajout), et une ligne « fragile »
+    // dont la phrase ne le dit pas aussi. Le moteur complète ; le code ne vérifie que les renvois et les chiffres.
+    if (methodOf(state.settings).summaryChecks) {
+      const h = highlights(state.groups, ideaById)
+      const scale = methodOf(state.settings).scaleInLines === true
+      const lang = state.settings.language
+      const sentences = sentencesOf(state.globalSummary).flat()
+      const lines = methodOf(state.settings).summaryLines ?? 6
+      // Les freins d'abord : deux ajouts au plus sont acceptés, et ce sont eux que le résumé oubliait.
+      for (const [kind, list] of [['blockers', h.blockers.slice(0, lines)], ['strengths', h.strengths.slice(0, lines)]] as const)
+        for (const x of list) {
+          const ids = new Set(groupById.get(x.groupId)?.ideaIds ?? [])
+          const at = sentences.findIndex((t) => (t.match(/I\d{4,}/g) ?? []).some((id) => ids.has(id)))
+          const line = highlightLine(x, kind, lang, scale)
+          if (at < 0) {
+            allowed.push(...ids)
+            flags.push({ n: 0, problem: `la ligne « ${line} » n'est pas reprise : ajoute une phrase qui la dit, avec son mot de l'échelle et son chiffre, et un renvoi à une idée de ce motif` })
+          } else if (x.fragile && !/fragile/i.test(sentences[at])) flags.push({ n: at + 1, problem: `la ligne « ${line} » est fragile : écris « fragile » à côté du mot de l'échelle` })
+        }
+    }
+    targets.push({ id: 'R', get: () => state.globalSummary, set: (t) => (state.globalSummary = t), allowed: [...new Set(allowed)], flags, addTo: 'second' })
   }
   if (!targets.length) return
   s.message = 'Vérification des renvois'
@@ -1889,6 +1962,8 @@ function markUnverified(corpus: Corpus, state: AnalysisState) {
   const all = computeMetrics(state.ideas)
   const allowed = allowedNumbers([all, ...state.themes.map((t) => t.metrics), ...state.groups.map((g) => g.metrics)], quotes(state.ideas.map((i) => i.id)))
   allowed.add(activeParticipants(corpus).length)
+  // L'équilibre des avis donné au résumé (méthode « consultation »).
+  for (const n of Object.values(opinionBalance(state))) allowed.add(n)
   allowed.add(state.ideas.length)
   allowed.add(state.themes.length)
   allowed.add(state.groups.length)
