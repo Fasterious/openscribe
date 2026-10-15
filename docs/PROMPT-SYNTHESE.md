@@ -11,7 +11,11 @@ contrôlées caractère par caractère, les chiffres ne sont plus calculés par 
 consigne ne redonne pas exactement le même rapport. La consigne demande donc au modèle de vérifier
 lui-même, et le lecteur doit contrôler par sondage quelques citations et quelques chiffres.
 
-Version 1 (14/10/2026). Évaluée sur ÉcoSol avec Opus 5.5 : voir `docs/METHODES.md`.
+Version 2 (15/10/2026). La version 1 a été évaluée sur ÉcoSol avec Opus 5.5 (voir `docs/METHODES.md`).
+La version 2 ajoute seulement les règles qui ont corrigé un défaut à chaque passe de l'Observatoire
+(ton jugé par rapport à l'objet, éloge et critique séparés, jugement partiel, échelle « de ceux qui en
+parlent »), corrige une contradiction sur « unanime », et demande le tableau de comptage en annexe :
+un modèle utilisé seul compte mieux quand il écrit ses listes, et le lecteur peut les vérifier.
 
 ---
 
@@ -33,13 +37,15 @@ PRINCIPES (non négociables)
   ni désapprouver.
 - Aucune citation n'est reformulée. Aucun chiffre n'est inventé ou estimé.
 
-Travaille en cinq étapes, dans l'ordre. Fais les étapes 1 à 4 pour toi (brouillon), puis écris
-seulement le rapport de l'étape 5.
+Travaille en cinq étapes, dans l'ordre. Les étapes 1, 2 et 4 restent ton brouillon ; le tableau de
+l'étape 3 est rendu en annexe du rapport (étape 5).
 
 ÉTAPE 1 — DÉCOUPER EN IDÉES ATOMIQUES (personne par personne, avec le même soin pour la dernière)
 1. Une idée = un seul objet et un seul ton. Une réponse contient souvent plusieurs idées.
-2. « C'est beau mais trop lent » donne deux idées. Une énumération d'objets (« la collaboration et le
-   processus de décision ») donne une idée par objet.
+2. Un éloge et une critique donnent toujours deux idées, chacune avec sa propre citation, même dans
+   une seule phrase : « Les chauffeurs sont aimables, mais les bus sont en retard » donne « Les
+   chauffeurs sont aimables » (positif) et « les bus sont en retard » (négatif). Une énumération
+   d'objets (« la collaboration et le processus de décision ») donne une idée par objet.
 3. Pour chaque idée : un libellé de 2 à 6 mots, générique ; une citation COPIÉE À L'IDENTIQUE,
    qui se comprend seule (si elle commence par « mais », « et », « sinon », « cela », prends aussi ce
    qui précède) ; la personne ; la question à laquelle elle répondait ; une catégorie :
@@ -47,9 +53,12 @@ seulement le rapport de l'étape 5.
    question (interrogation ouverte) · constat (fait sans jugement).
 4. La question posée donne le sens d'une réponse qui ne juge pas d'elle-même (« Les tarifs » en
    réponse à « quel est le principal problème ? » est négatif). Un jugement explicite l'emporte sur la
-   question. Une réserve reste avec ce qu'elle nuance (« je reviendrai, mais seulement si… ») et se
-   catégorise selon ce qu'elle dit de la situation actuelle. Lis l'ironie et le conditionnel.
-5. « Rien », « RAS », un merci, « idem » sans contenu : aucune idée. N'oublie rien, n'invente rien.
+   question. Une condition ou une limite reste avec ce qu'elle nuance (« je reviendrai, mais seulement
+   si… ») et se catégorise selon ce qu'elle dit de la situation actuelle. Lis l'ironie et le
+   conditionnel. Un jugement limité à une période ou à une personne (« le premier mois s'est bien
+   passé ») garde sa limite dans le libellé : ce n'est pas un bilan d'ensemble.
+5. « Rien », « RAS », un merci, « idem » sans contenu : aucune idée. Une idée qui ne répond pas à
+   l'objet de l'étude va dans « Hors question » : listée, jamais comptée. N'oublie rien, n'invente rien.
 
 ÉTAPE 2 — REGROUPER EN MOTIFS
 1. Un motif = UN objet sur lequel l'équipe pourrait agir d'un seul geste (« Délais de livraison »,
@@ -65,8 +74,15 @@ seulement le rapport de l'étape 5.
    isolée peut rester seule.
 5. Titre de 2 à 6 mots qui nomme l'objet, pas le jugement (« Vitesse de l'application », pas
    « Application trop lente »).
-6. Relis chaque motif : une idée qui ne parle pas de son objet change de motif ; un ton faux par
-   rapport à l'objet est corrigé.
+6. Relis chaque motif : une idée qui ne parle pas de son objet change de motif. Le ton se juge par
+   rapport à l'OBJET du motif, pas à la phrase :
+   - « faute de bus le soir, je prends la voiture » critique le bus : elle va avec le bus, pas avec la
+     voiture ; la raison d'avoir choisi un objet va avec cet objet ;
+   - dans une comparaison (« le bus est en retard, le tram est à l'heure »), chaque moitié va avec son objet ;
+   - regretter qu'une règle ou un service manque ou ne soit pas appliqué lui est favorable ;
+     réclamer davantage de ce que le motif regrette est une critique, pas un éloge.
+7. Ne découpe jamais un objet selon le jugement : si tu ranges les éloges d'un objet dans un motif,
+   ses critiques y vont aussi, sinon il paraîtra unanime à tort. Pas de motif « Choix de X » à côté de X.
 
 ÉTAPE 3 — COMPTER (comme le ferait un tableur, en listant les P)
 Pour chaque motif, liste les personnes qui le portent, puis : positifs (que du positif sur ce
@@ -81,7 +97,8 @@ chiffre à côté :
   grand, ou autant de mitigés que le camp le plus fort ;
 - peu d'avis : moins de 4 avis.
 Ajoute « fragile » si une seule voix changeant de camp changerait l'étiquette, et « à contre-courant »
-pour une minorité face à un courant net.
+pour une minorité face à un courant net. Ce tableau (motif, P positifs, P négatifs, P mitigés,
+étiquette) est rendu en annexe : les chiffres du rapport en viennent tous.
 
 ÉTAPE 4 — RASSEMBLER EN THÈMES
 Environ √(nombre de motifs) thèmes. Un thème rapproche des motifs voisins (même partie du service,
@@ -91,8 +108,11 @@ pas de thème défini par le ton. On n'additionne jamais les avis de motifs diff
 ÉTAPE 5 — LE RAPPORT (en français, Markdown)
 1. Résumé (6 à 9 phrases, trois paragraphes) : ce qui a marché ; ce qui a freiné ou divisé ; ce que
    demandent les participants et les questions qu'ils se posent. Un chiffre qualifie un motif entier,
-   jamais un détail porté par une seule personne. Pas d'« unanimité » ni de « tout le monde » : les
-   questions orientaient les réponses.
+   jamais un détail porté par une seule personne. L'étiquette s'entend toujours de ceux qui en parlent
+   (« unanime parmi les 24 qui en parlent », « une large majorité de ceux qui en parlent ») et porte sur
+   le ton, jamais sur un détail que tous ne disent pas. Jamais « tout le monde », « des personnes » ou
+   « beaucoup » : un nombre. Un motif d'appréciation d'ensemble ne se présente pas comme l'avis de la
+   plupart. Les questions orientaient les réponses : se taire n'est pas approuver.
 2. Ce qui a marché · Ce qui bloque · Ce qui divise · Ce que proposent les participants (avec deux
    citations chacun) · Questions soulevées : une ligne par motif, avec son chiffre et son étiquette.
 3. Les thèmes : une intro de 3 ou 4 phrases qui tranche (ce qui marche, ce qui freine, ce qui est
@@ -104,6 +124,7 @@ pas de thème défini par le ton. On n'additionne jamais les avis de motifs diff
 5. Signaux isolés : les motifs à une seule personne, en fin de rapport, sans les effacer.
 6. Méthode (5 lignes) : nombre de participants, d'idées, de motifs ; comment on compte ; la part
    des trois personnes qui écrivent le plus, si elle dépasse un tiers des idées.
+7. Annexe : le tableau de comptage de l'étape 3, et la liste « Hors question ».
 
 STYLE : un français direct, écrit d'emblée en français (pas de calque de l'anglais). Chaque phrase
 nomme son sujet ; jamais « Elles » ou « Enfin » en tête de phrase. Parle de personnes, pas de
@@ -112,7 +133,8 @@ lente », pas « inégale »).
 
 AVANT DE RENDRE, VÉRIFIE (et corrige) :
 - chaque citation figure mot pour mot dans les réponses ;
-- chaque nombre de personnes correspond à la liste des P cités ;
+- chaque nombre de personnes correspond à la liste des P du tableau ;
+- chaque éloge et chaque critique d'une même phrase sont deux idées ;
 - aucun motif « unanime » ne cache un avis contraire rangé ailleurs ;
 - aucune personne n'est comptée deux fois dans un même motif ;
 - le résumé ne contient aucun chiffre absent des motifs.
@@ -123,8 +145,11 @@ AVANT DE RENDRE, VÉRIFIE (et corrige) :
 ## Notes d'usage
 
 - **Réglages** : température 0 quand l'outil le permet ; une réflexion moyenne suffit.
-- **Taille** : jusqu'à une vingtaine de participants et une centaine de réponses, la consigne tient
-  en une demande. Au-delà, découper par lots de personnes (étape 1), puis donner les idées au
-  modèle pour les étapes suivantes.
+- **Taille** : évaluée sur une vingtaine de participants. Plus il y a de personnes, plus le comptage
+  fait par le modèle seul est fragile : au-delà d'une cinquantaine (ordre de grandeur, non mesuré),
+  tirer un échantillon, ou découper par lots de personnes (étape 1) puis donner les idées au modèle
+  pour les étapes suivantes.
+- **Ordre** : coller d'abord la consigne (objectif complété), puis les données dans le même message.
+- **Contrôle** : vérifier par sondage trois citations et deux lignes du tableau de comptage.
 - **Données sensibles** : remplacer les noms par P1, P2… avant de coller, et choisir un service qui
   n'entraîne pas ses modèles sur vos données.
