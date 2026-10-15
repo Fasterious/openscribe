@@ -108,7 +108,7 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Mise en ligne (hébergement statique)
 - ⏳ Module Entretiens et tests (transcription, vidéo synchronisée), puis Personas
 - ⏳ Stratégie d'acquisition (une fois l'expérience validée)
-- 🔄 L'Observatoire : première étude (école, Grand débat 2019) à 3/5, sous le seuil de 3,5 après 7 passes ; outil de publication prêt (`scripts/observatoire/publier.ts`) ; passe 8 (découpage refait) en cours
+- 🔄 L'Observatoire : première étude (école, Grand débat 2019) à 3/5, sous le seuil de 3,5 après 7 passes ; outil de publication prêt (`scripts/observatoire/publier.ts`) ; arrêtée par Arnaud après 7 passes (non publiée)
 
 ## Itération 7 — Offres gratuites et modèles locaux (13-14/10)
 

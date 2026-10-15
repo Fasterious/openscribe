@@ -343,9 +343,13 @@ Le découpage est repris du cache jusqu'à la passe 7, pour ne faire varier que 
 passe bute sur une ou deux idées limites, différentes d'une passe à l'autre ; aucune n'a changé le sens
 du rapport, plusieurs ont changé une étiquette. Les deux lectures de la passe 7 désignent la même
 cause profonde, hors de portée des relectures : **le découpage**, gardé du cache, absorbe des éloges
-dans la critique qui les suit quand elle porte sur un autre objet. Prochain levier : le découpage
-lui-même (passe 8), puis le traitement des motifs qui portent sur une règle (regretter qu'elle manque
-ou ne soit pas appliquée lui est favorable).
+dans la critique qui les suit quand elle porte sur un autre objet. Prochain levier, préparé mais non joué
+(Arnaud a arrêté après la passe 7) : le découpage lui-même. Le `methodologue` a trouvé une cause dans le
+code : le dédoublonnage retire une idée contenue dans une plus longue même de ton opposé, si bien qu'un
+éloge cité dans la critique qui le suit disparaît des comptes. La passe 8 (commit ecf1903, retiré en
+0da320b faute d'avoir été éprouvé) gardait deux avis opposés qui se recouvrent, séparait toujours éloge
+et critique, gardait un jugement partiel comme tel et nommait le regret d'une règle ; découpage par lots
+de 10 personnes et 6 000 caractères. À rejouer en premier sur la prochaine étude.
 
 Ce qui reste acquis, utile à toutes les études de l'Observatoire :
 - **Relecture des motifs** : une idée ne voit pas toujours le bon motif au premier tour (lots parallèles) :
