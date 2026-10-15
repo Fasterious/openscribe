@@ -354,21 +354,6 @@ describe('idées qui se recouvrent', () => {
     const r = await extractParticipant([corpus.contributions[0]], corpus.contributions[0].participantId, DEFAULT_SETTINGS, runner)
     expect(r.ideas.map((i) => i.label)).toEqual(['Long'])
   })
-
-  it('méthode « consultation » : un éloge et une critique qui se recouvrent restent deux avis, dans les deux ordres', async () => {
-    const c = { id: 'c1', participantId: 'P1', sourceId: 's', text: 'Les chauffeurs sont aimables, mais les bus sont toujours en retard.' }
-    const settings = { ...DEFAULT_SETTINGS, method: 'consultation' as const }
-    const runner = new LlmRunner({ label: 'x', fingerprint: { presetId: 'x', model: 'x', baseUrl: 'x' }, async complete() { return { text: '{}' } } }, new MemoryCache(), settings)
-    const praise = { ref: 'C1', label: 'Chauffeurs aimables', verbatim: 'Les chauffeurs sont aimables', category: 'positive' as const }
-    const critique = { ref: 'C1', label: 'Retards des bus', verbatim: c.text, category: 'negative' as const }
-    for (const ideas of [[praise, critique], [critique, praise]]) {
-      const r = await extractParticipant([c], 'P1', settings, runner, { ideas, names: [] })
-      expect(r.ideas.map((i) => i.category).sort()).toEqual(['negative', 'positive'])
-    }
-    // La référence garde la plus longue (comportement inchangé).
-    const ref = await extractParticipant([c], 'P1', DEFAULT_SETTINGS, runner, { ideas: [praise, critique], names: [] })
-    expect(ref.ideas.map((i) => i.label)).toEqual(['Retards des bus'])
-  })
 })
 
 describe('sources multiples', () => {
@@ -999,9 +984,8 @@ describe('méthode « consultation » (Observatoire)', () => {
     expect(c.seen.summarize).toContain('Format de "opposed"')
     expect(c.seen.summarize).toContain('Ne montre pas tes comptes')
     expect(ref.seen.summarize).not.toContain('Ne montre pas tes comptes')
-    // Passe 8 : le découpage a ses propres règles (réserve sur un autre objet, jugement partiel, regret d'une règle) ; la référence n'en a aucune.
-    expect(c.seen.extract).toContain('Un éloge suivi d\'une critique, ou l\'inverse')
-    expect(ref.seen.extract).not.toContain('Un éloge suivi d\'une critique, ou l\'inverse')
+    // Le découpage ne change pas : l'extraction déjà en cache reste valable.
+    expect(c.seen.extract).toBe(ref.seen.extract)
   })
 
   it('le mot de l’échelle accompagne le chiffre ; un camp unanime se dit « les 24 »', () => {
