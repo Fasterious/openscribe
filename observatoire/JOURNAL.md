@@ -2,7 +2,7 @@
 
 ## À REGARDER
 
-- 2026-10-15 · École : passes 3 à 7 faites (méthode « consultation » affinée, voir docs/METHODES.md). Toujours 3/5 avec plafond, langue 3,5. Le plafond tombe chaque fois sur une ou deux idées limites, différentes d'une passe à l'autre ; la cause commune est le découpage, gardé du cache. Passe 8 : découpage refait (lots de 10 personnes). Avant toute publication : régénérer le résumé de fiche.json avec les chiffres de la passe retenue (il date de la passe 1).
+- 2026-10-15 · École : passes 3 à 7 faites (méthode « consultation » affinée, voir docs/METHODES.md). Toujours 3/5 avec plafond, langue 3,5. Le plafond tombe chaque fois sur une ou deux idées limites, différentes d'une passe à l'autre ; la cause commune est le découpage, gardé du cache. Passe 8 (découpage refait) préparée puis non jouée : Arnaud a arrêté les passes le 15/10. Étude non publiée ; à reprendre en rejouant la passe 8 (docs/METHODES.md). Avant toute publication : régénérer le résumé de fiche.json (il date de la passe 1).
 
 - 2026-10-14 · École (Grand débat 2019) **non publiée** : note méthode 3/5 (seuil 3,5). À corriger dans le moteur, pas dans le rapport :
   1. ton jugé par rapport à l'objet du motif (« Enseignement privé » : les critiques du public comptées contre le privé) ;
