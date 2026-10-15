@@ -16,6 +16,9 @@ La version 2 ajoute seulement les règles qui ont corrigé un défaut à chaque 
 (ton jugé par rapport à l'objet, éloge et critique séparés, jugement partiel, échelle « de ceux qui en
 parlent »), corrige une contradiction sur « unanime », et demande le tableau de comptage en annexe :
 un modèle utilisé seul compte mieux quand il écrit ses listes, et le lecteur peut les vérifier.
+Essai de la version 2 avec Sonnet, une passe, sur le questionnaire fictif de la médiathèque
+(12 personnes) : 46 citations sur 46 exactes, tableau de comptage rendu et juste sur sondage. Ce n'est
+pas une évaluation : la version 2 n'a pas été notée sur un corpus réel ni sur plus de 12 personnes.
 
 ---
 
