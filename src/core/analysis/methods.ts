@@ -47,12 +47,8 @@ export interface Method {
   compactDivided?: boolean
   /** Lignes de "strengths" et de "blockers" données au résumé (6 par défaut). */
   summaryLines?: number
-  /** Vérification des unanimités : seules les candidates qui nomment un mot distinctif du titre du motif (moins de 7 % des idées) sont soumises. */
-  unanimityLexical?: boolean
   /** Résumé : équilibre des critiques et des satisfactions dans "facts", exemple pris dans la synthèse du motif, lignes oubliées et « fragile » signalés à la vérification des renvois. */
   summaryChecks?: boolean
-  /** Après le rangement, les motifs qui porteront le résumé sont relus pour le seul ton, idée par idée. */
-  summaryToneReview?: boolean
 }
 
 const REFERENCE: Method = {
@@ -178,12 +174,9 @@ export const METHODS: Record<MethodId, Method> = {
     // Methodologue, passe 3 : propositions du résumé réduites à des rubriques ; un sujet unanime de 19 personnes absent du résumé.
     globalContext: true,
     summaryLines: 8,
-    // Methodologue, passe 4 : le privé dit unanime alors que ses critiques étaient rangées dans un autre motif ; deux freins et « fragile » oubliés au résumé ; exemple du résumé à contresens.
-    unanimityReview: true,
-    unanimityLexical: true,
+    // Methodologue, passe 4 : deux freins et « fragile » oubliés au résumé ; exemple du résumé à contresens.
     summaryChecks: true,
-    // Methodologue, passe 6 : un regret de la disparition d'un objet compté contre lui, sur un motif du résumé (plafond).
-    summaryToneReview: true,
+    // Retirés le 15/10 (aucun effet mesuré en trois passes) : vérification des unanimités, relecture des tons des motifs du résumé.
     extraRules: {
       grouping: `6. Une idée qui ne répond pas à l'objet de l'étude (elle parle d'un tout autre sujet) va dans le groupe « ${OFF_TOPIC} », sans autre titre : elle sera gardée et listée, mais ni comptée ni résumée. Une idée qui touche l'objet de l'étude, même de loin, n'y va jamais.
 7. Une idée qui critique un objet pour expliquer le recours à un autre (« faute de bus le soir, je prends la voiture ») juge le premier : elle va avec l'objet critiqué (le bus), pas avec l'objet choisi (la voiture). Range ensemble ce qui juge un même objet.`,
@@ -196,13 +189,10 @@ export const METHODS: Record<MethodId, Method> = {
 11. Un objet ne se découpe pas selon le jugement : quand tu déplaces les éloges d'un objet vers son motif (existant ou nouveau), déplace-y aussi les critiques qui jugent ce même objet, sinon ce motif paraîtra unanime à tort. Sauf une critique qui juge l'autre objet, pour expliquer un choix ou dans une comparaison (règles 7 et 9) : elle reste avec l'objet critiqué.
 12. N'ouvre pas de motif « Choix de X » à côté d'un motif sur X : les raisons de choisir le covoiturage vont dans « Covoiturage ».
 13. Défendre davantage de ce que les autres idées du motif regrettent de ne pas avoir (dans « Fréquence des contrôles », où l'on regrette des contrôles trop rares : « un contrôle strict, même pénible, ça marche ») n'est pas un éloge de l'objet tel qu'il est : c'est une critique ("negative") ou une proposition ("suggestion").`,
-      unanimity: `4. Une candidate qui critique un objet pour expliquer le choix d'un autre (« faute de bus, je prends la voiture »), ou qui compare deux objets (« le bus est en retard, alors que le tram est à l'heure »), juge l'objet qu'elle critique : ne la déplace jamais vers le motif de l'objet choisi ou loué.`,
       summary: `9. Format de "opposed" : [{"a":"I0012","b":"I0040","about":"le prix de l'adhésion"}], "a" et "b" étant les identifiants des deux propositions.
 10. Ne montre pas tes comptes : pas de « dont une des précédentes », « dont deux déjà citées », « parmi elles » (cette règle remplace l'exemple de la règle 7). Chaque affirmation donne son propre nombre de personnes ; le lecteur retrouve les personnes dans les renvois.
 11. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un motif (le lecteur comprendrait « la plupart des répondants ») ; écris le nombre de personnes, ou « la plupart de ceux qui en parlent » quand l'objet est nommé plus tôt dans la même phrase (sinon « la plupart de ceux qui parlent des horaires »). Jamais « des personnes » ni « beaucoup » : un nombre ou un mot de l'échelle. Nombres en chiffres, en lettres seulement en tête de phrase. Au plus un point-virgule par phrase.
-12. Un motif d'une seule personne se dit en une phrase, avec un seul crochet (cette règle remplace « 2 à 4 phrases »).
-13. La phrase suivante ne redit jamais la première : si la première annonce le constat, la suivante apporte un détail nouveau ou un autre camp, avec d'autres renvois. Varie l'ouverture d'un motif à l'autre : pas toujours « Toutes les personnes qui… » ni « Ceux qui parlent de… ».
-14. Quand les avis sont partagés, chaque camp a sa phrase, avec son nombre de personnes et ce qu'il dit de concret ; le camp le plus nombreux d'abord.`,
+12. Un motif d'une seule personne se dit en une phrase, avec un seul crochet (cette règle remplace « 2 à 4 phrases »).`,
       themes: `4. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un groupe ; écris le nombre de personnes, ou « la plupart de ceux qui parlent de… » avec l'objet nommé dans la phrase.
 5. La synthèse du thème relie ses groupes : ce qu'ils ont en commun, ce qui les distingue. Elle ne recopie aucune phrase d'une synthèse de groupe, même reformulée de près : le lecteur les lit juste en dessous. Aucun lien de cause que les participants n'ont pas formulé.`,
       polish: `7. Cette règle remplace l'exemple de la règle 5. Pour attribuer un constat, ne remplace jamais un nombre ou un mot de l'échelle déjà écrit, et n'écris pas « des personnes » : reprends le sujet déjà nommé dans le texte (« ces 6 personnes », « ceux qui parlent des horaires »). « Ceux qui en parlent » suppose l'objet nommé plus tôt dans la phrase.`,

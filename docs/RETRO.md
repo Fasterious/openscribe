@@ -2,6 +2,12 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-15 — Bilan de l'autonomie (passes 4 à 7), demandé par Arnaud
+
+- **Résultat honnête** : beaucoup de passes, pas d'amélioration significative de la note ; quatre vrais défauts du code trouvés et corrigés, et le diagnostic (le découpage) arrivé trop tard.
+- **Coût** : de l'ordre de 20 millions de jetons de sous-agents (estimation), surtout pour jouer le moteur à chaque passe.
+- **On change** : trois passes au plus, deux lectures dès la première, arrêt et remontée en amont sans gain net ; on retire les règles qui n'ont rien prouvé (fait : 77 lignes de méthode et de code en moins).
+
 ## 2026-10-15 — Observatoire, école : passes 3 à 7
 
 **Ce qui a marché**

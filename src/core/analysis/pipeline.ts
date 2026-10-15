@@ -773,7 +773,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       return (start > 160 ? prev.slice(prev.indexOf(' ') + 1) : prev).trim() || undefined
     }
     // Un tour de relecture sur les motifs donnés ; `arrived` : idées déplacées au tour précédent, à vérifier d'abord.
-    const reviewRound = async (scope: Group[], arrived?: Set<string>, toneFocus = false) => {
+    const reviewRound = async (scope: Group[], arrived?: Set<string>) => {
       const titles = groups.map((g) => ({ id: g.id, title: g.title }))
       const batches: Group[][] = []
       let cur: Group[] = []
@@ -791,7 +791,6 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
             reviewPrompt(
               {
                 titles,
-                ...(toneFocus ? { toneFocus } : {}),
                 groups: batch.map((g) => ({
                   id: g.id,
                   title: g.title,
@@ -847,31 +846,12 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       }
     }
 
-    // Méthode qui le demande : les motifs qui porteront le résumé (forces, freins, ce qui divise) sont relus pour le seul ton,
-    // idée par idée, par rapport à leur objet. Une erreur de ton y change une conclusion ; ailleurs, elle ne change qu'un détail.
-    if (methodOf(state.settings).summaryToneReview) {
-      const lines = methodOf(state.settings).summaryLines ?? 6
-      const h = highlights(groups, ideaById)
-      const ids = new Set([...h.strengths.slice(0, lines), ...h.blockers.slice(0, lines), ...h.divided.slice(0, 3)].map((x) => x.groupId))
-      const scope = groups.filter((g) => ids.has(g.id))
-      if (scope.length) {
-        s.message = 'Relecture des tons des motifs du résumé'
-        await emit()
-        // Seules les corrections de ton passent : le rangement a déjà été relu deux fois.
-        const tones = (await reviewRound(scope, undefined, true)).filter((c) => c.category).map((c) => ({ id: c.id, category: c.category }))
-        const toned = applyReview(state.ideas, groups, tones)
-        state.retoned = [...(state.retoned ?? []), ...toned.retoned]
-        if (toned.retoned.length) groups = takeOffTopic(build(toned.groups))
-      }
-    }
     s.message = undefined
   }
 
   // Méthode qui le demande : un motif unanime (ou presque) est confronté aux idées de ton contraire rangées ailleurs.
   if (!grid.length && methodOf(state.settings).unanimityReview && groups.length > 1) {
-    const unchecked: string[] = []
-    const motifs = unanimityCheck(groups, state.ideas, methodOf(state.settings).unanimityLexical === true, unchecked)
-    if (unchecked.length) state.unanimityUnchecked = unchecked
+    const motifs = unanimityCheck(groups, state.ideas)
     if (motifs.length) {
       s.message = 'Vérification des unanimités'
       await emit()
@@ -904,24 +884,8 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
 export function unanimityCheck(
   groups: Group[],
   ideas: Idea[],
-  lexical = false,
-  /** Rempli des titres de motifs que le filtre lexical n'a pas pu vérifier (aucun mot distinctif). */
-  unchecked: string[] = [],
 ): (Omit<UnanimityInput['motifs'][number], 'candidates'> & { candidates: UnanimityInput['pool'] })[] {
   const byId = new Map(ideas.map((i) => [i.id, i]))
-  // `lexical` : une candidate doit nommer un mot distinctif du titre (« privé » dans « Enseignement privé ») ; un mot que portent
-  // plus de 7 % des idées (« enseignement ») ne distingue rien. Sans mot distinctif, le motif n'est pas vérifié.
-  const fold = (t: string) => t.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
-  const texts = new Map(ideas.map((i) => [i.id, fold(`${i.label} ${i.verbatim}`)]))
-  // En début de mot : « privé » ne doit pas répondre à « on nous prive ».
-  const startsWord = (t: string, st: string) => new RegExp(`(?<![\\p{L}])${st}`, 'u').test(t)
-  const stems = (title: string) =>
-    (fold(title).match(/\p{L}{4,}/gu) ?? [])
-      .map((w) => w.slice(0, 6))
-      .filter((st) => [...texts.values()].filter((t) => startsWord(t, st)).length <= ideas.length * 0.07)
-  const ownStems = new Map(lexical ? groups.map((g) => [g.id, stems(g.title)] as const) : [])
-  if (lexical) for (const g of groups) if (!ownStems.get(g.id)?.length && (g.metrics.stance === 'unanimous' || g.metrics.stance === 'consensus')) unchecked.push(g.title)
-  const names = (g: Group, i: Idea) => !lexical || (ownStems.get(g.id) ?? []).some((st) => startsWord(texts.get(i.id)!, st))
   const home = new Map(groups.flatMap((g) => g.ideaIds.map((id) => [id, g] as const)))
   const opinions = (g: Group) => g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
   return groups
@@ -938,7 +902,7 @@ export function unanimityCheck(
           .filter((i) => i.category === side)
           .map((i) => ({ id: i.id, label: i.label, verbatim: shortExample(i.verbatim, 160) })),
         candidates: ideas
-          .filter((i) => i.category === opposite && home.get(i.id) && home.get(i.id) !== g && names(g, i))
+          .filter((i) => i.category === opposite && home.get(i.id) && home.get(i.id) !== g)
           .map((i) => ({ id: i.id, motif: home.get(i.id)!.title, tone: opposite, label: i.label, verbatim: shortExample(i.verbatim, 160) })),
       }
     })

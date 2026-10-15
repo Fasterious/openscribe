@@ -371,8 +371,6 @@ ${dataBlock(input)}`,
 export interface ReviewInput {
   /** Tous les motifs, pour pouvoir y déplacer une idée. */
   titles: { id: string; title: string }[]
-  /** Relecture du seul ton (motifs qui portent le résumé). */
-  toneFocus?: boolean
   groups: {
     id: string
     title: string
@@ -395,8 +393,6 @@ export const reviewSchema = z.object({
 
 /** Seconde relecture : les idées marquées "arrived" viennent d'un autre motif, on les vérifie d'abord. */
 function arrivedRule(input: ReviewInput): string {
-  if (input.toneFocus)
-    return `Ces motifs portent le résumé de l'étude : relis le ton de CHAQUE idée par rapport à l'objet du motif, et ne renvoie que des corrections de catégorie. Regretter la disparition, l'affaiblissement ou le non-respect de l'objet lui est favorable (dans « Ligne de bus 12 », « depuis qu'on a supprimé la ligne, plus moyen d'aller au marché » est un avis positif sur la ligne). Réclamer davantage de ce que le motif regrette est une critique ou une proposition. Une idée qui dit du bien et du mal du même objet garde le ton de ce qu'elle dit d'abord.\n`
   if (!input.groups.some((g) => g.ideas.some((i) => i.arrived))) return ''
   return `Les idées marquées "arrived" viennent d'être déplacées dans ce motif, parfois faute de mieux : la liste des motifs a changé depuis. Vérifie chacune d'abord. Si elle parle d'un autre objet que celui du motif, déplace-la vers le motif de cet objet (existant ou nouveau). Si elle parle bien de l'objet du motif, juge son ton par rapport à lui : un éloge d'un autre objet n'est pas un avis positif sur celui-ci.\n`
 }

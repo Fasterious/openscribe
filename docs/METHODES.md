@@ -32,7 +32,7 @@ avant d'être gardés : aucun effet sur une réponse saine.
 | `gptoss` | gpt-oss 20B sur l'ordinateur (Ollama) | réflexion moyenne ; lots 100/50, synthèses par 10, relecture par 4 ; exemple neutre | arrêté : aucune synthèse complète sur un Mac de 24 Go |
 | `gemma` | Gemma 4 12B sur l'ordinateur (Ollama) | apports de Gemini (isolés rattachés, règles de titre et de rédaction), titres fourre-tout interdits, lots 150/75 | 3 / — (passe 2) ; sous le seuil, retiré des choix |
 | `gemini` | Gemini 3.5 et 3.1 Flash-Lite, 3.8 Flash (Google, offre gratuite) | rattachement des motifs isolés ; règles ajoutées : titres de motif sans « et » ni remplissage, « range d'abord », phrases autonomes, compte = personnes citées | 3,5 / 2,5 (passe 4) |
-| `consultation` | Opus 5.5 (Observatoire : consultations publiques, grand public) | « Hors question » ; ton jugé par rapport à l'objet du motif (raison d'un choix, comparaison, regret d'une limite) ; seconde relecture des motifs qui ont reçu une idée ; unanimités vérifiées (filtre lexical) ; relecture des tons des motifs du résumé ; résumé : équilibre des avis, 8 lignes, mot de l'échelle « de ceux qui en parlent », lignes oubliées signalées ; phrases du code en une phrase | École (Grand débat) : 3 / 3,5 (passes 3 à 7, plafond) |
+| `consultation` | Opus 5.5 (Observatoire : consultations publiques, grand public) | « Hors question » ; ton jugé par rapport à l'objet du motif (raison d'un choix, comparaison, regret d'une limite) ; seconde relecture des motifs qui ont reçu une idée ; résumé : équilibre des avis, 8 lignes, mot de l'échelle « de ceux qui en parlent », lignes oubliées signalées ; phrases du code en une phrase | École (Grand débat) : 3 / 3,5 (passes 3 à 7, plafond) |
 
 ## Ministral 14B sur ÉcoSol — 13/10/2026
 
@@ -371,3 +371,19 @@ Questions pour Arnaud (décisions de méthode) :
   change pas ? Les lectures divergent (passe 6). La grille ne tranche pas ; non changée.
 - Contrôle « toutes les personnes » : il exige que tous soient cités, et la vérification des renvois
   remplace alors un vrai « toutes » (motif unanime) par un sous-compte. À revoir pour les motifs unanimes.
+
+### Bilan et allègement (15/10/2026, à la demande d'Arnaud)
+
+Sept passes pour aucun gain prouvé de la note : moyennes de 3,25 à 3,67, dans le bruit de l'évaluateur ;
+langue à 3,5 de bout en bout. Les passes 4 à 7 (de l'ordre de 20 millions de jetons de sous-agents, estimation)
+ont corrigé chaque fois le cas signalé sans lever le plafond, parce que la cause était en amont (le découpage).
+
+Retiré de la méthode « consultation », faute d'effet mesuré : la vérification des unanimités et son filtre
+lexical (trois passes sans un seul déplacement, pour une demande de 110 Ko), la relecture des tons des motifs
+du résumé (trois idées corrigées, aucun plafond levé), et deux règles de synthèse (phrase-chapeau, une phrase
+par camp : la langue n'a pas bougé). Gardé : ce qui a corrigé un défaut observé et ne coûte presque rien
+(seconde relecture des arrivées, règles de ton par rapport à l'objet, contrôles du résumé, phrase du code
+sur ce qui divise, règle contre « des personnes ») et tous les correctifs du code.
+
+Leçon, devenue règle dans `CLAUDE.md` : trois passes au plus pour prouver une amélioration, deux lectures
+dès la première ; sans gain net, on s'arrête, on remonte en amont et on retire ce qu'on a ajouté.

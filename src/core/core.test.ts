@@ -763,25 +763,6 @@ describe('chaîne complète (simulation)', () => {
     expect(unanimityCheck([group('G1', ['I1', 'I2']), group('G2', ['I4'])], ideas)).toEqual([])
   })
 
-  it('vérification des unanimités, filtre lexical : seule une candidate qui nomme un mot distinctif du titre est soumise', () => {
-    const idea = (id: string, p: string, category: IdeaCategory, verbatim: string) => ({ id, participantId: p, category, label: '', verbatim }) as unknown as Idea
-    const filler = Array.from({ length: 100 }, (_, k) => idea(`F${k}`, `Q${k}`, 'suggestion', 'il faudrait plus de bus le soir'))
-    const ideas = [
-      idea('I1', 'P1', 'positive', 'le covoiturage est pratique'),
-      idea('I2', 'P2', 'positive', 'covoiturage très utile'),
-      idea('I3', 'P3', 'positive', 'vive le covoiturage'),
-      idea('I6', 'P6', 'positive', 'pratique, ce covoiturage'),
-      idea('I4', 'P4', 'negative', 'le covoiturage est mal organisé'),
-      idea('I5', 'P5', 'negative', 'le bus est toujours en retard'),
-      ...filler,
-    ]
-    const group = (id: string, title: string, ids: string[]): Group => ({ id, title, ideaIds: ids, summary: '', metrics: computeMetrics(ids.map((x) => ideas.find((i) => i.id === x)!)) })
-    const groups = [group('G1', 'Covoiturage du bus', ['I1', 'I2', 'I3', 'I6']), group('G2', 'Horaires', ['I4', 'I5', ...filler.map((f) => f.id)])]
-    // « bus » est trop court et trop courant pour distinguer ; « covoiturage » distingue : I4 est soumise, pas I5.
-    expect(unanimityCheck(groups, ideas, true).map((m) => m.candidates.map((c) => c.id))).toEqual([['I4']])
-    expect(unanimityCheck(groups, ideas).map((m) => m.candidates.map((c) => c.id))).toEqual([['I4', 'I5']])
-  })
-
   it('vérification des unanimités : seul un déplacement vers le motif vérifié, d’une de ses candidates, est appliqué', () => {
     const ideas = [
       { id: 'I1', participantId: 'P1', category: 'positive' },
