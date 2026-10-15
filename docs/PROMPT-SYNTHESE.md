@@ -19,6 +19,14 @@ un modèle utilisé seul compte mieux quand il écrit ses listes, et le lecteur 
 Essai de la version 2 avec Sonnet, une passe, sur le questionnaire fictif de la médiathèque
 (12 personnes) : 46 citations sur 46 exactes, tableau de comptage rendu et juste sur sondage. Ce n'est
 pas une évaluation : la version 2 n'a pas été notée sur un corpus réel ni sur plus de 12 personnes.
+Essai sur corpus réel (15 octobre 2026) : Sonnet, une passe, sur les 378 réponses de l'Observatoire
+(école). 173 citations sur 175 exactes (deux reformulations mises entre guillemets), comptes du résumé
+identiques au tableau de comptage. Deux lectures `methodologue` indépendantes : 3/5 chacune, plafond
+appliqué, comme l'application sur le même corpus. Défauts : sur la carte scolaire, ceux qui veulent
+qu'on l'applique et ceux qui veulent la supprimer sont mêlés dans les deux camps ; un motif à deux
+positions contraires étiqueté « unanime » ; quelques éloges absorbés dans des critiques ; listes de
+propositions qui changent entre le résumé et la section. ÉcoSol n'a pas pu être testé (corpus absent
+de la session). La consigne reste en version 2 : pas de passe supplémentaire.
 
 ---
 
@@ -148,11 +156,11 @@ AVANT DE RENDRE, VÉRIFIE (et corrige) :
 ## Notes d'usage
 
 - **Réglages** : température 0 quand l'outil le permet ; une réflexion moyenne suffit.
-- **Taille** : évaluée sur une vingtaine de participants. Plus il y a de personnes, plus le comptage
+- **Taille** : évaluée sur une vingtaine de participants et sur 378 (même niveau que l'application). Plus il y a de personnes, plus le comptage
   fait par le modèle seul est fragile : au-delà d'une cinquantaine (ordre de grandeur, non mesuré),
   tirer un échantillon, ou découper par lots de personnes (étape 1) puis donner les idées au modèle
   pour les étapes suivantes.
 - **Ordre** : coller d'abord la consigne (objectif complété), puis les données dans le même message.
-- **Contrôle** : vérifier par sondage trois citations et deux lignes du tableau de comptage.
+- **Contrôle** : vérifier par sondage trois citations et deux lignes du tableau de comptage ; sur un motif qui oppose deux camps, vérifier que chaque camp ne réunit qu'une seule position, et que les P des propositions sont les mêmes au résumé et dans la section.
 - **Données sensibles** : remplacer les noms par P1, P2… avant de coller, et choisir un service qui
   n'entraîne pas ses modèles sur vos données.
