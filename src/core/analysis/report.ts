@@ -91,6 +91,10 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
         `Relecture des motifs par le moteur d'IA : ${[moved && pl(moved, 'idée déplacée vers le motif dont elle parle vraiment', 'idées déplacées vers le motif dont elles parlent vraiment'), retoned && pl(retoned, "idée changée de camp après un nouvel examen de son ton au regard de l'objet du motif", "idées changées de camp après un nouvel examen de leur ton au regard de l'objet du motif")].filter(Boolean).join(' ; ')}. Une personne n'est « mitigée » que si elle dit du bien et du mal du même objet.`,
       )
   }
+  if (state.copied?.length)
+    lines.push(
+      `Codage en double, à la demande du chercheur : ${state.copied.length} idée${state.copied.length > 1 ? 's' : ''} qui satisf${state.copied.length > 1 ? 'ont' : 'ait'} la définition de deux motifs ${state.copied.length > 1 ? 'comptent' : 'compte'} dans les deux (la citation figure sous chacun, avec la mention « aussi dans »). Chaque motif compte des personnes, aucune deux fois.`,
+    )
   if (state.groups.some((g) => g.definition))
     lines.push(
       `Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme favorable, défavorable ou hors camp. Cette définition figure sous le titre du motif ; les camps d'avis s'y conforment, et le lecteur peut la contester.${state.reconciled?.pairs || state.reconciled?.merges ? ` Le livre de codes a ensuite été relu d'un bloc : ${[state.reconciled.pairs && `${state.reconciled.pairs} paire${state.reconciled.pairs > 1 ? 's' : ''} de motifs voisins relue${state.reconciled.pairs > 1 ? 's' : ''} ensemble avec une règle de partage`, state.reconciled.merges && `${state.reconciled.merges} fusion${state.reconciled.merges > 1 ? 's' : ''} de motifs qui traitaient le même objet`].filter(Boolean).join(' ; ')}.` : ''}`,
@@ -659,6 +663,9 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
   }
   const sizeOf = motifSizes(state)
   const prose = (t: string) => refsToPeople(v.text(t), byId, undefined, sizeOf)
+  // Codage en double : la copie dit sous quel autre motif la même citation figure.
+  const titleOfIdea = new Map(state.groups.flatMap((g) => g.ideaIds.map((id) => [id, g.title] as const)))
+  const alsoIn = (i: Idea) => (i.copyOf ? titleOfIdea.get(i.copyOf) : undefined)
   if (state.globalSummary) out.push('## Résumé', '', prose(state.globalSummary), '')
   warn(state.globalUnverified)
 
@@ -699,7 +706,7 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
         const quotes = line.ideas.map((i) => {
           const q = v.question(i)
           const ctx = full.has(i.id) ? v.context(i) : undefined
-          const origin = [q, ctx && `en réponse à « ${ctx} »`].filter(Boolean).join(', ')
+          const origin = [q, ctx && `en réponse à « ${ctx} »`, alsoIn(i) && `aussi dans « ${alsoIn(i)} »`].filter(Boolean).join(', ')
           // Un retour à la ligne dans une citation casserait la liste : il devient « / », les mots restent les mêmes.
           return `« ${v.text(i.verbatim).replace(/\s*\n+\s*/g, ' / ')} »${origin ? ` *(${origin})*` : ''}`
         })
@@ -747,6 +754,8 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
   const parts: string[] = []
   // Un texte rédigé peut compter plusieurs paragraphes (le résumé en trois temps).
   const sizeOf = motifSizes(state)
+  const titleOfIdea = new Map(state.groups.flatMap((g) => g.ideaIds.map((id) => [id, g.title] as const)))
+  const alsoIn = (i: Idea) => (i.copyOf ? titleOfIdea.get(i.copyOf) : undefined)
   // Chaque référence d'une synthèse devient le code du participant, relié à son verbatim (survol : la citation).
   const link = (who: string, i: Idea) => `<a href="#${e(i.id)}" title="« ${e(v.text(i.verbatim))} »">${e(who)}</a>`
   const para = (text: string) =>
@@ -789,7 +798,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
                 .map((i) => {
                   const q = v.question(i)
                   const ctx = full.has(i.id) ? v.context(i) : undefined
-                  const origin = [q, ctx && `en réponse à « ${ctx} »`].filter(Boolean).join(', ')
+                  const origin = [q, ctx && `en réponse à « ${ctx} »`, alsoIn(i) && `aussi dans « ${alsoIn(i)} »`].filter(Boolean).join(', ')
                   return `<span id="${e(i.id)}">« ${e(v.text(i.verbatim))} »</span>${origin ? ` <span class="origin">${e(origin)}</span>` : ''}`
                 })
                 .join(' ; ')}</li>`,

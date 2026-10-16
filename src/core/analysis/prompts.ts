@@ -399,6 +399,8 @@ export const reviewSchema = z.object({
       id: z.string(),
       to: z.string().optional(),
       new: z.string().optional(),
+      /** Codage en double (option) : l'idée compte aussi dans ce motif, par une copie. */
+      also: z.string().optional(),
       category: z.enum(['positive', 'negative', 'neutral', 'suggestion', 'question']).optional(),
     }),
   ),
@@ -408,6 +410,12 @@ export const reviewSchema = z.object({
 function arrivedRule(input: ReviewInput): string {
   if (!input.groups.some((g) => g.ideas.some((i) => i.arrived))) return ''
   return `Les idées marquées "arrived" viennent d'être déplacées dans ce motif, parfois faute de mieux : la liste des motifs a changé depuis. Vérifie chacune d'abord. Si elle parle d'un autre objet que celui du motif, déplace-la vers le motif de cet objet (existant ou nouveau). Si elle parle bien de l'objet du motif, juge son ton par rapport à lui : un éloge d'un autre objet n'est pas un avis positif sur celui-ci.\n`
+}
+
+/** Codage en double (option du chercheur) : une idée qui satisfait deux définitions compte dans les deux motifs, par une copie. */
+function multiRule(settings: AnalysisSettings): string {
+  if (!settings.multiCoding) return ''
+  return `Codage en double. Une idée qui satisfait la définition de DEUX motifs (la cause chez l'un, l'effet chez l'autre : « 40 km par jour à cause du regroupement scolaire » juge l'éloignement de l'école et le regroupement) compte dans les deux : {"id":"I0042","also":"G7","category":"negative"} ajoute une copie dans G7, avec le ton jugé par rapport à G7 ; l'idée reste dans son motif. Deux motifs au plus par idée, et seulement quand les deux définitions la réclament : dans le doute, un seul motif.\n`
 }
 
 /** Réconciliation : deux motifs voisins relus ensemble, avec la règle qui dit où va chaque sorte d'idée. */
@@ -428,7 +436,7 @@ Règles :
 3. Si le ton d'une idée est faux par rapport à l'objet de son motif, corrige sa catégorie ({"id":"I0044","category":"negative"}) : dans « Prix de l'abonnement », « heureusement que la qualité suit » sous-entend que le prix est élevé. Une proposition est "suggestion".
 4. Un titre de nouveau motif nomme l'objet, jamais le jugement (pas « Points forts », « Critiques ») ; 2 à 6 mots, sans « et ». Réutilise le même titre pour plusieurs idées qui vont ensemble.
 5. Ne renvoie que les changements. Dans le doute, ne change rien : la plupart des idées sont bien rangées.
-${methodRules(settings, 'review')}${arrivedRule(input)}${sharedRule(input)}${lang(settings)}
+${methodRules(settings, 'review')}${arrivedRule(input)}${sharedRule(input)}${multiRule(settings)}${lang(settings)}
 
 Réponds avec : {"changes":[…]}
 

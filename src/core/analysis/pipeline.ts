@@ -503,6 +503,9 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   state.retoned = []
   state.moved = []
   state.offTopic = []
+  // Codage en double : les copies d'un regroupement précédent sont refaites avec lui.
+  state.ideas = state.ideas.filter((i) => !i.copyOf)
+  state.copied = []
   s.state = 'running'
   s.done = 0
   await emit()
@@ -848,10 +851,12 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
         }
       return responses.flatMap((r) => r.changes)
     }
-    const reviewed = applyReview(state.ideas, groups, await reviewRound(groups))
+    const multi = { multiCoding: state.settings.multiCoding === true }
+    const reviewed = applyReview(state.ideas, groups, await reviewRound(groups), multi)
     state.retoned = reviewed.retoned
     state.moved = reviewed.moved
-    if (reviewed.retoned.length || reviewed.moved.length) groups = takeOffTopic(build(reviewed.groups))
+    state.copied = [...(state.copied ?? []), ...reviewed.copied]
+    if (reviewed.retoned.length || reviewed.moved.length || reviewed.copied.length) groups = takeOffTopic(build(reviewed.groups))
 
     // Méthode qui le demande : les motifs qui ont reçu une idée sont relus une seconde fois, avec la liste à jour des motifs.
     // Au premier tour, chaque lot ne connaît que les motifs d'avant : un motif ouvert par un autre lot lui échappe,
@@ -862,10 +867,11 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       if (scope.length) {
         s.message = 'Seconde relecture des motifs'
         await emit()
-        const second = applyReview(state.ideas, groups, keepForward(await reviewRound(scope, arrived), reviewed.moved, groups))
+        const second = applyReview(state.ideas, groups, keepForward(await reviewRound(scope, arrived), reviewed.moved, groups), multi)
         state.retoned = [...state.retoned, ...second.retoned]
         state.moved = [...state.moved, ...second.moved]
-        if (second.retoned.length || second.moved.length) groups = takeOffTopic(build(second.groups))
+        state.copied = [...(state.copied ?? []), ...second.copied]
+        if (second.retoned.length || second.moved.length || second.copied.length) groups = takeOffTopic(build(second.groups))
       }
     }
 
@@ -903,10 +909,11 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
           ),
         )
       ).flat()
-      const shared = applyReview(state.ideas, groups, changes)
+      const shared = applyReview(state.ideas, groups, changes, multi)
       state.retoned = [...state.retoned, ...shared.retoned]
       state.moved = [...state.moved, ...shared.moved]
-      if (shared.retoned.length || shared.moved.length) groups = takeOffTopic(build(shared.groups))
+      state.copied = [...(state.copied ?? []), ...shared.copied]
+      if (shared.retoned.length || shared.moved.length || shared.copied.length) groups = takeOffTopic(build(shared.groups))
       const merges = res.merges.filter((m) => m.groups.every((id) => groups.some((g) => g.id === id)))
       if (merges.length) {
         // Le motif fusionné garde la définition du plus peuplé de ses motifs d'origine.
@@ -1056,11 +1063,14 @@ const JUDGEMENT_TITLE =
 export function applyReview(
   ideas: Idea[],
   groups: { id: string; title: string; ideaIds: string[] }[],
-  changes: { id: string; to?: string; new?: string; category?: IdeaCategory }[],
+  changes: { id: string; to?: string; new?: string; also?: string; category?: IdeaCategory }[],
+  /** `multiCoding` : « also » est appliqué (copie de l'idée dans un second motif) ; sinon ignoré. */
+  options: { multiCoding?: boolean } = {},
 ): {
   groups: { title: string; ideaIds: string[] }[]
   retoned: { id: string; from: IdeaCategory; to: IdeaCategory }[]
   moved: { id: string; from: string; to: string }[]
+  copied: { id: string; from: string; to: string }[]
 } {
   const byId = new Map(ideas.map((i) => [i.id, i]))
   const home = new Map(groups.flatMap((g) => g.ideaIds.map((id) => [id, g.id] as const)))
@@ -1068,11 +1078,13 @@ export function applyReview(
   const byTitle = new Map(out.map((g) => [g.title.trim().toLowerCase(), g]))
   const retoned: { id: string; from: IdeaCategory; to: IdeaCategory }[] = []
   const moved: { id: string; from: string; to: string }[] = []
+  const copied: { id: string; from: string; to: string }[] = []
   // Deux changements sur une même idée (un déplacement, puis une correction de ton) se cumulent : le premier de chaque sorte compte.
-  const merged = new Map<string, { id: string; to?: string; new?: string; category?: IdeaCategory }>()
+  const merged = new Map<string, { id: string; to?: string; new?: string; also?: string; category?: IdeaCategory }>()
   for (const c of changes) {
     const m = merged.get(c.id) ?? { id: c.id }
     if (!m.to && !m.new && (c.to || c.new)) Object.assign(m, c.to ? { to: c.to } : { new: c.new })
+    if (!m.also && c.also) m.also = c.also
     if (!m.category && c.category) m.category = c.category
     merged.set(c.id, m)
   }
@@ -1080,6 +1092,21 @@ export function applyReview(
     const idea = byId.get(c.id)
     const from = home.get(c.id)
     if (!idea || !from) continue
+    // Codage en double : une copie dans le second motif, avec le ton jugé par rapport à lui ; l'original ne bouge pas.
+    // Une idée n'a que deux motifs : ni copie d'une copie, ni seconde copie d'un original déjà copié.
+    if (c.also && options.multiCoding) {
+      const target = out.find((g) => g.id === c.also)
+      const source = out.find((g) => g.id === from)!
+      const already = idea.copyOf || ideas.some((i) => i.copyOf === idea.id)
+      if (target && target.id !== from && !already) {
+        const copy: Idea = { ...idea, id: `I${String(ideas.length + 1).padStart(4, '0')}`, copyOf: idea.id, category: c.category && IDEA_CATEGORIES.includes(c.category) ? c.category : idea.category }
+        ideas.push(copy)
+        byId.set(copy.id, copy)
+        target.ideaIds.push(copy.id)
+        copied.push({ id: copy.id, from: source.title, to: target.title })
+      }
+      continue
+    }
     if (c.category && c.category !== idea.category && IDEA_CATEGORIES.includes(c.category)) {
       retoned.push({ id: c.id, from: idea.category, to: c.category })
       idea.category = c.category
@@ -1102,7 +1129,7 @@ export function applyReview(
     home.set(c.id, target.id)
     moved.push({ id: c.id, from: source.title, to: target.title })
   }
-  return { groups: out.map(({ title, ideaIds }) => ({ title, ideaIds })), retoned, moved }
+  return { groups: out.map(({ title, ideaIds }) => ({ title, ideaIds })), retoned, moved, copied }
 }
 
 /**

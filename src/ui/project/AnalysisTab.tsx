@@ -283,6 +283,22 @@ export function AnalysisTab({ project }: { project: Project }) {
                   </span>
                 </span>
               </label>
+              <label className="mt-3 flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 size-4 accent-primary"
+                  disabled={running}
+                  checked={settings.multiCoding === true}
+                  onChange={(e) => setSettings({ ...settings, multiCoding: e.target.checked })}
+                />
+                <span>
+                  Une idée peut compter dans deux motifs
+                  <span className="block text-xs text-muted-foreground">
+                    Codage en double : une idée qui répond à la définition de deux motifs (la cause chez l'un, l'effet chez l'autre) est
+                    copiée dans le second. Chaque motif compte des personnes, aucune deux fois. Par défaut, une idée n'a qu'un motif.
+                  </span>
+                </span>
+              </label>
               <p className="mt-2 text-xs text-muted-foreground">
                 Température fixée à 0 et réponses mémorisées : relancer la même analyse redonne exactement le même résultat, sans nouvelle demande.
               </p>

@@ -450,7 +450,16 @@ Arnaud :
 Et une question sur la grille elle-même : le plafond est binaire ; deux lectures donnent 3,42 et 3,17 de
 moyenne pour la même passe. La note « réelle » de la méthode sur ce corpus est entre 3 et 3,5.
 
-Gardé dans la méthode « consultation » (Arnaud peut demander le retrait, règle des trois passes) : le
+**Décisions d'Arnaud (16/10, soir).** Pas de seuil d'entrée au résumé (les échantillons ne sont pas toujours
+grands ; un petit motif y a sa place avec son chiffre). Les apports des passes 8 et 9 sont gardés : la règle des
+trois passes protège les jetons, pas le résultat. Le codage en double devient une **option du chercheur**,
+désactivée par défaut (« Une idée peut compter dans deux motifs », réglages avancés) : à la relecture et à la
+réconciliation, une idée qui satisfait la définition de deux motifs est copiée dans le second avec le ton jugé
+par rapport à lui ; l'original ne bouge pas, chaque motif compte des personnes, deux motifs au plus par idée,
+la citation figure sous les deux titres avec « aussi dans ». À essayer sur l'école (passe 10) quand Arnaud le
+demandera : environ 4 millions de jetons de sous-agents.
+
+Gardé dans la méthode « consultation » (décision d'Arnaud) : le
 dédoublonnage corrigé (une erreur du code, pas une règle de plus), le livre de codes (une demande, zéro
 étape de plus, transparence jugée réelle par les deux lectures), la réconciliation (une demande plus une
 par paire), les séparations. Rien n'a changé pour la référence ni pour les autres méthodes : seuls les

@@ -385,6 +385,45 @@ describe('idées qui se recouvrent', () => {
   })
 })
 
+describe('codage en double (option)', () => {
+  const mk = () => {
+    const ideas = [idea('I1', 'P1', 'negative'), idea('I2', 'P2', 'positive')]
+    const groups = [
+      { id: 'G1', title: 'Proximité', ideaIds: ['I1'] },
+      { id: 'G2', title: 'Carte scolaire', ideaIds: ['I2'] },
+    ]
+    return { ideas, groups }
+  }
+  it('copie l’idée dans le second motif, avec son ton, sans toucher à l’original', () => {
+    const { ideas, groups } = mk()
+    const r = applyReview(ideas, groups, [{ id: 'I1', also: 'G2', category: 'negative' }], { multiCoding: true })
+    expect(r.copied).toEqual([{ id: 'I0003', from: 'Proximité', to: 'Carte scolaire' }])
+    expect(ideas.map((i) => i.id)).toEqual(['I1', 'I2', 'I0003'])
+    expect(ideas[2]).toMatchObject({ copyOf: 'I1', participantId: 'P1', category: 'negative' })
+    expect(r.groups.map((g) => g.ideaIds)).toEqual([['I1'], ['I2', 'I0003']])
+    // Pas de copie d'une copie, ni de seconde copie du même original.
+    const again = applyReview(
+      ideas,
+      [groups[0], { id: 'G2', title: 'Carte scolaire', ideaIds: ['I2', 'I0003'] }, { id: 'G3', title: 'Transports', ideaIds: [] }],
+      [
+        { id: 'I1', also: 'G3' },
+        { id: 'I0003', also: 'G3' },
+      ],
+      { multiCoding: true },
+    )
+    expect(again.copied).toEqual([])
+  })
+  it('sans l’option, « also » est ignoré et la consigne n’en parle pas', () => {
+    const { ideas, groups } = mk()
+    const r = applyReview(ideas, groups, [{ id: 'I1', also: 'G2' }])
+    expect(r.copied).toEqual([])
+    expect(ideas).toHaveLength(2)
+    const input = { titles: [], groups: [] }
+    expect(reviewPrompt(input, DEFAULT_SETTINGS).user).not.toContain('Codage en double')
+    expect(reviewPrompt(input, { ...DEFAULT_SETTINGS, multiCoding: true }).user).toContain('Codage en double')
+  })
+})
+
 describe('motifs soumis à la question « un ou deux objets ? »', () => {
   it('« et » partout ; « face à » et les motifs partagés de 8 personnes avec la méthode « consultation »', () => {
     const g = (title: string, stance: string, participants: number) => ({ title, metrics: { stance, participants } as unknown as Metrics })

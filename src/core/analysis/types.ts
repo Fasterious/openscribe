@@ -33,6 +33,8 @@ export interface Idea {
   parts?: { start: number; end: number }[]
   /** Citation retrouvée avec de légers écarts (ponctuation, accents) plutôt qu'à l'identique. */
   approximate: boolean
+  /** Codage en double (option) : copie d'une idée qui satisfait la définition de deux motifs ; l'original reste dans le sien. */
+  copyOf?: string
 }
 
 /** Une citation proposée par l'IA que le code n'a pas retrouvée dans la source. */
@@ -144,6 +146,12 @@ export interface AnalysisSettings {
   method?: import('./methods').MethodId
   /** Mode Confidentiel : rien ne quitte cet ordinateur (seuls les moteurs locaux sont acceptés, par le code). */
   confidential?: boolean
+  /**
+   * Codage en double (décision d'Arnaud, 16/10/2026, désactivé par défaut) : une idée qui satisfait la définition de deux
+   * motifs (la cause chez l'un, l'effet chez l'autre) est copiée dans le second, avec le ton jugé par rapport à lui.
+   * Chaque motif compte toujours des personnes, aucune deux fois. Deux motifs au plus par idée.
+   */
+  multiCoding?: boolean
   /** Remplacé par `method` (analyses enregistrées avant les profils de méthode). */
   lightModel?: boolean
 }
@@ -214,6 +222,8 @@ export interface AnalysisState {
   removedSentences?: number
   /** Réconciliation du livre de codes (méthodes qui la demandent) : paires de motifs relues ensemble, fusions appliquées. */
   reconciled?: { pairs: number; merges: number }
+  /** Codage en double : les copies créées à la relecture (identifiant de la copie, motif d'origine, motif d'accueil). */
+  copied?: { id: string; from: string; to: string }[]
   /** Bilan de la relecture : textes relus, modifiés, et réécritures refusées par le contrôle. */
   polish?: { checked: number; changed: number; refused: number }
   steps: StepStatus[]
