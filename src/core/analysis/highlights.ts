@@ -102,7 +102,8 @@ export function highlightLine(h: Highlight, kind: keyof Highlights, lang: 'fr' |
   if (kind === 'divided') return `${h.title} : avis partagés entre ${h.of} participants`
   if (scale && (kind === 'strengths' || kind === 'blockers')) {
     const word = h.stance === 'unanimous' ? 'unanime' : h.stance === 'consensus' ? 'large majorité' : h.stance === 'majority' ? 'majorité' : ''
-    const count = h.people === h.of ? `les ${h.of} participants qui donnent un avis` : `${h.people} des ${h.of} participants qui donnent un avis`
+    // Le mot de l'échelle dit déjà « de ceux qui en parlent » : le chiffre reste nu (plume, passe 9 : « ceux qui en parlent » et « qui donnent un avis » dans la même phrase).
+    const count = h.people === h.of ? `${h.of} sur ${h.of}` : `${h.people} sur ${h.of}`
     return `${h.title} : ${word ? `${word}${h.fragile ? ' (fragile)' : ''}, ` : ''}${count}`
   }
   return `${h.title} : ${h.people} des ${h.of} participants qui donnent un avis`

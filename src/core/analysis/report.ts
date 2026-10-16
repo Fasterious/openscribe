@@ -60,7 +60,7 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   const lines = [
     `Participants ayant répondu : ${respondents} ; participants dont au moins une idée a été retenue : ${withIdeas}.`,
     `Idées retenues : ${state.ideas.length} (verbatims vérifiés mot pour mot dans les réponses). Verbatims écartés car introuvables tels quels : ${state.rejected.length || 'aucun'}.`,
-    `Motifs : ${state.groups.length}${state.themes.length ? `, regroupés en ${state.themes.length} thèmes` : ''} ; ${single ? `${single} ${single > 1 ? 'reposent' : 'repose'} sur un seul participant (signaux isolés, pas des tendances)` : 'aucun ne repose sur un seul participant'}.${state.merges?.length ? ` La passe de consolidation a fusionné ${state.merges.length} ensembles de motifs qui traitaient le même objet.` : ''}`,
+    `Motifs : ${state.groups.length}${state.themes.length ? `, regroupés en ${state.themes.length} thèmes` : ''} ; ${single ? `${single} ${single > 1 ? 'reposent' : 'repose'} sur un seul participant (signaux isolés, pas des tendances)` : 'aucun ne repose sur un seul participant'}.${state.merges?.length ? ` La passe de consolidation a fusionné ${state.merges.length} ensemble${state.merges.length > 1 ? 's' : ''} de motifs qui traitaient le même objet.` : ''}`,
   ]
   const off = offTopicLines(state)
   if (off.ideas)
@@ -329,7 +329,9 @@ export function refsToPeople(
         const cited = new Set(ids.map(personOf).filter(Boolean)).size
         // « Toutes les personnes qui en parlent », « la plupart » : la base est le motif entier.
         const universal = sizeOf && UNIVERSAL.test(sentence) ? Math.max(0, ...ids.map(sizeOf)) : 0
-        const tag = Math.max(claimedPeople(sentence), universal) > cited ? 'notamment ' : ''
+        // Un compte écrit dans la phrase prime sur « tous » : « 3 personnes dénoncent… tous les ans [a, b, c] » cite ses trois personnes.
+        const claimed = claimedPeople(sentence)
+        const tag = (claimed || universal) > cited ? 'notamment ' : ''
         return sentence.replace(REFS, (_, ids: string) => {
           const seen = new Map<string, Idea>()
           for (const id of ids.split(/\s*,\s*/)) {

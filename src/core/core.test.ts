@@ -1057,13 +1057,11 @@ describe('méthode « consultation » (Observatoire)', () => {
     expect(c.seen.extract).toBe(ref.seen.extract)
   })
 
-  it('le mot de l’échelle accompagne le chiffre ; un camp unanime se dit « les 24 »', () => {
+  it('le mot de l’échelle accompagne le chiffre nu (la base est dans le mot)', () => {
     const h = { groupId: 'G1', title: 'Absences', people: 24, of: 24, ideaIds: [], stance: 'unanimous' as const }
     expect(highlightLine(h, 'blockers')).toBe('Absences : 24 des 24 participants qui donnent un avis')
-    expect(highlightLine(h, 'blockers', 'fr', true)).toBe('Absences : unanime, les 24 participants qui donnent un avis')
-    expect(highlightLine({ ...h, people: 28, of: 33, stance: 'consensus', fragile: true }, 'blockers', 'fr', true)).toBe(
-      'Absences : large majorité (fragile), 28 des 33 participants qui donnent un avis',
-    )
+    expect(highlightLine(h, 'blockers', 'fr', true)).toBe('Absences : unanime, 24 sur 24')
+    expect(highlightLine({ ...h, people: 28, of: 33, stance: 'consensus', fragile: true }, 'blockers', 'fr', true)).toBe('Absences : large majorité (fragile), 28 sur 33')
   })
 
   it('« notamment » ne vient pas d’un « tous » qui ne compte pas des personnes ; un seul prénom s’accorde', () => {
