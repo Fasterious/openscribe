@@ -378,6 +378,8 @@ export interface ReviewInput {
     mixed: string[]
     /** Livre de codes déjà écrit pour ce motif (second tour) : le moteur le garde. */
     definition?: GroupDefinition
+    /** Règle de partage avec un motif voisin (réconciliation du livre de codes) : à appliquer. */
+    rule?: string
     ideas: { id: string; participant: string; category: IdeaCategory; label: string; verbatim: string; before?: string; arrived?: boolean }[]
   }[]
 }
@@ -403,6 +405,12 @@ function arrivedRule(input: ReviewInput): string {
   return `Les idées marquées "arrived" viennent d'être déplacées dans ce motif, parfois faute de mieux : la liste des motifs a changé depuis. Vérifie chacune d'abord. Si elle parle d'un autre objet que celui du motif, déplace-la vers le motif de cet objet (existant ou nouveau). Si elle parle bien de l'objet du motif, juge son ton par rapport à lui : un éloge d'un autre objet n'est pas un avis positif sur celui-ci.\n`
 }
 
+/** Réconciliation : deux motifs voisins relus ensemble, avec la règle qui dit où va chaque sorte d'idée. */
+function sharedRule(input: ReviewInput): string {
+  if (!input.groups.some((g) => g.rule)) return ''
+  return `Les motifs ci-dessous se partagent un même objet ou une frontière floue ; "rule" dit où va chaque sorte d'idée. Applique-la à chaque idée des deux motifs : déplace vers l'autre motif celles qu'elle lui attribue ({"id":"I0042","to":"G7"}), passe en "neutral" celles qu'elle dit hors camp, et corrige le ton d'une idée que la définition de son motif range dans l'autre camp. Un éloge et une critique d'un même objet finissent dans le même motif.\n`
+}
+
 export function reviewPrompt(input: ReviewInput, settings: AnalysisSettings) {
   return {
     task: 'review',
@@ -415,9 +423,45 @@ Règles :
 3. Si le ton d'une idée est faux par rapport à l'objet de son motif, corrige sa catégorie ({"id":"I0044","category":"negative"}) : dans « Prix de l'abonnement », « heureusement que la qualité suit » sous-entend que le prix est élevé. Une proposition est "suggestion".
 4. Un titre de nouveau motif nomme l'objet, jamais le jugement (pas « Points forts », « Critiques ») ; 2 à 6 mots, sans « et ». Réutilise le même titre pour plusieurs idées qui vont ensemble.
 5. Ne renvoie que les changements. Dans le doute, ne change rien : la plupart des idées sont bien rangées.
-${methodRules(settings, 'review')}${arrivedRule(input)}${lang(settings)}
+${methodRules(settings, 'review')}${arrivedRule(input)}${sharedRule(input)}${lang(settings)}
 
 Réponds avec : {"changes":[…]}
+
+${dataBlock(input)}`,
+    json: true,
+  }
+}
+
+// ─── Réconciliation du livre de codes : motifs qui se chevauchent ─────────────
+
+export interface ReconcileInput {
+  motifs: { id: string; title: string; people: number; definition?: GroupDefinition }[]
+}
+
+export const reconcileSchema = z.object({
+  /** Deux motifs qui traitent le même objet : à fusionner. */
+  merges: lenientArray(z.object({ groups: z.array(z.string()), title: z.string().min(1), reason: z.string().optional().default('') }))
+    .optional()
+    .default([]),
+  /** Deux motifs voisins à la frontière floue : la règle dit où va chaque sorte d'idée. */
+  overlaps: lenientArray(z.object({ a: z.string(), b: z.string(), rule: z.string().min(1) }))
+    .optional()
+    .default([]),
+})
+
+export function reconcilePrompt(input: ReconcileInput, settings: AnalysisSettings) {
+  return {
+    task: 'reconcile',
+    system: SYSTEM,
+    user: `${context(settings)}Tu reçois le livre de codes d'une analyse : chaque motif avec son titre, son nombre de personnes et sa définition (ce qui y compte comme favorable, défavorable ou hors camp). Les motifs ont été définis par lots séparés : certains se chevauchent. Relis-les ensemble, comme on relit un livre de codes avant de compter.
+
+Règles :
+1. Deux motifs traitent le MÊME objet (l'équipe agirait d'un seul geste sur les deux ; l'un reçoit par exemple les éloges d'un objet et l'autre ses critiques) : propose une fusion, avec un titre court (2 à 6 mots, sans « et ») qui nomme l'objet.
+2. Deux motifs traitent deux objets voisins mais leurs définitions se recouvrent (une même idée pourrait aller dans l'un ou l'autre ; un motif « X face à Y » à côté d'un motif « Y » ; un camp qui réunit deux positions contraires) : écris une règle de partage en une ou deux phrases, qui dit où va chaque sorte d'idée (« toute critique de Y va dans G12 ; un simple passage de X à Y sans jugement est hors camp »).
+3. Au plus 8 paires, les plus lourdes de conséquences d'abord (motifs les plus peuplés, motifs unanimes dont les voix contraires seraient ailleurs). Un motif figure dans une seule paire. Dans le doute, ne propose rien : la plupart des motifs sont bien séparés.
+${lang(settings)}
+
+Réponds avec : {"merges":[{"groups":["G3","G12"],"title":"…","reason":"…"}],"overlaps":[{"a":"G5","b":"G26","rule":"…"}]}
 
 ${dataBlock(input)}`,
     json: true,

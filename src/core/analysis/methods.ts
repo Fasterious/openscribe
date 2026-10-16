@@ -53,6 +53,10 @@ export interface Method {
   keepOpposedOverlaps?: boolean
   /** Livre de codes : à la relecture, le moteur définit chaque motif (favorable, défavorable, hors camp) avant de juger ses idées ; la définition suit le motif jusqu'au rapport. */
   codebook?: boolean
+  /** Après la relecture, le livre de codes est relu d'un bloc : motifs d'un même objet fusionnés, motifs voisins relus ensemble avec une règle de partage. */
+  reconcile?: boolean
+  /** La question « un ou deux objets ? » est posée aussi pour un titre « X face à Y » et pour un motif aux avis partagés d'au moins 8 personnes. */
+  splitChecks?: boolean
 }
 
 const REFERENCE: Method = {
@@ -174,6 +178,10 @@ export const METHODS: Record<MethodId, Method> = {
     // Passe 8 : sept passes ont buté sur des idées limites (regret qu'une règle manque, demande de plus d'exigence, principe général)
     // jugées différemment d'un lecteur à l'autre. La définition écrite avant le jugement rend le camp vérifiable.
     codebook: true,
+    // Passe 9 : les deux lectures de la passe 8 plafonnent sur des motifs voisins qui se partagent un objet (les éloges du privé
+    // d'un côté, ses critiques dans « École publique face au privé » ; la gratuité de l'école contre le coût du supérieur).
+    reconcile: true,
+    splitChecks: true,
     offTopic: true,
     scaleInLines: true,
     // Passe 3 (15/10) : une idée déplacée vers un motif voisin faute de mieux (le bon motif était ouvert par un autre lot) y gardait son ton.

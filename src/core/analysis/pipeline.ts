@@ -32,6 +32,8 @@ import {
   themePrompt,
   themeSchema,
   reviewPrompt,
+  reconcilePrompt,
+  reconcileSchema,
   unanimityPrompt,
   type UnanimityInput,
   reviewSchema,
@@ -748,7 +750,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   }
 
   // Un titre qui relie deux mots par « et » peut cacher deux objets : on pose la question au modèle, le code applique.
-  const joined = !grid.length ? groups.filter((g) => /\s(et|and)\s/i.test(g.title)) : []
+  const joined = !grid.length ? splitCandidates(groups, methodOf(state.settings).splitChecks === true) : []
   if (joined.length) {
     const res = await runner.json(
       splitPrompt(
@@ -783,13 +785,14 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     // (les identifiants G… sont renumérotés après chaque tour).
     const definitions = new Map<string, GroupDefinition>()
     const codebook = methodOf(state.settings).codebook === true
-    // Un tour de relecture sur les motifs donnés ; `arrived` : idées déplacées au tour précédent, à vérifier d'abord.
-    const reviewRound = async (scope: Group[], arrived?: Set<string>) => {
+    // Un tour de relecture sur les motifs donnés ; `arrived` : idées déplacées au tour précédent, à vérifier d'abord ;
+    // `rules` : règle de partage par motif (réconciliation), les motifs d'une même règle restent dans une même demande.
+    const reviewRound = async (scope: Group[], arrived?: Set<string>, rules?: Map<string, string>) => {
       const titles = groups.map((g) => ({ id: g.id, title: g.title }))
       const titleOf = new Map(groups.map((g) => [g.id, g.title]))
-      const batches: Group[][] = []
+      const batches: Group[][] = rules ? [scope] : []
       let cur: Group[] = []
-      for (const g of scope) {
+      for (const g of rules ? [] : scope) {
         if (cur.length && cur.reduce((n, x) => n + x.ideaIds.length, 0) + g.ideaIds.length > batchSizes(state.settings).review) {
           batches.push(cur)
           cur = []
@@ -808,6 +811,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
                   title: g.title,
                   mixed: g.metrics.mixed,
                   ...(codebook && definitions.has(titleKey(g.title)) ? { definition: definitions.get(titleKey(g.title)) } : {}),
+                  ...(rules?.get(g.id) ? { rule: rules.get(g.id) } : {}),
                   ideas: g.ideaIds.map((id) => {
                     const i = ideaById.get(id)!
                     return {
@@ -865,6 +869,52 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       }
     }
 
+    // Méthode qui le demande : le livre de codes est relu d'un bloc. Les motifs définis par lots séparés se chevauchent parfois
+    // (les éloges d'un objet dans un motif, ses critiques dans un voisin : une fausse unanimité). Le moteur propose des fusions
+    // et des règles de partage ; le code fusionne, puis fait relire chaque paire ensemble avec sa règle.
+    if (codebook && methodOf(state.settings).reconcile && definitions.size && groups.length > 1) {
+      s.message = 'Réconciliation du livre de codes'
+      await emit()
+      const res = await runner.json(
+        reconcilePrompt(
+          { motifs: groups.map((g) => ({ id: g.id, title: g.title, people: g.metrics.participants, definition: definitions.get(titleKey(g.title)) })) },
+          state.settings,
+        ),
+        reconcileSchema,
+      )
+      const byId = new Map(groups.map((g) => [g.id, g]))
+      const used = new Set<string>()
+      const pairs = res.overlaps
+        .filter((o) => o.a !== o.b && byId.has(o.a) && byId.has(o.b) && !used.has(o.a) && !used.has(o.b) && o.rule.trim())
+        .slice(0, 8)
+      for (const o of pairs) used.add(o.a).add(o.b)
+      let changes: { id: string; to?: string; new?: string; category?: IdeaCategory }[] = []
+      for (const o of pairs) {
+        const rules = new Map([
+          [o.a, o.rule.trim()],
+          [o.b, o.rule.trim()],
+        ])
+        changes = [...changes, ...(await reviewRound([byId.get(o.a)!, byId.get(o.b)!], undefined, rules))]
+      }
+      const shared = applyReview(state.ideas, groups, changes)
+      state.retoned = [...state.retoned, ...shared.retoned]
+      state.moved = [...state.moved, ...shared.moved]
+      if (shared.retoned.length || shared.moved.length) groups = takeOffTopic(build(shared.groups))
+      const merges = res.merges.filter((m) => m.groups.every((id) => groups.some((g) => g.id === id)))
+      if (merges.length) {
+        // Le motif fusionné garde la définition du plus peuplé de ses motifs d'origine.
+        const current = new Map(groups.map((g) => [g.id, g]))
+        for (const m of merges) {
+          const biggest = m.groups.map((id) => current.get(id)!).sort((a, b) => b.metrics.participants - a.metrics.participants)[0]
+          const d = biggest && definitions.get(titleKey(biggest.title))
+          if (d && !definitions.has(titleKey(m.title))) definitions.set(titleKey(m.title), d)
+        }
+        const merged = applyMerges(groups, merges)
+        state.merges = [...(state.merges ?? []), ...merged.merges]
+        groups = build(merged.groups)
+      }
+      state.reconciled = { pairs: pairs.length, merges: merges.length }
+    }
     if (definitions.size) groups = groups.map((g) => (definitions.has(titleKey(g.title)) ? { ...g, definition: definitions.get(titleKey(g.title)) } : g))
     s.message = undefined
   }
@@ -1046,6 +1096,19 @@ export function applyReview(
     moved.push({ id: c.id, from: source.title, to: target.title })
   }
   return { groups: out.map(({ title, ideaIds }) => ({ title, ideaIds })), retoned, moved }
+}
+
+/**
+ * Motifs soumis à la question « un ou deux objets ? » : un titre qui relie deux mots par « et » ; avec `checks`
+ * (méthode « consultation »), aussi un titre « X face à Y » ou « X contre Y », et un motif aux avis partagés d'au
+ * moins 8 personnes (deux camps proches en nombre cachent souvent deux objets).
+ */
+export function splitCandidates<G extends { title: string; metrics: Metrics }>(groups: G[], checks: boolean): G[] {
+  return groups.filter(
+    (g) =>
+      /\s(et|and)\s/i.test(g.title) ||
+      (checks && (/\s(face (à|au|aux)|contre|versus|vs\.?)\s/i.test(g.title) || (g.metrics.stance === 'divided' && g.metrics.participants >= 8))),
+  )
 }
 
 /**
@@ -1435,10 +1498,15 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
   // Méthode qui le demande : l'exemple d'une ligne est la première idée de son camp citée par la synthèse du motif
   // (la première par identifiant tombait parfois sur un avis atypique du camp).
+  // Une force s'illustre de préférence par une personne qui critique aussi ailleurs : « que certaines nuancent ailleurs
+  // (notamment P4) » n'est vrai que si P4 nuance (methodologue, passe 8).
+  const critics = new Set(state.ideas.filter((i) => i.category === 'negative').map((i) => i.participantId))
+  const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
   const refOf = (x: (typeof h)['strengths'][number]) => {
     if (!checks) return x.ideaIds[0]
     const side = new Set(x.ideaIds)
-    return (groupById.get(x.groupId)?.summary.match(/I\d{4,}/g) ?? []).find((id) => side.has(id)) ?? x.ideaIds[0]
+    const cited = (groupById.get(x.groupId)?.summary.match(/I\d{4,}/g) ?? []).filter((id) => side.has(id))
+    return cited.find((id) => critics.has(ideaById.get(id)?.participantId ?? '')) ?? cited[0] ?? x.ideaIds[0]
   }
   const sections = state.themes.length
     ? state.themes.map((t) => ({

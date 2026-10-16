@@ -212,6 +212,8 @@ export interface AnalysisState {
   reviewSkipped?: number
   /** Phrases retirées des synthèses parce qu'elles citaient un nombre introuvable. */
   removedSentences?: number
+  /** Réconciliation du livre de codes (méthodes qui la demandent) : paires de motifs relues ensemble, fusions appliquées. */
+  reconciled?: { pairs: number; merges: number }
   /** Bilan de la relecture : textes relus, modifiés, et réécritures refusées par le contrôle. */
   polish?: { checked: number; changed: number; refused: number }
   steps: StepStatus[]

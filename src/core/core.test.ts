@@ -40,6 +40,7 @@ import {
   sanitizeCitations,
   dropInventedQuotes,
   applyAttachments,
+  splitCandidates,
 } from './analysis/pipeline'
 import { uncoveredPassages, uncoveredWithContext } from './analysis/coverage'
 import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
@@ -381,6 +382,15 @@ describe('idées qui se recouvrent', () => {
     )
     const one = await extractParticipant([corpus.contributions[0]], corpus.contributions[0].participantId, { ...DEFAULT_SETTINGS, method: 'consultation' }, twin)
     expect(one.ideas.map((i) => i.label)).toEqual(['Long'])
+  })
+})
+
+describe('motifs soumis à la question « un ou deux objets ? »', () => {
+  it('« et » partout ; « face à » et les motifs partagés de 8 personnes avec la méthode « consultation »', () => {
+    const g = (title: string, stance: string, participants: number) => ({ title, metrics: { stance, participants } as unknown as Metrics })
+    const groups = [g('Accueil et convivialité', 'consensus', 3), g('École publique face au privé', 'lean', 18), g('Coût des études', 'divided', 17), g('Horaires', 'divided', 5)]
+    expect(splitCandidates(groups, false).map((x) => x.title)).toEqual(['Accueil et convivialité'])
+    expect(splitCandidates(groups, true).map((x) => x.title)).toEqual(['Accueil et convivialité', 'École publique face au privé', 'Coût des études'])
   })
 })
 
@@ -985,9 +995,15 @@ describe('méthode « consultation » (Observatoire)', () => {
           }
           // Livre de codes : le modèle définit le premier motif du lot avant ses changements.
           if (method && req.task === 'review') {
+            if (req.user.includes('"rule"')) seen.reviewRule = req.user
             const data = readDataBlock<{ groups: { id: string }[] }>(req.user)
             const out = JSON.parse(res.text) as { changes: unknown[] }
             return { ...res, text: JSON.stringify({ definitions: [{ id: data.groups[0].id, positive: 'le juge utile', negative: 'le juge inutile.', neutral: 'un principe général' }], ...out }) }
+          }
+          // Réconciliation : les deux premiers motifs se chevauchent.
+          if (method && req.task === 'reconcile') {
+            const data = readDataBlock<{ motifs: { id: string }[] }>(req.user)
+            return { ...res, text: JSON.stringify({ merges: [], overlaps: [{ a: data.motifs[0].id, b: data.motifs[1].id, rule: 'toute critique du second va dans le premier' }] }) }
           }
           return res
         },
@@ -1016,6 +1032,14 @@ describe('méthode « consultation » (Observatoire)', () => {
     expect(ref.seen.review).not.toContain('Livre de codes')
     expect(c.seen.summarize).toContain('"definition"')
     expect(ref.seen.support).not.toContain('"definition"')
+    // Réconciliation : le livre de codes relu d'un bloc, puis la paire relue ensemble avec sa règle ; rien de tout cela dans la référence.
+    expect(c.seen.reconcile).toContain('"definition"')
+    expect(c.seen.reviewRule).toContain('toute critique du second va dans le premier')
+    expect(c.seen.reviewRule).toContain('frontière floue')
+    expect(c.state.reconciled).toEqual({ pairs: 1, merges: 0 })
+    expect(ref.seen.reconcile).toBeUndefined()
+    expect(ref.seen.reviewRule).toBeUndefined()
+    expect(md).toContain('relue ensemble avec une règle de partage')
     // Règles propres à la méthode, absentes de la référence.
     expect(c.seen.group).toContain('« Hors question »')
     expect(ref.seen.group).not.toContain('Hors question')

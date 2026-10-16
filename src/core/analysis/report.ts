@@ -93,7 +93,7 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   }
   if (state.groups.some((g) => g.definition))
     lines.push(
-      "Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme favorable, défavorable ou hors camp. Cette définition figure sous le titre du motif ; les camps d'avis s'y conforment, et le lecteur peut la contester.",
+      `Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme favorable, défavorable ou hors camp. Cette définition figure sous le titre du motif ; les camps d'avis s'y conforment, et le lecteur peut la contester.${state.reconciled?.pairs || state.reconciled?.merges ? ` Le livre de codes a ensuite été relu d'un bloc : ${[state.reconciled.pairs && `${state.reconciled.pairs} paire${state.reconciled.pairs > 1 ? 's' : ''} de motifs voisins relue${state.reconciled.pairs > 1 ? 's' : ''} ensemble avec une règle de partage`, state.reconciled.merges && `${state.reconciled.merges} fusion${state.reconciled.merges > 1 ? 's' : ''} de motifs qui traitaient le même objet`].filter(Boolean).join(' ; ')}.` : ''}`,
     )
   if (state.support)
     lines.push(
