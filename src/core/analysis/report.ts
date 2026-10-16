@@ -38,7 +38,17 @@ export function engineName(presetId: string, model?: string): string {
   return presetById(presetId)?.label ?? presetId
 }
 
-/** Le livre de codes d'un motif, en une ligne sous son titre : ce qui y compte comme favorable, défavorable ou hors camp. */
+/** Codage en double : sous chaque exemplaire d'une citation, le titre de l'autre motif où elle compte (copie comme original). */
+function alsoInOf(state: AnalysisState): (i: Idea) => string | undefined {
+  const titleOfIdea = new Map(state.groups.flatMap((g) => g.ideaIds.map((id) => [id, g.title] as const)))
+  const copyOf = new Map(state.ideas.filter((i) => i.copyOf).map((i) => [i.copyOf!, i.id]))
+  return (i) => {
+    const other = i.copyOf ?? copyOf.get(i.id)
+    return other ? titleOfIdea.get(other) : undefined
+  }
+}
+
+/** Le livre de codes d'un motif, en une ligne sous son titre : ce qui y compte comme positif, négatif ou pas comme un avis. */
 export function definitionLine(d: GroupDefinition): string {
   // Une phrase française, pas une consigne de codage (plume, passe 8) : minuscule après les deux-points, pas de « hors camp ».
   const dot = (s: string) => {
@@ -93,11 +103,11 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   }
   if (state.copied?.length)
     lines.push(
-      `Codage en double, à la demande du chercheur : ${state.copied.length} idée${state.copied.length > 1 ? 's' : ''} qui satisf${state.copied.length > 1 ? 'ont' : 'ait'} la définition de deux motifs ${state.copied.length > 1 ? 'comptent' : 'compte'} dans les deux (la citation figure sous chacun, avec la mention « aussi dans »). Chaque motif compte des personnes, aucune deux fois.`,
+      `Codage en double, à la demande du chercheur : ${state.copied.length} idée${state.copied.length > 1 ? 's' : ''} qui satisf${state.copied.length > 1 ? 'ont' : 'ait'} la définition de deux motifs ${state.copied.length > 1 ? 'comptent' : 'compte'} dans les deux (la citation figure sous chacun, avec la mention « aussi dans » et le nom de l'autre motif). Chaque motif compte des personnes, aucune deux fois.`,
     )
   if (state.groups.some((g) => g.definition))
     lines.push(
-      `Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme favorable, défavorable ou hors camp. Cette définition figure sous le titre du motif ; les camps d'avis s'y conforment, et le lecteur peut la contester.${state.reconciled?.pairs || state.reconciled?.merges ? ` Le livre de codes a ensuite été relu d'un bloc : ${[state.reconciled.pairs && `${state.reconciled.pairs} paire${state.reconciled.pairs > 1 ? 's' : ''} de motifs voisins relue${state.reconciled.pairs > 1 ? 's' : ''} ensemble avec une règle de partage`, state.reconciled.merges && `${state.reconciled.merges} fusion${state.reconciled.merges > 1 ? 's' : ''} de motifs qui traitaient le même objet`].filter(Boolean).join(' ; ')}.` : ''}`,
+      `Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme positif, comme négatif, et ce qui ne compte pas comme un avis. Cette définition figure sous le titre du motif ; les camps d'avis s'y conforment, et le lecteur peut la contester.${state.reconciled?.pairs || state.reconciled?.merges ? ` Le livre de codes a ensuite été relu d'un bloc : ${[state.reconciled.pairs && `${state.reconciled.pairs} paire${state.reconciled.pairs > 1 ? 's' : ''} de motifs voisins relue${state.reconciled.pairs > 1 ? 's' : ''} ensemble avec une règle de partage`, state.reconciled.merges && `${state.reconciled.merges} fusion${state.reconciled.merges > 1 ? 's' : ''} de motifs qui traitaient le même objet`].filter(Boolean).join(' ; ')}.` : ''}`,
     )
   if (state.support)
     lines.push(
@@ -663,9 +673,7 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
   }
   const sizeOf = motifSizes(state)
   const prose = (t: string) => refsToPeople(v.text(t), byId, undefined, sizeOf)
-  // Codage en double : la copie dit sous quel autre motif la même citation figure.
-  const titleOfIdea = new Map(state.groups.flatMap((g) => g.ideaIds.map((id) => [id, g.title] as const)))
-  const alsoIn = (i: Idea) => (i.copyOf ? titleOfIdea.get(i.copyOf) : undefined)
+  const alsoIn = alsoInOf(state)
   if (state.globalSummary) out.push('## Résumé', '', prose(state.globalSummary), '')
   warn(state.globalUnverified)
 
@@ -754,8 +762,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
   const parts: string[] = []
   // Un texte rédigé peut compter plusieurs paragraphes (le résumé en trois temps).
   const sizeOf = motifSizes(state)
-  const titleOfIdea = new Map(state.groups.flatMap((g) => g.ideaIds.map((id) => [id, g.title] as const)))
-  const alsoIn = (i: Idea) => (i.copyOf ? titleOfIdea.get(i.copyOf) : undefined)
+  const alsoIn = alsoInOf(state)
   // Chaque référence d'une synthèse devient le code du participant, relié à son verbatim (survol : la citation).
   const link = (who: string, i: Idea) => `<a href="#${e(i.id)}" title="« ${e(v.text(i.verbatim))} »">${e(who)}</a>`
   const para = (text: string) =>

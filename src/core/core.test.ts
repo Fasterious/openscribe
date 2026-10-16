@@ -464,6 +464,10 @@ describe('codage en double, de bout en bout', () => {
     const md = reportToMarkdown(state, corpus, 'Test')
     expect(md).toContain('aussi dans «')
     expect(md).toContain('Codage en double')
+    // La mention figure sous les deux exemplaires : l'original renvoie au motif de la copie, et inversement.
+    const motifOf = (id: string) => state.groups.find((g) => g.ideaIds.includes(id))!.title
+    expect(md).toContain(`aussi dans « ${motifOf(copy.id)} »`)
+    expect(md).toContain(`aussi dans « ${motifOf(copy.copyOf!)} »`)
     expect(titlesDefined).toBe(true)
     // Sans l'option, les titres restent nus : la définition coûterait des jetons pour rien.
     titlesDefined = false
