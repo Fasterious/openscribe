@@ -788,10 +788,17 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     // (les identifiants G… sont renumérotés après chaque tour).
     const definitions = new Map<string, GroupDefinition>()
     const codebook = methodOf(state.settings).codebook === true
+    const multi = { multiCoding: state.settings.multiCoding === true }
     // Un tour de relecture sur les motifs donnés ; `arrived` : idées déplacées au tour précédent, à vérifier d'abord ;
     // `rules` : règle de partage par motif (réconciliation), les motifs d'une même règle restent dans une même demande.
     const reviewRound = async (scope: Group[], arrived?: Set<string>, rules?: Map<string, string>) => {
-      const titles = groups.map((g) => ({ id: g.id, title: g.title }))
+      // Codage en double : la définition de chaque motif cible accompagne son titre, sinon le moteur ne peut pas
+      // savoir si elle réclame l'idée (coût : quelques jetons par motif, seulement avec l'option).
+      const withDefinition = multi.multiCoding && codebook
+      const titles = groups.map((g) => {
+        const d = withDefinition ? definitions.get(titleKey(g.title)) : undefined
+        return { id: g.id, title: g.title, ...(d ? { definition: d } : {}) }
+      })
       const titleOf = new Map(groups.map((g) => [g.id, g.title]))
       const batches: Group[][] = rules ? [scope] : []
       let cur: Group[] = []
@@ -851,7 +858,6 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
         }
       return responses.flatMap((r) => r.changes)
     }
-    const multi = { multiCoding: state.settings.multiCoding === true }
     // Les copies du codage en double sont des idées nouvelles : la table des idées, construite avant la relecture, les apprend.
     const learn = (copied: { id: string }[]) => {
       for (const c of copied) {

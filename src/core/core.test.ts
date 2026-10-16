@@ -434,14 +434,24 @@ describe('codage en double, de bout en bout', () => {
       label: base.label,
       async complete(req) {
         const res = await base.complete(req)
-        if (req.task !== 'review' || req.user.includes('"rule"')) return res
-        // Le modèle copie la première idée du premier motif dans le second motif du lot.
-        const data = readDataBlock<{ groups: { id: string; ideas: { id: string }[] }[] }>(req.user)
-        if (data.groups.length < 2 || !data.groups[0].ideas.length) return res
+        // Réconciliation : les deux premiers motifs se chevauchent, leur paire est relue avec le livre de codes déjà écrit.
+        if (req.task === 'reconcile') {
+          const data = readDataBlock<{ motifs: { id: string }[] }>(req.user)
+          return { ...res, text: JSON.stringify({ merges: [], overlaps: [{ a: data.motifs[0].id, b: data.motifs[1].id, rule: 'toute critique du second va dans le premier' }] }) }
+        }
+        if (req.task !== 'review') return res
+        // Avec le codage en double, les titres cibles portent leur définition dès qu'elle existe.
+        const data = readDataBlock<{ titles: { definition?: unknown }[]; groups: { id: string; ideas: { id: string }[] }[] }>(req.user)
+        if (data.titles.some((t) => t.definition)) titlesDefined = true
+        if (req.user.includes('"rule"')) return res
         const out = JSON.parse(res.text) as { changes: unknown[] }
-        return { ...res, text: JSON.stringify({ ...out, changes: [...out.changes, { id: data.groups[0].ideas[0].id, also: data.groups[1].id, category: 'negative' }] }) }
+        // Le modèle définit le premier motif du lot, puis copie sa première idée dans le second motif du lot.
+        const definitions = [{ id: data.groups[0].id, positive: 'le juge utile', negative: 'le juge inutile' }]
+        if (data.groups.length < 2 || !data.groups[0].ideas.length) return { ...res, text: JSON.stringify({ definitions, ...out }) }
+        return { ...res, text: JSON.stringify({ definitions, ...out, changes: [...out.changes, { id: data.groups[0].ideas[0].id, also: data.groups[1].id, category: 'negative' }] }) }
       },
     }
+    let titlesDefined = false
     const settings = { ...DEFAULT_SETTINGS, method: 'consultation' as const, multiCoding: true }
     const state = await runAnalysis(corpus, await newAnalysis(corpus, settings, spy), { provider: spy, cache: new MemoryCache() })
     expect(state.status).toBe('done')
@@ -454,6 +464,11 @@ describe('codage en double, de bout en bout', () => {
     const md = reportToMarkdown(state, corpus, 'Test')
     expect(md).toContain('aussi dans «')
     expect(md).toContain('Codage en double')
+    expect(titlesDefined).toBe(true)
+    // Sans l'option, les titres restent nus : la définition coûterait des jetons pour rien.
+    titlesDefined = false
+    await runAnalysis(corpus, await newAnalysis(corpus, { ...settings, multiCoding: false }, spy), { provider: spy, cache: new MemoryCache() })
+    expect(titlesDefined).toBe(false)
   })
 })
 

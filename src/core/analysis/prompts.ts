@@ -374,8 +374,8 @@ ${dataBlock(input)}`,
 // ─── Relecture des motifs ────────────────────────────────────────────────────
 
 export interface ReviewInput {
-  /** Tous les motifs, pour pouvoir y déplacer une idée. */
-  titles: { id: string; title: string }[]
+  /** Tous les motifs, pour pouvoir y déplacer une idée ; avec leur définition quand le codage en double est actif. */
+  titles: { id: string; title: string; definition?: GroupDefinition }[]
   groups: {
     id: string
     title: string
@@ -415,7 +415,7 @@ function arrivedRule(input: ReviewInput): string {
 /** Codage en double (option du chercheur) : une idée qui satisfait deux définitions compte dans les deux motifs, par une copie. */
 function multiRule(settings: AnalysisSettings): string {
   if (!settings.multiCoding) return ''
-  return `Codage en double. Une idée qui satisfait la définition de DEUX motifs (la cause chez l'un, l'effet chez l'autre : « 40 km par jour à cause du regroupement scolaire » juge l'éloignement de l'école et le regroupement) compte dans les deux : {"id":"I0042","also":"G7","category":"negative"} ajoute une copie dans G7, avec le ton jugé par rapport à G7 ; l'idée reste dans son motif. Deux motifs au plus par idée, et seulement quand les deux définitions la réclament : dans le doute, un seul motif.\n`
+  return `Codage en double. Une idée qui satisfait la définition de DEUX motifs (la cause chez l'un, l'effet chez l'autre : « 40 km par jour à cause du regroupement scolaire » juge l'éloignement de l'école et le regroupement) compte dans les deux : {"id":"I0042","also":"G7","category":"negative"} ajoute une copie dans G7, avec le ton jugé par rapport à G7 ; l'idée reste dans son motif. Deux motifs au plus par idée, et seulement quand les deux définitions la réclament ("titles" donne la définition de chaque motif quand elle existe) : dans le doute, un seul motif.\n`
 }
 
 /** Réconciliation : deux motifs voisins relus ensemble, avec la règle qui dit où va chaque sorte d'idée. */
