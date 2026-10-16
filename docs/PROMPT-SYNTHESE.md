@@ -23,6 +23,15 @@ Version 3 (16/10/2026) : ajoute le livre de codes (une définition par motif, é
 puis relue d'un bloc avec règles de partage entre motifs voisins), tiré des passes 8 et 9 de
 l'Observatoire (`docs/METHODES.md`) : c'est là que se jouaient tous les plafonds (un avis rangé dans le
 mauvais camp sur un motif du résumé), et une définition écrite rend chaque camp vérifiable.
+Essai de la version 3 sur corpus réel (16 octobre 2026) : Sonnet, une passe, mêmes 378 réponses.
+12 700 mots, 37 motifs avec leur définition, 260 citations sur 261 exactes (une apostrophe), chiffres du
+résumé identiques au tableau. Une lecture `methodologue` : moyenne 3,67 (découpage 4, traçabilité 4),
+ramenée à 3 par le plafond (sur la carte scolaire, un regret que la règle soit contournée compté contre
+elle, et une définition qui réunit deux positions contraires dans le camp favorable). Trois des quatre
+défauts de la v2 ont disparu (éloges comptés, propositions identiques entre résumé et sections, positions
+contraires signalées sous un « unanime »). La définition rend chaque camp vérifiable en quelques minutes,
+mais un modèle seul l'écrit après coup, pour justifier son regroupement : le contrôle des recouvrements
+doit venir d'une seconde lecture (la vôtre) ou du code. Même note finale que la v2 : pas de passe de plus.
 Essai de la version 2 sur corpus réel (15 octobre 2026) : Sonnet, une passe, sur les 378 réponses de l'Observatoire
 (école). 173 citations sur 175 exactes (deux reformulations mises entre guillemets), comptes du résumé
 identiques au tableau de comptage. Deux lectures `methodologue` indépendantes : 3/5 chacune, plafond
