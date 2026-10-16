@@ -671,9 +671,25 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   for (const i of items) if (!assigned.has(i.id)) assigned.set(i.id, addTitle(fallback))
 
   const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
+  // Codage en double : une copie qui finit dans le motif de son original (déplacement, fusion) n'a plus d'objet ;
+  // elle disparaît, sinon la citation s'affiche deux fois et se renvoie à elle-même.
+  const withoutHomedCopies = (ideaIds: string[]): string[] => {
+    const here = new Set(ideaIds)
+    const homed = ideaIds.filter((id) => {
+      const original = ideaById.get(id)?.copyOf
+      return original !== undefined && here.has(original)
+    })
+    if (!homed.length) return ideaIds
+    const gone = new Set(homed)
+    state.ideas = state.ideas.filter((i) => !gone.has(i.id))
+    for (const id of gone) ideaById.delete(id)
+    state.copied = (state.copied ?? []).filter((c) => !gone.has(c.id))
+    return ideaIds.filter((id) => !gone.has(id))
+  }
   const build = (list: { title: string; ideaIds: string[] }[]): Group[] =>
     list
-      .map((g) => ({ title: g.title, ideaIds: [...g.ideaIds].sort(), summary: '', metrics: computeMetrics(g.ideaIds.map((id) => ideaById.get(id)!)) }))
+      .map((g) => ({ title: g.title, ideaIds: withoutHomedCopies([...g.ideaIds].sort()) }))
+      .map((g) => ({ title: g.title, ideaIds: g.ideaIds, summary: '', metrics: computeMetrics(g.ideaIds.map((id) => ideaById.get(id)!)) }))
       .filter((g) => g.ideaIds.length > 0)
       .sort((a, b) => b.metrics.participants - a.metrics.participants || b.metrics.mentions - a.metrics.mentions || a.title.localeCompare(b.title))
       .map((g, i) => ({ ...g, id: `G${i + 1}` }))
@@ -904,6 +920,9 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
         reconcileSchema,
       )
       const byId = new Map(groups.map((g) => [g.id, g]))
+      // Les identifiants de la demande ne survivent pas à la relecture des paires (les motifs sont renumérotés) :
+      // les fusions se retrouvent par leur titre.
+      const titleOfAsked = new Map(groups.map((g) => [g.id, titleKey(g.title)]))
       const used = new Set<string>()
       const pairs = res.overlaps
         .filter((o) => o.a !== o.b && byId.has(o.a) && byId.has(o.b) && !used.has(o.a) && !used.has(o.b) && o.rule.trim())
@@ -930,7 +949,10 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       state.moved = [...state.moved, ...shared.moved]
       state.copied = [...(state.copied ?? []), ...shared.copied]
       if (shared.retoned.length || shared.moved.length || shared.copied.length) groups = takeOffTopic(build(shared.groups))
-      const merges = res.merges.filter((m) => m.groups.every((id) => groups.some((g) => g.id === id)))
+      const idByTitle = new Map(groups.map((g) => [titleKey(g.title), g.id]))
+      const merges = res.merges
+        .map((m) => ({ ...m, groups: [...new Set(m.groups.map((id) => idByTitle.get(titleOfAsked.get(id) ?? '')).filter((id): id is string => id !== undefined))] }))
+        .filter((m) => m.groups.length >= 2)
       if (merges.length) {
         // Le motif fusionné garde la définition du plus peuplé de ses motifs d'origine.
         const current = new Map(groups.map((g) => [g.id, g]))

@@ -436,15 +436,30 @@ describe('codage en double, de bout en bout', () => {
         const res = await base.complete(req)
         // Réconciliation : les deux premiers motifs se chevauchent, leur paire est relue avec le livre de codes déjà écrit.
         if (req.task === 'reconcile') {
-          const data = readDataBlock<{ motifs: { id: string }[] }>(req.user)
-          return { ...res, text: JSON.stringify({ merges: [], overlaps: [{ a: data.motifs[0].id, b: data.motifs[1].id, rule: 'toute critique du second va dans le premier' }] }) }
+          const data = readDataBlock<{ motifs: { id: string; title: string }[] }>(req.user)
+          // Fusion des troisième et quatrième motifs : les identifiants sont ceux de la demande, et les motifs sont
+          // renumérotés après les paires (la paire ci-dessous vide presque le deuxième motif, qui tombe en queue).
+          const last = data.motifs.slice(2, 4)
+          toMerge = last.map((m) => m.title)
+          return {
+            ...res,
+            text: JSON.stringify({
+              merges: [{ groups: last.map((m) => m.id), title: 'Objet réuni', reason: 'même objet' }],
+              overlaps: [{ a: data.motifs[0].id, b: data.motifs[1].id, rule: 'toute critique du second va dans le premier' }],
+            }),
+          }
         }
         if (req.task !== 'review') return res
         // Avec le codage en double, les titres cibles portent leur définition dès qu'elle existe.
         const data = readDataBlock<{ titles: { definition?: unknown }[]; groups: { id: string; ideas: { id: string }[] }[] }>(req.user)
         if (data.titles.some((t) => t.definition)) titlesDefined = true
-        if (req.user.includes('"rule"')) return res
         const out = JSON.parse(res.text) as { changes: unknown[] }
+        if (req.user.includes('"rule"')) {
+          // Paire : le second motif se vide dans un motif nouveau, sauf l'idée à l'identifiant le plus haut (la copie,
+          // si elle est là), qui y reste seule : l'ordre des motifs change.
+          const keep = data.groups[1].ideas.map((i) => i.id).sort().at(-1)
+          return { ...res, text: JSON.stringify({ ...out, changes: data.groups[1].ideas.filter((i) => i.id !== keep).map((i) => ({ id: i.id, new: 'Motif déplacé' })) }) }
+        }
         // Le modèle définit le premier motif du lot, puis copie sa première idée dans le second motif du lot.
         const definitions = [{ id: data.groups[0].id, positive: 'le juge utile', negative: 'le juge inutile' }]
         if (data.groups.length < 2 || !data.groups[0].ideas.length) return { ...res, text: JSON.stringify({ definitions, ...out }) }
@@ -452,6 +467,7 @@ describe('codage en double, de bout en bout', () => {
       },
     }
     let titlesDefined = false
+    let toMerge: string[] = []
     const settings = { ...DEFAULT_SETTINGS, method: 'consultation' as const, multiCoding: true }
     const state = await runAnalysis(corpus, await newAnalysis(corpus, settings, spy), { provider: spy, cache: new MemoryCache() })
     expect(state.status).toBe('done')
@@ -469,10 +485,52 @@ describe('codage en double, de bout en bout', () => {
     expect(md).toContain(`aussi dans « ${motifOf(copy.id)} »`)
     expect(md).toContain(`aussi dans « ${motifOf(copy.copyOf!)} »`)
     expect(titlesDefined).toBe(true)
+    // La fusion touche les motifs demandés, pas ceux qui portent leurs numéros après renumérotation.
+    expect(state.merges!.map((m) => m.from)).toEqual([toMerge])
+    expect(state.groups.some((g) => g.title === 'Objet réuni')).toBe(true)
+    for (const t of toMerge) expect(state.groups.some((g) => g.title === t)).toBe(false)
     // Sans l'option, les titres restent nus : la définition coûterait des jetons pour rien.
     titlesDefined = false
     await runAnalysis(corpus, await newAnalysis(corpus, { ...settings, multiCoding: false }, spy), { provider: spy, cache: new MemoryCache() })
     expect(titlesDefined).toBe(false)
+  })
+
+  it('une copie ramenée dans le motif de son original disparaît', async () => {
+    const corpus = surveyCorpus()
+    const base = createSimulationProvider()
+    const spy: LlmProvider = {
+      ...base,
+      fingerprint: base.fingerprint,
+      label: base.label,
+      async complete(req) {
+        const res = await base.complete(req)
+        if (req.task === 'reconcile') {
+          const data = readDataBlock<{ motifs: { id: string }[] }>(req.user)
+          return { ...res, text: JSON.stringify({ merges: [], overlaps: [{ a: data.motifs[0].id, b: data.motifs[1].id, rule: 'tout va dans le premier' }] }) }
+        }
+        if (req.task !== 'review') return res
+        const data = readDataBlock<{ groups: { id: string; ideas: { id: string }[] }[] }>(req.user)
+        const out = JSON.parse(res.text) as { changes: unknown[] }
+        if (data.groups.length < 2 || !data.groups[0].ideas.length) return res
+        // Paire : tout le second motif rejoint le premier, la copie y retrouve son original.
+        if (req.user.includes('"rule"')) return { ...res, text: JSON.stringify({ ...out, changes: data.groups[1].ideas.map((i) => ({ id: i.id, to: data.groups[0].id })) }) }
+        const definitions = [{ id: data.groups[0].id, positive: 'le juge utile', negative: 'le juge inutile' }]
+        return { ...res, text: JSON.stringify({ definitions, ...out, changes: [...out.changes, { id: data.groups[0].ideas[0].id, also: data.groups[1].id, category: 'negative' }] }) }
+      },
+    }
+    const settings = { ...DEFAULT_SETTINGS, method: 'consultation' as const, multiCoding: true }
+    const state = await runAnalysis(corpus, await newAnalysis(corpus, settings, spy), { provider: spy, cache: new MemoryCache() })
+    expect(state.status).toBe('done')
+    const ids = new Set(state.ideas.map((i) => i.id))
+    for (const g of state.groups) {
+      const here = new Set(g.ideaIds)
+      for (const id of g.ideaIds) {
+        expect(ids.has(id)).toBe(true)
+        const original = state.ideas.find((i) => i.id === id)!.copyOf
+        if (original) expect(here.has(original)).toBe(false)
+      }
+    }
+    for (const c of state.copied!) expect(ids.has(c.id)).toBe(true)
   })
 })
 
