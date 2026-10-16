@@ -351,7 +351,12 @@ export function splitPrompt(input: SplitInput, settings: AnalysisSettings) {
   return {
     task: 'split',
     system: SYSTEM,
-    user: `${context(settings)}Le titre de chacun de ces motifs relie deux mots par « et ». Pour chacun, dis s'il traite UN seul objet (« Accueil et convivialité » : l'accueil sur place) ou DEUX objets sur lesquels on agirait séparément (« Paiement et livraison »).
+    user: `${context(settings)}${
+      // La référence ne soumet que des titres en « et » ; la méthode « consultation » ajoute les titres « X face à Y » et les motifs partagés.
+      input.groups.every((g) => /\s(et|and)\s/i.test(g.title))
+        ? 'Le titre de chacun de ces motifs relie deux mots par « et ».'
+        : 'Chacun de ces motifs peut cacher deux objets : un titre qui relie deux mots par « et », un titre « X face à Y » (X et Y, chacun avec ses éloges et ses critiques), ou des avis partagés qui portent en fait sur deux objets (la gratuité de l\'un, le coût de l\'autre).'
+    } Pour chacun, dis s'il traite UN seul objet (« Accueil et convivialité » : l'accueil sur place) ou DEUX objets sur lesquels on agirait séparément (« Paiement et livraison »).
 
 Règles :
 1. Un seul objet : {"group":"G4","objects":1}.

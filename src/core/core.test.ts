@@ -51,7 +51,7 @@ import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtm
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
-import { groupingPrompt, groupSummaryPrompt, groupSummarySchema, readDataBlock, reviewPrompt } from './analysis/prompts'
+import { groupingPrompt, groupSummaryPrompt, groupSummarySchema, readDataBlock, reviewPrompt, splitPrompt } from './analysis/prompts'
 import { methodRules } from './analysis/methods'
 import { activeParticipants, duplicateContributions, type Corpus } from './corpus'
 import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole } from './import/csv'
@@ -391,6 +391,11 @@ describe('motifs soumis à la question « un ou deux objets ? »', () => {
     const groups = [g('Accueil et convivialité', 'consensus', 3), g('École publique face au privé', 'lean', 18), g('Coût des études', 'divided', 17), g('Horaires', 'divided', 5)]
     expect(splitCandidates(groups, false).map((x) => x.title)).toEqual(['Accueil et convivialité'])
     expect(splitCandidates(groups, true).map((x) => x.title)).toEqual(['Accueil et convivialité', 'École publique face au privé', 'Coût des études'])
+    // La consigne ne parle de « et » seul que si tous les titres en ont un.
+    const only = splitPrompt({ groups: [{ id: 'G1', title: 'Accueil et convivialité', ideas: [] }] }, DEFAULT_SETTINGS).user
+    const mixed = splitPrompt({ groups: [{ id: 'G1', title: 'École publique face au privé', ideas: [] }] }, { ...DEFAULT_SETTINGS, method: 'consultation' }).user
+    expect(only).toContain('relie deux mots par « et ».')
+    expect(mixed).toContain('un titre « X face à Y »')
   })
 })
 

@@ -888,14 +888,21 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
         .filter((o) => o.a !== o.b && byId.has(o.a) && byId.has(o.b) && !used.has(o.a) && !used.has(o.b) && o.rule.trim())
         .slice(0, 8)
       for (const o of pairs) used.add(o.a).add(o.b)
-      let changes: { id: string; to?: string; new?: string; category?: IdeaCategory }[] = []
-      for (const o of pairs) {
-        const rules = new Map([
-          [o.a, o.rule.trim()],
-          [o.b, o.rule.trim()],
-        ])
-        changes = [...changes, ...(await reviewRound([byId.get(o.a)!, byId.get(o.b)!], undefined, rules))]
-      }
+      // Les paires sont disjointes : elles se relisent en parallèle.
+      const changes = (
+        await Promise.all(
+          pairs.map((o) =>
+            reviewRound(
+              [byId.get(o.a)!, byId.get(o.b)!],
+              undefined,
+              new Map([
+                [o.a, o.rule.trim()],
+                [o.b, o.rule.trim()],
+              ]),
+            ),
+          ),
+        )
+      ).flat()
       const shared = applyReview(state.ideas, groups, changes)
       state.retoned = [...state.retoned, ...shared.retoned]
       state.moved = [...state.moved, ...shared.moved]
