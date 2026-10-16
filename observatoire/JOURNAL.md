@@ -2,6 +2,8 @@
 
 ## À REGARDER
 
+- 2026-10-16 · École : passes 8 et 9 faites (dédoublonnage corrigé, livre de codes, réconciliation ; détail dans docs/METHODES.md, « Passes 8 et 9 »). Toujours 3/5 avec plafond aux deux lectures (moyennes 3,25 ; 3,25 ; 3,42 ; 3,17), langue 3,5. Non publiée. Arrêt après deux itérations : le plafond se joue sur quelques idées limites entre motifs voisins ; les leviers suivants sont des décisions de méthode (codage en double, seuil d'entrée au résumé). Avant toute publication : régénérer le résumé de fiche.json depuis le rapport retenu.
+
 - 2026-10-15 · École : passes 3 à 7 faites (méthode « consultation » affinée, voir docs/METHODES.md). Toujours 3/5 avec plafond, langue 3,5. Le plafond tombe chaque fois sur une ou deux idées limites, différentes d'une passe à l'autre ; la cause commune est le découpage, gardé du cache. Passe 8 (découpage refait) préparée puis non jouée : Arnaud a arrêté les passes le 15/10. Étude non publiée ; à reprendre en rejouant la passe 8 (docs/METHODES.md). Avant toute publication : régénérer le résumé de fiche.json (il date de la passe 1).
 
 - 2026-10-14 · École (Grand débat 2019) **non publiée** : note méthode 3/5 (seuil 3,5). À corriger dans le moteur, pas dans le rapport :

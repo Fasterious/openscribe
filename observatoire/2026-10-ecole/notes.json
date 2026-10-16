@@ -92,5 +92,25 @@
     "note_langue": 3.5,
     "publie": false,
     "raison": "Plafond : avis comptés dans le mauvais camp sur un motif du résumé (carte scolaire : regretter que la règle manque compté contre elle ; un principe général compté comme éloge de l'école publique). Les deux lectures désignent la même cause profonde : le découpage (éloges absorbés par une critique sur un autre objet), gardé du cache depuis la passe 1."
+  },
+  {
+    "date": "2026-10-16",
+    "run": "run-opus-8",
+    "methode": "consultation (passe 8 : dédoublonnage corrigé, livre de codes)",
+    "modele": "claude-opus-5-5 (joué par sous-agents)",
+    "note_methode": "3 / 3 (moyennes 3,25 et 3,25, plafond dans les deux lectures)",
+    "note_langue": 3.5,
+    "publie": false,
+    "raison": "24 éloges rendus aux comptes (bilan d'ensemble 34 → 47) ; définitions des 76 motifs écrites avant jugement. Plafond : les critiques du privé restées dans « École publique face au privé » pendant que ses éloges formaient un motif « unanime » ; gratuité de l'école et coût du supérieur mêlés ; définitions de motifs voisins qui se chevauchent."
+  },
+  {
+    "date": "2026-10-16",
+    "run": "run-opus-9",
+    "methode": "consultation (passe 9 : séparations « X face à Y » et motifs partagés, réconciliation du livre de codes)",
+    "modele": "claude-opus-5-5 (joué par sous-agents)",
+    "note_methode": "3 / 3 (moyennes 3,42 et 3,17, plafond dans les deux lectures)",
+    "note_langue": 3.5,
+    "publie": false,
+    "raison": "Privé (13 sur 15) et gratuité corrigés, traçabilité 4, aucune phrase retirée, aucune citation déformée. Plafond : le même mécanisme sur d'autres paires (éloges de l'école publique dans « Expérience globale », critiques de la qualité des enseignants dans « Contrôle des enseignants défaillants », critiques de l'éloignement hors de « Proximité de l'école »). Arrêt après deux itérations ; leviers suivants (codage en double, seuil d'entrée au résumé) à trancher par Arnaud."
   }
 ]
