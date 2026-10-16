@@ -1521,7 +1521,8 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
         : [`${pos} positif${pos > 1 ? 's' : ''}`, `${neg} négatif${neg > 1 ? 's' : ''}`, ...(mix ? [`${mix} mitigé${mix > 1 ? 's' : ''}`] : [])]
     const and = lang === 'en' ? 'and' : 'et'
     const counts = `${camps.slice(0, -1).join(', ')} ${and} ${camps[camps.length - 1]}`
-    const among = compact && !first ? '' : lang === 'en' ? ` among the ${d.of} people who give one` : ` parmi les ${d.of} participants qui en donnent un`
+    // Méthode « consultation » : « qui donnent un avis » (« qui en donnent un » laissait le lecteur chercher « un » quoi).
+    const among = compact && !first ? '' : lang === 'en' ? ` among the ${d.of} people who give one` : compact ? ` parmi les ${d.of} participants qui donnent un avis` : ` parmi les ${d.of} participants qui en donnent un`
     const r = refs.length ? ` [${refs.join(', ')}]` : ''
     return compact ? `${bare(d.title)} (${counts}${among})${r}` : `${q(d.title)}${lang === 'en' ? ':' : ' :'} ${counts}${among}${r}`
   }
@@ -1556,9 +1557,9 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
         ...(opposed.length
           ? [
               lang === 'en'
-                ? `Two proposals go in opposite directions ${list(opposed.map((d) => `on ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}]`))}.`
+                ? `${opposed.length > 1 ? 'Proposals' : 'Two proposals'} go in opposite directions ${list(opposed.map((d) => `on ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}]`))}.`
                 : // L'objet du désaccord est nommé : « deux propositions s'opposent sur « X » : … » annonçait deux propositions sans les dire.
-                  `Deux propositions vont en sens contraire ${list(opposed.map((d) => `sur ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}]`))}.`,
+                  `${opposed.length > 1 ? 'Des propositions' : 'Deux propositions'} vont en sens contraire ${list(opposed.map((d) => `sur ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}]`))}.`,
             ]
           : []),
       ]

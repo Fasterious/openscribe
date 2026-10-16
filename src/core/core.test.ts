@@ -1010,7 +1010,7 @@ describe('méthode « consultation » (Observatoire)', () => {
     expect(c.state.groups.filter((g) => g.definition).length).toBeGreaterThan(0)
     expect(ref.state.groups.some((g) => g.definition)).toBe(false)
     const md = reportToMarkdown(c.state, corpus, 'Test')
-    expect(md).toContain('*Favorable : le juge utile · Défavorable : le juge inutile · Hors camp : un principe général.*')
+    expect(md).toContain('*Compte comme positif : le juge utile · comme négatif : le juge inutile · ne compte pas comme un avis : un principe général.*')
     expect(md).toContain('Livre de codes :')
     expect(c.seen.review).toContain('Livre de codes')
     expect(ref.seen.review).not.toContain('Livre de codes')
@@ -1355,7 +1355,7 @@ describe('contrôles ajoutés à la certification B9', () => {
     expect(out.endsWith('Ils le sont encore sur 2 autres sujets (voir « Ce qui divise »).')).toBe(true)
     // Méthode « consultation » : une seule phrase, la base au premier sujet, les camps seuls ensuite.
     const compact = withDivided('A.\n\nB.', [g('G1', 'Un'), g('G2', 'Deux'), g('G3', 'Trois'), g('G4', 'Quatre'), g('G5', 'Cinq')], 'fr', false, undefined, true)
-    expect(compact).toContain('Les avis sont partagés sur trois sujets : cinq (2 positifs et 2 négatifs parmi les 4 participants qui en donnent un), deux (2 positifs et 2 négatifs) et quatre (2 positifs et 2 négatifs).')
+    expect(compact).toContain('Les avis sont partagés sur trois sujets : cinq (2 positifs et 2 négatifs parmi les 4 participants qui donnent un avis), deux (2 positifs et 2 négatifs) et quatre (2 positifs et 2 négatifs).')
     expect(compact.endsWith('Deux autres sujets divisent aussi (voir « Ce qui divise »).')).toBe(true)
     // Les propositions contraires de plusieurs motifs tiennent en une phrase.
     const o = (id: string, title: string, about: string) =>
@@ -1368,7 +1368,7 @@ describe('contrôles ajoutés à la certification B9', () => {
         metrics: { stance: 'consensus', positiveOnly: [], negativeOnly: ['c', 'd', 'e'], mixed: [], participantsByCategory: {} },
       }) as unknown as Group
     const two = withDivided('A.\n\nB.', [o('G1', 'Un', 'le prix'), o('G2', 'Deux', 'les horaires')], 'fr', false, undefined, true)
-    expect(two).toContain('Deux propositions vont en sens contraire sur les horaires [I0001, I0002] et sur le prix [I0001, I0002].')
+    expect(two).toContain('Des propositions vont en sens contraire sur les horaires [I0001, I0002] et sur le prix [I0001, I0002].')
     expect(two.match(/sens contraire/g)).toHaveLength(1)
   })
   it('un nombre en tête de phrase s’écrit en lettres', () => {
@@ -1440,6 +1440,9 @@ describe('rapport', () => {
     const byId = new Map([idea('I0001', 'P2'), idea('I0002', 'P2'), idea('I0003', 'P7')].map((i) => [i.id, i]))
     expect(refsToPeople('Deux personnes regrettent [I0001, I0002, I0003].', byId)).toBe('Deux personnes regrettent (P2, P7).')
     expect(refsToPeople('Inconnue [I0099].', byId)).toBe('Inconnue.')
+    // « notamment » : trois exemples au plus.
+    const many = new Map(['P1', 'P2', 'P3', 'P4', 'P5'].map((p, i) => idea(`I000${i + 1}`, p)).map((i) => [i.id, i]))
+    expect(refsToPeople('Sept personnes regrettent X [I0001, I0002, I0003, I0004, I0005].', many)).toBe('Sept personnes regrettent X (notamment P1, P2, P3).')
     expect(refsToPeople('Lien [I0003].', byId, (who, i) => `<a href="#${i.id}">${who}</a>`)).toBe('Lien (<a href="#I0003">P7</a>).')
   })
 

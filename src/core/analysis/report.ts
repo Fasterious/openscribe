@@ -40,8 +40,12 @@ export function engineName(presetId: string, model?: string): string {
 
 /** Le livre de codes d'un motif, en une ligne sous son titre : ce qui y compte comme favorable, défavorable ou hors camp. */
 export function definitionLine(d: GroupDefinition): string {
-  const dot = (s: string) => s.trim().replace(/[.;]+$/, '')
-  return `${[`Favorable : ${dot(d.positive)}`, `Défavorable : ${dot(d.negative)}`, ...(d.neutral ? [`Hors camp : ${dot(d.neutral)}`] : [])].join(' · ')}.`
+  // Une phrase française, pas une consigne de codage (plume, passe 8) : minuscule après les deux-points, pas de « hors camp ».
+  const dot = (s: string) => {
+    const t = s.trim().replace(/[.;]+$/, '')
+    return t.charAt(0).toLowerCase() + t.slice(1)
+  }
+  return `${[`Compte comme positif : ${dot(d.positive)}`, `comme négatif : ${dot(d.negative)}`, ...(d.neutral ? [`ne compte pas comme un avis : ${dot(d.neutral)}`] : [])].join(' · ')}.`
 }
 
 function methodNote(state: AnalysisState, corpus: Corpus): string[] {
@@ -334,7 +338,9 @@ export function refsToPeople(
           }
           if (!seen.size) return ''
           const people = [...seen].sort(([a], [b]) => a.localeCompare(b, 'fr', { numeric: true }))
-          return `(${tag}${people.map(([who, idea]) => (link ? link(who, idea) : who)).join(', ')})`
+          // « notamment » annonce des exemples, pas une liste : trois personnes au plus (plume, passe 8 : jusqu'à douze).
+          const shown = tag ? people.slice(0, 3) : people
+          return `(${tag}${shown.map(([who, idea]) => (link ? link(who, idea) : who)).join(', ')})`
         })
       })
       .join('')
