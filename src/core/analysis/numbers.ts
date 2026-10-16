@@ -240,6 +240,8 @@ export function impliedOthers(text: string, personOf: (ideaId: string) => string
     const brackets = [...paragraph.matchAll(/\[([^\]]*)\]/g)].map((m) => ({ at: m.index ?? 0, who: people(m[1]) }))
     for (const m of paragraph.matchAll(WORD)) {
       const at = m.index ?? 0
+      // « d'une agence à l'autre », « d'un jour à l'autre » : une locution, pas une autre personne.
+      if (/^l['’]autre$/i.test(m[1]) && /d['’]une?\s+\S+(\s+\S+)?\s+à\s*$/iu.test(paragraph.slice(Math.max(0, at - 40), at))) continue
       const next = brackets.find((b) => b.at > at)
       if (!next || !next.who.size) continue
       const prev = [...brackets].reverse().find((b) => b.at < at)

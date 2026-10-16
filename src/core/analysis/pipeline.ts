@@ -1552,12 +1552,15 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
                 : spellLeadingNumbers(`${rest > 1 ? `${rest} autres sujets divisent` : 'Un autre sujet divise'} aussi (voir « Ce qui divise »).`),
             ]
           : []),
-        ...opposed.map((d) =>
-          lang === 'en'
-            ? `On ${q(d.title)}, two proposals go in opposite directions: ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`
-            : // L'objet du désaccord est nommé : « deux propositions s'opposent sur « X » : … » annonçait deux propositions sans les dire.
-              `Deux propositions vont en sens contraire sur ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}].`,
-        ),
+        // Une seule phrase pour toutes les propositions contraires (plume, passe 8 : trois phrases de même forme à la suite).
+        ...(opposed.length
+          ? [
+              lang === 'en'
+                ? `Two proposals go in opposite directions ${list(opposed.map((d) => `on ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}]`))}.`
+                : // L'objet du désaccord est nommé : « deux propositions s'opposent sur « X » : … » annonçait deux propositions sans les dire.
+                  `Deux propositions vont en sens contraire ${list(opposed.map((d) => `sur ${d.opposed!.about} [${d.opposed!.a}, ${d.opposed!.b}]`))}.`,
+            ]
+          : []),
       ]
     : [
         ...shownSplit.map((d, i) =>

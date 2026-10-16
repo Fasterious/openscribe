@@ -1259,6 +1259,9 @@ describe('contrôles ajoutés à la certification B8', () => {
     expect(impliedOthers('Une personne apprécie X [I0001]. Une autre regrette Y [I0003].', person)).toEqual([])
     expect(impliedOthers('Une personne apprécie X [I0001]. Une autre regrette Y [I0002].', person)).toEqual(['Une autre'])
     expect(impliedOthers('Une personne, une autre et une troisième proposent Z [I0001, I0003].', person)).toEqual(['une troisième'])
+    // Une locution, pas une autre personne.
+    expect(impliedOthers("Une personne voit le menu du restaurant changer d'un jour à l'autre [I0001].", person)).toEqual([])
+    expect(impliedOthers("Une personne trouve le tarif différent d'une agence à l'autre [I0001].", person)).toEqual([])
   })
   it('« il faut » n’est pas une reprise ; une question de deux mots emporte sa phrase ; jamais par-dessus une autre idée', () => {
     const text = 'Le magasin est loin. Il faut prendre la voiture. Pourquoi pas ? comment ?'
@@ -1354,6 +1357,19 @@ describe('contrôles ajoutés à la certification B9', () => {
     const compact = withDivided('A.\n\nB.', [g('G1', 'Un'), g('G2', 'Deux'), g('G3', 'Trois'), g('G4', 'Quatre'), g('G5', 'Cinq')], 'fr', false, undefined, true)
     expect(compact).toContain('Les avis sont partagés sur trois sujets : cinq (2 positifs et 2 négatifs parmi les 4 participants qui en donnent un), deux (2 positifs et 2 négatifs) et quatre (2 positifs et 2 négatifs).')
     expect(compact.endsWith('Deux autres sujets divisent aussi (voir « Ce qui divise »).')).toBe(true)
+    // Les propositions contraires de plusieurs motifs tiennent en une phrase.
+    const o = (id: string, title: string, about: string) =>
+      ({
+        id,
+        title,
+        ideaIds: [],
+        summary: '',
+        opposed: [{ a: 'I0001', b: 'I0002', about }],
+        metrics: { stance: 'consensus', positiveOnly: [], negativeOnly: ['c', 'd', 'e'], mixed: [], participantsByCategory: {} },
+      }) as unknown as Group
+    const two = withDivided('A.\n\nB.', [o('G1', 'Un', 'le prix'), o('G2', 'Deux', 'les horaires')], 'fr', false, undefined, true)
+    expect(two).toContain('Deux propositions vont en sens contraire sur les horaires [I0001, I0002] et sur le prix [I0001, I0002].')
+    expect(two.match(/sens contraire/g)).toHaveLength(1)
   })
   it('un nombre en tête de phrase s’écrit en lettres', () => {
     expect(spellLeadingNumbers('3 personnes regrettent X. Puis 4 autres.\n\n2 personnes proposent Y.')).toBe(
