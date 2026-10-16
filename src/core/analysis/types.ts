@@ -103,6 +103,14 @@ export interface Group {
   unverified?: string[]
   /** Propositions de personnes différentes qui vont en sens contraire (signalées par le moteur, vérifiées par le code). */
   opposed?: { a: string; b: string; about: string }[]
+  /** Livre de codes (méthodes qui le demandent) : ce qui compte, dans ce motif, comme favorable, défavorable ou hors camp, écrit avant de juger ses idées. */
+  definition?: GroupDefinition
+}
+
+export interface GroupDefinition {
+  positive: string
+  negative: string
+  neutral?: string
 }
 
 export interface Theme {

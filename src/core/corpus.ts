@@ -92,6 +92,25 @@ export function activeParticipants(corpus: Corpus): Participant[] {
   return corpus.participants.filter((p) => withText.has(p.id))
 }
 
+/**
+ * Réponses identiques entre personnes (textes copiés-collés, campagnes de réponses groupées) :
+ * une étape classique de l'analyse de consultations. Chaque entrée liste les participants qui ont
+ * envoyé exactement le même texte (espaces et casse ignorés, 40 caractères au moins).
+ */
+export function duplicateContributions(corpus: Corpus): string[][] {
+  const text = new Map<string, string[]>()
+  for (const p of activeParticipants(corpus)) {
+    const t = corpus.contributions
+      .filter((c) => c.participantId === p.id)
+      .map((c) => c.text.trim().toLowerCase().replace(/\s+/g, ' '))
+      .filter(Boolean)
+      .join('\n')
+    if (t.length < 40) continue
+    text.set(t, [...(text.get(t) ?? []), p.id])
+  }
+  return [...text.values()].filter((ids) => ids.length > 1)
+}
+
 /** Fusionne un corpus importé dans un corpus existant (nouvelle source). */
 export function mergeCorpus(base: Corpus, added: Corpus): Corpus {
   return {

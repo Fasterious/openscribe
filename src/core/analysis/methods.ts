@@ -30,7 +30,7 @@ export interface Method {
   /** Après la consolidation, chaque motif porté par une seule personne est proposé au rattachement à un motif existant (ou à aucun). */
   attachSingles: boolean
   /** Règles ajoutées à la fin des règles d'une consigne, pour cette méthode seulement (la référence n'en a aucune). */
-  extraRules: Partial<Record<'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish' | 'unanimity', string>>
+  extraRules: Partial<Record<'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish' | 'unanimity' | 'support', string>>
   /** Au regroupement, chaque libellé arrive avec plusieurs verbatims et leur ton (la référence : un seul exemple). */
   groupingContext?: boolean
   /** Après la relecture, chaque motif unanime ou à large majorité est confronté aux idées de ton contraire rangées ailleurs. */
@@ -49,6 +49,10 @@ export interface Method {
   summaryLines?: number
   /** Résumé : équilibre des critiques et des satisfactions dans "facts", exemple pris dans la synthèse du motif, lignes oubliées et « fragile » signalés à la vérification des renvois. */
   summaryChecks?: boolean
+  /** Au découpage, un éloge et une critique qui se recouvrent sont gardés tous les deux (la référence garde la plus longue). */
+  keepOpposedOverlaps?: boolean
+  /** Livre de codes : à la relecture, le moteur définit chaque motif (favorable, défavorable, hors camp) avant de juger ses idées ; la définition suit le motif jusqu'au rapport. */
+  codebook?: boolean
 }
 
 const REFERENCE: Method = {
@@ -165,6 +169,11 @@ export const METHODS: Record<MethodId, Method> = {
     ...REFERENCE,
     id: 'consultation',
     label: 'méthode de référence, adaptée aux consultations publiques',
+    // Passe 8 (16/10) : le dédoublonnage retirait l'éloge contenu dans une critique plus longue (24 des 188 éloges de l'école).
+    keepOpposedOverlaps: true,
+    // Passe 8 : sept passes ont buté sur des idées limites (regret qu'une règle manque, demande de plus d'exigence, principe général)
+    // jugées différemment d'un lecteur à l'autre. La définition écrite avant le jugement rend le camp vérifiable.
+    codebook: true,
     offTopic: true,
     scaleInLines: true,
     // Passe 3 (15/10) : une idée déplacée vers un motif voisin faute de mieux (le bon motif était ouvert par un autre lot) y gardait son ton.
@@ -188,14 +197,17 @@ export const METHODS: Record<MethodId, Method> = {
 10. Quand une personne apprécie un objet (lis "before") et regrette qu'une règle ou un tiers le limite (« j'adore ce conservatoire, dommage que les quotas empêchent d'y inscrire tous les enfants »), ce regret est favorable à l'objet : "positive". Un service jugé rare ou insuffisant (« dommage qu'il y ait si peu de bus le soir ») reste une critique de ce service. Une réserve qui nuance une critique (« heureusement, la plupart des chauffeurs sont aimables », après un reproche aux chauffeurs) va dans le motif de cette critique.
 11. Un objet ne se découpe pas selon le jugement : quand tu déplaces les éloges d'un objet vers son motif (existant ou nouveau), déplace-y aussi les critiques qui jugent ce même objet, sinon ce motif paraîtra unanime à tort. Sauf une critique qui juge l'autre objet, pour expliquer un choix ou dans une comparaison (règles 7 et 9) : elle reste avec l'objet critiqué.
 12. N'ouvre pas de motif « Choix de X » à côté d'un motif sur X : les raisons de choisir le covoiturage vont dans « Covoiturage ».
-13. Défendre davantage de ce que les autres idées du motif regrettent de ne pas avoir (dans « Fréquence des contrôles », où l'on regrette des contrôles trop rares : « un contrôle strict, même pénible, ça marche ») n'est pas un éloge de l'objet tel qu'il est : c'est une critique ("negative") ou une proposition ("suggestion").`,
+13. Défendre davantage de ce que les autres idées du motif regrettent de ne pas avoir (dans « Fréquence des contrôles », où l'on regrette des contrôles trop rares : « un contrôle strict, même pénible, ça marche ») n'est pas un éloge de l'objet tel qu'il est : c'est une critique ("negative") ou une proposition ("suggestion").
+14. Livre de codes. AVANT de juger les idées d'un motif, écris sa définition en trois clauses courtes (une phrase chacune, sans exemple tiré des idées) : "positive", ce qui compte ici comme favorable à l'objet (pour une règle ou un service : le défendre, l'apprécier, regretter qu'il manque ou ne soit pas appliqué) ; "negative", ce qui compte comme défavorable (le rejeter, le juger insuffisant, en subir les contraintes, en demander davantage) ; "neutral", hors camp (ce qui ne juge pas la situation : un principe général, un constat, un simple souhait). Puis juge chaque idée contre cette définition et corrige sa catégorie quand elle ne s'y conforme pas ; une idée hors camp devient "neutral". Un motif qui a déjà une "definition" la garde ; écris-en une pour chaque motif qui n'en a pas. Réponds alors avec {"definitions":[{"id":"G3","positive":"…","negative":"…","neutral":"…"}],"changes":[…]}, les définitions avant les changements.`,
       summary: `9. Format de "opposed" : [{"a":"I0012","b":"I0040","about":"le prix de l'adhésion"}], "a" et "b" étant les identifiants des deux propositions.
 10. Ne montre pas tes comptes : pas de « dont une des précédentes », « dont deux déjà citées », « parmi elles » (cette règle remplace l'exemple de la règle 7). Chaque affirmation donne son propre nombre de personnes ; le lecteur retrouve les personnes dans les renvois.
 11. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un motif (le lecteur comprendrait « la plupart des répondants ») ; écris le nombre de personnes, ou « la plupart de ceux qui en parlent » quand l'objet est nommé plus tôt dans la même phrase (sinon « la plupart de ceux qui parlent des horaires »). Jamais « des personnes » ni « beaucoup » : un nombre ou un mot de l'échelle. Nombres en chiffres, en lettres seulement en tête de phrase. Au plus un point-virgule par phrase.
-12. Un motif d'une seule personne se dit en une phrase, avec un seul crochet (cette règle remplace « 2 à 4 phrases »).`,
+12. Un motif d'une seule personne se dit en une phrase, avec un seul crochet (cette règle remplace « 2 à 4 phrases »).
+13. "definition" dit ce qui compte, dans ce motif, comme favorable, défavorable ou hors camp : la synthèse n'appelle éloge, satisfaction ou critique que ce que cette définition désigne ainsi, et décrit une idée hors camp sans la ranger dans un camp.`,
       themes: `4. Le rapport est lu par le grand public : n'écris jamais « les participants » ni « la plupart des participants » pour les personnes d'un groupe ; écris le nombre de personnes, ou « la plupart de ceux qui parlent de… » avec l'objet nommé dans la phrase.
 5. La synthèse du thème relie ses groupes : ce qu'ils ont en commun, ce qui les distingue. Elle ne recopie aucune phrase d'une synthèse de groupe, même reformulée de près : le lecteur les lit juste en dessous. Aucun lien de cause que les participants n'ont pas formulé.`,
       polish: `7. Cette règle remplace l'exemple de la règle 5. Pour attribuer un constat, ne remplace jamais un nombre ou un mot de l'échelle déjà écrit, et n'écris pas « des personnes » : reprends le sujet déjà nommé dans le texte (« ces 6 personnes », « ceux qui parlent des horaires »). « Ceux qui en parlent » suppose l'objet nommé plus tôt dans la phrase.`,
+      support: `7. "definition" (motifs) dit ce qui compte comme favorable, défavorable ou hors camp : une phrase qui met une personne dans un camp contraire à cette définition est fausse et se récrit.`,
       global: `7. Chaque ligne de "strengths" et "blockers" donne le mot de l'échelle d'avis (unanime, large majorité, majorité) : il ouvre la phrase et le chiffre suit entre parenthèses (« Une large majorité de ceux qui en parlent critique la carte de transport (29 des 35 participants qui donnent un avis) », « Tous ceux qui en parlent regrettent les retards (les 24 participants qui donnent un avis) »). Le mot de l'échelle s'entend de ceux qui parlent du motif : écris « une large majorité de ceux qui en parlent », jamais « une large majorité » seul, que le grand public lirait comme la majorité des répondants. « Unanime » ne l'est que parmi eux : la règle 3 ne l'interdit pas ici, mais n'écris jamais « tout le monde ». Deux lignes voisines peuvent partager une phrase, chacune avec son objet nommé, son mot et son chiffre (la limite d'un chiffre par phrase de la règle 1 ne s'applique pas à elles ; le reste de la règle 1 s'applique) : le résumé peut alors compter jusqu'à 12 phrases.
 8. Un motif d'appréciation d'ensemble (« Expérience globale », « Bilan ») ne recueille que des jugements généraux, parfois de personnes qui décrivent ailleurs des difficultés : ne le présente pas comme l'avis de la plupart, ni par le mot de l'échelle ; dis « N personnes portent un jugement positif d'ensemble, que certaines nuancent ailleurs », jamais « aucune difficulté ». Après la phrase sur l'équilibre des avis (règle 10), il ouvre le premier paragraphe s'il réunit le plus de personnes.
 9. Pour une proposition, nomme ce que proposent toutes les personnes comptées ("example" n'est que le verbatim de l'une d'elles), sans détail que porte une seule personne (« ouvrir le guichet le samedi » seulement si chaque personne comptée le propose). Une raison ou une précision (« pour son prix ou ses horaires ») n'accompagne le chiffre d'un motif que si chaque personne comptée la donne. Une phrase d'annonce (« L'accès au service concentre les critiques : ») ne couvre que les motifs qu'elle annonce.
@@ -223,7 +235,7 @@ export const METHODS: Record<MethodId, Method> = {
 /** Les règles propres à une méthode pour une consigne, prêtes à insérer (rien pour la référence). */
 export function methodRules(
   settings: Pick<AnalysisSettings, 'method'> & { lightModel?: boolean },
-  prompt: 'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish' | 'unanimity',
+  prompt: 'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish' | 'unanimity' | 'support',
 ): string {
   const r = methodOf(settings).extraRules[prompt]
   return r ? `${r}\n` : ''

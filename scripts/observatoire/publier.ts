@@ -65,7 +65,7 @@ ${paras(fiche.summary)}
 <blockquote>${e(fiche.question)}</blockquote>
 <h2>Les données</h2>
 <p><a href="${e(fiche.source.url)}">${e(fiche.source.name)}</a>, ${e(fiche.source.period)}. ${e(fiche.source.license)}.</p>
-<p>${n(fiche.sample)} réponses tirées au sort parmi ${n(fiche.population)} (marge de ± ${fiche.margin} points à 95 %).</p>
+<p>${n(fiche.sample)} réponses tirées au sort parmi ${n(fiche.population)} (marge de ± ${fiche.margin} points à 95 %). Un avis partagé par 1 % des contributeurs a ${Math.round((1 - 0.99 ** fiche.sample) * 100)} % de chances d'apparaître au moins une fois dans l'échantillon ; un avis plus rare peut manquer.</p>
 ${paras(fiche.sampling)}
 <h2>Avant de lire</h2>
 <ul>${fiche.warnings.map((w) => `<li>${e(w)}</li>`).join('')}</ul>

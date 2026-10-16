@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { asText, lenientArray, prose } from './json'
 import { methodOf, methodRules } from './methods'
-import type { AnalysisSettings, IdeaCategory } from './types'
+import type { AnalysisSettings, GroupDefinition, IdeaCategory } from './types'
 
 /**
  * Consignes envoyées au modèle.
@@ -376,11 +376,17 @@ export interface ReviewInput {
     title: string
     /** Personnes qui disent du bien ET du mal de ce motif : à vérifier en priorité. */
     mixed: string[]
+    /** Livre de codes déjà écrit pour ce motif (second tour) : le moteur le garde. */
+    definition?: GroupDefinition
     ideas: { id: string; participant: string; category: IdeaCategory; label: string; verbatim: string; before?: string; arrived?: boolean }[]
   }[]
 }
 
 export const reviewSchema = z.object({
+  /** Livre de codes (méthodes qui le demandent) : écrit avant les changements, un par motif. */
+  definitions: lenientArray(z.object({ id: z.string(), positive: z.string(), negative: z.string(), neutral: z.string().optional() }))
+    .optional()
+    .default([]),
   changes: lenientArray(
     z.object({
       id: z.string(),
@@ -460,6 +466,8 @@ export interface SummaryGroupInput {
   title: string
   /** Chiffres calculés par le code, à citer tels quels. */
   facts: string
+  /** Livre de codes du motif (méthodes qui le demandent). */
+  definition?: GroupDefinition
   ideas: { id: string; participant: string; category: IdeaCategory; verbatim: string }[]
 }
 
@@ -586,6 +594,8 @@ export interface SupportInput {
     flags?: { n: number; problem: string }[]
     /** Les idées que ce texte peut citer : celles du motif, du thème ou des listes du résumé. */
     ideas: { id: string; participant: string; category: IdeaCategory; verbatim: string }[]
+    /** Livre de codes du motif (méthodes qui le demandent). */
+    definition?: GroupDefinition
   }[]
 }
 
@@ -606,7 +616,7 @@ Règles :
 4. Une phrase du résumé ("R") qui reprend un chiffre de motif (« 6 des 7 participants qui donnent un avis ») ne cite qu'un exemple : c'est normal. Vérifie seulement que la précision ajoutée au chiffre vaut pour ce motif entier ; sinon retire-la.
 5. "flags" liste ce que les contrôles du code ont relevé. Une phrase signalée (n ≥ 1) est récrite pour que son compte corresponde exactement aux personnes de ses renvois (ou retirée si rien ne la fonde). Un manque (n = 0) se comble par une phrase ajoutée : {"text":"G:G4","n":0,"sentence":"Trois personnes jugent au contraire les délais trop longs [I0031, I0267, I0280]."} ; elle ne cite que les nombres donnés dans le signalement.
 6. N'invente aucun identifiant, ne réécris pas une phrase juste pour le style.
-${lang(settings)}
+${methodRules(settings, 'support')}${lang(settings)}
 
 Réponds avec : {"fixes":[…]}
 

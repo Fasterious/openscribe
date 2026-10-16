@@ -55,7 +55,7 @@ import {
   unverifiedNumbers,
   vaguePlurals,
 } from './numbers'
-import type { AnalysisSettings, AnalysisState, Group, Idea, IdeaCategory, Merge, Metrics, RejectedIdea, StepId, Theme } from './types'
+import type { AnalysisSettings, AnalysisState, Group, GroupDefinition, Idea, IdeaCategory, Merge, Metrics, RejectedIdea, StepId, Theme } from './types'
 import { methodOf, OFF_TOPIC } from './methods'
 import { explainMiss, locateQuote, quoteText, withAntecedent } from './verbatim'
 
@@ -397,13 +397,20 @@ export async function extractParticipant(
       ? 0
       : segs(a).reduce((n, p) => n + segs(b).reduce((m, q) => m + Math.max(0, Math.min(p.end, q.end) - Math.max(p.start, q.start)), 0), 0)
   const dropped = new Set<Omit<Idea, 'id'>>()
+  // Méthode qui le demande : un éloge et une critique qui se recouvrent (« X va bien, sauf Y » cité en entier pour la critique de Y)
+  // sont deux avis, pas un doublon. Les retirer faisait disparaître l'éloge des comptes : sur l'école (passe 7), 24 des 188 éloges
+  // rendus par le moteur, tous sur les motifs du résumé.
+  const keepOpposed = methodOf(settings).keepOpposedOverlaps === true
+  const polar = (c: IdeaCategory) => c === 'positive' || c === 'negative'
   const bySize = [...ideas].sort((a, b) => len(b) - len(a) || ideas.indexOf(a) - ideas.indexOf(b))
   for (const [k, a] of bySize.entries()) {
     if (dropped.has(a)) continue
     for (const b of bySize.slice(k + 1)) {
       // Une même citation pour deux objets d'une énumération (« le programme et l'équipe », même ton, libellés différents) : deux idées légitimes.
       const enumeration = a.category === b.category && a.span.start === b.span.start && a.span.end === b.span.end && normLabel(a.label) !== normLabel(b.label)
-      if (!dropped.has(b) && !enumeration && overlap(a, b) >= 0.5 * len(b)) dropped.add(b)
+      // Sauf deux citations presque identiques (la courte couvre 80 % de la longue) : un même objet codé deux fois en sens contraire.
+      const opposite = keepOpposed && polar(a.category) && polar(b.category) && a.category !== b.category && overlap(a, b) < 0.8 * len(a)
+      if (!dropped.has(b) && !enumeration && !opposite && overlap(a, b) >= 0.5 * len(b)) dropped.add(b)
     }
   }
   const kept = ideas.filter((i) => !dropped.has(i))
@@ -772,9 +779,14 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       const prev = text.slice(Math.max(0, start - 160), start)
       return (start > 160 ? prev.slice(prev.indexOf(' ') + 1) : prev).trim() || undefined
     }
+    // Livre de codes (méthode qui le demande) : la définition écrite par le moteur suit le motif par son titre
+    // (les identifiants G… sont renumérotés après chaque tour).
+    const definitions = new Map<string, GroupDefinition>()
+    const codebook = methodOf(state.settings).codebook === true
     // Un tour de relecture sur les motifs donnés ; `arrived` : idées déplacées au tour précédent, à vérifier d'abord.
     const reviewRound = async (scope: Group[], arrived?: Set<string>) => {
       const titles = groups.map((g) => ({ id: g.id, title: g.title }))
+      const titleOf = new Map(groups.map((g) => [g.id, g.title]))
       const batches: Group[][] = []
       let cur: Group[] = []
       for (const g of scope) {
@@ -795,6 +807,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
                   id: g.id,
                   title: g.title,
                   mixed: g.metrics.mixed,
+                  ...(codebook && definitions.has(titleKey(g.title)) ? { definition: definitions.get(titleKey(g.title)) } : {}),
                   ideas: g.ideaIds.map((id) => {
                     const i = ideaById.get(id)!
                     return {
@@ -817,12 +830,18 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
             // est ignorée pour ce lot : le rangement d'avant reste, l'analyse continue.
             if (e instanceof ProviderError && e.truncated) {
               state.reviewSkipped = (state.reviewSkipped ?? 0) + 1
-              return { changes: [] }
+              return { definitions: [], changes: [] }
             }
             throw e
           }),
         ),
       )
+      if (codebook)
+        for (const d of responses.flatMap((r) => r.definitions ?? [])) {
+          const title = titleOf.get(d.id)
+          if (title && d.positive.trim() && d.negative.trim())
+            definitions.set(titleKey(title), { positive: d.positive.trim(), negative: d.negative.trim(), ...(d.neutral?.trim() ? { neutral: d.neutral.trim() } : {}) })
+        }
       return responses.flatMap((r) => r.changes)
     }
     const reviewed = applyReview(state.ideas, groups, await reviewRound(groups))
@@ -846,6 +865,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       }
     }
 
+    if (definitions.size) groups = groups.map((g) => (definitions.has(titleKey(g.title)) ? { ...g, definition: definitions.get(titleKey(g.title)) } : g))
     s.message = undefined
   }
 
@@ -1249,6 +1269,7 @@ async function summarizeGroups(corpus: Corpus, state: AnalysisState, runner: Llm
     id: g.id,
     title: g.title,
     facts: describeMetrics(g.metrics, state.settings.language),
+    ...(g.definition ? { definition: g.definition } : {}),
     ideas: g.ideaIds.map((id) => {
       const idea = ideaById.get(id)!
       return { id, participant: labelOf.get(idea.participantId) ?? idea.participantId, category: idea.category, verbatim: idea.verbatim }
@@ -1773,6 +1794,7 @@ async function checkSupport(state: AnalysisState, runner: LlmRunner, emit: () =>
     allowed: string[]
     flags: { n: number; problem: string }[]
     addTo: 'last' | 'second'
+    definition?: GroupDefinition
   }
   const targets: Target[] = []
   const unsupported = (text: string, bad?: string[]) => [
@@ -1793,7 +1815,7 @@ async function checkSupport(state: AnalysisState, runner: LlmRunner, emit: () =>
         n: 0,
         problem: `le camp ${c.side === 'positive' ? 'positif' : 'négatif'} (${c.people.length} ${c.people.length > 1 ? 'personnes' : 'personne'} : ${c.ideaIds.join(', ')}) n'est pas cité : ajoute une phrase sur ce qu'il dit`,
       })
-    targets.push({ id: `G:${g.id}`, get: () => g.summary, set: (t) => (g.summary = t), allowed: g.ideaIds, flags, addTo: 'last' })
+    targets.push({ id: `G:${g.id}`, get: () => g.summary, set: (t) => (g.summary = t), allowed: g.ideaIds, flags, addTo: 'last', ...(g.definition ? { definition: g.definition } : {}) })
   }
   for (const t of state.themes)
     if (t.summary)
@@ -1866,6 +1888,7 @@ async function checkSupport(state: AnalysisState, runner: LlmRunner, emit: () =>
                 const i = ideaById.get(id)!
                 return { id, participant: i.participantId, category: i.category, verbatim: shortExample(i.verbatim, 200) }
               }),
+              ...(t.definition ? { definition: t.definition } : {}),
             })),
           },
           state.settings,

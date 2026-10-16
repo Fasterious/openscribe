@@ -50,9 +50,9 @@ import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtm
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
-import { groupingPrompt, groupSummaryPrompt, groupSummarySchema, reviewPrompt } from './analysis/prompts'
+import { groupingPrompt, groupSummaryPrompt, groupSummarySchema, readDataBlock, reviewPrompt } from './analysis/prompts'
 import { methodRules } from './analysis/methods'
-import { activeParticipants, type Corpus } from './corpus'
+import { activeParticipants, duplicateContributions, type Corpus } from './corpus'
 import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole } from './import/csv'
 import { detectSpeakers, textToCorpus } from './import/text'
 import { corpusForAnalysis, exportProject, importProject, newProject } from './project'
@@ -353,6 +353,49 @@ describe('idées qui se recouvrent', () => {
     )
     const r = await extractParticipant([corpus.contributions[0]], corpus.contributions[0].participantId, DEFAULT_SETTINGS, runner)
     expect(r.ideas.map((i) => i.label)).toEqual(['Long'])
+    // Méthode « consultation » : un éloge contenu dans une critique plus longue reste un avis (il disparaissait des comptes).
+    const kept = await extractParticipant([corpus.contributions[0]], corpus.contributions[0].participantId, { ...DEFAULT_SETTINGS, method: 'consultation' }, runner)
+    expect(kept.ideas.map((i) => [i.label, i.category])).toEqual([
+      ['Long', 'negative'],
+      ['Court', 'positive'],
+    ])
+    // Deux citations presque identiques de tons contraires : un même objet codé deux fois, on garde la plus longue.
+    const twin = new LlmRunner(
+      {
+        label: 'test',
+        fingerprint: { presetId: 'test', model: 't', baseUrl: '' },
+        async complete() {
+          return {
+            text: JSON.stringify({
+              ideas: [
+                { ref: 'C1', label: 'Long', verbatim: text.slice(0, 40), category: 'negative' },
+                { ref: 'C1', label: 'Jumeau', verbatim: text.slice(0, 36), category: 'positive' },
+              ],
+              names: [],
+            }),
+          }
+        },
+      },
+      new MemoryCache(),
+      DEFAULT_SETTINGS,
+    )
+    const one = await extractParticipant([corpus.contributions[0]], corpus.contributions[0].participantId, { ...DEFAULT_SETTINGS, method: 'consultation' }, twin)
+    expect(one.ideas.map((i) => i.label)).toEqual(['Long'])
+  })
+})
+
+describe('réponses identiques entre personnes', () => {
+  it('signale les textes copiés, jamais une réponse courte', () => {
+    const corpus = surveyCorpus()
+    const long = 'Nous demandons le maintien du guichet du samedi matin, indispensable aux familles qui travaillent en semaine.'
+    corpus.participants.push({ id: 'P20', label: 'P20', attributes: {} }, { id: 'P21', label: 'P21', attributes: {} }, { id: 'P22', label: 'P22', attributes: {} }, { id: 'P23', label: 'P23', attributes: {} })
+    corpus.contributions.push(
+      { id: 'C20', participantId: 'P20', sourceId: corpus.sources[0].id, text: long },
+      { id: 'C21', participantId: 'P21', sourceId: corpus.sources[0].id, text: `  ${long.toUpperCase()} ` },
+      { id: 'C22', participantId: 'P22', sourceId: corpus.sources[0].id, text: 'Rien à dire' },
+      { id: 'C23', participantId: 'P23', sourceId: corpus.sources[0].id, text: 'Rien à dire' },
+    )
+    expect(duplicateContributions(corpus)).toEqual([['P20', 'P21']])
   })
 })
 
@@ -940,6 +983,12 @@ describe('méthode « consultation » (Observatoire)', () => {
             out.groups.push({ title: 'Hors question', items: [first] })
             return { ...res, text: JSON.stringify(out) }
           }
+          // Livre de codes : le modèle définit le premier motif du lot avant ses changements.
+          if (method && req.task === 'review') {
+            const data = readDataBlock<{ groups: { id: string }[] }>(req.user)
+            const out = JSON.parse(res.text) as { changes: unknown[] }
+            return { ...res, text: JSON.stringify({ definitions: [{ id: data.groups[0].id, positive: 'le juge utile', negative: 'le juge inutile.', neutral: 'un principe général' }], ...out }) }
+          }
           return res
         },
       }
@@ -957,6 +1006,16 @@ describe('méthode « consultation » (Observatoire)', () => {
     expect(c.state.groups.some((g) => g.title === 'Hors question')).toBe(false)
     expect(reportToMarkdown(c.state, corpus, 'Test')).toContain('## Hors question')
     expect(reportToMarkdown(ref.state, corpus, 'Test')).not.toContain('## Hors question')
+    // Le livre de codes suit le motif jusqu'au rapport ; la référence n'en a pas.
+    expect(c.state.groups.filter((g) => g.definition).length).toBeGreaterThan(0)
+    expect(ref.state.groups.some((g) => g.definition)).toBe(false)
+    const md = reportToMarkdown(c.state, corpus, 'Test')
+    expect(md).toContain('*Favorable : le juge utile · Défavorable : le juge inutile · Hors camp : un principe général.*')
+    expect(md).toContain('Livre de codes :')
+    expect(c.seen.review).toContain('Livre de codes')
+    expect(ref.seen.review).not.toContain('Livre de codes')
+    expect(c.seen.summarize).toContain('"definition"')
+    expect(ref.seen.support).not.toContain('"definition"')
     // Règles propres à la méthode, absentes de la référence.
     expect(c.seen.group).toContain('« Hors question »')
     expect(ref.seen.group).not.toContain('Hors question')

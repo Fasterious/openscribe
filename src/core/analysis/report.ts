@@ -1,11 +1,11 @@
 import type { Corpus } from '../corpus'
-import { activeParticipants, promptsOf } from '../corpus'
+import { activeParticipants, duplicateContributions, promptsOf } from '../corpus'
 import { presetById } from '../providers/presets'
 import { highlights, type Highlight, type Highlights } from './highlights'
 import { withCurrentMetrics } from './metrics'
 import { maskNames } from './names'
 import { describeTheme } from './pipeline'
-import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from './types'
+import type { AnalysisState, Group, GroupDefinition, Idea, IdeaCategory, Metrics } from './types'
 
 /**
  * Export du rapport en Markdown et en HTML autonome.
@@ -38,6 +38,12 @@ export function engineName(presetId: string, model?: string): string {
   return presetById(presetId)?.label ?? presetId
 }
 
+/** Le livre de codes d'un motif, en une ligne sous son titre : ce qui y compte comme favorable, défavorable ou hors camp. */
+export function definitionLine(d: GroupDefinition): string {
+  const dot = (s: string) => s.trim().replace(/[.;]+$/, '')
+  return `${[`Favorable : ${dot(d.positive)}`, `Défavorable : ${dot(d.negative)}`, ...(d.neutral ? [`Hors camp : ${dot(d.neutral)}`] : [])].join(' · ')}.`
+}
+
 function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   const respondents = activeParticipants(corpus).length
   const withIdeas = new Set(state.ideas.map((i) => i.participantId)).size
@@ -61,6 +67,14 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     lines.push(
       `Les trois participants les plus prolixes portent ${Math.round((top3 / state.ideas.length) * 100)} % des idées : les chiffres comptent des personnes, mais les synthèses citent davantage ceux qui ont beaucoup écrit.`,
     )
+  {
+    const dup = duplicateContributions(corpus)
+    const people = dup.reduce((n, ids) => n + ids.length, 0)
+    if (dup.length)
+      lines.push(
+        `Réponses identiques entre personnes : ${dup.length} texte${dup.length > 1 ? 's' : ''} envoyé${dup.length > 1 ? 's' : ''} à l'identique par ${people} participants (réponses copiées ou campagnes groupées). Chaque personne compte une fois : un texte repris par dix personnes pèse dix personnes, ni plus ni moins.`,
+      )
+  }
   if (state.settings.maskNames && state.names?.length)
     lines.push(`Prénoms de particuliers masqués dans les verbatims : ${state.names.length}. Les citations exactes restent dans OpenScribe.`)
   {
@@ -73,6 +87,10 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
         `Relecture des motifs par le moteur d'IA : ${[moved && pl(moved, 'idée déplacée vers le motif dont elle parle vraiment', 'idées déplacées vers le motif dont elles parlent vraiment'), retoned && pl(retoned, "idée changée de camp après un nouvel examen de son ton au regard de l'objet du motif", "idées changées de camp après un nouvel examen de leur ton au regard de l'objet du motif")].filter(Boolean).join(' ; ')}. Une personne n'est « mitigée » que si elle dit du bien et du mal du même objet.`,
       )
   }
+  if (state.groups.some((g) => g.definition))
+    lines.push(
+      "Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme favorable, défavorable ou hors camp. Cette définition figure sous le titre du motif ; les camps d'avis s'y conforment, et le lecteur peut la contester.",
+    )
   if (state.support)
     lines.push(
       `Renvois vérifiés : chaque phrase des synthèses a été confrontée par le moteur d'IA aux verbatims qu'elle cite (${state.support.checked} phrases) ; ${state.support.fixed || 'aucune'} corrigée${state.support.fixed > 1 ? 's' : ''}, ${state.support.dropped || 'aucune'} retirée${state.support.dropped > 1 ? 's' : ''} faute d'appui${state.support.added ? ` ; le moteur d'IA en a ajouté ${state.support.added} pour un sujet ou un camp d'avis qui manquait` : ''}.${state.campsAdded ? ` Le code en a écrit ${state.campsAdded} pour un camp d'avis encore absent de la synthèse de son motif.` : ''}`,
@@ -650,6 +668,7 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
   const writeGroup = (g: Group, level: string) => {
     const squares = opinionSquares(g.metrics)
     out.push(`${level} ${g.title}`, '', `${squares ? `${squares}  ` : ''}*${metricsLine(g.metrics)}*`, '')
+    if (g.definition) out.push(`*${definitionLine(g.definition)}*`, '')
     const dominant = dominantVoice(ideasOf(g, byId))
     if (dominant) out.push(`*${dominant}*`, '')
     if (g.summary) out.push(`> ${prose(g.summary).replace(/\n\s*\n/g, '\n>\n> ')}`, '')
@@ -772,7 +791,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
       .join('')
     const note = both.size ? `<p class="facts">* s'exprime aussi dans l'autre sens sur ce motif.</p>` : ''
     const dominant = dominantVoice(ideasOf(g, byId))
-    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}</p>${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
+    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}</p>${g.definition ? `<p class="facts">${e(definitionLine(g.definition))}</p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
   }
 
   if (opts.stale) parts.push(`<p class="facts"><strong>${e(STALE_NOTE)}</strong></p>`)
