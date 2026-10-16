@@ -19,7 +19,11 @@ un modèle utilisé seul compte mieux quand il écrit ses listes, et le lecteur 
 Essai de la version 2 avec Sonnet, une passe, sur le questionnaire fictif de la médiathèque
 (12 personnes) : 46 citations sur 46 exactes, tableau de comptage rendu et juste sur sondage. Ce n'est
 pas une évaluation : la version 2 n'a pas été notée sur un corpus réel ni sur plus de 12 personnes.
-Essai sur corpus réel (15 octobre 2026) : Sonnet, une passe, sur les 378 réponses de l'Observatoire
+Version 3 (16/10/2026) : ajoute le livre de codes (une définition par motif, écrite avant de compter,
+puis relue d'un bloc avec règles de partage entre motifs voisins), tiré des passes 8 et 9 de
+l'Observatoire (`docs/METHODES.md`) : c'est là que se jouaient tous les plafonds (un avis rangé dans le
+mauvais camp sur un motif du résumé), et une définition écrite rend chaque camp vérifiable.
+Essai de la version 2 sur corpus réel (15 octobre 2026) : Sonnet, une passe, sur les 378 réponses de l'Observatoire
 (école). 173 citations sur 175 exactes (deux reformulations mises entre guillemets), comptes du résumé
 identiques au tableau de comptage. Deux lectures `methodologue` indépendantes : 3/5 chacune, plafond
 appliqué, comme l'application sur le même corpus. Défauts : sur la carte scolaire, ceux qui veulent
@@ -93,7 +97,20 @@ l'étape 3 est rendu en annexe du rapport (étape 5).
    - regretter qu'une règle ou un service manque ou ne soit pas appliqué lui est favorable ;
      réclamer davantage de ce que le motif regrette est une critique, pas un éloge.
 7. Ne découpe jamais un objet selon le jugement : si tu ranges les éloges d'un objet dans un motif,
-   ses critiques y vont aussi, sinon il paraîtra unanime à tort. Pas de motif « Choix de X » à côté de X.
+   ses critiques y vont aussi, sinon il paraîtra unanime à tort. Pas de motif « Choix de X » à côté de X,
+   ni de motif « X face à Y » (c'est X et Y, chacun avec ses éloges et ses critiques).
+8. Livre de codes. AVANT de compter, écris pour chaque motif une ligne de définition en trois clauses
+   courtes, à l'infinitif : « compte comme positif : … ; comme négatif : … ; ne compte pas comme un
+   avis : … » (pour une règle ou un service : la défendre ou regretter qu'elle manque est positif ; la
+   rejeter, la juger insuffisante ou en subir les contraintes est négatif ; un principe général ou un
+   simple constat est hors camp). Puis relis le livre de codes d'un bloc : deux motifs dont les
+   définitions se recouvrent (l'un reçoit les éloges d'un objet et l'autre ses critiques ; la gratuité
+   d'une chose et le coût d'une autre dans un même motif ; deux positions contraires dans un même camp)
+   sont fusionnés s'ils traitent le même objet, ou se partagent par une règle écrite (« toute critique
+   de Y va dans Y ; un simple passage de X à Y sans jugement est hors camp »). Range enfin chaque idée
+   contre la définition de son motif : déplace celle qu'une autre définition réclame, et corrige le
+   camp de celle qui contredit sa définition. Un motif d'au moins 8 personnes aux avis partagés mêle
+   souvent deux objets : vérifie-le.
 
 ÉTAPE 3 — COMPTER (comme le ferait un tableur, en listant les P)
 Pour chaque motif, liste les personnes qui le portent, puis : positifs (que du positif sur ce
@@ -127,7 +144,8 @@ pas de thème défini par le ton. On n'additionne jamais les avis de motifs diff
 2. Ce qui a marché · Ce qui bloque · Ce qui divise · Ce que proposent les participants (avec deux
    citations chacun) · Questions soulevées : une ligne par motif, avec son chiffre et son étiquette.
 3. Les thèmes : une intro de 3 ou 4 phrases qui tranche (ce qui marche, ce qui freine, ce qui est
-   demandé), puis chaque motif : en-tête chiffré, synthèse de 2 à 4 phrases, verbatims par camp.
+   demandé), puis chaque motif : en-tête chiffré, sa ligne de définition (étape 2.8), synthèse de 2 à
+   4 phrases, verbatims par camp.
 4. Synthèse d'un motif : le camp le plus nombreux d'abord, puis la minorité, puis les propositions ;
    le nombre exact de personnes derrière chaque affirmation, avec les P entre parenthèses
    (« quatre personnes (P2, P5, P9, P19) ») ; chaque P cité dit vraiment ce que dit la phrase.
@@ -161,6 +179,6 @@ AVANT DE RENDRE, VÉRIFIE (et corrige) :
   tirer un échantillon, ou découper par lots de personnes (étape 1) puis donner les idées au modèle
   pour les étapes suivantes.
 - **Ordre** : coller d'abord la consigne (objectif complété), puis les données dans le même message.
-- **Contrôle** : vérifier par sondage trois citations et deux lignes du tableau de comptage ; sur un motif qui oppose deux camps, vérifier que chaque camp ne réunit qu'une seule position, et que les P des propositions sont les mêmes au résumé et dans la section.
+- **Contrôle** : vérifier par sondage trois citations et deux lignes du tableau de comptage ; sur un motif qui oppose deux camps, vérifier que chaque camp ne réunit qu'une seule position, et que les P des propositions sont les mêmes au résumé et dans la section ; pour chaque motif « unanime » du résumé, chercher dans les motifs voisins un avis contraire que sa définition réclame.
 - **Données sensibles** : remplacer les noms par P1, P2… avant de coller, et choisir un service qui
   n'entraîne pas ses modèles sur vos données.

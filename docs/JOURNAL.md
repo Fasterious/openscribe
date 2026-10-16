@@ -2,6 +2,15 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-16 — Observatoire, école : passes 8 et 9 (dédoublonnage, livre de codes, réconciliation), non publiée
+
+- **Demande d'Arnaud** : relire tout l'historique, trouver ce qui reste à optimiser « au plus intelligent » (meilleure qualité, code le plus efficace), trois itérations au plus, en puisant dans d'autres disciplines.
+- **Diagnostic mesuré** : le dédoublonnage du découpage retirait 24 des 188 éloges rendus par le moteur (contenus dans une critique plus longue sur un autre objet), tous sur les motifs du résumé. Corrigé pour la méthode « consultation » (`keepOpposedOverlaps`).
+- **Livre de codes** (analyse qualitative : définition et critères d'inclusion par code) : le moteur définit chaque motif avant de juger ses idées ; la définition suit le motif jusqu'au rapport. **Réconciliation** : le livre de codes relu d'un bloc, fusions et règles de partage, paires relues ensemble. **Séparations** étendues aux titres « X face à Y » et aux motifs partagés. Détail et chiffres : `docs/METHODES.md`, « Passes 8 et 9 ».
+- **Résultat** : 3/5 plafonné aux deux passes (moyennes 3,25 ; 3,25 ; 3,42 ; 3,17), langue 3,5. Chaque défaut visé corrigé, le plafond déplacé sur d'autres motifs voisins. Arrêt après deux itérations, règle des trois passes.
+- **À trancher par Arnaud** : codage en double d'une idée qui satisfait deux définitions ; seuil d'entrée au résumé (8 avis) ; retrait ou non des apports gardés. Rien ne touche la référence ni les autres méthodes.
+- **Apports hors notation, recommandés par le `methodologue`** : réponses identiques entre personnes signalées dans la Méthode (campagnes de copier-coller) ; dans la fiche de l'Observatoire, la chance qu'un avis partagé par 1 % des contributeurs figure dans l'échantillon (98 % pour 378). La saturation thématique a été écartée (trompeuse sur un tirage au sort).
+
 ## 2026-10-15 — Observatoire, première étude (école) : passes 3 à 7, non publiée (palier)
 
 - **Demande d'Arnaud** : finir la passe 3, publier à 3,5/5 au moins ; puis (même nuit) « aller au bout » de la méthode et du processus sans dégrader les autres modèles ni les autres études, et publier une fois le rapport à son meilleur. Les passes 4 à 7 dépassent donc la limite de trois passes, à sa demande.

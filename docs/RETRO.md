@@ -2,6 +2,12 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-16 — Passes 8 et 9 : mesurer avant de coder, deux itérations puis arrêt
+
+- **Bien marché** : chiffrer la cause sur le cache avant tout appel (24 éloges perdus, en dix minutes de script) ; faire valider le plan par le `methodologue` avant de coder (il a retiré la saturation, ajouté le critère des citations jumelles et le contrôle des faux mitigés) ; le livre de codes, qui transforme chaque désaccord de lecture en une ligne vérifiable ; les corrections de langue faites à la source dans le code (quatre sur quatre ont porté).
+- **Coûté pour rien** : deux passes complètes (de l'ordre de 8 millions de jetons de sous-agents) pour une note inchangée, parce que le plafond est binaire et se joue sur quelques idées limites entre 74 motifs ; les relectures par paire enchaînées une par une (corrigé : en parallèle) .
+- **On change** : on s'arrête à deux itérations quand la note ne bouge pas et que la cause suivante est une décision de méthode (ici le codage en double) ; on la soumet à Arnaud au lieu de jouer la troisième passe.
+
 ## 2026-10-15 — Bilan de l'autonomie (passes 4 à 7), demandé par Arnaud
 
 - **Résultat honnête** : beaucoup de passes, pas d'amélioration significative de la note ; quatre vrais défauts du code trouvés et corrigés, et le diagnostic (le découpage) arrivé trop tard.

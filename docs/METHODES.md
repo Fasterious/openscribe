@@ -338,6 +338,8 @@ Le découpage est repris du cache jusqu'à la passe 7, pour ne faire varier que 
 | 5 | unanimités vérifiées ; un objet ne se découpe pas selon le jugement ; résumé contrôlé | 3 (3,42) | 3,5 | une demande de plus d'exigence comptée comme éloge |
 | 6 | « réclamer davantage » ; pas de « Choix de X » à côté de X | 3,5 et 3 (3,25 et 3,5) | 3,5 | lectures divergentes : regret qu'une règle manque compté contre elle |
 | 7 | relecture des tons des seuls motifs du résumé | 3 et 3 (3,33 et 3,67) | 3,5 | idem, et un principe général compté comme éloge |
+| 8 | dédoublonnage : éloge et critique qui se recouvrent gardés tous deux ; livre de codes (définition écrite avant de juger) | 3 et 3 (3,25 et 3,25) | 3,5 | critiques du privé restées dans « École publique face au privé », ses éloges formant un motif « unanime » |
+| 9 | « un ou deux objets ? » pour « X face à Y » et les motifs partagés ; livre de codes relu d'un bloc (fusions, règles de partage, paires relues ensemble) | 3 et 3 (3,42 et 3,17) | 3,5 | même mécanisme déplacé : éloges de l'école publique dans « Expérience globale », critiques de la qualité des enseignants dans « Contrôle des enseignants défaillants » |
 
 **Verdict à la passe 7 : palier, non publié.** La moyenne monte doucement (3,25 → 3,67) mais chaque
 passe bute sur une ou deux idées limites, différentes d'une passe à l'autre ; aucune n'a changé le sens
@@ -387,3 +389,71 @@ sur ce qui divise, règle contre « des personnes ») et tous les correctifs du 
 
 Leçon, devenue règle dans `CLAUDE.md` : trois passes au plus pour prouver une amélioration, deux lectures
 dès la première ; sans gain net, on s'arrête, on remonte en amont et on retire ce qu'on a ajouté.
+
+### Passes 8 et 9 (16/10/2026, à la demande d'Arnaud : « optimiser au plus intelligent, trois itérations au plus »)
+
+**Diagnostic chiffré avant de coder.** Sur le cache de la passe 7, le moteur avait rendu 188 éloges au
+découpage ; le code n'en gardait que 151. Le dédoublonnage (« deux idées qui se recouvrent : on garde la
+plus longue ») retirait 31 éloges, dont 24 contenus dans une critique plus longue qui portait sur un autre
+objet. Les motifs touchés étaient ceux du résumé (bilan d'ensemble, enseignants, école publique) : la cause
+désignée par les lectures de la passe 7, enfin mesurée. Plan validé par le `methodologue` avant de coder.
+
+**Passe 8** (code commun : 0 ; méthode « consultation » : 2 apports).
+- Dédoublonnage : un éloge et une critique qui se recouvrent restent deux avis, sauf citations presque
+  identiques (la courte couvre 80 % de la longue). 25 éloges revenus ; 4 paires tombent dans un même motif,
+  toutes de vrais avis partagés (vérifié à la relecture). Le résumé passe de 34 à 47 jugements positifs
+  d'ensemble.
+- Livre de codes : à la relecture, le moteur écrit pour chaque motif, avant de juger ses idées, ce qui y
+  compte comme favorable, défavorable ou hors camp (pratique du livre de codes en analyse qualitative :
+  définition, critères d'inclusion et d'exclusion). La définition suit le motif (synthèse, vérification des
+  renvois) et s'affiche sous son titre : une erreur de camp devient vérifiable contre une ligne écrite,
+  au lieu de dépendre du cadrage implicite de chaque lecteur.
+- Résultat : 3 et 3 (plafond), moyennes 3,25 et 3,25. Les deux nouveautés font ce qu'elles visaient
+  (éloges revenus, erreurs démontrables), mais le plafond revient par la passe 4 : les éloges du privé
+  forment un motif « unanime » pendant que ses critiques restent dans « École publique face au privé ».
+  Les définitions de ces motifs voisins se chevauchent.
+
+**Passe 9** (méthode « consultation » : 3 apports).
+- La question « un ou deux objets ? » (déjà posée aux titres en « et ») l'est aussi aux titres « X face à
+  Y » et aux motifs aux avis partagés d'au moins 8 personnes : deux séparations (école publique /
+  enseignement privé ; gratuité de l'école / frais d'études).
+- Réconciliation du livre de codes : après la relecture, toutes les définitions sont relues d'un bloc (une
+  demande) ; le moteur propose des fusions et des règles de partage entre motifs voisins (8 paires au plus) ;
+  le code fusionne et fait relire chaque paire ensemble avec sa règle. Ici 1 fusion, 7 paires, 22 idées
+  déplacées ou recodées.
+- L'exemple « que certaines nuancent ailleurs (notamment P…) » du résumé est pris parmi les personnes qui
+  nuancent vraiment.
+- Résultat : 3 et 3 (plafond), moyennes 3,42 et 3,17. Le privé (13 sur 15) et la gratuité sont corrigés,
+  la traçabilité monte à 4, aucune phrase retirée, aucune citation déformée ; mais le même mécanisme
+  réapparaît sur d'autres paires (école publique / expérience globale, qualité / contrôle des enseignants,
+  proximité / carte scolaire), que la réconciliation n'avait pas retenues parmi ses 8 paires.
+
+**Langue** (`plume`) : 3,5 aux deux passes. Ses défauts venaient surtout de phrases injectées par le code,
+corrigées à la source : livre de codes en phrase lisible (« Compte comme positif : … »), « notamment »
+limité à trois exemples et jamais devant une liste complète, une seule phrase pour les propositions
+contraires, chiffre nu à côté du mot de l'échelle (« 29 sur 35 »), attaques variées demandées.
+
+**Conclusion (16/10).** Deux itérations sur les trois permises, sans gain de note : 3/5 plafonné à chaque
+passe depuis la passe 1, moyennes de 3,17 à 3,67 dans le bruit de l'évaluateur. Les apports ont corrigé
+chaque fois le défaut visé et rendu le rapport plus vérifiable ; ils n'ont pas levé le plafond parce que
+celui-ci se joue sur une poignée d'idées limites entre motifs voisins, et qu'un corpus de 942 idées en
+74 motifs en contient toujours quelques-unes. Trois leviers restent, tous de méthode, donc à trancher par
+Arnaud :
+1. **Codage en double** (proposé par les deux lectures) : une idée qui satisfait la définition de deux
+   motifs compte dans les deux (la cause chez l'un, l'effet chez l'autre). Aujourd'hui une idée n'a qu'un
+   motif (principe « une idée, un motif » de la méthode des idées atomiques).
+2. **Balayage par définition** : pour chaque motif d'au moins 8 personnes, chercher dans les autres motifs
+   les idées qui remplissent sa définition. Coûteux (une demande par motif, avec candidats filtrés) ;
+   c'est la version avec définitions de la vérification des unanimités retirée à la passe 7.
+3. **Seuil d'entrée au résumé** : un motif de 4 avis (« Proximité de l'école ») n'a rien à y faire ;
+   exiger 8 avis au moins pour les lignes de forces et de freins.
+Et une question sur la grille elle-même : le plafond est binaire ; deux lectures donnent 3,42 et 3,17 de
+moyenne pour la même passe. La note « réelle » de la méthode sur ce corpus est entre 3 et 3,5.
+
+Gardé dans la méthode « consultation » (Arnaud peut demander le retrait, règle des trois passes) : le
+dédoublonnage corrigé (une erreur du code, pas une règle de plus), le livre de codes (une demande, zéro
+étape de plus, transparence jugée réelle par les deux lectures), la réconciliation (une demande plus une
+par paire), les séparations. Rien n'a changé pour la référence ni pour les autres méthodes : seuls les
+filets communs ont bougé (« d'une X à l'autre » n'est plus un compte ; « notamment » : trois exemples au
+plus, et un compte écrit prime sur « tous » ; réponses identiques entre personnes signalées dans la
+Méthode), rodés sur le cache de l'école, à rejouer sur les caches ÉcoSol avant la prochaine certification.
