@@ -2,6 +2,8 @@
 
 ## À REGARDER
 
+- 2026-10-16 (soir) · École : passe 10 (codage en double) jouée et notée 3/5 avec plafond aux deux lectures (moyennes 3,08 et 3,0), langue 4/5. Invalidée : un bug de code appliquait les fusions de la réconciliation aux mauvais motifs (renumérotation après la relecture des paires) ; corrigé, rejoué en passe 11 depuis le cache. Les notations (notation-methodologue-1/2.md, notation-plume.md) sont dans run-opus-10.
+
 - 2026-10-16 · École : passes 8 et 9 faites (dédoublonnage corrigé, livre de codes, réconciliation ; détail dans docs/METHODES.md, « Passes 8 et 9 »). Toujours 3/5 avec plafond aux deux lectures (moyennes 3,25 ; 3,25 ; 3,42 ; 3,17), langue 3,5. Non publiée. Arrêt après deux itérations : le plafond se joue sur quelques idées limites entre motifs voisins ; les leviers suivants sont des décisions de méthode (codage en double, seuil d'entrée au résumé). Avant toute publication : régénérer le résumé de fiche.json depuis le rapport retenu.
 
 - 2026-10-15 · École : passes 3 à 7 faites (méthode « consultation » affinée, voir docs/METHODES.md). Toujours 3/5 avec plafond, langue 3,5. Le plafond tombe chaque fois sur une ou deux idées limites, différentes d'une passe à l'autre ; la cause commune est le découpage, gardé du cache. Passe 8 (découpage refait) préparée puis non jouée : Arnaud a arrêté les passes le 15/10. Étude non publiée ; à reprendre en rejouant la passe 8 (docs/METHODES.md). Avant toute publication : régénérer le résumé de fiche.json (il date de la passe 1).

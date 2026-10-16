@@ -1,116 +1,126 @@
 [
-  {
-    "date": "2026-10-14",
-    "run": "run-opus-1",
-    "methode": "reference",
-    "modele": "claude-opus-5-5 (joué par sous-agents)",
-    "note_methode": 3,
-    "note_langue": 3.5,
-    "publie": false,
-    "raison": "Sous le seuil de 3,5 : ton du motif « Enseignement privé » jugé hors de son objet ; phrase du résumé injectée sans chiffres ni renvoi ; motifs hors question ; renvoi P3 erroné."
-  },
-  {
-    "date": "2026-10-14",
-    "run": "run-opus-2",
-    "methode": "consultation",
-    "modele": "claude-opus-5-5 (joué par sous-agents)",
-    "note_methode": 3,
-    "note_langue": 3.5,
-    "publie": false,
-    "raison": "Moyenne 3,5 mais plafond : « Place de l'école publique » compte des éloges du privé."
-  },
-  {
-    "date": "2026-10-15",
-    "run": "run-opus-3",
-    "methode": "consultation",
-    "modele": "claude-opus-5-5 (joué par sous-agents)",
-    "note_methode": 3,
-    "note_langue": 3.5,
-    "publie": false,
-    "criteres_methode": [
-      3.5,
-      3.5,
-      3.5,
-      3,
-      3.5,
-      3
-    ],
-    "raison": "Moyenne 3,33 (3,5 à l'arrondi) mais plafond : avis comptés dans le mauvais camp sur des motifs du résumé (I0556 dans « Place de l'école publique », déplacé là par la relecture faute de voir « Enseignement privé », ouvert par un autre lot ; I0677 « absence de grève » positif dans « Absences des enseignants » ; I0636 regret des quotas compté négatif dans « Enseignement privé »). Résumé ouvert sur un motif de 10 personnes, « aucune difficulté » non appuyé. Langue : « Des personnes… » ajouté par la relecture, intros de thèmes qui recopient les synthèses, phrases du code mécaniques."
-  },
-  {
-    "date": "2026-10-15",
-    "run": "run-opus-4",
-    "methode": "consultation (passe 4)",
-    "modele": "claude-opus-5-5 (joué par sous-agents)",
-    "note_methode": 3,
-    "note_langue": 3.5,
-    "publie": false,
-    "criteres_methode": [
-      3.5,
-      3.5,
-      3,
-      3,
-      3.5,
-      3
-    ],
-    "raison": "Moyenne 3,25 mais plafond : l'enseignement privé dit unanime, ses critiques étant restées dans « Place de l'école publique » (regroupement selon le jugement). Les trois idées mal classées de la passe 3 sont corrigées. Résumé : deux freins et « fragile » oubliés, exemple de la carte scolaire à contresens. Langue : une synthèse amputée de sa première phrase par le contrôle des comptes (corrigé dans le code)."
-  },
-  {
-    "date": "2026-10-15",
-    "run": "run-opus-5r",
-    "methode": "consultation (passe 5, rejouée avec les correctifs du code)",
-    "modele": "claude-opus-5-5 (joué par sous-agents)",
-    "note_methode": 3,
-    "note_langue": 3.5,
-    "publie": false,
-    "criteres_methode": [
-      3.5,
-      3.5,
-      3,
-      3.5,
-      3.5,
-      3.5
-    ],
-    "raison": "Moyenne 3,42 mais plafond : un faux mitigé sur « Niveau d'exigence scolaire » (une demande de plus d'exigence comptée comme éloge). Plafond du privé levé (11 sur 12)."
-  },
-  {
-    "date": "2026-10-15",
-    "run": "run-opus-6",
-    "methode": "consultation (passe 6)",
-    "modele": "claude-opus-5-5 (joué par sous-agents)",
-    "note_methode": "3,5 (lecture 1, moyenne 3,25, sans plafond) / 3 (lecture 2, moyenne 3,5, plafond)",
-    "note_langue": 3.5,
-    "publie": false,
-    "raison": "Les deux lectures divergent : la seconde plafonne pour un regret de la disparition de la carte scolaire compté comme critique. Décision non confirmée par deux lectures."
-  },
-  {
-    "date": "2026-10-15",
-    "run": "run-opus-7",
-    "methode": "consultation (passe 7, relecture des tons des motifs du résumé)",
-    "modele": "claude-opus-5-5 (joué par sous-agents)",
-    "note_methode": "3 / 3 (moyennes 3,33 et 3,67, plafond dans les deux lectures)",
-    "note_langue": 3.5,
-    "publie": false,
-    "raison": "Plafond : avis comptés dans le mauvais camp sur un motif du résumé (carte scolaire : regretter que la règle manque compté contre elle ; un principe général compté comme éloge de l'école publique). Les deux lectures désignent la même cause profonde : le découpage (éloges absorbés par une critique sur un autre objet), gardé du cache depuis la passe 1."
-  },
-  {
-    "date": "2026-10-16",
-    "run": "run-opus-8",
-    "methode": "consultation (passe 8 : dédoublonnage corrigé, livre de codes)",
-    "modele": "claude-opus-5-5 (joué par sous-agents)",
-    "note_methode": "3 / 3 (moyennes 3,25 et 3,25, plafond dans les deux lectures)",
-    "note_langue": 3.5,
-    "publie": false,
-    "raison": "24 éloges rendus aux comptes (bilan d'ensemble 34 → 47) ; définitions des 76 motifs écrites avant jugement. Plafond : les critiques du privé restées dans « École publique face au privé » pendant que ses éloges formaient un motif « unanime » ; gratuité de l'école et coût du supérieur mêlés ; définitions de motifs voisins qui se chevauchent."
-  },
-  {
-    "date": "2026-10-16",
-    "run": "run-opus-9",
-    "methode": "consultation (passe 9 : séparations « X face à Y » et motifs partagés, réconciliation du livre de codes)",
-    "modele": "claude-opus-5-5 (joué par sous-agents)",
-    "note_methode": "3 / 3 (moyennes 3,42 et 3,17, plafond dans les deux lectures)",
-    "note_langue": 3.5,
-    "publie": false,
-    "raison": "Privé (13 sur 15) et gratuité corrigés, traçabilité 4, aucune phrase retirée, aucune citation déformée. Plafond : le même mécanisme sur d'autres paires (éloges de l'école publique dans « Expérience globale », critiques de la qualité des enseignants dans « Contrôle des enseignants défaillants », critiques de l'éloignement hors de « Proximité de l'école »). Arrêt après deux itérations ; leviers suivants (codage en double, seuil d'entrée au résumé) à trancher par Arnaud."
-  }
+ {
+  "date": "2026-10-14",
+  "run": "run-opus-1",
+  "methode": "reference",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": 3,
+  "note_langue": 3.5,
+  "publie": false,
+  "raison": "Sous le seuil de 3,5 : ton du motif « Enseignement privé » jugé hors de son objet ; phrase du résumé injectée sans chiffres ni renvoi ; motifs hors question ; renvoi P3 erroné."
+ },
+ {
+  "date": "2026-10-14",
+  "run": "run-opus-2",
+  "methode": "consultation",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": 3,
+  "note_langue": 3.5,
+  "publie": false,
+  "raison": "Moyenne 3,5 mais plafond : « Place de l'école publique » compte des éloges du privé."
+ },
+ {
+  "date": "2026-10-15",
+  "run": "run-opus-3",
+  "methode": "consultation",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": 3,
+  "note_langue": 3.5,
+  "publie": false,
+  "criteres_methode": [
+   3.5,
+   3.5,
+   3.5,
+   3,
+   3.5,
+   3
+  ],
+  "raison": "Moyenne 3,33 (3,5 à l'arrondi) mais plafond : avis comptés dans le mauvais camp sur des motifs du résumé (I0556 dans « Place de l'école publique », déplacé là par la relecture faute de voir « Enseignement privé », ouvert par un autre lot ; I0677 « absence de grève » positif dans « Absences des enseignants » ; I0636 regret des quotas compté négatif dans « Enseignement privé »). Résumé ouvert sur un motif de 10 personnes, « aucune difficulté » non appuyé. Langue : « Des personnes… » ajouté par la relecture, intros de thèmes qui recopient les synthèses, phrases du code mécaniques."
+ },
+ {
+  "date": "2026-10-15",
+  "run": "run-opus-4",
+  "methode": "consultation (passe 4)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": 3,
+  "note_langue": 3.5,
+  "publie": false,
+  "criteres_methode": [
+   3.5,
+   3.5,
+   3,
+   3,
+   3.5,
+   3
+  ],
+  "raison": "Moyenne 3,25 mais plafond : l'enseignement privé dit unanime, ses critiques étant restées dans « Place de l'école publique » (regroupement selon le jugement). Les trois idées mal classées de la passe 3 sont corrigées. Résumé : deux freins et « fragile » oubliés, exemple de la carte scolaire à contresens. Langue : une synthèse amputée de sa première phrase par le contrôle des comptes (corrigé dans le code)."
+ },
+ {
+  "date": "2026-10-15",
+  "run": "run-opus-5r",
+  "methode": "consultation (passe 5, rejouée avec les correctifs du code)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": 3,
+  "note_langue": 3.5,
+  "publie": false,
+  "criteres_methode": [
+   3.5,
+   3.5,
+   3,
+   3.5,
+   3.5,
+   3.5
+  ],
+  "raison": "Moyenne 3,42 mais plafond : un faux mitigé sur « Niveau d'exigence scolaire » (une demande de plus d'exigence comptée comme éloge). Plafond du privé levé (11 sur 12)."
+ },
+ {
+  "date": "2026-10-15",
+  "run": "run-opus-6",
+  "methode": "consultation (passe 6)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": "3,5 (lecture 1, moyenne 3,25, sans plafond) / 3 (lecture 2, moyenne 3,5, plafond)",
+  "note_langue": 3.5,
+  "publie": false,
+  "raison": "Les deux lectures divergent : la seconde plafonne pour un regret de la disparition de la carte scolaire compté comme critique. Décision non confirmée par deux lectures."
+ },
+ {
+  "date": "2026-10-15",
+  "run": "run-opus-7",
+  "methode": "consultation (passe 7, relecture des tons des motifs du résumé)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": "3 / 3 (moyennes 3,33 et 3,67, plafond dans les deux lectures)",
+  "note_langue": 3.5,
+  "publie": false,
+  "raison": "Plafond : avis comptés dans le mauvais camp sur un motif du résumé (carte scolaire : regretter que la règle manque compté contre elle ; un principe général compté comme éloge de l'école publique). Les deux lectures désignent la même cause profonde : le découpage (éloges absorbés par une critique sur un autre objet), gardé du cache depuis la passe 1."
+ },
+ {
+  "date": "2026-10-16",
+  "run": "run-opus-8",
+  "methode": "consultation (passe 8 : dédoublonnage corrigé, livre de codes)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": "3 / 3 (moyennes 3,25 et 3,25, plafond dans les deux lectures)",
+  "note_langue": 3.5,
+  "publie": false,
+  "raison": "24 éloges rendus aux comptes (bilan d'ensemble 34 → 47) ; définitions des 76 motifs écrites avant jugement. Plafond : les critiques du privé restées dans « École publique face au privé » pendant que ses éloges formaient un motif « unanime » ; gratuité de l'école et coût du supérieur mêlés ; définitions de motifs voisins qui se chevauchent."
+ },
+ {
+  "date": "2026-10-16",
+  "run": "run-opus-9",
+  "methode": "consultation (passe 9 : séparations « X face à Y » et motifs partagés, réconciliation du livre de codes)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": "3 / 3 (moyennes 3,42 et 3,17, plafond dans les deux lectures)",
+  "note_langue": 3.5,
+  "publie": false,
+  "raison": "Privé (13 sur 15) et gratuité corrigés, traçabilité 4, aucune phrase retirée, aucune citation déformée. Plafond : le même mécanisme sur d'autres paires (éloges de l'école publique dans « Expérience globale », critiques de la qualité des enseignants dans « Contrôle des enseignants défaillants », critiques de l'éloignement hors de « Proximité de l'école »). Arrêt après deux itérations ; leviers suivants (codage en double, seuil d'entrée au résumé) à trancher par Arnaud."
+ },
+ {
+  "date": "2026-10-16",
+  "run": "run-opus-10",
+  "methode": "consultation (passe 10 : codage en double, option du chercheur ; définitions des motifs cibles ajoutées après coup aux relectures)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": "3 / 3 (moyennes 3,08 et 3,0, plafond dans les deux lectures)",
+  "note_langue": 4,
+  "publie": false,
+  "raison": "Passe invalidée par un bug de code : après la relecture des paires, les motifs sont renumérotés et les trois fusions se sont appliquées aux motifs qui portaient ces numéros (handicap fondu dans les démarches d'inscription, encadrement administratif dans la qualité des enseignants). Une copie du codage en double est revenue dans le motif de son original (citation en double). Corrigé dans le code (fusions par titre, copie chez elle retirée), rejoué en passe 11. Le codage en double est utile pour 13 copies sur 20 ; Proximité de l'école et Contrôle des enseignants défaillants corrigés ; éloges du public hors d'« École publique face au privé » persistent (paire non proposée par la réconciliation). Langue : meilleure note à ce jour (ligne Méthode et « aussi dans » corrigés à la source)."
+ }
 ]
