@@ -111,6 +111,8 @@ const settings = {
   researchQuestion: opt('question') ?? '',
   ...(opt('method') ? { method: opt('method') as MethodId } : {}),
   ...(rest.includes('--mask-names') ? { maskNames: true } : {}),
+  // --multi-coding : codage en double (une idée qui satisfait deux définitions est copiée dans le second motif).
+  ...(rest.includes('--multi-coding') ? { multiCoding: true } : {}),
 }
 
 const statePath = join(dir, 'state.json')
