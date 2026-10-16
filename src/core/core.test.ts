@@ -424,6 +424,39 @@ describe('codage en double (option)', () => {
   })
 })
 
+describe('codage en double, de bout en bout', () => {
+  it('une copie proposée à la relecture traverse le regroupement, les synthèses et le rapport', async () => {
+    const corpus = surveyCorpus()
+    const base = createSimulationProvider()
+    const spy: LlmProvider = {
+      ...base,
+      fingerprint: base.fingerprint,
+      label: base.label,
+      async complete(req) {
+        const res = await base.complete(req)
+        if (req.task !== 'review' || req.user.includes('"rule"')) return res
+        // Le modèle copie la première idée du premier motif dans le second motif du lot.
+        const data = readDataBlock<{ groups: { id: string; ideas: { id: string }[] }[] }>(req.user)
+        if (data.groups.length < 2 || !data.groups[0].ideas.length) return res
+        const out = JSON.parse(res.text) as { changes: unknown[] }
+        return { ...res, text: JSON.stringify({ ...out, changes: [...out.changes, { id: data.groups[0].ideas[0].id, also: data.groups[1].id, category: 'negative' }] }) }
+      },
+    }
+    const settings = { ...DEFAULT_SETTINGS, method: 'consultation' as const, multiCoding: true }
+    const state = await runAnalysis(corpus, await newAnalysis(corpus, settings, spy), { provider: spy, cache: new MemoryCache() })
+    expect(state.status).toBe('done')
+    expect(state.copied!.length).toBeGreaterThan(0)
+    const copy = state.ideas.find((i) => i.copyOf)!
+    expect(copy.category).toBe('negative')
+    const grouped = state.groups.flatMap((g) => g.ideaIds)
+    expect(grouped).toContain(copy.id)
+    expect(grouped).toContain(copy.copyOf)
+    const md = reportToMarkdown(state, corpus, 'Test')
+    expect(md).toContain('aussi dans «')
+    expect(md).toContain('Codage en double')
+  })
+})
+
 describe('motifs soumis à la question « un ou deux objets ? »', () => {
   it('« et » partout ; « face à » et les motifs partagés de 8 personnes avec la méthode « consultation »', () => {
     const g = (title: string, stance: string, participants: number) => ({ title, metrics: { stance, participants } as unknown as Metrics })

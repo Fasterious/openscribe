@@ -852,7 +852,15 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       return responses.flatMap((r) => r.changes)
     }
     const multi = { multiCoding: state.settings.multiCoding === true }
+    // Les copies du codage en double sont des idées nouvelles : la table des idées, construite avant la relecture, les apprend.
+    const learn = (copied: { id: string }[]) => {
+      for (const c of copied) {
+        const idea = state.ideas.find((i) => i.id === c.id)
+        if (idea) ideaById.set(idea.id, idea)
+      }
+    }
     const reviewed = applyReview(state.ideas, groups, await reviewRound(groups), multi)
+    learn(reviewed.copied)
     state.retoned = reviewed.retoned
     state.moved = reviewed.moved
     state.copied = [...(state.copied ?? []), ...reviewed.copied]
@@ -868,6 +876,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
         s.message = 'Seconde relecture des motifs'
         await emit()
         const second = applyReview(state.ideas, groups, keepForward(await reviewRound(scope, arrived), reviewed.moved, groups), multi)
+        learn(second.copied)
         state.retoned = [...state.retoned, ...second.retoned]
         state.moved = [...state.moved, ...second.moved]
         state.copied = [...(state.copied ?? []), ...second.copied]
@@ -910,6 +919,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
         )
       ).flat()
       const shared = applyReview(state.ideas, groups, changes, multi)
+      learn(shared.copied)
       state.retoned = [...state.retoned, ...shared.retoned]
       state.moved = [...state.moved, ...shared.moved]
       state.copied = [...(state.copied ?? []), ...shared.copied]
