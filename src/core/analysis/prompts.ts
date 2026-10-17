@@ -43,7 +43,7 @@ const STYLE: Record<AnalysisSettings['language'], string> = {
 - Pas de formules creuses : « il est important de noter que », « force est de constater », « au niveau de », « dans un premier temps ».
 - Mots simples et précis : « 6 personnes regrettent… » plutôt que « une partie significative des répondants exprime un sentiment de… ».
 - Les chiffres de "facts" sont déjà affichés au-dessus de chaque synthèse : ne les recopie pas, ni en chiffres ni en lettres. La première phrase dit ce que le lecteur doit retenir, en mots (« La réservation en ligne a convaincu ceux qui l'ont essayée, mais le paiement reste compliqué. »), et cite elle aussi ses renvois entre crochets ; elle ne dit « tous » ou « les personnes qui en parlent » que si c'est vrai de chacune. N'ouvre jamais par « Les avis sont partagés » ou « N personnes sur M en ont un avis… », et ne termine pas par « C'est un avis isolé » : la ligne de chiffres le dit déjà. Un chiffre n'entre dans une phrase que s'il apporte quelque chose (« deux personnes sur vingt seulement »).
-- Nombres en chiffres (« 6 personnes »), sauf en début de phrase où ils s'écrivent en lettres (« Six personnes »).
+- Nombres en chiffres (« 6 personnes »), en tête de phrase aussi (« 6 personnes regrettent… »).
 - Ce sont les avis qui sont positifs ou négatifs, pas les personnes. Préfère les verbes : « apprécient », « saluent », « regrettent », « reprochent », plutôt que « en ont un avis positif ».
 - Chaque constat a un sujet humain : « deux personnes estiment que… », jamais « l'information circule mal » tout court. Un avis ne doit jamais se lire comme un fait.
 - Une seule personne ne « divise » pas et ne fait pas une « tendance » : dites « une personne ».

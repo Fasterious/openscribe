@@ -2091,7 +2091,8 @@ async function checkSupport(state: AnalysisState, runner: LlmRunner, emit: () =>
   const batches: Target[][] = []
   let cur: Target[] = []
   for (const t of targets) {
-    if (cur.length && cur.reduce((n, x) => n + x.allowed.length, 0) + t.allowed.length > methodOf(state.settings).batches.support) {
+    // Le résumé a son lot à lui : le récrire ne redécoupe pas les lots des motifs (et ne relance pas leur vérification).
+    if (cur.length && (t.id === 'R' || cur.reduce((n, x) => n + x.allowed.length, 0) + t.allowed.length > methodOf(state.settings).batches.support)) {
       batches.push(cur)
       cur = []
     }
