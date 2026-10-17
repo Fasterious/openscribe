@@ -132,5 +132,15 @@
   "note_langue": 3.5,
   "publie": false,
   "raison": "Fusions justes (Qualité + Motivation des enseignants ; Démarches + Pièces à fournir), 30 copies (24 à 26 justes, 2 dans le mauvais camp, 3 redondantes), 6 paires. Corrigés : administration hors de Qualité des enseignants, handicap au Résumé (18 sur 18). Plafond : éloges de l'école publique restés dans Expérience globale (8 idées), plaintes d'éloignement hors de Proximité ; aucune paire relue ne couvrait ces frontières. Cycle de trois passes clos ; levier suivant (balayage par définition des motifs du Résumé) soumis à Arnaud. Notations : notation-methodologue-1/2.md, notation-plume.md."
+ },
+ {
+  "date": "2026-10-17",
+  "run": "run-opus-12",
+  "methode": "consultation (passe 12 : balayage par définition des motifs du résumé, codage en double)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": "3 / 3 (moyennes 3,33 et 3,33, plafond dans les deux lectures)",
+  "note_langue": 3.5,
+  "publie": false,
+  "raison": "Les quatre défauts des passes 8 à 11 sont levés (éloges du public dans École publique face au privé, éloignement dans Proximité, privé non unanime, carte scolaire). 88 copies du balayage relues : 75 à 77 justes. Plafond nouveau, créé par le balayage : Gratuité de l'école reçoit 5 copies sur le coût du supérieur et passe d'unanime à « divise » (séparation de la passe 9 défaite) ; Accès aux services administratifs et Écoles rurales deviennent « divise » par des copies à sens unique. Cause : la consigne fait chercher d'abord le camp le moins nombreux. Premier essai du balayage écarté avant les synthèses (Proximité non balayée, 78 copies presque toutes du camp majoritaire). Notations : notation-methodologue-1/2.md, notation-plume.md."
  }
 ]

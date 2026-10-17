@@ -2,6 +2,8 @@
 
 ## À REGARDER
 
+- 2026-10-17 · École : passe 12 (balayage par définition) notée 3/5 avec plafond aux deux lectures (moyennes 3,33), langue 3,5. Non publiée. Les quatre défauts des passes 8 à 11 sont levés ; le plafond vient maintenant de copies du balayage qui changent à tort une étiquette (Gratuité de l'école, Accès aux services administratifs, Écoles rurales). Proposition à Arnaud : une relecture des seules copies qui changent une étiquette du résumé (docs/METHODES.md, « Passe 12 »).
+
 - 2026-10-17 · École : passe 11 (rejeu de la passe 10 après correction du bug de fusion) notée 3/5 avec plafond aux deux lectures (moyennes 3,5 et 3,17), langue 3,5. Non publiée. Handicap et administration corrigés ; le plafond tient aux éloges du public restés dans « Expérience globale » et aux plaintes d'éloignement hors de « Proximité ». Cycle de trois passes clos ; levier suivant (balayage par définition) à trancher par Arnaud (docs/METHODES.md, « Passes 10 et 11 »).
 
 - 2026-10-16 (soir) · École : passe 10 (codage en double) jouée et notée 3/5 avec plafond aux deux lectures (moyennes 3,08 et 3,0), langue 4/5. Invalidée : un bug de code appliquait les fusions de la réconciliation aux mauvais motifs (renumérotation après la relecture des paires) ; corrigé, rejoué en passe 11 depuis le cache. Les notations (notation-methodologue-1/2.md, notation-plume.md) sont dans run-opus-10.
