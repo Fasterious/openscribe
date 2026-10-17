@@ -2,6 +2,19 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — L'Observatoire en deux versions : interactive et document
+
+- **Demande d'Arnaud** : la page publiée se lit mieux (sans cadres, texte large), mais elle n'est pas
+  interactive ; garder les deux pour comparer avant d'en retirer une.
+- **Fait** : `#/observatoire/<slug>` ouvre l'étude dans le rapport de Synthèse, en lecture seule, avec sa fiche ;
+  la page statique reste la « version document » (d'un seul tenant, faite pour imprimer, lue par les moteurs de
+  recherche). Chacune renvoie à l'autre ; l'accueil et la liste mènent à l'interactive.
+- **Prénoms masqués à la source** (règle d'Arnaud : personne ne doit être visé dans une restitution) : la version
+  interactive montre la réponse entière autour de chaque verbatim, donc le fichier publié (`etude.json`) est
+  masqué partout, réponses comprises ; les positions des citations sont recalculées (1 051 sur 1 051 retrouvées
+  sur l'école). La publication échoue si un prénom subsiste ; ni la liste des prénoms ni les réponses du moteur
+  ne sont publiées ; un test le vérifie sur chaque étude publiée.
+
 ## 2026-10-17 — La barre d'un motif reprend ses listes ; lecture mobile sans cadres
 
 - **Remarque d'Arnaud** : la barre mêlait une couleur absente du reste (orange pour « mitigé ») alors qu'en
