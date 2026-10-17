@@ -108,6 +108,10 @@ chiffres.
 - **« fragile »** : une seule voix changeant de camp changerait l'étiquette (« large majorité, fragile »).
 - **« à vérifier »** : l'étiquette dépend d'avis comptés aussi dans un autre motif ; sans eux, elle serait
   différente. Le rapport dit laquelle. C'est au lecteur de trancher, en relisant les citations.
+- **Au survol** (et au clavier), chaque marque de méthode s'explique : les étiquettes d'avis, « fragile »,
+  « à vérifier », la minorité et les limites disent ce qu'elles veulent dire, pourquoi la méthode les pose et,
+  s'il le faut, quoi faire. Les textes sont dans `src/core/analysis/glossary.ts` ; le rapport exporté les porte
+  en attribut `title`. Au toucher, les mêmes explications se lisent dans la section Méthode.
 - **La section Méthode** dit ce qui a été fait sur ces données : idées écartées, déplacées, fusions,
   copies, phrases retirées, réponses identiques entre personnes, part des trois personnes les plus prolixes.
 
@@ -154,4 +158,5 @@ même grille, sur les mêmes corpus (l'école, ÉcoSol). Elle gagnera, ou la ré
 | Règles propres à chaque méthode | `src/core/analysis/methods.ts` |
 | Chiffres et échelle d'avis | `src/core/analysis/metrics.ts` |
 | Listes du résumé, « à vérifier », « fragile » | `src/core/analysis/highlights.ts` |
+| Explications au survol des marques de méthode | `src/core/analysis/glossary.ts` |
 | Rapport et section Méthode | `src/core/analysis/report.ts` |

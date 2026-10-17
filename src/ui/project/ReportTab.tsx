@@ -1,5 +1,5 @@
 import { CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, Users } from 'lucide-react'
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState, type ReactElement } from 'react'
 import { createPortal } from 'react-dom'
 import { computeMetrics, METRICS_VERSION, withCurrentMetrics } from '@/core/analysis/metrics'
 import { maskNames } from '@/core/analysis/names'
@@ -18,6 +18,7 @@ import {
   displayOrder,
   reportToHtml,
   reportToMarkdown,
+  stanceTitle,
 } from '@/core/analysis/report'
 import { corpusHash } from '@/core/analysis/pipeline'
 import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from '@/core/analysis/types'
@@ -27,6 +28,8 @@ import { isExample } from '../Synthesis'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, CATEGORY_ORDER, download, formatDate, plural, slug } from '../format'
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, Disclosure, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
+import { DOUBT_HELP, FRAGILE_HELP, helpText, LIMITS_HELP, MINORITY_HELP, type LabelHelp } from '@/core/analysis/glossary'
+import { labelDoubt } from '@/core/analysis/highlights'
 
 /** Classes écrites en entier : Tailwind ne génère pas une classe construite à la volée. */
 const BORDER: Record<IdeaCategory, string> = {
@@ -85,7 +88,23 @@ const SECTION_LOOK = {
   },
 } as const
 
+/** Une marque de méthode qui s'explique au survol et au focus clavier : ce qu'elle veut dire, pourquoi, quoi faire. */
+function Help({ help, lead, children }: { help: LabelHelp | string; lead?: string; children: ReactElement }) {
+  const text = typeof help === 'string' ? help : helpText(help)
+  return (
+    <Tooltip content={lead ? `${lead} ${text}` : text}>
+      <span tabIndex={0} className="cursor-help rounded focus-visible:outline-2 focus-visible:outline-ring">
+        {children}
+      </span>
+    </Tooltip>
+  )
+}
+
 function stanceBadge(m: Metrics) {
+  return <Help help={stanceTitle(m)}>{stanceBadgeOnly(m)}</Help>
+}
+
+function stanceBadgeOnly(m: Metrics) {
   const tone = m.majority === 'positive' ? 'positive' : 'negative'
   const pol = m.majority === 'positive' ? 'positif' : 'négatif'
   const fem = m.majority === 'positive' ? 'positive' : 'négative'
@@ -313,6 +332,8 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
   const m = ctx.segment ? computeMetrics(ideas) : group.metrics
   const both = bothSides(ideas)
   const full = fullQuestionIds(displayOrder(ideas, m, CATEGORY_ORDER), ctx.context)
+  // La mention « à vérifier » vaut pour le motif entier : elle se tait quand on regarde un segment.
+  const doubt = ctx.segment ? undefined : labelDoubt(group, ctx.ideaById)
   if (!ideas.length) return null
   const H = headingLevel
   return (
@@ -329,7 +350,16 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
               {m.participants}
             </span>
             {stanceBadge(m)}
-            {m.minority && <Badge tone="suggestion">Minorité constante</Badge>}
+            {m.minority && (
+              <Help help={MINORITY_HELP}>
+                <Badge tone="suggestion">Minorité constante</Badge>
+              </Help>
+            )}
+            {doubt && (
+              <Help help={DOUBT_HELP} lead={`${doubt.charAt(0).toUpperCase()}${doubt.slice(1)}.`}>
+                <Badge tone="warning">À vérifier</Badge>
+              </Help>
+            )}
           </span>
         </span>
       }
@@ -742,7 +772,25 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
                       {sec.items.map((x) => (
                         <li key={x.title} className={`border-l-[3px] pl-2.5 ${look.line}`}>
                           <span className="font-medium">{x.title}</span>
-                          <span className="block text-xs text-muted-foreground">{x.detail}</span>
+                          <span className="block text-xs text-muted-foreground">
+                            {x.detail}
+                            {x.fragile && (
+                              <>
+                                {' · '}
+                                <Help help={FRAGILE_HELP}>
+                                  <span className="underline decoration-dotted underline-offset-2">fragile</span>
+                                </Help>
+                              </>
+                            )}
+                            {x.doubt && (
+                              <>
+                                {' · '}
+                                <Help help={DOUBT_HELP} lead={`${x.doubt.charAt(0).toUpperCase()}${x.doubt.slice(1)}.`}>
+                                  <span className="rounded bg-warning/30 px-1 font-medium text-foreground">À vérifier</span>
+                                </Help>
+                              </>
+                            )}
+                          </span>
                           {x.quotes.map((q, i) => (
                             <span key={i} className="mt-1 block text-xs">
                               <span className="italic">«&nbsp;{q.text}&nbsp;»</span> <span className="font-semibold text-muted-foreground">{q.who}</span>
@@ -921,6 +969,8 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
             camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver. Un thème réunit des motifs différents : on n'y additionne pas les avis.
             Les listes en tête du rapport sont établies par le code, sans rédaction de l'IA. (Indicateurs, version {METRICS_VERSION})
           </p>
+          {analysis.groups.some((g) => labelDoubt(g, ctx.ideaById)) && <p>« À vérifier » : {helpText(DOUBT_HELP)}</p>}
+          <p>Limites : {helpText(LIMITS_HELP)}</p>
           <p>
             {plural(analysis.groups.length, 'motif')}
             {analysis.merges?.length ? `, dont ${plural(analysis.merges.length, 'fusion')} de motifs qui traitaient le même objet` : ''}

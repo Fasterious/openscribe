@@ -1,6 +1,7 @@
 import type { Corpus } from '../corpus'
 import { activeParticipants, duplicateContributions, promptsOf } from '../corpus'
 import { presetById } from '../providers/presets'
+import { DOUBT_HELP, FRAGILE_HELP, helpText, STANCE_HELP } from './glossary'
 import { dividedFragile, highlights, labelDoubt, type Highlight, type Highlights } from './highlights'
 import { withCurrentMetrics } from './metrics'
 import { maskNames } from './names'
@@ -47,6 +48,9 @@ function alsoInOf(state: AnalysisState): (i: Idea) => string | undefined {
     return other ? titleOfIdea.get(other) : undefined
   }
 }
+
+/** L'infobulle d'une ligne de chiffres : ce que veut dire son étiquette, et « fragile » s'il y a lieu. */
+export const stanceTitle = (m: Metrics): string => [helpText(STANCE_HELP[m.stance]), m.fragile && `Fragile : ${helpText(FRAGILE_HELP)}`].filter(Boolean).join(' ')
 
 const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
 
@@ -547,8 +551,8 @@ export interface HighlightSection {
   heading: string
   /** Ce que comptent les chiffres de la liste, dit une seule fois. */
   intro?: string
-  /** Verbatims montrés sous une ligne, avec leur auteur. */
-  items: { title: string; detail: string; quotes: { who: string; text: string }[] }[]
+  /** Verbatims montrés sous une ligne, avec leur auteur ; `fragile` et `doubt` : les marques de méthode, que l'affichage explique. */
+  items: { title: string; detail: string; quotes: { who: string; text: string }[]; fragile?: boolean; doubt?: string }[]
   /** Motifs au-delà des premiers, nommés sans détail : une liste n'est jamais coupée en silence. */
   more: string[]
 }
@@ -571,10 +575,10 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
   }
   // Une étiquette discutable le dit à côté de son chiffre : le lecteur sait où relire les citations.
   const groupOf = new Map(state.groups.map((g) => [g.id, g]))
-  const withDoubt = (detail: string, groupId: string) => {
+  const marks = (groupId: string) => {
     const g = groupOf.get(groupId)!
     const doubt = labelDoubt(g, byId)
-    return [detail, dividedFragile(g) && 'fragile', doubt].filter(Boolean).join(' · ')
+    return { ...(dividedFragile(g) ? { fragile: true } : {}), ...(doubt ? { doubt } : {}) }
   }
   const s1 = cut(h.strengths)
   const s2 = cut(h.blockers)
@@ -589,7 +593,8 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
       intro: INTRO,
       items: s1.shown.map((x) => ({
         title: x.title,
-        detail: withDoubt(opinion(x, 'positif'), x.groupId),
+        detail: opinion(x, 'positif'),
+        ...marks(x.groupId),
         quotes: [],
       })),
       more: s1.more,
@@ -600,7 +605,8 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
       intro: INTRO,
       items: s2.shown.map((x) => ({
         title: x.title,
-        detail: withDoubt(opinion(x, 'négatif'), x.groupId),
+        detail: opinion(x, 'négatif'),
+        ...marks(x.groupId),
         quotes: [],
       })),
       more: s2.more,
@@ -622,7 +628,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
             quotes: [quote(x.opposed.a), quote(x.opposed.b)],
           }
         }
-        return { title: x.title, detail: withDoubt(describeOpinions(g) + (x.opposed ? ` ; pistes opposées : ${x.opposed.about}` : ''), x.groupId), quotes: [] }
+        return { title: x.title, detail: describeOpinions(g) + (x.opposed ? ` ; pistes opposées : ${x.opposed.about}` : ''), quotes: [], ...marks(x.groupId) }
       }),
       more: s3.more,
     },
@@ -712,7 +718,7 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
     out.push(`## ${SECTION_MARK[sec.key]} ${sec.heading}`, '')
     if (sec.intro) out.push(`*${sec.intro}*`, '')
     for (const x of sec.items) {
-      out.push(`- **${x.title}** — ${x.detail}`)
+      out.push(`- **${x.title}** — ${[x.detail, x.fragile && 'fragile', x.doubt].filter(Boolean).join(' · ')}`)
       for (const q of x.quotes) out.push(`  - « ${q.text} » — ${q.who}`)
     }
     if (sec.more.length) out.push(`- Et aussi : ${sec.more.join(' · ')}`)
@@ -848,7 +854,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
       .join('')
     const note = both.size ? `<p class="facts">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>` : ''
     const dominant = dominantVoice(ideasOf(g, byId))
-    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}</p>${g.definition ? `<p class="facts">${e(definitionLine(g.definition))}</p>` : ''}${labelDoubt(g, byId) ? `<p class="facts"><strong>${e(cap(labelDoubt(g, byId)!))}.</strong></p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
+    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts" title="${e(stanceTitle(g.metrics))}">${e(metricsLine(g.metrics))}</p>${g.definition ? `<p class="facts">${e(definitionLine(g.definition))}</p>` : ''}${labelDoubt(g, byId) ? `<p class="facts" title="${e(helpText(DOUBT_HELP))}"><strong>${e(cap(labelDoubt(g, byId)!))}.</strong></p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
   }
 
   if (opts.stale) parts.push(`<p class="facts"><strong>${e(STALE_NOTE)}</strong></p>`)
@@ -857,7 +863,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
     const items = sec.items
       .map(
         (x) =>
-          `<li class="${SECTION_CLASS[sec.key]}"><strong>${e(x.title)}</strong> — ${e(x.detail)}${x.quotes.length ? `<ul>${x.quotes.map((q) => `<li class="quote">« ${e(q.text)} » <span class="who">${e(q.who)}</span></li>`).join('')}</ul>` : ''}</li>`,
+          `<li class="${SECTION_CLASS[sec.key]}"><strong>${e(x.title)}</strong> — ${e(x.detail)}${x.fragile ? ` · <abbr title="${e(helpText(FRAGILE_HELP))}">fragile</abbr>` : ''}${x.doubt ? ` · <abbr title="${e(helpText(DOUBT_HELP))}">${e(x.doubt)}</abbr>` : ''}${x.quotes.length ? `<ul>${x.quotes.map((q) => `<li class="quote">« ${e(q.text)} » <span class="who">${e(q.who)}</span></li>`).join('')}</ul>` : ''}</li>`,
       )
       .join('')
     const more = sec.more.length ? `<li class="more">Et aussi : ${e(sec.more.join(' · '))}</li>` : ''

@@ -571,6 +571,22 @@ describe('étiquettes à vérifier', () => {
   })
 })
 
+describe('explications des marques de méthode', () => {
+  it('chaque étiquette d’avis a son explication, et le rapport HTML la porte au survol', async () => {
+    const { STANCE_HELP, helpText, FRAGILE_HELP } = await import('./analysis/glossary')
+    for (const stance of ['unanimous', 'consensus', 'majority', 'lean', 'divided', 'thin', 'none'] as const) {
+      expect(STANCE_HELP[stance].what.length).toBeGreaterThan(20)
+      expect(STANCE_HELP[stance].why.length).toBeGreaterThan(20)
+    }
+    expect(helpText(FRAGILE_HELP)).toContain('une seule personne')
+    const corpus = surveyCorpus()
+    const provider = createSimulationProvider()
+    const state = await runAnalysis(corpus, await newAnalysis(corpus, DEFAULT_SETTINGS, provider), { provider, cache: new MemoryCache() })
+    const html = reportToHtml(state, corpus, 'Test')
+    expect(html).toContain(`title="${helpText(STANCE_HELP[state.groups[0].metrics.stance]).slice(0, 40)}`)
+  })
+})
+
 describe('balayage par définition', () => {
   // Le moteur définit chaque motif à la relecture ; au balayage, il propose quatre changements, dont deux interdits.
   const run = async (multiCoding: boolean) => {

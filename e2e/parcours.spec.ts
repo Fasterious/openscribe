@@ -62,11 +62,17 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   await expect(page.getByRole('heading', { level: 1 })).toContainText('médiathèque')
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
   await expect(page.getByText("Rapport d'exemple")).toBeVisible()
-  await expect(page.getByText('À vérifier')).toHaveCount(0)
+  await expect(page.getByText('À vérifier', { exact: true })).toHaveCount(0)
   // Le second niveau existe : des thèmes rapprochent les groupes.
   expect(await page.locator('section h2').count()).toBeGreaterThan(3)
   await noHorizontalScroll(page)
   await shot(page, '3-rapport')
+
+  // Une étiquette d'avis s'explique au survol, et au clavier : ce qu'elle veut dire et pourquoi.
+  const label = page.locator('span[tabindex="0"]').filter({ hasText: /unanime|majorité|Avis partagés|Peu d'avis/i }).first()
+  await label.hover()
+  await expect(page.getByRole('tooltip')).toContainText('donnent un avis')
+  await page.mouse.move(0, 0)
 
   // Une référence de la synthèse déplie ses verbatims juste en dessous, sans fenêtre.
   await page
