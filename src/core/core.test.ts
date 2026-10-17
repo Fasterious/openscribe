@@ -612,7 +612,7 @@ describe('explications des marques de méthode', () => {
     expect(html).not.toContain('class="summary"')
     // Chaque idée affichée retrouve sa réponse : le passage cité tient dans le texte.
     for (const [, [c, spans]] of Object.entries(data.i) as [string, [string, [number, number][]]][])
-      for (const [a, b] of spans) expect(b).toBeLessThanOrEqual(data.c[c][1].length)
+      for (const [, b] of spans) expect(b).toBeLessThanOrEqual(data.c[c][1].length)
   })
   it('l’explication d’une ligne de chiffres dit aussi ce qu’est une minorité constante', async () => {
     const { MINORITY_HELP } = await import('./analysis/glossary')
