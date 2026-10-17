@@ -28,7 +28,7 @@ import { isExample } from '../Synthesis'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, CATEGORY_ORDER, download, formatDate, plural, slug } from '../format'
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, Disclosure, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
-import { DOUBT_HELP, FRAGILE_HELP, helpText, LIMITS_HELP, MINORITY_HELP, type LabelHelp } from '@/core/analysis/glossary'
+import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, MINORITY_HELP, type LabelHelp } from '@/core/analysis/glossary'
 import { labelDoubt } from '@/core/analysis/highlights'
 
 /** Classes écrites en entier : Tailwind ne génère pas une classe construite à la volée. */
@@ -90,7 +90,8 @@ const SECTION_LOOK = {
 
 /** Une marque de méthode qui s'explique au survol et au focus clavier : ce qu'elle veut dire, pourquoi, quoi faire. */
 function Help({ help, lead, children }: { help: LabelHelp | string; lead?: string; children: ReactElement }) {
-  const text = typeof help === 'string' ? help : helpText(help)
+  // Un intitulé qui dit déjà ce que veut dire la marque (lead) dispense de le redire : restent le pourquoi et l'action.
+  const text = typeof help === 'string' ? help : lead ? helpText({ ...help, what: '' }) : helpText(help)
   return (
     <Tooltip content={lead ? `${lead} ${text}` : text}>
       <span tabIndex={0} className="cursor-help rounded focus-visible:outline-2 focus-visible:outline-ring">
@@ -969,8 +970,8 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
             camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver. Un thème réunit des motifs différents : on n'y additionne pas les avis.
             Les listes en tête du rapport sont établies par le code, sans rédaction de l'IA. (Indicateurs, version {METRICS_VERSION})
           </p>
-          {analysis.groups.some((g) => labelDoubt(g, ctx.ideaById)) && <p>« À vérifier » : {helpText(DOUBT_HELP)}</p>}
-          <p>Limites : {helpText(LIMITS_HELP)}</p>
+          {analysis.groups.some((g) => labelDoubt(g, ctx.ideaById)) && <p>{labelled('« À vérifier »', DOUBT_HELP)}</p>}
+          <p>{labelled('Limites', LIMITS_HELP)}</p>
           <p>
             {plural(analysis.groups.length, 'motif')}
             {analysis.merges?.length ? `, dont ${plural(analysis.merges.length, 'fusion')} de motifs qui traitaient le même objet` : ''}

@@ -578,7 +578,7 @@ describe('explications des marques de méthode', () => {
       expect(STANCE_HELP[stance].what.length).toBeGreaterThan(20)
       expect(STANCE_HELP[stance].why.length).toBeGreaterThan(20)
     }
-    expect(helpText(FRAGILE_HELP)).toContain('une seule personne')
+    expect(helpText(FRAGILE_HELP)).toContain("qu'une personne change d'avis")
     const corpus = surveyCorpus()
     const provider = createSimulationProvider()
     const state = await runAnalysis(corpus, await newAnalysis(corpus, DEFAULT_SETTINGS, provider), { provider, cache: new MemoryCache() })

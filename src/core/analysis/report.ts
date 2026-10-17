@@ -1,7 +1,7 @@
 import type { Corpus } from '../corpus'
 import { activeParticipants, duplicateContributions, promptsOf } from '../corpus'
 import { presetById } from '../providers/presets'
-import { DOUBT_HELP, FRAGILE_HELP, helpText, STANCE_HELP } from './glossary'
+import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, STANCE_HELP } from './glossary'
 import { dividedFragile, highlights, labelDoubt, type Highlight, type Highlights } from './highlights'
 import { withCurrentMetrics } from './metrics'
 import { maskNames } from './names'
@@ -50,7 +50,7 @@ function alsoInOf(state: AnalysisState): (i: Idea) => string | undefined {
 }
 
 /** L'infobulle d'une ligne de chiffres : ce que veut dire son étiquette, et « fragile » s'il y a lieu. */
-export const stanceTitle = (m: Metrics): string => [helpText(STANCE_HELP[m.stance]), m.fragile && `Fragile : ${helpText(FRAGILE_HELP)}`].filter(Boolean).join(' ')
+export const stanceTitle = (m: Metrics): string => [helpText(STANCE_HELP[m.stance]), m.fragile && labelled('Fragile', FRAGILE_HELP)].filter(Boolean).join(' ')
 
 const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
 
@@ -152,9 +152,7 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     lines.push(
       `Sources : ${kinds.join(' ; ')}. Un entretien compte pour une personne, comme une ligne de questionnaire : on compte des personnes, pas la longueur de ce qu'elles disent.`,
     )
-  lines.push(
-    "Limites : selon la façon dont on la lit, une même idée peut relever de plusieurs motifs, se découper en plusieurs idées ou se ranger dans un motif plus large ou plus fin ; deux lecteurs humains ne trancheraient pas toujours de la même façon. Le moteur d'IA tranche ces cas, le code les rend vérifiables : chaque citation se consulte et chaque motif affiche sa définition.",
-  )
+  lines.push(labelled('Limites', LIMITS_HELP))
   lines.push(
     'Principe : restituer ce que les participants ont dit, avec le moins de déformation possible. Les verbatims sont recopiés tels quels, sans correction ; seule une coupure « […] » peut sauter un passage sans rapport, jamais une négation ou une réserve. Le texte complet reste consultable dans OpenScribe.',
   )
@@ -854,7 +852,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
       .join('')
     const note = both.size ? `<p class="facts">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>` : ''
     const dominant = dominantVoice(ideasOf(g, byId))
-    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts" title="${e(stanceTitle(g.metrics))}">${e(metricsLine(g.metrics))}</p>${g.definition ? `<p class="facts">${e(definitionLine(g.definition))}</p>` : ''}${labelDoubt(g, byId) ? `<p class="facts" title="${e(helpText(DOUBT_HELP))}"><strong>${e(cap(labelDoubt(g, byId)!))}.</strong></p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
+    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts" title="${e(stanceTitle(g.metrics))}">${e(metricsLine(g.metrics))}</p>${g.definition ? `<p class="facts">${e(definitionLine(g.definition))}</p>` : ''}${labelDoubt(g, byId) ? `<p class="facts" title="${e(helpText({ ...DOUBT_HELP, what: '' }))}"><strong>${e(cap(labelDoubt(g, byId)!))}.</strong></p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
   }
 
   if (opts.stale) parts.push(`<p class="facts"><strong>${e(STALE_NOTE)}</strong></p>`)
