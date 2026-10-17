@@ -179,5 +179,22 @@
    "plume_resume": 7
   },
   "publie": true
+ },
+ {
+  "date": "2026-10-17",
+  "passes": [
+   "15",
+   "16",
+   "16b",
+   "16c"
+  ],
+  "publiée": "16c",
+  "methodologue": [
+   7,
+   7.5
+  ],
+  "plume_motifs": 7,
+  "erreurs_resume": 1,
+  "reste": "école publique face au privé (définition du motif) ; décisions de méthode soumises à Arnaud"
  }
 ]
