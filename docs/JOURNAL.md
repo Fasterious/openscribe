@@ -2,6 +2,31 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — Synthèses des motifs récrites, article d'une page retiré (retours d'Arnaud)
+
+- **Synthèses des motifs** (passes 15, 16, 16b, 16c, idées et motifs identiques à la 14b) : plus de « une large
+  majorité de ceux qui en parlent » ; le mot de l'échelle toujours avec son nombre, entre parenthèses ; la base
+  « qui donnent un avis » ; chaque camp compté ; aucun sujet collectif sans nombre. Passe 15 : langue meilleure,
+  mais G1 et G2 ne citaient plus qu'une part de leur camp (69 personnes absentes). Passe 16 : nouveau contrôle du
+  code, un camp cité à moins de 80 % est signalé à la vérification des renvois (seuil du `methodologue`, rodé sur le
+  cache : 4 camps en 15, 0 en 14b). Résultat 16c : 0 camp sous 80 %, 1 erreur au résumé au lieu de 2 (« réforme »
+  corrigée ; « public face au privé » demeure, elle vient de la définition du motif) ; `methodologue` 7 et 7,5/10,
+  `plume` 7/10 aux motifs (6 en 14b). Publiée à la place de la 14b.
+- **Exemples des consignes : deux reprenaient le corpus de certification** (« l'orientation des élèves… 27 des 28 »,
+  « la carte scolaire, par 24 sur 29 »). Remplacés par des exemples fictifs ; le test de confidentialité vérifie
+  désormais qu'aucun titre de motif d'une analyse privée n'apparaît dans les consignes.
+- **Contrôles des comptes, fausses alertes corrigées à la source** : « 2 personnes … : l'une, l'autre » ; la base
+  d'un rapport (« 4 des 5 personnes ») ; une date (« les années 1950 ») ; « la seconde » ; la phrase qui dit le
+  compte du motif, gardée sans renvoi. Passe 16 : 5 phrases justes retirées ; 16c : 0.
+- **L'article « Lire en une page » est retiré** (Arnaud préfère l'application). Avant de le supprimer, on a repris
+  dans l'application ce qu'il avait en plus : la méthode détaillée (le même texte que l'export, une seule source),
+  la section « Hors question », l'impression (« Imprimer ou enregistrer en PDF »). Son adresse devient une page
+  légère (titre, description, aperçu pour les réseaux) qui ouvre l'étude : les anciens liens marchent.
+- **Replier ramène là où l'on a déplié** ; **Ollama n'est cherché depuis le site en ligne que sur demande**, avec
+  une phrase qui explique la demande d'accès du navigateur (elle s'affichait à l'ouverture de la page Moteur).
+- **À trancher par Arnaud** (décisions de méthode) : un motif « A face à B » peut-il porter un camp ? ; une copie du
+  codage en double peut-elle changer d'objet et de ton ? ; une rubrique à part pour les propositions opposées ?
+
 ## 2026-10-17 — Observatoire dans l'application : menu, résumé, listes, chiffres (retours d'Arnaud)
 
 - **Arnaud préfère la version application.** Un clic sur l'étude l'ouvre dans l'application ; la liste des études

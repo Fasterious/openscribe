@@ -2,6 +2,19 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-17 — Synthèses des motifs : trois passes, et ce qu'elles ont appris
+
+- **Bien marché** : rejouer depuis le cache (idées et motifs identiques, vérifiés par script) ; les deux lectures
+  `methodologue` qui ont trouvé ce qu'aucun contrôle ne voyait (deux exemples de consigne tirés du corpus, des camps
+  à moitié cités) ; mesurer chaque contrôle sur le cache avant de le garder (couverture des camps, fausses alertes) ;
+  le résumé vérifié dans son propre lot : la passe 16b n'a rejoué que 3 demandes.
+- **Coûté pour rien** : la passe 15 a retiré « de ceux qui en parlent » sans dire par quoi le remplacer : le moteur a
+  généralisé sans nombre. Cinq phrases justes retirées en passe 16 par des contrôles trop étroits, vues seulement
+  en rejouant avec un journal des retraits.
+- **On change** : une consigne qui interdit une tournure donne celle qui la remplace ; un exemple de consigne
+  applique toutes les règles de sa consigne (il pèse plus que la règle) ; toute phrase retirée par le code se
+  journalise (à faire : la Méthode le compte déjà, la liste n'est pas gardée).
+
 ## 2026-10-17 — Résumé et listes : rejouer seulement ce qui change
 
 - **Bien marché** : rejouer le seul résumé depuis le cache (passes 14 et 14b) au lieu de toute l'analyse ; deux

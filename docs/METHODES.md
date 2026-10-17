@@ -32,7 +32,7 @@ avant d'être gardés : aucun effet sur une réponse saine.
 | `gptoss` | gpt-oss 20B sur l'ordinateur (Ollama) | réflexion moyenne ; lots 100/50, synthèses par 10, relecture par 4 ; exemple neutre | arrêté : aucune synthèse complète sur un Mac de 24 Go |
 | `gemma` | Gemma 4 12B sur l'ordinateur (Ollama) | apports de Gemini (isolés rattachés, règles de titre et de rédaction), titres fourre-tout interdits, lots 150/75 | 3 / — (passe 2) ; sous le seuil, retiré des choix |
 | `gemini` | Gemini 3.5 et 3.1 Flash-Lite, 3.8 Flash (Google, offre gratuite) | rattachement des motifs isolés ; règles ajoutées : titres de motif sans « et » ni remplissage, « range d'abord », phrases autonomes, compte = personnes citées | 3,5 / 2,5 (passe 4) |
-| `consultation` | Opus 5.5 (Observatoire : consultations publiques, grand public) | « Hors question » ; ton jugé par rapport à l'objet du motif (raison d'un choix, comparaison, regret d'une limite) ; seconde relecture des motifs qui ont reçu une idée ; résumé : équilibre des avis, 8 lignes, mot de l'échelle « de ceux qui en parlent », lignes oubliées signalées ; phrases du code en une phrase | École (Grand débat) : 3 / 3,5 (passes 3 à 7, plafond) |
+| `consultation` | Opus 5.5 (Observatoire : consultations publiques, grand public) | « Hors question » ; ton jugé par rapport à l'objet du motif (raison d'un choix, comparaison, regret d'une limite) ; seconde relecture des motifs qui ont reçu une idée ; résumé : équilibre des avis, 8 lignes, mot de l'échelle avec son nombre, entre parenthèses, base « qui donnent un avis » ; chaque camp compté (contrôle : camp cité à moins de 80 % signalé) ; lignes oubliées signalées ; phrases du code en une phrase | École (Grand débat) : 3 / 3,5 (passes 3 à 7, plafond) |
 
 ## Ministral 14B sur ÉcoSol — 13/10/2026
 
@@ -592,3 +592,17 @@ l'étiquette serait plus nette sans les copies a été essayé puis retiré : il
 - Méthode : une définition de motif ne doit pas réunir dans un camp deux positions opposées (refuser une
   réforme et en réclamer une) ; le codage en double doit rester symétrique (copier les inscriptions ratées
   comme les réussies).
+
+### Passes 15 à 16c — synthèses des motifs (17/10/2026)
+
+| Passe | Changement | `methodologue` | Erreurs du résumé | `plume` (motifs) |
+|---|---|---|---|---|
+| 14b | référence publiée | 7 · 7 | 2 | 6 |
+| 15 | plus de « de ceux qui en parlent », l'échelle avec son nombre | 7 · 7 | 2 | 7 |
+| 16b | exemples fictifs ; chaque camp compté ; contrôle de couverture des camps (80 %) | 7 · 7,5 | 1 | 7 |
+| 16c | fausses alertes des comptes corrigées (16 : 5 phrases justes retirées ; 16c : 0) | — | 1 | — |
+
+Gardé : tout ce qui précède (chacun a corrigé un défaut observé). L'erreur restante (« école publique face au
+privé ») vient de la définition du motif, qui réunit dans un camp « juger le public moins bon » et « dénoncer
+l'inégalité entre les deux » : décision de méthode soumise à Arnaud. Restent pour la langue : « qui donnent un
+avis » répété (46 fois), des passifs « par N personnes », « 18 sur 18 » écrit par `highlightLine`.
