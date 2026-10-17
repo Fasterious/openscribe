@@ -23,8 +23,6 @@ export const CATEGORY: Record<IdeaCategory, { label: string; plural: string; ton
   neutral: { label: 'Constat', plural: 'Constats', tone: 'neutral', mark: '·' },
 }
 
-export const CATEGORY_ORDER: IdeaCategory[] = ['negative', 'positive', 'suggestion', 'question', 'neutral']
-
 export function download(filename: string, content: string, type: string) {
   const blob = new Blob([content], { type })
   const url = URL.createObjectURL(blob)

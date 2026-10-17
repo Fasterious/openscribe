@@ -2,6 +2,21 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — La barre d'un motif reprend ses listes ; lecture mobile sans cadres
+
+- **Remarque d'Arnaud** : la barre mêlait une couleur absente du reste (orange pour « mitigé ») alors qu'en
+  dessous la personne mitigée figure en vert et en rouge ; les suggestions doivent y figurer, car elles disent
+  quelque chose sans être un avis.
+- **Fait** : `categoryBar` donne une part par liste affichée sous le motif (avis positifs, négatifs,
+  suggestions, questions, constats), dans le même ordre et aux mêmes couleurs, à la largeur de son nombre de
+  participants ; une personne mitigée compte dans les deux parts d'avis, comme dans les listes. Même barre
+  dans l'application, la page HTML et le Markdown ; légende et infobulle disent ce qu'elle compte. Les chiffres
+  et l'échelle d'avis ne changent pas.
+- **Ordre** : l'application listait toujours les avis négatifs d'abord, le document le camp le plus nombreux
+  d'abord ; on garde la règle de la méthode (la majorité d'abord) partout.
+- **Mobile** : sur petit écran, les motifs, les listes du résumé et la Méthode perdent leur cadre (un trait sous
+  chaque bloc) ; le contenu prend toute la largeur, comme sur la page de l'Observatoire.
+
 ## 2026-10-17 — Navigation de l'Observatoire
 
 - **Remarque d'Arnaud** : un clic sur l'étude doit mener à l'étude, pas à une page intermédiaire ; et sur les

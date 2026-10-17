@@ -458,18 +458,16 @@ function motifSizes(state: AnalysisState): (ideaId: string) => number {
 }
 
 /**
- * Une case par participant : vert, jaune (mitigé) ou rouge pour ceux qui donnent
- * un avis, blanc pour ceux qui proposent, questionnent ou constatent sans juger.
- * Trois critiques parmi neuf participants ne se lisent pas comme un motif tout rouge.
+ * La barre en Markdown : une case par participant de chaque liste du motif, aux couleurs des listes
+ * (vert positif, rouge négatif, violet suggestion, bleu question, blanc constat). Voir `categoryBar`.
  */
 export function opinionSquares(m: Metrics, max = 30): string {
-  const pos = m.positiveOnly.length
-  const mix = m.mixed.length
-  const neg = m.negativeOnly.length
-  const none = Math.max(0, m.participants - pos - mix - neg)
-  if (!(pos + mix + neg) || m.participants > max) return ''
-  return '🟩'.repeat(pos) + '🟨'.repeat(mix) + '🟥'.repeat(neg) + '⬜'.repeat(none)
+  const bar = categoryBar(m)
+  if (!bar.length || bar.reduce((a, x) => a + x.people, 0) > max) return ''
+  return bar.map(({ cat, people }) => SQUARE[cat].repeat(people)).join('')
 }
+
+const SQUARE: Record<IdeaCategory, string> = { positive: '🟩', negative: '🟥', suggestion: '🟪', question: '🟦', neutral: '⬜' }
 
 /** Repère de couleur d'une ligne en Markdown, là où le HTML trace un trait. */
 const CATEGORY_MARK: Record<IdeaCategory, string> = {
@@ -533,8 +531,39 @@ export function bothSides(ideas: Idea[]): Set<string> {
 const CATEGORY_ORDER: IdeaCategory[] = ['positive', 'negative', 'suggestion', 'question', 'neutral']
 
 /** Le camp le plus nombreux d'abord : un motif jugé négatif s'ouvre sur ses critiques. */
-function categoryOrder(m: Metrics): IdeaCategory[] {
+/** L'ordre des listes d'un motif : le camp le plus nombreux d'abord, puis suggestions, questions, constats. */
+export function categoryOrder(m: Metrics): IdeaCategory[] {
   return m.majority === 'negative' ? ['negative', 'positive', 'suggestion', 'question', 'neutral'] : CATEGORY_ORDER
+}
+
+/**
+ * La barre d'un motif : une part par liste affichée en dessous (avis positifs, négatifs, suggestions,
+ * questions, constats), dans le même ordre, aux mêmes couleurs, à la largeur de son nombre de participants.
+ * Une personne mitigée figure dans les deux listes d'avis, donc dans les deux parts, comme en dessous
+ * (décision d'Arnaud, 17/10 : la barre résume ce qu'on lit plus bas, suggestions comprises).
+ */
+export function categoryBar(m: Metrics): { cat: IdeaCategory; people: number }[] {
+  return categoryOrder(m)
+    .map((cat) => ({ cat, people: m.participantsByCategory[cat] ?? 0 }))
+    .filter((x) => x.people > 0)
+}
+
+const BAR_WORD: Record<IdeaCategory, [string, string]> = {
+  positive: ['avis positif', 'avis positifs'],
+  negative: ['avis négatif', 'avis négatifs'],
+  suggestion: ['suggestion', 'suggestions'],
+  question: ['question', 'questions'],
+  neutral: ['constat', 'constats'],
+}
+
+/** « 3 avis positifs (dont 1 mitigé), 1 suggestion » : ce que dit la barre, pour un lecteur d'écran ou une infobulle. */
+export function categoryBarLabel(m: Metrics): string {
+  return `Participants par liste : ${categoryBar(m)
+    .map(({ cat, people }) => {
+      const mixed = cat === 'positive' || cat === 'negative' ? m.mixed.length : 0
+      return `${people} ${BAR_WORD[cat][people > 1 ? 1 : 0]}${mixed ? ` (dont ${mixed} mitigé${mixed > 1 ? 's' : ''})` : ''}`
+    })
+    .join(', ')}`
 }
 
 /** Les idées d'un motif dans l'ordre où le rapport les affiche : par catégorie, puis par personne. */
@@ -834,14 +863,10 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
       .join('')
   // La barre d'avis : une part par camp, à la largeur de son nombre de participants.
   const bar = (m: Metrics) => {
-    const pos = m.positiveOnly.length
-    const mix = m.mixed.length
-    const neg = m.negativeOnly.length
-    const total = pos + mix + neg
-    if (!total) return ''
-    const none = Math.max(0, m.participants - total)
-    const seg = (k: number, cls: string) => (k ? `<span class="${cls}" style="flex:${k}"></span>` : '')
-    return `<div class="bar" role="img" aria-label="${pos} positifs, ${mix} mitigés, ${neg} négatifs, ${none} sans avis">${seg(pos, 'b-pos')}${seg(mix, 'b-mix')}${seg(neg, 'b-neg')}${seg(none, 'b-none')}</div>`
+    const parts = categoryBar(m)
+    if (!parts.length) return ''
+    const label = e(categoryBarLabel(m))
+    return `<div class="bar" role="img" aria-label="${label}" title="${label}">${parts.map(({ cat, people }) => `<span class="b-${cat}" style="flex:${people}"></span>`).join('')}</div>`
   }
 
   const groupHtml = (g: Group, h: 'h2' | 'h3' | 'h4') => {
@@ -928,7 +953,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${e(title)}</title>
 <style>
-:root{--ink:#1d1f2b;--muted:#5b6078;--line:#e3e5f5;--brand:#2F40C2;--pos:#2e9d6a;--neg:#d1495b;--mix:#e0a526;--sug:#2F40C2;--que:#2a8fb0;--neu:#9aa0b5;--card:#f7f8fd}
+:root{--ink:#1d1f2b;--muted:#5b6078;--line:#e3e5f5;--brand:#2F40C2;--pos:#2e9d6a;--neg:#d1495b;--sug:#2F40C2;--que:#2a8fb0;--neu:#9aa0b5;--card:#f7f8fd}
 body{font-family:Geist,system-ui,-apple-system,"Segoe UI",sans-serif;max-width:52rem;margin:2rem auto;padding:0 1rem;line-height:1.6;color:var(--ink);background:#fff}
 h1{color:var(--brand);font-size:2rem;margin-bottom:.5rem}h2{margin-top:2.6rem;border-bottom:2px solid var(--line);padding-bottom:.3rem}
 h3{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line)}h4{margin-top:1.4rem}
@@ -936,7 +961,7 @@ h3{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line)}h4{margin-t
 .theme>h2{color:var(--brand)}
 .facts{color:var(--muted);font-size:.9rem;margin:.3rem 0}
 .bar{display:flex;height:.55rem;max-width:16rem;border-radius:99px;overflow:hidden;background:var(--line);margin:.4rem 0 .2rem;gap:2px}
-.b-none{background:var(--line)}[id]{scroll-margin-top:5rem}.b-pos{background:var(--pos)}.b-mix{background:var(--mix)}.b-neg{background:var(--neg)}
+[id]{scroll-margin-top:5rem}.b-positive{background:var(--pos)}.b-negative{background:var(--neg)}.b-suggestion{background:var(--sug)}.b-question{background:var(--que)}.b-neutral{background:var(--neu)}
 .summary{background:var(--card);border-radius:.5rem;padding:.2rem 1rem;margin:.6rem 0}
 details{margin:.6rem 0}summary{cursor:pointer;font-weight:600;font-size:.95rem}
 .cat-positive>summary{color:var(--pos)}.cat-negative>summary{color:var(--neg)}.cat-suggestion>summary{color:var(--sug)}.cat-question>summary{color:var(--que)}.cat-neutral>summary{color:var(--muted)}

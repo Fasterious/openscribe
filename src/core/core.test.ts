@@ -47,7 +47,7 @@ import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
 import { emptyCorpus, promptsOf, removeSource, renameSource } from './corpus'
 import { maskNames, verifiedNames } from './analysis/names'
 import { dividedFragile, fragileShown, highlightLine, highlights, labelDoubt } from './analysis/highlights'
-import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext, stanceTitle, summaryDoubts } from './analysis/report'
+import { categoryBar, categoryBarLabel, fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext, stanceTitle, summaryDoubts } from './analysis/report'
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
@@ -1771,10 +1771,18 @@ describe('rapport', () => {
     expect(refsToPeople('Lien [I0003].', byId, (who, i) => `<a href="#${i.id}">${who}</a>`)).toBe('Lien (<a href="#I0003">P7</a>).')
   })
 
-  it('une case par participant : avis en couleur, les autres en blanc', () => {
-    const m = { participants: 6, positiveOnly: ['a'], mixed: ['b'], negativeOnly: ['c', 'd'] } as unknown as Metrics
-    expect(opinionSquares(m)).toBe('🟩🟨🟥🟥⬜⬜')
+  it('la barre reprend les listes du motif : mêmes couleurs, même ordre, un mitigé dans les deux avis', () => {
+    // a positif, b mitigé, c et d négatifs ; e propose, f constate.
+    const m = computeMetrics([idea('I1', 'a', 'positive'), idea('I2', 'b', 'positive'), idea('I3', 'b', 'negative'), idea('I4', 'c', 'negative'), idea('I5', 'd', 'negative'), idea('I6', 'e', 'suggestion'), idea('I7', 'f', 'neutral')])
+    expect(categoryBar(m)).toEqual([
+      { cat: 'negative', people: 3 },
+      { cat: 'positive', people: 2 },
+      { cat: 'suggestion', people: 1 },
+      { cat: 'neutral', people: 1 },
+    ])
+    expect(opinionSquares(m)).toBe('🟥🟥🟥🟩🟩🟪⬜')
     expect(opinionSquares(m, 5)).toBe('')
+    expect(categoryBarLabel(m)).toBe('Participants par liste : 3 avis négatifs (dont 1 mitigé), 2 avis positifs (dont 1 mitigé), 1 suggestion, 1 constat')
   })
 
   it('« notamment » quand la phrase compte plus de personnes que les renvois, numéros triés', () => {

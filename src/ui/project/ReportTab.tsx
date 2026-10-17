@@ -9,6 +9,9 @@ import {
   categoryHeading,
   dominantVoice,
   engineName,
+  categoryBar,
+  categoryOrder,
+  categoryBarLabel,
   highlightSections,
   summaryDoubts,
   metricsLine,
@@ -27,7 +30,7 @@ import type { Contribution } from '@/core/corpus'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { isExample } from '../Synthesis'
 import { TAB_ACTIONS } from './slots'
-import { CATEGORY, CATEGORY_ORDER, download, formatDate, plural, slug } from '../format'
+import { CATEGORY, download, formatDate, plural, slug } from '../format'
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, Disclosure, DropMenu, MenuItem, MenuSection, Explain, Tooltip } from '../primitives'
 import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, MINORITY_HELP, type LabelHelp } from '@/core/analysis/glossary'
 import { fragileShown, labelDoubt } from '@/core/analysis/highlights'
@@ -135,27 +138,31 @@ function stanceBadgeOnly(m: Metrics) {
   return <Badge tone="outline">Pas d'avis</Badge>
 }
 
-/** Barre empilée en participants : avis positifs, mitigés, négatifs. */
+/** La barre d'un motif : une part par liste affichée en dessous, aux mêmes couleurs (`categoryBar`). */
 function OpinionBar({ m }: { m: Metrics }) {
-  const pos = m.positiveOnly.length
-  const mix = m.mixed.length
-  const neg = m.negativeOnly.length
-  const total = pos + mix + neg
-  if (!total) return <div className="h-2 rounded-full bg-muted" aria-hidden />
-  // Rapportée à tous les participants du motif : la part grise, ce sont ceux qui proposent ou constatent sans juger.
-  const all = Math.max(total, m.participants)
-  const w = (n: number) => `${(n / all) * 100}%`
+  const parts = categoryBar(m)
+  if (!parts.length) return <div className="h-2 rounded-full bg-muted" aria-hidden />
+  const label = categoryBarLabel(m)
   return (
-    <div
-      className="flex h-2 overflow-hidden rounded-full bg-muted"
-      role="img"
-      aria-label={`Participants : ${plural(pos, 'positif')}, ${plural(mix, 'mitigé')}, ${plural(neg, 'négatif')}, ${all - total} sans avis`}
-    >
-      <div className="bg-positive" style={{ width: w(pos) }} />
-      <div className="bg-warning" style={{ width: w(mix) }} />
-      <div className="bg-negative" style={{ width: w(neg) }} />
+    <div className="flex h-2 gap-0.5 overflow-hidden rounded-full" role="img" aria-label={label} title={label}>
+      {parts.map(({ cat, people }) => (
+        <div key={cat} className={BAR[cat]} style={{ flexGrow: people }} />
+      ))}
     </div>
   )
+}
+
+/** Sur petit écran, une carte perd son cadre : le contenu prend toute la largeur (remarque d'Arnaud, 17/10). */
+const FLAT_CARD = 'max-sm:rounded-none max-sm:border-x-0 max-sm:border-b-0 max-sm:bg-transparent max-sm:shadow-none'
+
+const LEGEND: Record<IdeaCategory, string> = { positive: 'avis positifs', negative: 'avis négatifs', suggestion: 'suggestions', question: 'questions', neutral: 'constats' }
+
+const BAR: Record<IdeaCategory, string> = {
+  positive: 'bg-positive',
+  negative: 'bg-negative',
+  suggestion: 'bg-suggestion',
+  question: 'bg-question',
+  neutral: 'bg-neutral',
 }
 
 /**
@@ -329,13 +336,14 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
   const ideas = group.ideaIds.map((id) => ctx.ideaById.get(id)!).filter((i) => !ctx.segment || ctx.segment.has(i.participantId))
   const m = ctx.segment ? computeMetrics(ideas) : group.metrics
   const both = bothSides(ideas)
-  const full = fullQuestionIds(displayOrder(ideas, m, CATEGORY_ORDER), ctx.context)
+  const full = fullQuestionIds(displayOrder(ideas, m), ctx.context)
   // La mention « à vérifier » vaut pour le motif entier : elle se tait quand on regarde un segment.
   const doubt = ctx.segment ? undefined : labelDoubt(group, ctx.ideaById)
   if (!ideas.length) return null
   const H = headingLevel
   return (
     <Disclosure
+      flat
       summary={
         <span className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
           <H className="text-base font-semibold">{group.title}</H>
@@ -376,7 +384,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
         )}
         {m.minority && <MinorityNote minority={m.minority} ctx={ctx} />}
         <div className="grid gap-3 md:grid-cols-2">
-          {CATEGORY_ORDER.map((cat) => {
+          {categoryOrder(m).map((cat) => {
             const items = ideas.filter((i) => i.category === cat)
             if (!items.length) return null
             const lines = personLines(items)
@@ -758,14 +766,14 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
               const look = SECTION_LOOK[sec.key]
               const Icon = look.icon
               return (
-                <Card key={sec.key} className={`mb-3 break-inside-avoid border-t-4 ${look.top}`}>
-                  <CardHeader className="pb-2">
+                <Card key={sec.key} className={`mb-3 break-inside-avoid border-t-4 ${look.top} ${FLAT_CARD}`}>
+                  <CardHeader className="pb-2 max-sm:px-0">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Icon className={`size-4 ${look.text}`} aria-hidden />
                       {sec.heading}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="max-sm:px-0">
                     {sec.intro && <p className="mb-2 text-sm text-muted-foreground">{sec.intro}</p>}
                     <ul className="space-y-2 text-base">
                       {sec.items.map((x) => (
@@ -815,19 +823,12 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
           Vue d'ensemble
         </h2>
         <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-          <span className="flex max-w-full flex-wrap items-center gap-1">
-            <span className="inline-block size-2.5 rounded-full bg-positive" /> positifs
-          </span>
-          <span className="flex max-w-full flex-wrap items-center gap-1">
-            <span className="inline-block size-2.5 rounded-full bg-warning" /> mitigés
-          </span>
-          <span className="flex max-w-full flex-wrap items-center gap-1">
-            <span className="inline-block size-2.5 rounded-full bg-negative" /> négatifs
-          </span>
-          <span className="flex max-w-full flex-wrap items-center gap-1">
-            <span className="inline-block size-2.5 rounded-full bg-muted ring-1 ring-border" /> sans avis
-          </span>
-          <span>(en participants)</span>
+          {(['positive', 'negative', 'suggestion', 'question', 'neutral'] as const).map((cat) => (
+            <span key={cat} className="flex max-w-full flex-wrap items-center gap-1">
+              <span className={`inline-block size-2.5 rounded-full ${BAR[cat]}`} /> {LEGEND[cat]}
+            </span>
+          ))}
+          <span>(en participants ; une personne mitigée compte dans les deux couleurs d'avis)</span>
         </div>
         <ul className="grid gap-2 sm:grid-cols-2">
           {overview
@@ -836,7 +837,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
               <li key={s.id}>
                 <a
                   href={`#sec-${s.id}`}
-                  className="block rounded-lg border bg-card p-3 hover:border-primary"
+                  className="block rounded-lg border bg-card p-3 hover:border-primary max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0 max-sm:bg-transparent max-sm:px-0"
                   onClick={(e) => {
                     e.preventDefault()
                     document.getElementById(`sec-${s.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -860,7 +861,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
             ))}
         </ul>
         {overview.some((s) => s.shown.participants === 1) && (
-          <div className="rounded-lg border border-dashed bg-card p-3 text-base">
+          <div className="rounded-lg border border-dashed bg-card p-3 text-base max-sm:rounded-none max-sm:border-x-0 max-sm:bg-transparent max-sm:px-0">
             <p className="font-medium">Avis isolés</p>
             <p className="text-sm text-muted-foreground">Portés chacun par un seul participant : à lire comme des signaux, pas comme des tendances.</p>
             <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
@@ -935,11 +936,11 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
             ))}
       </section>
 
-      <Card>
-        <CardHeader>
+      <Card className={`max-sm:border-t ${FLAT_CARD}`}>
+        <CardHeader className="max-sm:px-0">
           <CardTitle>Méthode</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
+        <CardContent className="space-y-2 text-sm text-muted-foreground max-sm:px-0">
           <p>
             Le moteur d'IA ({engineName(analysis.engine.presetId, analysis.engine.model)} · {analysis.engine.model}) a découpé les réponses en idées, proposé
             les motifs et rédigé les synthèses. Le code a vérifié chaque verbatim mot pour mot dans les réponses, rangé chaque idée exactement une fois, calculé

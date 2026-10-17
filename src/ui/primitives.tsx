@@ -207,21 +207,32 @@ export function Disclosure({
   children,
   defaultOpen,
   className,
+  flat,
 }: {
   summary: React.ReactNode
   children: React.ReactNode
   defaultOpen?: boolean
   className?: string
+  /** Sur petit écran, sans cadre : un simple trait sous chaque bloc, le contenu prend toute la largeur. */
+  flat?: boolean
 }) {
   return (
-    <details open={defaultOpen} className={cn('group rounded-lg border bg-card', className)}>
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+    <details
+      open={defaultOpen}
+      className={cn('group rounded-lg border bg-card', flat && 'max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0 max-sm:bg-transparent', className)}
+    >
+      <summary
+        className={cn(
+          'flex cursor-pointer list-none items-center justify-between gap-2 p-3 text-sm font-medium [&::-webkit-details-marker]:hidden',
+          flat && 'max-sm:px-0',
+        )}
+      >
         <span className="min-w-0 flex-1">{summary}</span>
         <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-90">
           ›
         </span>
       </summary>
-      <div className="border-t p-3">{children}</div>
+      <div className={cn('border-t p-3', flat && 'max-sm:border-t-0 max-sm:px-0 max-sm:pt-1')}>{children}</div>
     </details>
   )
 }
