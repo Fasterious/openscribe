@@ -96,15 +96,15 @@ export function highlightLine(h: Highlight, kind: keyof Highlights, lang: 'fr' |
     if (kind === 'divided') return `${h.title}: opinions divided among ${h.of} people`
     return `${h.title}: ${h.people} of the ${h.of} people who give an opinion`
   }
-  if (kind === 'proposals') return `${h.title} : ${h.people} participant${h.people > 1 ? 's' : ''} ${h.people > 1 ? 'font' : 'fait'} des propositions`
-  if (kind === 'questions') return `${h.title} : ${h.people} participant${h.people > 1 ? 's' : ''} ${h.people > 1 ? 'se posent' : 'se pose'} des questions`
+  if (kind === 'proposals') return `${h.title} : ${h.people} personne${h.people > 1 ? 's' : ''} ${h.people > 1 ? 'font' : 'fait'} des propositions`
+  if (kind === 'questions') return `${h.title} : ${h.people} personne${h.people > 1 ? 's' : ''} ${h.people > 1 ? 'se posent' : 'se pose'} des questions`
   if (kind === 'divided' && h.opposed) return `${h.title} : constat partagé, propositions opposées (${h.opposed.about})`
-  if (kind === 'divided') return `${h.title} : avis partagés entre ${h.of} participants`
+  if (kind === 'divided') return `${h.title} : avis partagés entre ${h.of} personnes`
   if (scale && (kind === 'strengths' || kind === 'blockers')) {
     const word = h.stance === 'unanimous' ? 'unanime' : h.stance === 'consensus' ? 'large majorité' : h.stance === 'majority' ? 'majorité' : ''
     // Le mot de l'échelle dit déjà « de ceux qui en parlent » : le chiffre reste nu (plume, passe 9 : « ceux qui en parlent » et « qui donnent un avis » dans la même phrase).
     const count = h.people === h.of ? `${h.of} sur ${h.of}` : `${h.people} sur ${h.of}`
     return `${h.title} : ${word ? `${word}${h.fragile ? ' (fragile)' : ''}, ` : ''}${count}`
   }
-  return `${h.title} : ${h.people} des ${h.of} participants qui donnent un avis`
+  return `${h.title} : ${h.people} des ${h.of} personnes qui donnent un avis`
 }

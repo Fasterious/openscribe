@@ -1208,7 +1208,7 @@ describe('méthode « consultation » (Observatoire)', () => {
 
   it('le mot de l’échelle accompagne le chiffre nu (la base est dans le mot)', () => {
     const h = { groupId: 'G1', title: 'Absences', people: 24, of: 24, ideaIds: [], stance: 'unanimous' as const }
-    expect(highlightLine(h, 'blockers')).toBe('Absences : 24 des 24 participants qui donnent un avis')
+    expect(highlightLine(h, 'blockers')).toBe('Absences : 24 des 24 personnes qui donnent un avis')
     expect(highlightLine(h, 'blockers', 'fr', true)).toBe('Absences : unanime, 24 sur 24')
     expect(highlightLine({ ...h, people: 28, of: 33, stance: 'consensus', fragile: true }, 'blockers', 'fr', true)).toBe('Absences : large majorité (fragile), 28 sur 33')
   })
@@ -1551,6 +1551,13 @@ describe('contrôles ajoutés à la certification B9', () => {
     expect(spellLeadingNumbers('3 personnes regrettent X. Puis 4 autres.\n\n2 personnes proposent Y.')).toBe(
       'Trois personnes regrettent X. Puis 4 autres.\n\nDeux personnes proposent Y.',
     )
+  })
+  it('un compte de personnes au milieu d’une phrase s’écrit en chiffres', () => {
+    expect(spellLeadingNumbers('Trois personnes saluent X, tandis que deux personnes et cinq autres le déplorent. Deux d’entre elles hésitent.')).toBe(
+      'Trois personnes saluent X, tandis que 2 personnes et 5 autres le déplorent. Deux d’entre elles hésitent.',
+    )
+    // Un nombre qui ne compte pas des personnes reste en lettres : « à deux vitesses », « en deux temps ».
+    expect(spellLeadingNumbers('Une école à deux vitesses, en deux temps.')).toBe('Une école à deux vitesses, en deux temps.')
   })
 })
 

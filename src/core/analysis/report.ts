@@ -62,6 +62,8 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   const respondents = activeParticipants(corpus).length
   const withIdeas = new Set(state.ideas.map((i) => i.participantId)).size
   const single = state.groups.filter((g) => g.metrics.participants === 1).length
+  // Les fusions de la réconciliation du livre de codes sont annoncées avec lui, pas deux fois.
+  const consolidated = (state.merges?.length ?? 0) - (state.reconciled?.merges ?? 0)
   // Part des idées venues des trois participants les plus prolixes : un rapport peut être tiré par quelques voix.
   const perPerson = [...state.ideas.reduce((m, i) => m.set(i.participantId, (m.get(i.participantId) ?? 0) + 1), new Map<string, number>()).values()].sort(
     (a, b) => b - a,
@@ -70,7 +72,7 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   const lines = [
     `Participants ayant répondu : ${respondents} ; participants dont au moins une idée a été retenue : ${withIdeas}.`,
     `Idées retenues : ${state.ideas.length} (verbatims vérifiés mot pour mot dans les réponses). Verbatims écartés car introuvables tels quels : ${state.rejected.length || 'aucun'}.`,
-    `Motifs : ${state.groups.length}${state.themes.length ? `, regroupés en ${state.themes.length} thèmes` : ''} ; ${single ? `${single} ${single > 1 ? 'reposent' : 'repose'} sur un seul participant (signaux isolés, pas des tendances)` : 'aucun ne repose sur un seul participant'}.${state.merges?.length ? ` La passe de consolidation a fusionné ${state.merges.length} ensemble${state.merges.length > 1 ? 's' : ''} de motifs qui traitaient le même objet.` : ''}`,
+    `Motifs : ${state.groups.length}${state.themes.length ? `, regroupés en ${state.themes.length} thèmes` : ''} ; ${single ? `${single} ${single > 1 ? 'reposent' : 'repose'} sur un seul participant (signaux isolés, pas des tendances)` : 'aucun ne repose sur un seul participant'}.${consolidated ? ` La passe de consolidation a fusionné ${consolidated} ensemble${consolidated > 1 ? 's' : ''} de motifs qui traitaient le même objet.` : ''}`,
   ]
   const off = offTopicLines(state)
   if (off.ideas)
@@ -103,11 +105,11 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   }
   if (state.copied?.length)
     lines.push(
-      `Codage en double, à la demande du chercheur : ${state.copied.length} idée${state.copied.length > 1 ? 's' : ''} qui satisf${state.copied.length > 1 ? 'ont' : 'ait'} la définition de deux motifs ${state.copied.length > 1 ? 'comptent' : 'compte'} dans les deux (la citation figure sous chacun, avec la mention « aussi dans » et le nom de l'autre motif). Chaque motif compte des personnes, aucune deux fois.`,
+      `Codage en double, à la demande du chercheur : ${state.copied.length} idée${state.copied.length > 1 ? 's' : ''} qui répond${state.copied.length > 1 ? 'ent' : ''} à la définition de deux motifs ${state.copied.length > 1 ? 'comptent' : 'compte'} dans les deux (la citation figure sous chacun, avec la mention « aussi dans » et le nom de l'autre motif). Chaque motif compte des personnes, aucune deux fois.`,
     )
   if (state.groups.some((g) => g.definition))
     lines.push(
-      `Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme positif, comme négatif, et ce qui ne compte pas comme un avis. Cette définition figure sous le titre du motif ; les camps d'avis s'y conforment, et le lecteur peut la contester.${state.reconciled?.pairs || state.reconciled?.merges ? ` Le livre de codes a ensuite été relu d'un bloc : ${[state.reconciled.pairs && `${state.reconciled.pairs} paire${state.reconciled.pairs > 1 ? 's' : ''} de motifs voisins relue${state.reconciled.pairs > 1 ? 's' : ''} ensemble avec une règle de partage`, state.reconciled.merges && `${state.reconciled.merges} fusion${state.reconciled.merges > 1 ? 's' : ''} de motifs qui traitaient le même objet`].filter(Boolean).join(' ; ')}.` : ''}`,
+      `Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme positif, comme négatif, et ce qui ne compte pas comme un avis. Cette définition figure sous le titre du motif ; le positif et le négatif y obéissent, et le lecteur peut la contester.${state.reconciled?.pairs || state.reconciled?.merges ? ` Le livre de codes a ensuite été relu d'un bloc : ${[state.reconciled.pairs && `${state.reconciled.pairs} paire${state.reconciled.pairs > 1 ? 's' : ''} de motifs voisins relue${state.reconciled.pairs > 1 ? 's' : ''} ensemble avec une règle de partage`, state.reconciled.merges && `${state.reconciled.merges} fusion${state.reconciled.merges > 1 ? 's' : ''} de motifs qui traitaient le même objet`].filter(Boolean).join(' ; ')}.` : ''}`,
     )
   if (state.support)
     lines.push(

@@ -2201,9 +2201,21 @@ const LEADING: Record<string, string> = {
   '20': 'Vingt',
 }
 
-/** Un nombre en tête de phrase s'écrit en lettres (« Trois personnes… ») : règle typographique appliquée par le code, pas laissée au moteur. */
+const DIGITS: Record<string, string> = Object.fromEntries(Object.entries(LEADING).map(([n, w]) => [w.toLowerCase(), n]))
+const COUNTED = /\b(deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|vingt)(?= (?:personnes?|autres|participants?|parents|familles|d['’]entre)\b)/gi
+
+/**
+ * Un nombre en tête de phrase s'écrit en lettres (« Trois personnes… ») ; au milieu d'une phrase, un compte de
+ * personnes s'écrit en chiffres (« 3 personnes… ») : règle typographique appliquée par le code, pas laissée au moteur
+ * (plume, passe 11 : 16 comptes en lettres au milieu des phrases).
+ */
 export function spellLeadingNumbers(text: string): string {
-  return text.replace(/(^|[.!?]\s+|\n\s*\n)(\d{1,2})(?= )/g, (all, before: string, n: string) => (LEADING[n] ? `${before}${LEADING[n]}` : all))
+  const digits = text.replace(COUNTED, (word, _w, offset: number) => {
+    const before = text.slice(0, offset)
+    const startsSentence = /(^|[.!?]\s+|\n\s*\n|[«(]\s?)$/.test(before)
+    return startsSentence ? word : DIGITS[word.toLowerCase()] ?? word
+  })
+  return digits.replace(/(^|[.!?]\s+|\n\s*\n)(\d{1,2})(?= )/g, (all, before: string, n: string) => (LEADING[n] ? `${before}${LEADING[n]}` : all))
 }
 
 /**
