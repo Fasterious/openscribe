@@ -575,7 +575,7 @@ describe('balayage par définition', () => {
         if (req.task !== 'sweep') return res
         sweep ??= readDataBlock(req.user)
         const data = readDataBlock<{ motifs: { id: string; ideas: { id: string }[] }[]; pool: { id: string }[] }>(req.user)
-        const [m] = data.motifs
+        const m = data.motifs[0] as { id: string; ideas: { id: string; category: string }[] }
         const [a, b] = data.pool
         return {
           ...res,
@@ -585,6 +585,7 @@ describe('balayage par définition', () => {
               { id: b.id, to: m.id, category: 'positive' }, // accepté
               { id: b.id, category: 'neutral' }, // refusé : le ton d'une idée qui n'est pas dans le motif balayé
               { id: m.ideas[0].id, to: 'G999' }, // refusé : la cible n'est pas un motif balayé
+              ...m.ideas.filter((i) => i.category === 'suggestion').map((i) => ({ id: i.id, category: 'negative' })), // refusé : une proposition reste une proposition
             ],
           }),
         }
@@ -604,6 +605,7 @@ describe('balayage par définition', () => {
     expect(state.swept).toMatchObject({ copied: 1, moved: 1 })
     expect(state.swept!.retoned).toBeLessThanOrEqual(1)
     expect(state.ideas.some((i) => i.category === 'neutral' && i.id === sweep!.pool[1].id)).toBe(false)
+    expect(state.retoned!.some((r) => r.from === 'suggestion')).toBe(false)
     expect(reportToMarkdown(state, corpus, 'Test')).toContain('Balayage par définition :')
   })
   it('sans codage en double, une copie proposée est refusée, le déplacement reste', async () => {

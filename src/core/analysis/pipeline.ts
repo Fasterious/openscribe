@@ -1010,7 +1010,10 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
             const pooled = new Set(pool.map((x) => x.id))
             return res.changes.filter((c) => {
               const target = c.to ?? c.also
-              if (!target) return !!c.category && inBatch.has(home.get(c.id)?.id ?? '')
+              // Le balayage juge des avis : une proposition ou une question reste ce qu'elle est (passe 12 : trois propositions
+              // passées en critiques, qui sortaient ainsi de « Ce que proposent les participants »).
+              const avis = (cat?: IdeaCategory) => cat === 'positive' || cat === 'negative' || cat === 'neutral'
+              if (!target) return !!c.category && avis(c.category) && avis(ideaById.get(c.id)?.category) && inBatch.has(home.get(c.id)?.id ?? '')
               if (!inBatch.has(target) || !pooled.has(c.id)) return false
               return c.also ? multi.multiCoding : true
             })
