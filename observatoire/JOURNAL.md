@@ -2,7 +2,7 @@
 
 ## À REGARDER
 
-- 2026-10-17 · École **publiée** (passe 12) dans public/observatoire/, sur décision d'Arnaud : note relative 6,5/10, pas de seuil, limites et mentions « à vérifier » dans le rapport. Fiche mise à jour (résumé tiré du rapport de la passe 12, avertissement « Méthode et limites »).
+- 2026-10-17 · École **publiée** (passe 12) dans public/observatoire/, sur décision d'Arnaud : note relative, pas de seuil (notes de la passe sur 5, à re-noter sur 10), limites et mentions « à vérifier » dans le rapport. Fiche mise à jour (résumé tiré du rapport de la passe 12, avertissement « Méthode et limites »).
 
 - 2026-10-17 · École : passe 12 (balayage par définition) notée 3/5 avec plafond aux deux lectures (moyennes 3,33), langue 3,5. Non publiée. Les quatre défauts des passes 8 à 11 sont levés ; le plafond vient maintenant de copies du balayage qui changent à tort une étiquette (Gratuité de l'école, Accès aux services administratifs, Écoles rurales). Proposition à Arnaud : une relecture des seules copies qui changent une étiquette du résumé (docs/METHODES.md, « Passe 12 »).
 
@@ -26,7 +26,7 @@
 
 | Date | Sujet d'actualité | Source | Échantillon | Notes (méthode / langue) | Publié |
 |---|---|---|---|---|---|
-| 2026-10-14/17 | Mobilisation lycéenne et étudiante | Grand débat 2019, « Organisation de l'État et des services publics », question scolarisation | 378 / 21 868 (± 5 pts) | 6,5/10 / 7/10 (passe 12, note relative) | Oui, 17/10 |
+| 2026-10-14/17 | Mobilisation lycéenne et étudiante | Grand débat 2019, « Organisation de l'État et des services publics », question scolarisation | 378 / 21 868 (± 5 pts) | 3,33/5 / 3,5/5 (passe 12, à re-noter sur 10) | Oui, 17/10 |
 
 ## Consultations repérées pour plus tard
 
