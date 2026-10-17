@@ -165,7 +165,19 @@
   "erreurs_du_resume": 2,
   "structure": "saine",
   "relecture_humaine": "1 h 30 à 3 h",
-  "publie": true,
-  "raison": "Deux lectures indépendantes notées directement sur 10. Erreurs : Réforme du système éducatif (refus et demande de réforme dans le même camp), École publique face au privé (critiques du public et du privé mêlées) ; toutes deux marquées « à vérifier ». Affichage retouché sans rejeu : « fragile » plus posé sur un unanime, présent dans toutes les listes ; « à vérifier » rappelé sous le résumé. Fiche corrigée sur les deux phrases."
+  "publie": false,
+  "raison": "Deux lectures indépendantes notées directement sur 10. Erreurs : Réforme du système éducatif (refus et demande de réforme dans le même camp), École publique face au privé (critiques du public et du privé mêlées) ; toutes deux marquées « à vérifier ». Affichage retouché sans rejeu : « fragile » plus posé sur un unanime, présent dans toutes les listes ; « à vérifier » rappelé sous le résumé. Fiche corrigée sur les deux phrases.",
+  "remplace_par": "run-opus-14b"
+ },
+ {
+  "date": "2026-10-17",
+  "run": "run-opus-14b",
+  "methode": "consultation, analyse de la passe 13 ; résumé récrit (qui pense quoi, en personnes ; échelle entre parenthèses ; base une fois par paragraphe) ; comptes en chiffres",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "relecture": {
+   "methodologue": "mêmes 2 erreurs qu'en passe 13, aucune nouvelle, première phrase plus utile",
+   "plume_resume": 7
+  },
+  "publie": true
  }
 ]
