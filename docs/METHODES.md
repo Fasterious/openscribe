@@ -340,6 +340,8 @@ Le découpage est repris du cache jusqu'à la passe 7, pour ne faire varier que 
 | 7 | relecture des tons des seuls motifs du résumé | 3 et 3 (3,33 et 3,67) | 3,5 | idem, et un principe général compté comme éloge |
 | 8 | dédoublonnage : éloge et critique qui se recouvrent gardés tous deux ; livre de codes (définition écrite avant de juger) | 3 et 3 (3,25 et 3,25) | 3,5 | critiques du privé restées dans « École publique face au privé », ses éloges formant un motif « unanime » |
 | 9 | « un ou deux objets ? » pour « X face à Y » et les motifs partagés ; livre de codes relu d'un bloc (fusions, règles de partage, paires relues ensemble) | 3 et 3 (3,42 et 3,17) | 3,5 | même mécanisme déplacé : éloges de l'école publique dans « Expérience globale », critiques de la qualité des enseignants dans « Contrôle des enseignants défaillants » |
+| 10 | codage en double (option du chercheur) : une idée qui répond à deux définitions est copiée dans le second motif | 3 et 3 (3,08 et 3,0) | 4 | passe invalidée : un bug de code appliquait les fusions de la réconciliation aux mauvais motifs (renumérotation) ; une copie revenue chez son original |
+| 11 | rejeu corrigé : fusions par titre, copie chez son original retirée, définitions des motifs cibles fournies aux relectures | 3 et 3 (3,5 et 3,17) | 3,5 | handicap et administration corrigés ; éloges de l'école publique toujours dans « Expérience globale », plaintes d'éloignement hors de « Proximité » : aucune paire relue ne couvrait ces frontières |
 
 **Verdict à la passe 7 : palier, non publié.** La moyenne monte doucement (3,25 → 3,67) mais chaque
 passe bute sur une ou deux idées limites, différentes d'une passe à l'autre ; aucune n'a changé le sens
@@ -458,6 +460,49 @@ réconciliation, une idée qui satisfait la définition de deux motifs est copi�
 par rapport à lui ; l'original ne bouge pas, chaque motif compte des personnes, deux motifs au plus par idée,
 la citation figure sous les deux titres avec « aussi dans ». À essayer sur l'école (passe 10) quand Arnaud le
 demandera : environ 4 millions de jetons de sous-agents.
+
+### Passes 10 et 11 (16-17/10/2026) : le codage en double
+
+**Passe 10** (option `multiCoding`, cache de la passe 9) : 20 copies, 8 paires, 3 fusions. Notes 3 et 3
+(plafond ; moyennes 3,08 et 3,0), langue 4 (meilleure note à ce jour). Invalidée : après la relecture des
+paires, le code renumérote les motifs par taille, puis appliquait les fusions proposées par le moteur sur les
+nouveaux numéros. Le handicap (20 personnes, unanime) a fondu dans « Démarches d'inscription », l'encadrement
+administratif dans « Qualité des enseignants » ; le Résumé s'en trouvait faux sur deux lignes. Une copie est
+aussi revenue dans le motif de son original (déplacée par une paire) : la citation s'affichait deux fois.
+Les deux lectures ont trouvé le bug par la même preuve (le motif de la raison d'une fusion n'était pas celui
+de son titre) : la relecture indépendante a servi de test d'intégration.
+
+**Corrections de code (communes).** Les fusions se retrouvent par le titre capturé à la demande ; une copie
+qui finit chez son original disparaît ; une copie qui n'ajouterait qu'une personne déjà comptée dans ce camp
+du motif cible n'est pas faite ; avec l'option, les titres des motifs cibles portent leur définition dans la
+relecture (le moteur ne pouvait pas savoir si l'autre définition réclamait l'idée). Trois tests de bout en
+bout : fusion sous renumérotation, copie ramenée chez elle, copie redondante.
+
+**Passe 11** (rejeu depuis le cache ; les consignes de relecture ayant changé, relectures, réconciliation et
+tout l'aval ont été rejoués : environ 5 millions de jetons de sous-agents). 30 copies (24 à 26 justes selon
+la lecture, 2 dans le mauvais camp, 3 redondantes), 6 paires, 2 fusions justes. Notes 3 et 3 (plafond ;
+moyennes 3,5 et 3,17), langue 3,5. Corrigés par rapport aux passes 8 à 10 : l'administration a quitté
+« Qualité des enseignants » (avis partagés justifiés), le handicap a son motif et sa ligne au Résumé (18 sur
+18), les fusions touchent les bons motifs. Le plafond tient à deux frontières qu'aucune paire relue ne
+couvrait : les éloges de l'école publique restés dans « Expérience globale » (8 idées ; « École publique face
+au privé » passerait de « bloque » à « divise »), et les plaintes d'éloignement restées dans Handicap, Carte
+scolaire ou Écoles rurales (« Proximité » passerait de « divise » à « bloque »). Le codage en double répare
+les paires qu'il voit ; il ne voit que celles que la réconciliation a retenues parmi ses 8.
+
+**Langue** : 4 puis 3,5. Les textes injectés par le code ont été corrigés à la source (ligne Méthode,
+« aussi dans » sous les deux exemplaires, « personnes » dans les lignes de faits, fusions annoncées une fois,
+comptes de personnes en chiffres au milieu des phrases). Reste au moteur : la base « de ceux qui en parlent »
+répétée à chaque phrase du Résumé (règles 7 et 10 de la consigne `global`, et « fragile » exigé par le
+contrôle des renvois), des phrases-inventaires de plus de 60 mots (4), « subir » dans les définitions.
+
+**Conclusion (17/10).** Le cycle de trois passes (8, 9, 11 ; la 10 ne compte pas) est clos sans gain de note :
+3/5 plafonné, moyennes 3,17 à 3,5. Chaque passe a corrigé le défaut visé et le rapport est plus vérifiable
+(définitions, copies visibles, fusions justes) ; le plafond se déplace vers la frontière voisine que la passe
+ne regardait pas. Le levier suivant est le **balayage par définition** (levier 2 de la liste du 16/10) : pour
+chaque motif du Résumé, chercher dans les autres motifs les idées qui remplissent sa définition et les copier
+(ou les déplacer). C'est une décision de méthode et un coût (une demande par motif du Résumé, une quinzaine,
+avec tous les libellés d'idées) : soumise à Arnaud. Sans elle, la méthode « consultation » sur ce corpus vaut
+3 à 3,5 selon la lecture, et l'étude reste non publiée (seuil 3,5 sans plafond).
 
 Gardé dans la méthode « consultation » (décision d'Arnaud) : le
 dédoublonnage corrigé (une erreur du code, pas une règle de plus), le livre de codes (une demande, zéro

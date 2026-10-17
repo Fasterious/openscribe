@@ -2,6 +2,12 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-17 — Passes 10 et 11 : une passe invalidée par le code, pas par la méthode
+
+- **Bien marché** : deux lectures indépendantes qui trouvent le même bug par la même preuve (la raison d'une fusion ne parlait pas du motif fusionné) ; vérifier le soupçon sur les fichiers de la passe avant de toucher au code ; des tests de bout en bout qui échouent sans le correctif et passent avec ; le rejeu depuis le cache (le découpage et le regroupement n'ont pas été refaits).
+- **Coûté pour rien** : une passe complète (environ 4 millions de jetons de sous-agents) sur un état faux, parce qu'aucun test ne couvrait la renumérotation des motifs entre deux étapes qui échangent des identifiants ; une limite de session atteinte en pleine notation (reprise le lendemain sans perte).
+- **On change** : un identifiant de motif ne traverse jamais un `build` ; entre deux étapes, on passe par le titre. Toute étape qui reçoit des identifiants du moteur et les applique après un autre tour a son test « sous renumérotation ». Avant de noter une passe, un contrôle de cohérence par script (fusions : titres de `from` cohérents avec la raison ; copies : jamais chez leur original) évite de payer deux lectures pour trouver un bug.
+
 ## 2026-10-16 — Passes 8 et 9 : mesurer avant de coder, deux itérations puis arrêt
 
 - **Bien marché** : chiffrer la cause sur le cache avant tout appel (24 éloges perdus, en dix minutes de script) ; faire valider le plan par le `methodologue` avant de coder (il a retiré la saturation, ajouté le critère des citations jumelles et le contrôle des faux mitigés) ; le livre de codes, qui transforme chaque désaccord de lecture en une ligne vérifiable ; les corrections de langue faites à la source dans le code (quatre sur quatre ont porté).

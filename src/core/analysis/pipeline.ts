@@ -1136,8 +1136,14 @@ export function applyReview(
       const target = out.find((g) => g.id === c.also)
       const source = out.find((g) => g.id === from)!
       const already = idea.copyOf || ideas.some((i) => i.copyOf === idea.id)
-      if (target && target.id !== from && !already) {
-        const copy: Idea = { ...idea, id: `I${String(ideas.length + 1).padStart(4, '0')}`, copyOf: idea.id, category: c.category && IDEA_CATEGORIES.includes(c.category) ? c.category : idea.category }
+      const category = c.category && IDEA_CATEGORIES.includes(c.category) ? c.category : idea.category
+      // Une copie qui n'apporte rien (la personne compte déjà dans ce camp du motif cible) afficherait la même voix deux fois.
+      const redundant = target?.ideaIds.some((id) => {
+        const other = byId.get(id)
+        return other?.participantId === idea.participantId && other.category === category
+      })
+      if (target && target.id !== from && !already && !redundant) {
+        const copy: Idea = { ...idea, id: `I${String(ideas.length + 1).padStart(4, '0')}`, copyOf: idea.id, category }
         ideas.push(copy)
         byId.set(copy.id, copy)
         target.ideaIds.push(copy.id)

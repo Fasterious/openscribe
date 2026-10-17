@@ -413,6 +413,20 @@ describe('codage en double (option)', () => {
     )
     expect(again.copied).toEqual([])
   })
+  it('ne copie pas une idée dont la personne compte déjà dans ce camp du motif cible', () => {
+    // P1 critique déjà la carte scolaire (I3) : copier sa critique de la proximité n'ajouterait qu'une citation en double.
+    const ideas = [idea('I1', 'P1', 'negative'), idea('I2', 'P2', 'positive'), idea('I3', 'P1', 'negative')]
+    const groups = [
+      { id: 'G1', title: 'Proximité', ideaIds: ['I1'] },
+      { id: 'G2', title: 'Carte scolaire', ideaIds: ['I2', 'I3'] },
+    ]
+    const r = applyReview(ideas, groups, [{ id: 'I1', also: 'G2', category: 'negative' }], { multiCoding: true })
+    expect(r.copied).toEqual([])
+    expect(ideas).toHaveLength(3)
+    // Avec un ton différent (elle nuance), la copie a un sens : la personne devient mitigée dans le motif cible.
+    const nuanced = applyReview(ideas, groups, [{ id: 'I1', also: 'G2', category: 'positive' }], { multiCoding: true })
+    expect(nuanced.copied).toHaveLength(1)
+  })
   it('sans l’option, « also » est ignoré et la consigne n’en parle pas', () => {
     const { ideas, groups } = mk()
     const r = applyReview(ideas, groups, [{ id: 'I1', also: 'G2' }])

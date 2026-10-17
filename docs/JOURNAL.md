@@ -2,6 +2,14 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — Observatoire, école : passes 10 et 11 (codage en double), un bug de fusion corrigé, non publiée
+
+- **Demande d'Arnaud** : jouer la passe 10 avec le codage en double.
+- **Passe 10** : 3/5 plafonné (3,08 et 3,0), langue 4. Invalidée par un bug de code : les fusions de la réconciliation s'appliquaient après renumérotation des motifs, donc aux mauvais motifs (le handicap fondu dans les démarches d'inscription). Trouvé par les deux lectures `methodologue`, confirmé sur les fichiers de la passe.
+- **Corrigé dans le code** : fusions résolues par titre ; copie ramenée chez son original retirée ; copie redondante (personne déjà comptée dans ce camp) non faite ; définitions des motifs cibles fournies aux relectures avec l'option ; textes injectés du rapport alignés (« personnes », fusions annoncées une fois, comptes en chiffres au milieu des phrases). Tests de bout en bout pour chacun.
+- **Passe 11** (rejeu) : 3/5 plafonné (3,5 et 3,17), langue 3,5. Handicap, administration et fusions corrigés ; le plafond tient aux éloges de l'école publique restés dans « Expérience globale » et aux plaintes d'éloignement hors de « Proximité », deux frontières qu'aucune paire relue ne couvrait. Détail : `docs/METHODES.md`, « Passes 10 et 11 ».
+- **Décision** : cycle de trois passes clos, étude non publiée. Le codage en double reste une option (il répare ce qu'il voit, 24 à 26 copies justes sur 30). Le levier suivant, le balayage par définition des motifs du Résumé, est une décision de méthode et de coût : soumis à Arnaud.
+
 ## 2026-10-16 — Observatoire, école : passes 8 et 9 (dédoublonnage, livre de codes, réconciliation), non publiée
 
 - **Demande d'Arnaud** : relire tout l'historique, trouver ce qui reste à optimiser « au plus intelligent » (meilleure qualité, code le plus efficace), trois itérations au plus, en puisant dans d'autres disciplines.
