@@ -2,7 +2,7 @@
 
 ## Résumé
 
-Sur 366 participants, 286 expriment au moins une critique, 132 au moins une satisfaction, 76 les deux. Quarante-6 personnes portent un jugement positif d'ensemble sur la scolarisation de leurs enfants, que certaines nuancent ailleurs (notamment P51). Une large majorité, fragile, de ceux qui en parlent apprécie l'enseignement privé (12 sur 14 ; P41).
+Sur 366 participants, 286 expriment au moins une critique, 132 au moins une satisfaction, 76 les deux. Quarante-six personnes portent un jugement positif d'ensemble sur la scolarisation de leurs enfants, que certaines nuancent ailleurs (notamment P51). Une large majorité, fragile, de ceux qui en parlent apprécie l'enseignement privé (12 sur 14 ; P41).
 
 Une large majorité de ceux qui en parlent critique l'orientation des élèves (27 sur 28 ; P92), et les absences des enseignants s'attirent des reproches unanimes, mais fragiles, de ceux qui en parlent (25 sur 25 ; P34). Une large majorité, fragile, de ceux qui en parlent conteste la carte scolaire (24 sur 29 ; P18). Pour une majorité de ceux qui en parlent, les démarches d'inscription posent problème (24 sur 34 ; P52) ; une majorité de ceux qui en parlent critique de même l'école publique face au privé (24 sur 34 ; P22). Une large majorité, fragile, de ceux qui en parlent critique aussi la réforme du système éducatif (20 sur 24 ; P21). Enfin, une large majorité de ceux qui en parlent juge insuffisants les moyens des écoles (19 sur 20 ; notamment P7), et tous ceux qui évoquent la scolarisation des enfants handicapés la critiquent, de façon unanime mais fragile (18 sur 18 ; notamment P1). Les avis sont partagés sur trois sujets : qualité des enseignants (22 positifs, 23 négatifs et 6 mitigés parmi les 51 participants qui donnent un avis ; notamment P57), accès aux services administratifs (10 positifs, 19 négatifs et 1 mitigé ; notamment P62, P70) et services périscolaires (9 positifs et 9 négatifs ; notamment P8, P15). Deux autres sujets divisent aussi (voir « Ce qui divise »). Des propositions vont en sens contraire sur la place des expériences pédagogiques (P54, P230), sur le contenu du bulletin scolaire (P103, P228) et sur la place des langues régionales à l'école publique (P252, P368).
 
@@ -13,30 +13,30 @@ Six personnes font des propositions pour l'orientation des élèves (notamment P
 *Chiffres : participants qui donnent un avis sur le motif.*
 
 - **Expérience globale de scolarisation** — 46 avis positifs sur 48
-- **Enseignement privé** — 12 avis positifs sur 14
+- **Enseignement privé** — 12 avis positifs sur 14 · à vérifier : 6 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime »
 
 ## ⛔ Ce qui bloque
 
 *Chiffres : participants qui donnent un avis sur le motif.*
 
-- **Orientation des élèves** — 27 avis négatifs sur 28
+- **Orientation des élèves** — 27 avis négatifs sur 28 · à vérifier : 3 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime »
 - **Absences des enseignants** — 25 avis négatifs sur 25
 - **Carte scolaire** — 24 avis négatifs sur 29
 - **Démarches d'inscription** — 24 avis négatifs sur 34
-- **École publique face au privé** — 24 avis négatifs sur 34
-- **Réforme du système éducatif** — 20 avis négatifs sur 24
+- **École publique face au privé** — 24 avis négatifs sur 34 · à vérifier : 16 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « large majorité »
+- **Réforme du système éducatif** — 20 avis négatifs sur 24 · à vérifier : 9 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « majorité »
 - Et aussi : Moyens des écoles · Scolarisation des enfants handicapés · Effectifs par classe · Accès à l'enseignement supérieur · Égalité des chances · Niveau d'exigence scolaire · Méthodes pédagogiques · Programmes scolaires · Contrôle des enseignants défaillants · Suivi des élèves en difficulté · Proximité de l'école · Financement des études · Fermetures de classes · Garde des enfants · Encadrement administratif · Fonctionnement de l'université · Rythmes scolaires · Discipline dans les établissements · Harcèlement scolaire · Élèves à profil atypique · Évaluation des élèves · Niveau des élèves · Offre d'options · Territoires en difficulté · État des locaux scolaires · Transports scolaires · Accompagnement médical et psychologique · Grèves des enseignants · Composition des classes · Formation des enseignants · Information sur l'école · Relations avec les familles · Places disponibles à l'école · Numérique à l'école
 
 ## ⚖️ Ce qui divise
 
 - **Qualité des enseignants** — 22 positifs, 23 négatifs, 6 mitigés
-- **Accès aux services administratifs** — 10 positifs, 19 négatifs, 1 mitigé
+- **Accès aux services administratifs** — 10 positifs, 19 négatifs, 1 mitigé · fragile · à vérifier : 12 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « majorité »
 - **Services périscolaires** — 9 positifs, 9 négatifs
 - **Méthodes pédagogiques** — 12 avis négatifs sur 13, mais deux propositions s'opposent sur la place des expériences pédagogiques
   - « Ils ont besoin de tester et d'apprendre de manière plus interactive ! » — P54
   - « Abandon des idées d'expériences pédagogiques chères aux structuralistes post soixantehuitard » — P230
-- **Gratuité de l'école** — 5 positifs, 3 négatifs, 1 mitigé
-- **Écoles rurales** — 5 positifs, 3 négatifs
+- **Gratuité de l'école** — 5 positifs, 3 négatifs, 1 mitigé · fragile · à vérifier : 5 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime »
+- **Écoles rurales** — 5 positifs, 3 négatifs · fragile · à vérifier : 4 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime »
 - **Évaluation des élèves** — 5 avis négatifs sur 5, mais deux propositions s'opposent sur le contenu du bulletin scolaire
   - « le bulletin scolaire ne doit que mentionner les pistes pour faire encore mieux scolairement (encouragements faon usa). » — P103
   - « Revenir au classement dans chaque classe » — P228
@@ -155,13 +155,15 @@ La plupart de ceux qui racontent la scolarité de leurs enfants estiment qu'elle
 - ⚪ **P183** — « Donc 2 cycles différents, une même administration : l'éducation nationale, mais 2 ressentis totalement différents ! »
 - ⚪ **P304** — « La scolarité pour tous est une bien en soi »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Réforme du système éducatif
 
 🟩🟩🟩🟩🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥⬜⬜⬜⬜⬜  *29 participants · avis : 4 positifs, 20 négatifs · 5 participants font des suggestions · 1 participant pose une question · large majorité négative (20 sur 24 qui donnent un avis) · fragile · à contre-courant : 4 avis positifs*
 
 *Compte comme positif : approuver les réformes engagées ou le fonctionnement du système · comme négatif : rejeter les réformes ou juger le système défaillant et immobile · ne compte pas comme un avis : énoncer un principe général sur l'école sans juger le système.*
+
+**À vérifier : 9 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « majorité ».**
 
 > Le système éducatif est jugé défaillant par une large majorité de ceux qui en parlent, qu'ils visent l'école dans son ensemble ou les réformes successives (P21, P35, P57, P92, P113, P118, P123, P156, P173, P222, P249, P259, P272, P293, P304, P311, P321, P354, P357, P360). Quatorze personnes décrivent une école en échec, trop lourde, mal organisée, rigide, figée ou coupée du monde actuel (P35, P57, P92, P118, P123, P156, P173, P259, P272, P293, P304, P354, P357, P360) ; 2 reprochent à l'Éducation nationale de penser à ses personnels avant les élèves (P118, P156). Six personnes s'en prennent aux réformes, jugées incessantes, irréfléchies, inutiles ou restées à l'état de promesses, ou regrettent l'abandon de la semaine de 4,5 jours (P21, P113, P222, P249, P311, P321), et 3 réclament une réforme en profondeur (P28, P92, P135). À contre-courant, 4 personnes saluent un système bien organisé et de qualité, ou des réformes utiles au français et aux mathématiques (P191, P193, P203, P221) ; une personne demande que les professeurs acceptent les réformes (P201), une autre l'abandon de la loi du marché (P230).
 
@@ -266,7 +268,7 @@ La plupart de ceux qui racontent la scolarité de leurs enfants estiment qu'elle
 
 - 💡 **P282** — « il faut sortir de ce schéma d'un autre age » ; « Ecole primaire : communautés de communes , Collèges et Lycée = Région » ; « supprimer les départements »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 #### Laïcité à l'école
 
@@ -353,6 +355,8 @@ Ceux qui racontent leurs démarches ou leur dialogue avec l'école en retiennent
 
 *Compte comme positif : trouver les services joignables, rapides et efficaces · comme négatif : subir des délais, des erreurs ou des interlocuteurs injoignables · ne compte pas comme un avis : énoncer un principe général sur l'administration sans juger.*
 
+**À vérifier : 12 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « majorité ».**
+
 > L'inscription à l'école, les démarches en mairie et parfois le rectorat satisfont 10 personnes, qui les trouvent simples, fluides ou à taille humaine (P43, P70, P84, P109, P137, P154, P227, P235, P248, P344). À l'inverse, 10 personnes reprochent des délais trop longs, des demandes sans réponse, des horaires incompatibles avec un travail ou des services injoignables, au rectorat, au centre régional des œuvres universitaires et scolaires ou à l'inspection académique (P62, P73, P96, P128, P146, P157, P205, P240, P284, P319). Onze personnes décrivent aussi une mairie absente ou en mauvais termes avec l'école, des services qui se renvoient les familles ou perdent leurs documents, des erreurs difficiles à faire corriger et des interlocuteurs rigides, jusqu'au « calvaire » des demandes d'auxiliaire de vie scolaire (P89, P96, P120, P135, P145, P159, P205, P214, P289, P343, P363). Une personne dresse un bilan contrasté : l'inscription de son enfant à l'école a été rapide, mais le rendez-vous à la caisse d'allocations familiales s'est fait attendre (P11) ; 3 personnes proposent un guichet unique, un service public adapté à ceux qui travaillent ou une écoute des expatriés qui reviennent (P50, P96, P120).
 
 **Avis négatifs — 20 participants (dont 1 mitigé)**
@@ -398,7 +402,7 @@ Ceux qui racontent leurs démarches ou leur dialogue avec l'école en retiennent
 - 💡 **P96** — « interrogez les expatriés qui reviennent et vous aurez un bon sujet de travail. »
 - 💡 **P120** — « pourquoi ne pas creer un guichet unique (avec le directeur d'école par exemple ?). »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Encadrement administratif
 
@@ -510,7 +514,7 @@ Ceux qui racontent leurs démarches ou leur dialogue avec l'école en retiennent
 
 - 🟢 **P221\*** — « Je garde malgré tout ma confiance pour laisser mes enfants dans les établissements public bien gérés »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ## Le métier d'enseignant
 
@@ -598,7 +602,7 @@ Les enseignants rencontrés recueillent autant d'éloges que de reproches, mais 
 - ⚪ **P57** — « ca c est simple ...je vais vous donner un exemple ...j ai quatre filles la plus agee Trente ans la plus jeune quinze ans . Elles ont frequenté les mêmes établissements scolaires  ...eu les même profs ... »
 - ⚪ **P233** — « L'avenir de nos enfants dépend d'un bon service de l'éducation national, tant dans la qualité de l'enseignement »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Absences des enseignants
 
@@ -712,7 +716,7 @@ Les enseignants rencontrés recueillent autant d'éloges que de reproches, mais 
 
 - ⚪ **P378** — « Formation des professeurs »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Conditions de travail des enseignants
 
@@ -737,6 +741,8 @@ Les enseignants rencontrés recueillent autant d'éloges que de reproches, mais 
 🟥🟥🟥🟥  *4 participants · avis : 4 négatifs · avis négatif unanime (4 sur 4 qui donnent un avis) · fragile*
 
 *Compte comme positif : défendre le droit de grève des enseignants · comme négatif : subir la gêne causée par les grèves des enseignants · ne compte pas comme un avis : évoquer les enseignants sans juger leurs grèves.*
+
+**À vérifier : 2 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « peu d'avis ».**
 
 > Les grèves des enseignants gênent toutes les personnes qui en parlent (P55, P160, P221, P364). Deux personnes y associent l'absentéisme des professeurs : il sacrifie les élèves les plus fragiles pour l'une, il crée trop d'instabilité pour l'autre (P160, P221). Une personne regrette le nombre de jours de grève, une autre juge ces grèves bien plus gênantes au collège et au lycée (P55, P364).
 
@@ -822,6 +828,8 @@ Plusieurs personnes décrivent des familles mal informées et un parcours opaque
 *32 participants · avis : 1 positif, 27 négatifs · 6 participants font des suggestions · 2 participants font un constat · large majorité négative (27 sur 28 qui donnent un avis)*
 
 *Compte comme positif : apprécier l'accompagnement à l'orientation ou l'accès aux filières souhaitées · comme négatif : juger l'orientation insuffisante, opaque ou imposée, ou les filières sans débouchés · ne compte pas comme un avis : décrire une démarche ou un constat sans juger l'orientation offerte.*
+
+**À vérifier : 3 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime ».**
 
 > Six personnes décrivent des familles livrées à elles-mêmes pour l'orientation, sans information ni accompagnement (P92, P123, P126, P167, P222, P361), et 6 jugent peu fiables les conseillers, les enseignants ou la documentation (P222, P223, P233, P241, P246, P321). Neuf personnes trouvent le parcours complexe, opaque ou lent, de la réorientation au lycée à l'apprentissage et aux grandes écoles, ou regrettent un service d'orientation fermé pendant les vacances (P12, P13, P53, P94, P124, P246, P320, P324, P360). Une orientation imposée par l'établissement ou tournée vers le bac général, au détriment des filières professionnelles et manuelles, est reprochée par 7 personnes (P45, P92, P135, P148, P231, P272, P294), et 4 dénoncent des formations sans débouchés, coupées des besoins des employeurs (P27, P45, P233, P332). Une seule personne se félicite de l'admission de sa fille dans l'école de son choix (P56) ; 6 personnes proposent de mieux orienter, de revaloriser les métiers manuels et les filières professionnelles courtes, de partir des métiers qui recrutent ou de rendre obligatoires les cours sur la recherche d'apprentissage (P54, P78, P135, P233, P332, P347).
 
@@ -942,13 +950,15 @@ Plusieurs personnes décrivent des familles mal informées et un parcours opaque
 - 💡 **P8** — « MA PROPOSITION : une année de scolarisation en maternelle coute environ 6000/7000 euros par enfant dans le public. Donner cette somme à chaque famille, qui pourra en disposer pour scolariser son enfant où elle veut : dans le public, le privé catholique, le privé laïc, etc... »
 - 💡 **P350** — « l'Etat devrait développer des financements à taux réduits pour faciliter le bon déroulement des études et pérenniser l'utilisation de leurs compétences acquises au développement de notre économie. »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Gratuité de l'école
 
 🟩🟩🟩🟩🟩🟨🟥🟥🟥  *9 participants · avis : 5 positifs, 3 négatifs, 1 mitigé · avis partagés*
 
 *Compte comme positif : apprécier que l'enseignement soit gratuit ou peu coûteux · comme négatif : dénoncer des frais restant à la charge des familles · ne compte pas comme un avis : rappeler le principe de gratuité sans juger la situation.*
+
+**À vérifier : 5 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime ».**
 
 > Le coût de l'école divise ceux qui en parlent, entre éloge de la gratuité et dénonciation du prix des études (P7, P13, P69, P72, P91, P241, P329, P333, P361). Cinq personnes apprécient la gratuité ou le faible coût d'un enseignement de qualité, l'une le jugeant même « imbattable mondialement » (P7, P72, P241, P333, P361). Trois personnes regrettent au contraire que l'éducation devienne « un luxe », qu'une prépa et une école de commerce coûtent « une fortune » ou que le coût des études nuise à l'égalité des chances (P13, P69, P91). Une personne nuance : selon elle, il faut beaucoup d'argent pour que ses enfants accèdent aux écoles de leur choix, mais les grands corps de l'État offrent des carrières à coût abordable, les étudiants y étant payés (P329).
 
@@ -968,7 +978,7 @@ Plusieurs personnes décrivent des familles mal informées et un parcours opaque
 - 🔴 **P91** — « Il y a un véritable handicap progressif pour l'égalité des chances, pour le coût des études » *(aussi dans « Financement des études »)*
 - 🔴 **P329\*** — « Il faut beaucoup d'argent pour emmener ses enfants vers les écoles de leur choix. » *(aussi dans « Financement des études »)*
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Fonctionnement de l'université
 
@@ -1014,7 +1024,7 @@ Plusieurs personnes décrivent des familles mal informées et un parcours opaque
 
 - 💡 **P206** — « Les Bourses sont à réserver aux familles qui cotisent par leur Travail » ; « les étudiants venant de l'Etranger doivent être aidés par leur Pays d'origine »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Logement étudiant
 
@@ -1183,6 +1193,8 @@ La plupart de ceux qui parlent des méthodes, des programmes et du niveau d'exig
 
 *Compte comme positif : saluer une école exigeante qui pousse les élèves à progresser · comme négatif : dénoncer le manque d'exigence ou le nivellement par le bas · ne compte pas comme un avis : énoncer un principe sur l'exigence sans juger l'école actuelle.*
 
+**À vérifier : 1 de ces avis compte aussi dans un autre motif ; sans lui, ce serait « unanime ».**
+
 > Nivellement par le bas, programmes revus à la baisse, passages de classe à l'âge : une large majorité de ceux qui en parlent reprochent à l'école son manque d'exigence (P3, P20, P32, P38, P39, P85, P90, P173, P182, P245, P273, P308, P377). Cinq personnes dénoncent un nivellement par le bas ou une école qui forme à la moyenne (P39, P85, P90, P173, P377). Trois personnes décrivent des enfants qui s'ennuient ou ne sont pas nourris à leur niveau, dont une, par ailleurs très satisfaite de l'école publique de ses enfants (P90, P245, P308). Une personne mitigée juge stupide d'aligner les enfants sur les plus mauvais, mais salue l'exigence de l'école privée de ses enfants et défend une sélection par le haut (P252).
 
 **Avis négatifs — 14 participants (dont 1 mitigé)**
@@ -1210,7 +1222,7 @@ La plupart de ceux qui parlent des méthodes, des programmes et du niveau d'exig
 
 - 💡 **P252** — « Le système de sélection par le haut, même s'il est dur et décrié par nos élites (car la plupart n'ont pas réussi leurs études) amène les plus mauvais à grandir et à avoir plus de connaissance. »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Numérique à l'école
 
@@ -1238,7 +1250,7 @@ La plupart de ceux qui parlent des méthodes, des programmes et du niveau d'exig
 - 💡 **P220** — « La formation à internet et à l'informatique devrait être généralisée ainsi que de prévenir contre les dangers en ligne. »
 - 💡 **P330** — « La scolarité des enfants est bonne mais un mailleur suivis par internet devrait être élargit. »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Évaluation des élèves
 
@@ -1447,13 +1459,15 @@ La carte scolaire, l'éloignement et les fermetures de classes mécontentent la 
 
 - ⚪ **P181** — « nous n'avons, de plus, été prévenus que le 30/6 et nous avons donc choisi de l'inscrire dans le privé »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Proximité de l'école
 
 🟩🟩🟩🟩🟩🟨🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥⬜  *18 participants · avis : 5 positifs, 11 négatifs, 1 mitigé · 1 participant fait un constat · majorité négative (11 sur 17 qui donnent un avis) · fragile*
 
 *Compte comme positif : apprécier d'avoir une école près de chez soi · comme négatif : subir l'éloignement de l'établissement et les trajets qu'il impose · ne compte pas comme un avis : constater l'importance de la proximité sans juger sa situation.*
+
+**À vérifier : 12 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « avis partagés ».**
 
 > L'éloignement de l'école pèse sur une majorité de ceux qui en parlent (P19, P69, P121, P124, P129, P132, P275, P322, P340, P354, P365) ; à l'inverse, 5 personnes se félicitent d'avoir une école ou des filières proches, ou que leur commune garde son école (P46, P80, P143, P218, P226). Six personnes se voient refuser l'établissement le plus proche, à cause de la carte scolaire, d'un regroupement ou d'un recrutement sélectif (P19, P121, P132, P275, P322, P365). Cinq autres regrettent un lycée, des filières ou des structures trop éloignés, ou des fermetures de classes en milieu rural (P69, P124, P129, P340, P354). Une personne est mitigée : ses 2 plus jeunes enfants ont une école proche, mais une enfant de la famille fait 4 heures de route par jour pour rejoindre un institut médico-éducatif, faute de structures (P1).
 
@@ -1485,7 +1499,7 @@ La carte scolaire, l'éloignement et les fermetures de classes mécontentent la 
 
 - ⚪ **P168** — « Les jeunes couples privilégient la proximité pour l'éducation de leurs enfants. »
 
-\* s'exprime aussi dans l'autre sens sur ce motif.
+\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.
 
 ### Fermetures de classes
 
@@ -1527,6 +1541,8 @@ La carte scolaire, l'éloignement et les fermetures de classes mécontentent la 
 🟩🟩🟩🟩🟩🟥🟥🟥  *8 participants · avis : 5 positifs, 3 négatifs · avis partagés*
 
 *Compte comme positif : apprécier le cadre ou le maintien des écoles rurales · comme négatif : critiquer les conditions ou la disparition des écoles rurales · ne compte pas comme un avis : évoquer l'école rurale sans la juger.*
+
+**À vérifier : 4 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime ».**
 
 > Ceux qui ont connu les écoles de village en apprécient le cadre, d'autres en redoutent la fermeture (P155, P168, P175, P215, P256, P306, P353). Quatre personnes saluent une petite école à l'accueil chaleureux, « une seconde famille », aux classes peu chargées, au cadre serein et aux enseignants disponibles (P175, P215, P256, P353) ; une autre apprécie le regroupement scolaire des petits villages (P165). Trois personnes dénoncent à l'inverse les fermetures d'écoles ou de classes, décidées faute d'enfants ou après la mutation des enseignants vers les zones prioritaires, l'une y voyant la condamnation à terme du village (P155, P168, P306).
 
@@ -1983,6 +1999,8 @@ Le privé séduit la plupart de ceux qui en parlent, et la plupart de ceux qui l
 
 *Compte comme positif : défendre l'école publique ou l'émulation entre public et privé · comme négatif : juger le public défaillant, déplorer le cloisonnement ou l'inégalité public-privé · ne compte pas comme un avis : constater un passage au privé ou énoncer un principe général.*
 
+**À vérifier : 16 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « large majorité ».**
+
 > Treize personnes ont retiré ou tenu leurs enfants à l'écart de l'école publique, qu'elles jugent défaillante : manque de professeurs, réponse inadaptée, scolarité trop aléatoire ou absence d'anglais dès les petites classes (P22, P112, P171, P173, P208, P210, P232, P265, P285, P293, P305, P314, P325). Six autres personnes décrivent la fuite vers le privé ou lui prêtent un meilleur niveau et un encadrement plus personnalisé (P35, P41, P196, P231, P296, P367). Cinq personnes déplorent l'inégalité et le cloisonnement entre les deux systèmes : sélection des élèves par le privé malgré un même financement public, retour difficile vers le public, ascenseur social en panne (P106, P118, P192, P238, P283). À l'inverse, 8 personnes se disent satisfaites de l'école publique ou en saluent la qualité (P125, P170, P185, P221, P242, P246, P308, P346), et 2 la défendent comme socle républicain ou au nom de l'émulation entre public et privé (P26, P356) ; 2 personnes proposent de remettre l'école publique au centre ou de faciliter le passage du privé au public (P26, P288).
 
 **Avis négatifs — 24 participants**
@@ -2045,6 +2063,8 @@ Le privé séduit la plupart de ceux qui en parlent, et la plupart de ceux qui l
 🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟥🟥  *14 participants · avis : 12 positifs, 2 négatifs · 1 participant fait une suggestion · large majorité positive (12 sur 14 qui donnent un avis) · fragile · à contre-courant : 2 avis négatifs*
 
 *Compte comme positif : apprécier l'enseignement privé ou regretter ce qui le limite · comme négatif : critiquer l'enseignement privé, son coût, son niveau ou ses pratiques · ne compte pas comme un avis : constater un passage au privé sans juger cet enseignement.*
+
+**À vérifier : 6 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime ».**
 
 > Le privé recueille l'adhésion d'une large majorité de ceux qui en parlent (P41, P106, P112, P132, P196, P210, P231, P252, P253, P262, P279, P356). Cinq personnes y apprécient un meilleur niveau et un encadrement plus attentif : des enfants qui progressent et travaillent, des classes moins chargées, pas de grève (P132, P196, P231, P252, P279). Une personne regrette le système de quotas qui l'empêche de répondre à toutes les demandes (P262), et une autre propose d'augmenter ces quotas et de mieux le rémunérer (P356). À contre-courant, 2 personnes le critiquent, l'une pour sa sélection des élèves alors que le public doit accueillir tous les enfants, l'autre pour son coût (P192, P261).
 
@@ -2206,11 +2226,13 @@ Autour des heures de classe, le périscolaire a autant de partisans que de criti
 - Motifs : 73, regroupés en 10 thèmes ; 9 reposent sur un seul participant (signaux isolés, pas des tendances).
 - Hors question : 4 idées de 2 participants ne répondent pas à la question posée. Elles sont listées en fin de rapport, mais ne comptent dans aucun motif et ne sont pas résumées.
 - Les trois participants les plus prolixes portent 4 % des idées : les chiffres comptent des personnes, mais les synthèses citent davantage ceux qui ont beaucoup écrit.
-- Relecture des motifs par le moteur d'IA : 89 idées déplacées vers le motif dont elles parlent vraiment ; 16 idées changées de camp après un nouvel examen de leur ton au regard de l'objet du motif. Une personne n'est « mitigée » que si elle dit du bien et du mal du même objet.
+- Relecture des motifs par le moteur d'IA : 89 idées déplacées vers le motif dont elles parlent vraiment ; 16 idées qui ont changé de ton une fois jugées par rapport à l'objet du motif. Une personne n'est « mitigée » que si elle dit du bien et du mal du même objet.
 - Codage en double, à la demande du chercheur : 109 idées qui répondent à la définition de deux motifs comptent dans les deux (la citation figure sous chacun, avec la mention « aussi dans » et le nom de l'autre motif). Chaque motif compte des personnes, aucune deux fois.
 - Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme positif, comme négatif, et ce qui ne compte pas comme un avis. Cette définition figure sous le titre du motif ; le positif et le négatif y obéissent, et le lecteur peut la contester. Le livre de codes a ensuite été relu d'un bloc : 6 paires de motifs voisins relues ensemble avec une règle de partage ; 2 fusions de motifs qui traitaient le même objet.
-- Balayage par définition : 21 motifs du résumé ont été confrontés, avec leur définition, à tous les avis rangés ailleurs ; 88 avis rangés ailleurs y comptent aussi, 3 avis y ont été déplacés, 3 tons corrigés.
+- Balayage par définition : les idées rangées dans les autres motifs ont été relues au regard de la définition des 21 motifs du résumé ; 88 y comptent aussi (elles font partie des 109 idées du codage en double), 3 y ont été déplacées, 3 ont changé de ton.
+- Étiquettes à vérifier : 10 motifs portent la mention « à vérifier », parce que leur étiquette dépend d'avis comptés aussi dans un autre motif. Le code mesure cet écart ; c'est au lecteur de trancher, en relisant les citations.
 - Renvois vérifiés : chaque phrase des synthèses a été confrontée par le moteur d'IA aux verbatims qu'elle cite (270 phrases) ; 32 corrigées, aucune retirée faute d'appui.
+- Limites : selon la façon dont on la lit, une même idée peut relever de plusieurs motifs, se découper en plusieurs idées ou se ranger dans un motif plus large ou plus fin ; deux lecteurs humains ne trancheraient pas toujours de la même façon. Le moteur d'IA tranche ces cas, le code les rend vérifiables : chaque citation se consulte et chaque motif affiche sa définition.
 - Principe : restituer ce que les participants ont dit, avec le moins de déformation possible. Les verbatims sont recopiés tels quels, sans correction ; seule une coupure « […] » peut sauter un passage sans rapport, jamais une négation ou une réserve. Le texte complet reste consultable dans OpenScribe.
 - Ce rapport contient le prénom d'une personne citée dans les réponses : à anonymiser avant une diffusion si besoin (OpenScribe permet de le masquer).
 - Moteur d'IA : Claude (opus-5-5) · température 0 · graine 42.

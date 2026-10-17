@@ -1,7 +1,7 @@
 {
- "id": "an_072e0d3b2i6s",
- "createdAt": "2026-10-17T07:50:31.778Z",
- "updatedAt": "2026-10-17T08:04:50.328Z",
+ "id": "an_5t2x5x253p5j",
+ "createdAt": "2026-10-17T08:49:07.723Z",
+ "updatedAt": "2026-10-17T08:49:13.865Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -21938,7 +21938,7 @@
    "unverified": []
   }
  ],
- "globalSummary": "Sur 366 participants, 286 expriment au moins une critique, 132 au moins une satisfaction, 76 les deux. Quarante-6 personnes portent un jugement positif d'ensemble sur la scolarisation de leurs enfants, que certaines nuancent ailleurs [I0139]. Une large majorité, fragile, de ceux qui en parlent apprécie l'enseignement privé (12 sur 14) [I0121].\n\nUne large majorité de ceux qui en parlent critique l'orientation des élèves (27 sur 28) [I0234], et les absences des enseignants s'attirent des reproches unanimes, mais fragiles, de ceux qui en parlent (25 sur 25) [I0097]. Une large majorité, fragile, de ceux qui en parlent conteste la carte scolaire (24 sur 29) [I0053]. Pour une majorité de ceux qui en parlent, les démarches d'inscription posent problème (24 sur 34) [I0141] ; une majorité de ceux qui en parlent critique de même l'école publique face au privé (24 sur 34) [I0062]. Une large majorité, fragile, de ceux qui en parlent critique aussi la réforme du système éducatif (20 sur 24) [I0057]. Enfin, une large majorité de ceux qui en parlent juge insuffisants les moyens des écoles (19 sur 20) [I0022], et tous ceux qui évoquent la scolarisation des enfants handicapés la critiquent, de façon unanime mais fragile (18 sur 18) [I0003]. Les avis sont partagés sur trois sujets : qualité des enseignants (22 positifs, 23 négatifs et 6 mitigés parmi les 51 participants qui donnent un avis) [I0158, I0988], accès aux services administratifs (10 positifs, 19 négatifs et 1 mitigé) [I0188, I0171] et services périscolaires (9 positifs et 9 négatifs) [I0046, I0025]. Deux autres sujets divisent aussi (voir « Ce qui divise »). Des propositions vont en sens contraire sur la place des expériences pédagogiques [I0149, I0565], sur le contenu du bulletin scolaire [I0264, I0561] et sur la place des langues régionales à l'école publique [I0633, I0925].\n\nSix personnes font des propositions pour l'orientation des élèves [I0152]. Le contrôle des enseignants défaillants inspire aussi des propositions à 6 personnes [I0019]. Une personne se demande si l'inégalité des enfants devant l'absentéisme des professeurs va changer [I0745] ; une autre s'interroge sur le sens du métier d'enseignant, entre seul maître à bord et travail en équipe [I0676], et une troisième sur la réforme du baccalauréat que va vivre sa fille [I0846].",
+ "globalSummary": "Sur 366 participants, 286 expriment au moins une critique, 132 au moins une satisfaction, 76 les deux. Quarante-six personnes portent un jugement positif d'ensemble sur la scolarisation de leurs enfants, que certaines nuancent ailleurs [I0139]. Une large majorité, fragile, de ceux qui en parlent apprécie l'enseignement privé (12 sur 14) [I0121].\n\nUne large majorité de ceux qui en parlent critique l'orientation des élèves (27 sur 28) [I0234], et les absences des enseignants s'attirent des reproches unanimes, mais fragiles, de ceux qui en parlent (25 sur 25) [I0097]. Une large majorité, fragile, de ceux qui en parlent conteste la carte scolaire (24 sur 29) [I0053]. Pour une majorité de ceux qui en parlent, les démarches d'inscription posent problème (24 sur 34) [I0141] ; une majorité de ceux qui en parlent critique de même l'école publique face au privé (24 sur 34) [I0062]. Une large majorité, fragile, de ceux qui en parlent critique aussi la réforme du système éducatif (20 sur 24) [I0057]. Enfin, une large majorité de ceux qui en parlent juge insuffisants les moyens des écoles (19 sur 20) [I0022], et tous ceux qui évoquent la scolarisation des enfants handicapés la critiquent, de façon unanime mais fragile (18 sur 18) [I0003]. Les avis sont partagés sur trois sujets : qualité des enseignants (22 positifs, 23 négatifs et 6 mitigés parmi les 51 participants qui donnent un avis) [I0158, I0988], accès aux services administratifs (10 positifs, 19 négatifs et 1 mitigé) [I0188, I0171] et services périscolaires (9 positifs et 9 négatifs) [I0046, I0025]. Deux autres sujets divisent aussi (voir « Ce qui divise »). Des propositions vont en sens contraire sur la place des expériences pédagogiques [I0149, I0565], sur le contenu du bulletin scolaire [I0264, I0561] et sur la place des langues régionales à l'école publique [I0633, I0925].\n\nSix personnes font des propositions pour l'orientation des élèves [I0152]. Le contrôle des enseignants défaillants inspire aussi des propositions à 6 personnes [I0019]. Une personne se demande si l'inégalité des enfants devant l'absentéisme des professeurs va changer [I0745] ; une autre s'interroge sur le sens du métier d'enseignant, entre seul maître à bord et travail en équipe [I0676], et une troisième sur la réforme du baccalauréat que va vivre sa fille [I0846].",
  "steps": [
   {
    "id": "extract",
@@ -21979,12 +21979,13 @@
  ],
  "calls": {
   "total": 458,
-  "cached": 420,
+  "cached": 458,
   "inputTokens": 0,
   "outputTokens": 0
  },
  "cacheKeys": [
   "88a1e4422f36dcd877c055fa88879b9a5c57a25908192aec4b91d8b86fdac696",
+  "5adc6e3daf48d1118345980310a52f4554dd2f47640d852e01f671f777017fa6",
   "e5a1eb4f0cb19a7a6b7396706d2859d458c77650c4887026816cbd5825cc426b",
   "40ed1e36312377e00b071cf7b0db2e39508813a22e82e8504db7716df0196cfa",
   "a7a436d80bc1d8e192d00d274f150d66a60595aacf1aee19c5e44d633bf593ea",
@@ -21993,7 +21994,6 @@
   "86a45860e0093bc0312f2ac91d597bdfc12f16a76fa4dee9672a292e063b7420",
   "d02eaa2f3de0c9c45ae8ab3653e3248d0bcf2340260775abb8b750224357b919",
   "d71abd6ce85fabd8a18473fc71692838aaefe29cc1ce91992ed96e5bfd2e1a9b",
-  "5adc6e3daf48d1118345980310a52f4554dd2f47640d852e01f671f777017fa6",
   "fb0f661258ab87e544ba041af1b8b744133e3bc3edbb64c7f9014699c97e9699",
   "44b3ce6a4a12ed5e2516eba18ca52d0d8710faa73cb4ea9bbde60699f8a49b87",
   "1c7acbaeb505034e8e4fb6b6d952ac7591ae5b8b0ee90f2091c19bbbba0cf1aa",
@@ -22002,9 +22002,9 @@
   "ffff39c7e0c044be0d033b11550e225d87f43b1ac4cd366eddf99582a3d6d319",
   "cd762b3f649f080f69039e6ddb249fb242507d5212bcf1e55c8614882b60f963",
   "e5b346f559abb68594f915d7c036b786091f1d825d1766932ce42b57c2d9a629",
+  "e018c3fdaa45850ac081b3b8a459dd9953bba1bdb8be98dcdee03c34c183107e",
   "5db8eb0e598eab1750e4158ae0b37932964ced7fb8e74030303126014b4015db",
   "3abf78d8dd268f309f4c9629fe716a1ee4cbc5384dab74e50e5d4c1b3cd27bdf",
-  "e018c3fdaa45850ac081b3b8a459dd9953bba1bdb8be98dcdee03c34c183107e",
   "81208cb7f17d9738c0f32f478b92eb1958bd4ddf4b3ff0b6593b4d2be1a8ef8f",
   "e7b3f7062268dc12af37953eb80deb21afcfb6c8f72170ef806ea163bf762d87",
   "8d7d324a5f73af844b5544bcf55985a0193b4e3bd4a1fa66f84d6fa0601c298e",
@@ -22031,8 +22031,8 @@
   "eac70bf8d0625ad310e05498aa7da802bbfc2e7ce2a7c1da72482540c3ee66ef",
   "ebaa4ed33a4a7b0e40bbfbf662d47d4904e8d8f4951b6f903560b8c8e29f4af8",
   "28a48178978be1766c7a36b0672218e8226d953baa628c5fe154091a79948ba3",
-  "40ae6c680bc417fd8f93bc8f80ccc3d300624bc52316bb3227aaa9c3721db905",
   "cf947c1b4b159cd425299fb04b3b371e47b88d4c98129e412140c35dd09046dc",
+  "40ae6c680bc417fd8f93bc8f80ccc3d300624bc52316bb3227aaa9c3721db905",
   "c6e44cbb472d7657fb824c2c33dda6033c57af69193e44e6dfb57cdb73320f53",
   "cdec3a6d35853e26e13968d97442dca471519e500e723aed957fb4920b2e2ab3",
   "f83011f745144be4c6bb35fdb4d803730f062b0bfd5ea32aa0f6c70a96921bad",
@@ -22303,8 +22303,8 @@
   "e03ab80812938fc1f22d4f3bc7d59990d01b76bc5837860f377d114c1dd763b4",
   "bf5e68321732e4a0c76a11e8af8289a60266e606be32ae03535ea1dca78c8749",
   "dedee5f16c1803b829bc854218f1a1491dd27263d67ac230e990b3cc3beccdb9",
-  "82299a332f017ddcbdc73fdc6d585274347681a088906aae59dafd01b8eee474",
   "0ce5ec78ce15af84e2cf97d0ad037bf4fdd20754022c66da6cd5cfcd1ba8f628",
+  "82299a332f017ddcbdc73fdc6d585274347681a088906aae59dafd01b8eee474",
   "ad33fb9d6666b0461be9b4e35715eb3c087020032b01b0e57ca6e85c4be05ffc",
   "12d5509f7067032e9644628c80eaa18ff1f3d4aa56068c908a892b7dc5744608",
   "e6a79117334e14afb22fb4eae19d199f4048b46c84d3eb571fafa972528dc6c8",
@@ -22327,8 +22327,8 @@
   "7ca6392ce28c9c093d9c89600620c8f9e3220e71164fbb91a71379435f08481d",
   "4a0978eded74ef32ab73b6fc3a056499cd35fcc39ae86978dac3f2d95e24b7d6",
   "8532b7d13ab10fc57ba2ba261d68c4c91efb7ae03e47014894f2a1a5b75d0b21",
-  "284922d27429ac614e3331537c32043da9a8d0bd7ea67e5dfe93cc5ae101a35a",
   "268683735a2bfbf053802a953545ea996c75beff42435df2f597cbc73c361a1b",
+  "284922d27429ac614e3331537c32043da9a8d0bd7ea67e5dfe93cc5ae101a35a",
   "206fa12df95c252ff731d8202788f4d69c75bb5b9705efb4bc465a3d6d5387e2",
   "8680ed125b091c282ef466b003a11464607ac424400a8297c3f3ffb56be0ed15",
   "76d7c18eec9ded5d03470723dfc8bbe9ba82efd2484ccc608fd2a6b3a0ff1fd8",
