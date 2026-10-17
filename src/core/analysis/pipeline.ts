@@ -2293,7 +2293,8 @@ const LEADING: Record<string, string> = {
 }
 
 const DIGITS: Record<string, string> = Object.fromEntries(Object.entries(LEADING).map(([n, w]) => [w.toLowerCase(), n]))
-const COUNTED = /\b(deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|vingt)(?= (?:personnes?|autres|participants?|parents|familles|d['’]entre)\b)/gi
+// Le nombre n'est pas la fin d'un composé (« quarante-six », « dix-sept ») : ni lettre ni trait d'union juste avant.
+const COUNTED = /(?<![\p{L}-])(deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|vingt)(?= (?:personnes?|autres|participants?|parents|familles|d['’]entre)(?![\p{L}]))/giu
 
 /**
  * Un nombre en tête de phrase s'écrit en lettres (« Trois personnes… ») ; au milieu d'une phrase, un compte de

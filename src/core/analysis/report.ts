@@ -113,13 +113,14 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     )
   if (state.swept?.motifs) {
     const w = state.swept
+    const pl = (n: number) => (n > 1 ? 's' : '')
     const done = [
-      w.copied && `${w.copied} avis rangé${w.copied > 1 ? 's' : ''} ailleurs y ${w.copied > 1 ? 'comptent' : 'compte'} aussi`,
-      w.moved && `${w.moved} avis y ${w.moved > 1 ? 'ont' : 'a'} été déplacé${w.moved > 1 ? 's' : ''}`,
-      w.retoned && `${w.retoned} ton${w.retoned > 1 ? 's' : ''} corrigé${w.retoned > 1 ? 's' : ''}`,
+      w.copied && `${w.copied} y compte${w.copied > 1 ? 'nt' : ''} aussi${state.copied?.length ? ` (elle${pl(w.copied)} fai${w.copied > 1 ? 'sent' : 't'} partie des ${state.copied.length} idées du codage en double)` : ''}`,
+      w.moved && `${w.moved} y ${w.moved > 1 ? 'ont' : 'a'} été déplacée${pl(w.moved)}`,
+      w.retoned && `${w.retoned} ${w.retoned > 1 ? 'ont' : 'a'} changé de ton`,
     ].filter(Boolean)
     lines.push(
-      `Balayage par définition : ${w.motifs} motif${w.motifs > 1 ? 's' : ''} du résumé ${w.motifs > 1 ? 'ont' : 'a'} été confronté${w.motifs > 1 ? 's' : ''}, avec leur définition, à tous les avis rangés ailleurs ; ${done.length ? done.join(', ') : 'aucun avis mal rangé n’a été trouvé'}.`,
+      `Balayage par définition : les idées rangées dans les autres motifs ont été relues à la lumière de la définition de${w.motifs > 1 ? 's' : ''} ${w.motifs} motif${pl(w.motifs)} du résumé ; ${done.length ? done.join(', ') : 'aucune n’y manquait'}.`,
     )
   }
   if (state.support)
@@ -736,7 +737,7 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
       }
       out.push('')
     }
-    if (both.size) out.push(`\\* s'exprime aussi dans l'autre sens sur ce motif.`, '')
+    if (both.size) out.push(`\\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.`, '')
   }
 
   if (state.themes.length) {
@@ -826,7 +827,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
           .join('')}</ul></details>`
       })
       .join('')
-    const note = both.size ? `<p class="facts">* s'exprime aussi dans l'autre sens sur ce motif.</p>` : ''
+    const note = both.size ? `<p class="facts">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>` : ''
     const dominant = dominantVoice(ideasOf(g, byId))
     return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}</p>${g.definition ? `<p class="facts">${e(definitionLine(g.definition))}</p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
   }

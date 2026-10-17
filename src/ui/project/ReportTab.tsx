@@ -373,7 +373,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
             )
           })}
         </div>
-        {both.size > 0 && <p className="text-xs text-muted-foreground">* s'exprime aussi dans l'autre sens sur ce motif.</p>}
+        {both.size > 0 && <p className="text-xs text-muted-foreground">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>}
       </div>
     </Disclosure>
   )

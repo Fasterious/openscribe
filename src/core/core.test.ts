@@ -1639,6 +1639,8 @@ describe('contrôles ajoutés à la certification B9', () => {
     )
     // Un nombre qui ne compte pas des personnes reste en lettres : « à deux vitesses », « en deux temps ».
     expect(spellLeadingNumbers('Une école à deux vitesses, en deux temps.')).toBe('Une école à deux vitesses, en deux temps.')
+    // Un nombre composé reste entier (plume, passe 12 : « Quarante-6 personnes »).
+    expect(spellLeadingNumbers('Quarante-six personnes le saluent, et vingt-deux autres le critiquent.')).toBe('Quarante-six personnes le saluent, et vingt-deux autres le critiquent.')
   })
 })
 
