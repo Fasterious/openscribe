@@ -2,6 +2,20 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — Passe `testeur` sur la version application de l'Observatoire
+
+- **Trouvé** : l'application n'affichait ni la définition d'un motif ni la mention « aussi dans » d'une citation
+  codée en double, alors que l'explication de « à vérifier » y renvoie (vrai aussi dans Synthèse) ; l'impression
+  perdait le titre et la fiche ; un export depuis l'Observatoire partait sans source ni limites ; une coupure
+  réseau se disait « étude introuvable ».
+- **Corrigé** : définition pliée sous la synthèse et « aussi dans » sous chaque citation copiée, dans Synthèse
+  comme dans l'Observatoire ; titre et fiche imprimés ; une étude publiée se télécharge depuis l'article (qui
+  porte sa fiche), pas depuis l'application ; « Réessayer » en cas de coupure ; titre d'onglet ; accord
+  « réécritures qui ne respectaient pas ».
+- **Laissé pour plus tard** : le résumé rédigé dit encore « unanimes, mais fragiles » (le texte injecté au moteur
+  suit le calcul brut ; à corriger à la source, au prochain rejeu) ; le filtre par région (14 valeurs, au-delà de
+  la limite de 12) ; le violet des suggestions, proche du bleu de la marque.
+
 ## 2026-10-17 — L'article de l'Observatoire devient interactif
 
 - **Proposition d'Arnaud** : l'article se lit mieux (tout le texte, sans cadres) ; il lui manque l'interactivité

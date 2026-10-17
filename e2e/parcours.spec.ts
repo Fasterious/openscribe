@@ -75,8 +75,11 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await noHorizontalScroll(page)
   const motif = page.locator('details').filter({ has: page.locator('h3, h4') }).nth(2)
   await motif.locator('h3, h4').first().click()
+  // La définition du motif est là, pliée, sous sa synthèse.
+  await expect(motif.getByText('Ce qui compte comme positif ou négatif dans ce motif')).toBeVisible()
   await tap(motif.getByRole('button', { name: /^«/ }).first())
   await expect(motif.locator('mark').first()).toBeVisible()
+  await expect(page).toHaveTitle(/L'Observatoire OpenScribe/)
   await page.getByRole('link', { name: 'Lire en une page' }).click()
   await expect(page.getByText('Méthode et limites').first()).toBeVisible()
   await page.getByRole('link', { name: "Ouvrir dans l'application" }).click()

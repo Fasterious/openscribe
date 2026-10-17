@@ -9,7 +9,9 @@ import {
   categoryHeading,
   dominantVoice,
   engineName,
+  alsoInOf,
   categoryBar,
+  definitionLine,
   categoryOrder,
   categoryBarLabel,
   highlightSections,
@@ -56,6 +58,8 @@ interface Ctx {
   sourceName: (contributionId: string) => string | undefined
   /** La question à donner après une réponse courte qui est toute la réponse (sinon rien). */
   context: (idea: Idea) => string | undefined
+  /** Codage en double : l'autre motif où compte cette citation (la mention « à vérifier » y renvoie). */
+  alsoIn: (idea: Idea) => string | undefined
 }
 
 /** Chaque section calculée a sa couleur et son pictogramme : on s'y repère sans lire. */
@@ -382,6 +386,13 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
             <Unverified items={group.unverified} />
           </>
         )}
+        {/* La définition du motif : explication secondaire, pliée ; la synthèse se lit d'abord (remarque d'Arnaud, 17/10). */}
+        {group.definition && (
+          <details className="group/def text-sm">
+            <summary className="cursor-pointer text-muted-foreground">Ce qui compte comme positif ou négatif dans ce motif</summary>
+            <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{definitionLine(group.definition)}</p>
+          </details>
+        )}
         {m.minority && <MinorityNote minority={m.minority} ctx={ctx} />}
         <div className="grid gap-3 md:grid-cols-2">
           {categoryOrder(m).map((cat) => {
@@ -450,7 +461,13 @@ function PersonLine({
           const where = ctx.origin(i.contributionId)
           // Une réponse courte qui est toute la réponse (« Les tarifs ») ne dit son sens qu'avec sa question.
           const question = full.has(i.id) ? ctx.context(i) : undefined
-          const origin = question ? `— ${where ? `${where}, ` : ''}en réponse à «\u00a0${question}\u00a0»` : where ? `(${where})` : ''
+          const also = ctx.alsoIn(i)
+          const origin = [
+            question ? `— ${where ? `${where}, ` : ''}en réponse à «\u00a0${question}\u00a0»` : where ? `(${where})` : '',
+            also ? `aussi dans «\u00a0${also}\u00a0»` : '',
+          ]
+            .filter(Boolean)
+            .join(' · ')
           return (
             <Fragment key={i.id}>
               <span>
@@ -535,7 +552,7 @@ export function ReportTab({
   useEffect(() => {
     let closed: HTMLDetailsElement[] = []
     const before = () => {
-      closed = [...document.querySelectorAll<HTMLDetailsElement>('article details:not([open])')]
+      closed = [...document.querySelectorAll<HTMLDetailsElement>('main details:not([open])')]
       closed.forEach((d) => (d.open = true))
     }
     const after = () => closed.forEach((d) => (d.open = false))
@@ -574,6 +591,7 @@ export function ReportTab({
     mask: (t) => (masked ? maskNames(t, names) : t),
     origin: originOf(corpus),
     context: shortAnswerContext(corpus),
+    alsoIn: alsoInOf(analysis),
     sourceName: (id) => {
       const c = corpus.contributions.find((x) => x.id === id)
       return corpus.sources.find((src) => src.id === c?.sourceId)?.name
@@ -690,6 +708,8 @@ export function ReportTab({
             </label>
           </Tooltip>
         )}
+        {/* Une étude publiée se télécharge depuis l'article, qui porte sa fiche (source, licence, limites). */}
+        {!published && (
         <DropMenu icon={<Download />} label="Exporter">
           {(close) => {
             const run = (f: () => void) => () => {
@@ -732,6 +752,7 @@ export function ReportTab({
             )
           }}
         </DropMenu>
+        )}
       </TabActions>
 
       {stale && (
@@ -958,7 +979,7 @@ export function ReportTab({
             tous les chiffres, puis contrôlé que chaque nombre cité dans les synthèses correspond à un chiffre calculé ou à un verbatim.
             {analysis.polish &&
               analysis.polish.changed > 0 &&
-              ` Une relecture a ensuite amélioré la langue de ${plural(analysis.polish.changed, 'synthèse')} ; le code a vérifié qu'aucun verbatim ni aucun chiffre n'avait changé${analysis.polish.refused ? ` et a écarté ${plural(analysis.polish.refused, 'réécriture')} qui ne respectait pas cette règle` : ''}.`}
+              ` Une relecture a ensuite amélioré la langue de ${plural(analysis.polish.changed, 'synthèse')} ; le code a vérifié qu'aucun verbatim ni aucun chiffre n'avait changé${analysis.polish.refused ? ` et a écarté ${plural(analysis.polish.refused, 'réécriture')} qui ne ${analysis.polish.refused > 1 ? 'respectaient' : 'respectait'} pas cette règle` : ''}.`}
           </p>
           <p>
             Principe : restituer ce que les participants ont dit, avec le moins de déformation possible. Les verbatims sont recopiés tels quels ; seule une

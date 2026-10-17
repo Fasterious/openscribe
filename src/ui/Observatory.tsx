@@ -14,19 +14,41 @@ const paras = (t: string) => t.split(/\n+/).filter((p) => p.trim())
  */
 export function ObservatoryPage({ slug }: { slug: string }) {
   const [study, setStudy] = useState<PublishedStudy | null | undefined>(undefined)
+  // Une coupure réseau n'est pas une étude introuvable : on le dit, et on peut réessayer.
+  const [offline, setOffline] = useState(false)
+  const [attempt, setAttempt] = useState(0)
   useEffect(() => {
     setStudy(undefined)
+    setOffline(false)
     fetch(`/observatoire/${slug}/etude.json`)
       .then((r) => (r.ok ? r.json() : null))
       .then(setStudy)
-      .catch(() => setStudy(null))
-  }, [slug])
+      .catch(() => setOffline(true))
+  }, [slug, attempt])
+  useEffect(() => {
+    if (!study) return
+    const before = document.title
+    document.title = `${study.title} — L'Observatoire OpenScribe`
+    return () => {
+      document.title = before
+    }
+  }, [study])
 
   const back = (
     <a href="/observatoire/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
       <ArrowLeft className="size-4" /> Toutes les études de l'Observatoire
     </a>
   )
+  if (offline)
+    return (
+      <div className="space-y-3">
+        {back}
+        <p>L'étude n'a pas pu être chargée : la connexion semble coupée.</p>
+        <button type="button" className="text-primary underline" onClick={() => setAttempt((n) => n + 1)}>
+          Réessayer
+        </button>
+      </div>
+    )
   if (study === undefined) return <p className="text-sm text-muted-foreground">Chargement de l'étude…</p>
   if (study === null)
     return (
@@ -40,8 +62,8 @@ export function ObservatoryPage({ slug }: { slug: string }) {
   const f = study.fiche
   return (
     <div className="space-y-6">
-      <div className="no-print space-y-3">
-        {back}
+      <div className="space-y-3">
+        <div className="no-print">{back}</div>
         <div className="space-y-1">
           <h1 className="text-2xl font-bold sm:text-3xl">{study.title}</h1>
           <p className="text-sm text-muted-foreground">
@@ -49,7 +71,7 @@ export function ObservatoryPage({ slug }: { slug: string }) {
             {study.news && ` · ${study.news}`}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="no-print flex flex-wrap items-center gap-2">
           <a
             href={`/observatoire/${study.slug}/`}
             className="inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-card px-3 text-sm font-medium hover:bg-accent"

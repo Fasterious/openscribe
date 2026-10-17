@@ -109,7 +109,7 @@ ${menuStyle}
 const marker = /<h1>[\s\S]*?<\/h1>/
 if (!marker.test(report)) throw new Error('Rapport sans titre : gabarit inattendu.')
 const page = report
-  .replace('</head>', `${style}</head>`)
+  .replace('</head>', `<link rel="icon" href="/favicon.svg">${style}</head>`)
   .replace('<body>', `<body>\n${head}`)
   .replace(marker, (h1) => `${h1}\n${card}\n<h2 class="obs-report">Le rapport complet</h2>`)
 

@@ -64,6 +64,8 @@ export function publishedStudy(project: Project, analysis: AnalysisState, meta: 
     ...maskDeep(meta, mask),
     project: {
       ...project,
+      // Le titre publié, pas le nom de travail de la synthèse.
+      name: meta.title,
       // La source porte son nom public (« Grand débat national »), pas celui du fichier de travail.
       corpus: {
         ...maskDeep({ ...project.corpus, contributions: [] }, mask),

@@ -41,7 +41,7 @@ export function engineName(presetId: string, model?: string): string {
 }
 
 /** Codage en double : sous chaque exemplaire d'une citation, le titre de l'autre motif où elle compte (copie comme original). */
-function alsoInOf(state: AnalysisState): (i: Idea) => string | undefined {
+export function alsoInOf(state: AnalysisState): (i: Idea) => string | undefined {
   const titleOfIdea = new Map(state.groups.flatMap((g) => g.ideaIds.map((id) => [id, g.title] as const)))
   const copyOf = new Map(state.ideas.filter((i) => i.copyOf).map((i) => [i.copyOf!, i.id]))
   return (i) => {
