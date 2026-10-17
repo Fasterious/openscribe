@@ -10,6 +10,8 @@ export type Route =
   /** `back` : l'étude d'où l'on vient, pour y revenir après avoir configuré un moteur. */
   | { name: 'settings'; back?: string }
   | { name: 'project'; id: string; tab: 'data' | 'analysis' | 'report' }
+  /** Une étude publiée de l'Observatoire, lue dans l'application (lecture seule). */
+  | { name: 'observatory'; slug: string }
   | { name: 'not-found' }
 
 export function parseRoute(hash: string): Route {
@@ -18,6 +20,8 @@ export function parseRoute(hash: string): Route {
   if (path === '/' || path === '') return { name: 'home' }
   if (path === '/synthese') return { name: 'synthesis' }
   if (path === '/moteurs' || path === '/reglages') return { name: 'settings', back: params.get('retour') ?? undefined }
+  const o = path.match(/^\/observatoire\/([a-z0-9-]+)$/)
+  if (o) return { name: 'observatory', slug: o[1] }
   const m = path.match(/^\/etude\/([^/]+)(?:\/(donnees|analyse|rapport))?$/)
   if (m) {
     const tab = m[2] === 'analyse' ? 'analysis' : m[2] === 'rapport' ? 'report' : 'data'
@@ -36,6 +40,8 @@ export function href(route: Route): string {
       return route.back ? `#/moteurs?retour=${encodeURIComponent(route.back)}` : '#/moteurs'
     case 'project':
       return `#/etude/${encodeURIComponent(route.id)}/${route.tab === 'analysis' ? 'analyse' : route.tab === 'report' ? 'rapport' : 'donnees'}`
+    case 'observatory':
+      return `#/observatoire/${route.slug}`
     default:
       return '#/'
   }

@@ -38,7 +38,7 @@ async function newStudy(page: Page, name: string) {
   await expect(page.getByRole('heading', { level: 1 })).toContainText(name)
 }
 
-test('accueil : la promesse, la preuve dépliable, les sections de réassurance', async ({ page }) => {
+test('accueil : la promesse, la preuve dépliable, les sections de réassurance', async ({ page }, testInfo) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Des verbatims au rapport')
   // La preuve : un constat de l'exemple dont on déplie les verbatims.
@@ -51,11 +51,29 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await noHorizontalScroll(page)
   await shot(page, '1-accueil')
 
-  // Un clic sur une étude de l'Observatoire y mène directement ; ses pages portent le menu, on n'y est jamais coincé.
+  // Un clic sur une étude de l'Observatoire ouvre sa version interactive, dans l'application.
   await page.getByRole('link', { name: /L'école vue par les familles/ }).click()
-  await expect(page).toHaveURL(/\/observatoire\/ecole-grand-debat-2019\/$/)
+  await expect(page).toHaveURL(/#\/observatoire\/ecole-grand-debat-2019$/)
+  await expect(page.getByRole('heading', { name: 'En bref' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
+  await noHorizontalScroll(page)
+  // Un motif se déplie ; un verbatim montre la réponse entière, son passage cité en gras.
+  const motif = page.locator('details').filter({ has: page.locator('h3, h4') }).nth(2)
+  await motif.locator('h3, h4').first().click()
+  const quote = motif.getByRole('button', { name: /^«/ }).first()
+  if (testInfo.project.name === 'mobile') await quote.tap()
+  else await quote.click()
+  await expect(motif.locator('mark').first()).toBeVisible()
+  await expect(motif.getByRole('button', { name: 'Replier' })).toBeVisible()
+  // Les deux versions se répondent : document, puis retour à l'interactive.
+  await page.getByRole('link', { name: 'Version document' }).click()
   await expect(page.getByText('Méthode et limites').first()).toBeVisible()
   await noHorizontalScroll(page)
+  await page.getByRole('link', { name: 'Explorer la version interactive' }).click()
+  await expect(page.getByRole('heading', { name: 'En bref' })).toBeVisible()
+  await page.getByRole('link', { name: "Toutes les études de l'Observatoire" }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText("L'Observatoire")
+  await page.getByRole('link', { name: 'Version document' }).first().click()
   await page.getByRole('link', { name: "← Toutes les études de l'Observatoire" }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText("L'Observatoire")
   await page.getByRole('navigation', { name: 'Menu' }).getByRole('link', { name: 'Accueil' }).click()

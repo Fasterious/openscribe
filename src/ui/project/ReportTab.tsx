@@ -510,7 +510,18 @@ function ThemeBadges({ groups }: { groups: { metrics: Metrics }[] }) {
   )
 }
 
-export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: Project; analysis: AnalysisState; onSaveStudy?: () => void }) {
+export function ReportTab({
+  project,
+  analysis: saved,
+  onSaveStudy,
+  published = false,
+}: {
+  project: Project
+  analysis: AnalysisState
+  onSaveStudy?: () => void
+  /** Étude publiée (Observatoire) : lecture seule, textes déjà masqués, sa fiche dit d'où vient le rapport. */
+  published?: boolean
+}) {
   const analysis = useMemo(() => withCurrentMetrics(saved), [saved])
   const corpus = corpusForAnalysis(project)
   // Un rapport dont les données ont changé (source retirée…) le dit, ici aussi : l'étude s'ouvre souvent directement sur le rapport.
@@ -519,7 +530,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
     corpusHash(corpus).then(setCurrentHash)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project])
-  const stale = currentHash !== null && currentHash !== analysis.corpusHash
+  const stale = !published && currentHash !== null && currentHash !== analysis.corpusHash
   // À l'impression, tout est déplié : sinon les verbatims des motifs fermés disparaîtraient du PDF.
   useEffect(() => {
     let closed: HTMLDetailsElement[] = []
@@ -729,7 +740,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
           Analyse pour qu'il en tienne compte.
         </Alert>
       )}
-      {analysis.engine.presetId === 'bridge' && (
+      {analysis.engine.presetId === 'bridge' && !published && (
         <Alert tone="info">
           {isExample(project)
             ? `Rapport d'exemple : produit une fois par un vrai moteur d'IA (${analysis.engine.model}) à partir d'un questionnaire fictif, puis conservé tel quel. Pour vos propres données, choisissez un moteur dans « Moteurs d'IA ».`

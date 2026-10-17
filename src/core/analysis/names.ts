@@ -34,3 +34,42 @@ export function maskNames(text: string, names: string[] | undefined): string {
   for (const name of [...names].sort((a, b) => b.length - a.length)) out = out.replace(nameRegex(name), NAME_MASK)
   return out
 }
+
+/**
+ * Masque les noms et dit où est passé chaque caractère : une citation repérée par sa position dans le texte
+ * d'origine se retrouve dans le texte masqué (publication de l'Observatoire, réponses entières montrées).
+ */
+export function maskWithOffsets(text: string, names: string[] | undefined): { text: string; at: (pos: number) => number } {
+  if (!names?.length) return { text, at: (pos) => pos }
+  // Les passages à masquer, du plus long nom au plus court, sans chevauchement.
+  const cuts: { start: number; end: number }[] = []
+  for (const name of [...names].sort((a, b) => b.length - a.length))
+    for (const m of text.matchAll(nameRegex(name))) {
+      const start = m.index!
+      const end = start + m[0].length
+      if (!cuts.some((c) => start < c.end && end > c.start)) cuts.push({ start, end })
+    }
+  cuts.sort((a, b) => a.start - b.start)
+  let out = ''
+  let pos = 0
+  for (const c of cuts) {
+    out += text.slice(pos, c.start) + NAME_MASK
+    pos = c.end
+  }
+  out += text.slice(pos)
+  const at = (p: number) => {
+    let shift = 0
+    for (const c of cuts) {
+      if (c.end <= p) shift += NAME_MASK.length - (c.end - c.start)
+      // Une position au milieu d'un nom masqué tombe au bord du masque.
+      else if (c.start < p) return c.start + shift + (p - c.start >= (c.end - c.start) / 2 ? NAME_MASK.length : 0)
+    }
+    return p + shift
+  }
+  return { text: out, at }
+}
+
+/** Les noms encore présents dans un texte : vide si le masquage est complet. */
+export function remainingNames(text: string, names: string[] | undefined): string[] {
+  return (names ?? []).filter((name) => nameRegex(name).test(text))
+}

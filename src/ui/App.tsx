@@ -2,6 +2,7 @@ import { FlaskConical, House, KeyRound, Mic, Newspaper, PenTool, UserRound } fro
 import { useEngines } from '@/app/engines'
 import { href, useRoute } from '@/app/router'
 import { Home } from './Home'
+import { ObservatoryPage } from './Observatory'
 import { cn, Tooltip } from './primitives'
 import { ProjectPage } from './project/ProjectPage'
 import { SettingsPage } from './Settings'
@@ -32,7 +33,7 @@ export function App() {
               <FlaskConical className="size-4" /> Synthèse
             </NavLink>
             {/* Les études publiées : des pages à part, qui portent ce même menu pour revenir. */}
-            <NavLink href="/observatoire/" active={false}>
+            <NavLink href="/observatoire/" active={route.name === 'observatory'}>
               <Newspaper className="size-4" /> <span className="sr-only sm:not-sr-only">Observatoire</span>
             </NavLink>
             <SoonLink icon={<Mic className="size-4" />} label="Entretiens" />
@@ -66,6 +67,7 @@ export function App() {
         {route.name === 'synthesis' && <SynthesisPage />}
         {route.name === 'settings' && <SettingsPage back={route.back} />}
         {route.name === 'project' && <ProjectPage id={route.id} tab={route.tab} />}
+        {route.name === 'observatory' && <ObservatoryPage slug={route.slug} />}
         {route.name === 'not-found' && (
           <p>
             Page introuvable.{' '}

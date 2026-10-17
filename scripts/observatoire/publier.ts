@@ -1,20 +1,23 @@
 /**
  * Observatoire : publie une étude sur le site (dossier `public/observatoire/`).
  *
- * Seules des pages statiques sont publiées : la fiche de l'étude (actualité,
- * source, question, échantillon, précautions de lecture) suivie du rapport
- * complet, prénoms de particuliers masqués. Le fichier d'étude brut (corpus et
- * réponses du moteur) reste hors du dépôt.
+ * Deux versions de chaque étude, prénoms de particuliers masqués partout :
+ * - le document (`<slug>/index.html`) : la fiche (actualité, source, question,
+ *   échantillon, précautions de lecture) suivie du rapport complet, en une page ;
+ * - l'étude lisible dans l'application (`<slug>/etude.json`, ouverte par
+ *   `#/observatoire/<slug>`), réponses entières comprises, masquées à la source.
+ * Les réponses du moteur et la liste des prénoms restent hors du dépôt.
  *
  * Usage :
  *   npx tsx scripts/observatoire/publier.ts <etude.openscribe.json> <fiche.json>
  *
- * Écrit `public/observatoire/<slug>/index.html`, puis refait la liste
+ * Écrit `public/observatoire/<slug>/index.html` et `etude.json`, puis refait la liste
  * `public/observatoire/index.json` et la page `public/observatoire/index.html`.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { reportToHtml } from '../../src/core/analysis/report'
+import { publishedStudy } from '../../src/core/observatoire'
 import { importProject } from '../../src/core/project'
 
 interface Fiche {
@@ -66,8 +69,10 @@ const menuStyle = `.obs-menu{display:flex;flex-wrap:wrap;align-items:center;just
 .obs-menu nav a:hover{background:var(--card)}.obs-menu nav a[aria-current]{background:var(--card);color:var(--brand)}
 @media print{.obs-menu,.obs-nav{display:none}}`
 
+const sampleLine = `${n(fiche.sample)} réponses tirées au sort parmi ${n(fiche.population)} (marge de ± ${fiche.margin} points à 95 %). Un avis partagé par 1 % des contributeurs a ${Math.round((1 - 0.99 ** fiche.sample) * 100)} % de chances d'apparaître au moins une fois dans l'échantillon ; un avis plus rare peut manquer.`
 const head = `${menu('study')}
 <nav class="obs-nav"><a href="/observatoire/">← Toutes les études de l'Observatoire</a></nav>
+<p class="obs-switch">Vous lisez la version document, d'un seul tenant, faite pour imprimer. <a href="/#/observatoire/${e(fiche.slug)}">Explorer la version interactive</a> : verbatims à la demande, réponse entière autour de chaque citation.</p>
 <p class="obs-meta">Publié le ${e(date(fiche.publishedAt))} · ${e(fiche.news)}</p>`
 const card = `<section class="obs-fiche" aria-label="Fiche de l'étude">
 <h2>En bref</h2>
@@ -76,7 +81,7 @@ ${paras(fiche.summary)}
 <blockquote>${e(fiche.question)}</blockquote>
 <h2>Les données</h2>
 <p><a href="${e(fiche.source.url)}">${e(fiche.source.name)}</a>, ${e(fiche.source.period)}. ${e(fiche.source.license)}.</p>
-<p>${n(fiche.sample)} réponses tirées au sort parmi ${n(fiche.population)} (marge de ± ${fiche.margin} points à 95 %). Un avis partagé par 1 % des contributeurs a ${Math.round((1 - 0.99 ** fiche.sample) * 100)} % de chances d'apparaître au moins une fois dans l'échantillon ; un avis plus rare peut manquer.</p>
+<p>${e(sampleLine)}</p>
 ${paras(fiche.sampling)}
 <h2>Avant de lire</h2>
 <ul>${fiche.warnings.map((w) => `<li>${e(w)}</li>`).join('')}</ul>
@@ -85,6 +90,8 @@ const style = `<style>
 ${menuStyle}
 .obs-nav{font-size:.9rem;margin-bottom:1rem}.obs-nav a{color:var(--brand);text-decoration:none;font-weight:600}
 .obs-meta{color:var(--muted);font-size:.9rem;margin-top:0}
+.obs-switch{background:var(--card);border-radius:.5rem;padding:.6rem .9rem;font-size:.95rem}.obs-switch a{font-weight:600}
+@media print{.obs-switch{display:none}}
 .obs-fiche{background:var(--card);border-radius:.5rem;padding:.4rem 1.2rem 1rem;margin:1.2rem 0 2rem}
 .obs-fiche h2{font-size:1.1rem;margin-top:1.4rem;border:0;padding:0}
 .obs-fiche blockquote{margin:.4rem 0;padding-left:.8rem;border-left:3px solid var(--brand);font-style:italic}
@@ -100,6 +107,16 @@ const page = report
 const root = join('public', 'observatoire')
 mkdirSync(join(root, fiche.slug), { recursive: true })
 writeFileSync(join(root, fiche.slug, 'index.html'), page)
+
+// La version interactive : la même étude, ouverte dans l'application en lecture seule.
+const study = publishedStudy(project, analysis, {
+  slug: fiche.slug,
+  title: fiche.title,
+  publishedAt: fiche.publishedAt,
+  news: fiche.news,
+  fiche: { summary: fiche.summary, question: fiche.question, source: fiche.source, sample: sampleLine, sampling: fiche.sampling, warnings: fiche.warnings },
+})
+writeFileSync(join(root, fiche.slug, 'etude.json'), JSON.stringify(study))
 
 // La liste des études publiées, la plus récente d'abord.
 const listPath = join(root, 'index.json')
@@ -121,7 +138,7 @@ writeFileSync(
 body{font-family:Geist,system-ui,-apple-system,"Segoe UI",sans-serif;max-width:52rem;margin:2rem auto;padding:0 1rem;line-height:1.6;color:var(--ink);background:#fff}
 h1{color:var(--brand);font-size:2rem;margin-bottom:.3rem}.lead{color:var(--muted);margin-top:0}
 article{background:var(--card);border-radius:.5rem;padding:.6rem 1.2rem 1rem;margin:1.2rem 0}
-article h2{font-size:1.2rem;margin:.6rem 0 .2rem}article h2 a{color:var(--ink)}.meta{color:var(--muted);font-size:.9rem;margin:0 0 .6rem}
+article h2{font-size:1.2rem;margin:.6rem 0 .2rem}article h2 a{color:var(--ink)}.meta{color:var(--muted);font-size:.9rem;margin:0 0 .6rem}.meta a{color:var(--brand)}
 footer{color:var(--muted);font-size:.9rem;margin-top:2.5rem;border-top:1px solid var(--line);padding-top:1rem}footer a{color:var(--brand)}
 ${menuStyle}
 </style></head><body>
@@ -131,8 +148,8 @@ ${menu('list')}
 ${studies
   .map(
     (s) => `<article>
-<h2><a href="${e(s.slug)}/">${e(s.title)}</a></h2>
-<p class="meta">Publié le ${e(date(s.publishedAt))} · ${e(s.news)}</p>
+<h2><a href="/#/observatoire/${e(s.slug)}">${e(s.title)}</a></h2>
+<p class="meta">Publié le ${e(date(s.publishedAt))} · ${e(s.news)} · <a href="${e(s.slug)}/">Version document</a></p>
 ${paras(s.summary)}
 </article>`,
   )
