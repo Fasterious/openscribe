@@ -1674,6 +1674,14 @@ describe('contrôles ajoutés à la certification B9', () => {
     expect(clauseCounts("2 personnes trouvent la piscine mal ouverte : l'une le soir [I0001], l'autre le dimanche [I0002].", person)).toEqual([])
     expect(clauseCounts("2 personnes trouvent la piscine mal ouverte [I0001] ; l'autre le dimanche [I0002].", person)).toEqual(['2 personnes'])
   })
+  it('ni la base d’un rapport, ni une date, ni « la seconde » ne sont des comptes à appuyer', () => {
+    const five = (id: string) => ({ I0001: 'P1', I0002: 'P2', I0003: 'P3', I0004: 'P4', I0005: 'P4' })[id]
+    expect(overcountedPeople('Les horaires déplaisent à 4 des 5 personnes qui donnent un avis [I0001, I0002, I0003, I0004, I0005].', five)).toEqual([])
+    expect(overcountedPeople('5 personnes regrettent les horaires [I0001, I0002, I0003, I0004, I0005].', five)).toEqual(['5 personnes'])
+    expect(unverifiedNumbers("Une personne juge l'accueil resté dans les années 1950 [I0001].", new Set([1]))).toEqual([])
+    expect(unverifiedNumbers('1950 personnes le jugent mal [I0001].', new Set([1]))).toEqual(['1950'])
+    expect(impliedOthers("2 personnes regrettent les horaires : l'une le soir [I0001], l'autre le dimanche [I0002]. La seconde propose d'ouvrir plus tôt [I0002].", person)).toEqual([])
+  })
   it('« toutes les personnes » couvre chaque personne qui donne un avis', () => {
     expect(allClaims('Toutes les personnes qui en parlent le jugent tardif [I0001, I0002].', person, 3)).toEqual(['Toutes les personnes'])
     expect(allClaims('Toutes les personnes qui en parlent le jugent tardif [I0001, I0002, I0003].', person, 3)).toEqual([])

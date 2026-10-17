@@ -113,10 +113,12 @@ export function allowedNumbers(metrics: Metrics[], quotes: string[]): Set<number
 
 /** Les nombres cités qui ne correspondent à rien de calculé ni de cité. */
 export function unverifiedNumbers(text: string, allowed: Set<number>): string[] {
+  // Une date (« les années 1950 », « depuis 2017 ») vient de la réponse, pas d'un compte.
+  const years = new Set([...text.matchAll(/(?<![\p{L}])(?:années|en|depuis|dès|avant|après|jusqu['’]en)\s+((?:19|20)\d\d)\b/giu)].map((m) => m[1]))
   return [
     ...new Set(
       numbersIn(text)
-        .filter((n) => !allowed.has(n.value))
+        .filter((n) => !allowed.has(n.value) && !years.has(n.raw))
         .map((n) => n.raw),
     ),
   ]
@@ -144,11 +146,13 @@ export function overcountedPeople(text: string, personOf: (ideaId: string) => st
     if (!ids.length) continue
     const people = new Set(ids.map(personOf).filter(Boolean)).size
     const clean = sentence.replace(/\[[^\]]*\]/g, ' ')
+    // « 4 des 5 personnes qui donnent un avis » : la base d'un rapport vient des chiffres du code, pas des renvois.
+    const ratio = (at: number) => /\b(des|sur)\s+$/i.test(clean.slice(Math.max(0, at - 5), at))
     const claims = [
-      ...[...clean.matchAll(WORD_RE)].map((m) => ({ raw: m[0].trim(), value: WORDS[m[1].toLowerCase()] })),
-      ...[...clean.matchAll(DIGIT_PEOPLE_RE)].map((m) => ({ raw: m[0].trim(), value: Number(m[1]) })),
+      ...[...clean.matchAll(WORD_RE)].map((m) => ({ raw: m[0].trim(), value: WORDS[m[1].toLowerCase()], at: m.index ?? 0 })),
+      ...[...clean.matchAll(DIGIT_PEOPLE_RE)].map((m) => ({ raw: m[0].trim(), value: Number(m[1]), at: m.index ?? 0 })),
     ]
-    for (const c of claims) if (c.value > 1 && ids.length >= c.value && people < c.value) out.push(c.raw)
+    for (const c of claims) if (c.value > 1 && ids.length >= c.value && people < c.value && !ratio(c.at)) out.push(c.raw)
   }
   return [...new Set(out)]
 }
@@ -229,11 +233,12 @@ export function vaguePlurals(text: string, personOf: (ideaId: string) => string 
  * le mot doit donc citer quelqu'un d'autre que le renvoi précédent ; si une
  * seule référence couvre « une personne…, une autre… », elle doit citer assez
  * de personnes distinctes. Sinon une seule personne devient deux voix.
+ * « La seconde », comme « la première », reprend une personne déjà citée : elle n'en annonce pas une autre.
  */
 export function impliedOthers(text: string, personOf: (ideaId: string) => string | undefined): string[] {
   const out: string[] = []
   const WORD =
-    /(?<![\p{L}])(une autre|un autre|l['’]autre|la seconde|le second|une deuxième|un deuxième|une troisième|un troisième|deux autres|une quatrième|trois autres)(?![\p{L}])/giu
+    /(?<![\p{L}])(une autre|un autre|l['’]autre|une deuxième|un deuxième|une troisième|un troisième|deux autres|une quatrième|trois autres)(?![\p{L}])/giu
   const need = (w: string) => (/troisième|deux autres/i.test(w) ? 3 : /quatrième|trois autres/i.test(w) ? 4 : 2)
   const people = (ids: string) => new Set((ids.match(/I\d{4,}/g) ?? []).map(personOf).filter(Boolean) as string[])
   for (const paragraph of text.split(/\n\s*\n/)) {
