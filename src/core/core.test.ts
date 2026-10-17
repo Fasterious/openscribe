@@ -1273,12 +1273,15 @@ describe('méthode « consultation » (Observatoire)', () => {
     const run = async (method?: 'consultation') => {
       const base = createSimulationProvider()
       const seen: Record<string, string> = {}
+      // Toutes les demandes de découpage : la première reçue dépend de l'ordre d'arrivée des lots (test instable sinon).
+      const extracts: string[] = []
       const spy: LlmProvider = {
         ...base,
         fingerprint: base.fingerprint,
         label: base.label,
         async complete(req) {
           seen[req.task] ??= req.user
+          if (req.task === 'extract') extracts.push(req.user)
           const res = await base.complete(req)
           // Le modèle range la première idée du premier groupe « Hors question ».
           if (method && req.task === 'group') {
@@ -1303,7 +1306,7 @@ describe('méthode « consultation » (Observatoire)', () => {
         },
       }
       const state = await runAnalysis(corpus, await newAnalysis(corpus, { ...DEFAULT_SETTINGS, method }, spy), { provider: spy, cache: new MemoryCache() })
-      return { state, seen }
+      return { state, seen, extracts }
     }
     const ref = await run()
     const c = await run('consultation')
@@ -1343,7 +1346,7 @@ describe('méthode « consultation » (Observatoire)', () => {
     expect(c.seen.summarize).toContain('Ne montre pas tes comptes')
     expect(ref.seen.summarize).not.toContain('Ne montre pas tes comptes')
     // Le découpage ne change pas : l'extraction déjà en cache reste valable.
-    expect(c.seen.extract).toBe(ref.seen.extract)
+    expect([...c.extracts].sort()).toEqual([...ref.extracts].sort())
   })
 
   it('le mot de l’échelle accompagne le chiffre nu (la base est dans le mot)', () => {
