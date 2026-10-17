@@ -1,7 +1,7 @@
 {
  "id": "an_6q3g4v3o013t",
  "createdAt": "2026-10-17T15:43:47.117Z",
- "updatedAt": "2026-10-17T15:53:56.116Z",
+ "updatedAt": "2026-10-17T15:55:36.262Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -21850,7 +21850,7 @@
    "id": "T10"
   }
  ],
- "globalSummary": "",
+ "globalSummary": "46 personnes portent un jugement positif d'ensemble sur la scolarisation de leurs enfants, que certaines nuancent ailleurs [I0094] ; la critique la plus partagée vise l'orientation des élèves : 27 des 28 personnes qui donnent un avis (large majorité) [I0234]. Côté satisfactions, l'enseignement privé est salué par 12 sur 14 (large majorité, fragile) [I0337].\n\nLes absences des enseignants ne suscitent que des critiques, chez les 25 personnes qui donnent un avis (unanime) [I0114]. La carte scolaire attire les reproches de 24 sur 29 (large majorité, fragile) [I0053], les démarches d'inscription ceux de 24 sur 34 (majorité) [I0141]. 24 sur 34 (majorité) critiquent la place de l'école publique face au privé [I0729]. La réforme du système éducatif est critiquée par 20 sur 24 (large majorité, fragile) [I0162], et les moyens des écoles par 19 sur 20 (large majorité) [I0022]. Pour la scolarisation des enfants handicapés, les critiques viennent de 18 sur 18 (unanime) [I0524].\n\n6 personnes font des propositions sur l'orientation des élèves ; l'une s'étonne que des cours jugés utiles ne soient pas obligatoires [I0152]. Autant demandent un meilleur contrôle des enseignants défaillants, l'une voulant pouvoir licencier ou mettre à pied un enseignant visé par les plaintes de plusieurs parents [I0019]. Sur les démarches d'inscription, 5 personnes font des propositions, comme des journées d'inscription et de visite organisées le week-end [I0137]. Une personne se demande si l'inégalité des enfants devant l'absentéisme des professeurs va changer [I0745], une autre s'interroge sur la réforme du bac que va vivre sa fille [I0846].",
  "steps": [
   {
    "id": "extract",
@@ -21878,19 +21878,19 @@
   },
   {
    "id": "report",
-   "state": "running",
+   "state": "done",
    "done": 0,
    "total": 0
   },
   {
    "id": "polish",
-   "state": "pending",
+   "state": "running",
    "done": 0,
-   "total": 0
+   "total": 84
   }
  ],
  "calls": {
-  "total": 437,
+  "total": 438,
   "cached": 421,
   "inputTokens": 0,
   "outputTokens": 0
@@ -22332,7 +22332,8 @@
   "418de5803c3a0a8b0559d6b4bd65e98add01fbd9f311edda6352d43385682e74",
   "01b0161302315378aec62479bc1ff24111acfd2fb6034104f1d0a6574d24c85b",
   "3e3e4b474221bac1e8d736dce4a0234815e0b0e76cd1ab00c96f1ad4922bd970",
-  "cf0f37d7066e072a5a508c9ae2ca7f9733813048395657f5cb87e151bb96ad22"
+  "cf0f37d7066e072a5a508c9ae2ca7f9733813048395657f5cb87e151bb96ad22",
+  "bff2390ab58bb4b541fc75dec6ecbcfdc7dac4d4920aa175b0b3f17f0a70df84"
  ],
  "status": "running",
  "names": [
