@@ -135,11 +135,11 @@ il doit être visible et daté.
 | Cinq catégories : positif, négatif, suggestion, question, constat | Identiques ; seuls positif et négatif sont des avis | Gardé |
 | Idées regroupées en motifs, avec titre, comptage de personnes par ton et synthèse appuyée sur les citations | Étapes 2 et 3 | Gardé |
 | Le motif est défini par son titre | Chaque motif a aussi une définition écrite (livre de codes) qui fixe ce qui compte comme positif ou négatif | Prolongé (16/10) |
-| Une idée va dans un motif | Avec l'option du chercheur, une idée peut compter dans deux motifs ; le balayage s'appuie sur cette option | Écart assumé (16/10, décision d'Arnaud) |
+| Une idée va dans un motif | Toujours vrai par défaut. Avec l'option du chercheur (codage en double, désactivée par défaut), une idée peut compter dans deux motifs ; sans l'option, le balayage ne fait que déplacer des idées | Modifié, en option (16/10, décision d'Arnaud) |
 | Des motifs aux thèmes, facultatif | Seulement s'il y a beaucoup de motifs | Gardé |
 | Mode libre par défaut, grille imposée possible | Identique | Gardé |
 | Pas de normalisation obligatoire des libellés | Identique | Gardé |
-| Séquençage en étapes, pour les points de contrôle et la traçabilité | Les six étapes ; l'étape 2 compte désormais plusieurs tours de relecture | Gardé, alourdi |
+| Séquençage en étapes, pour les points de contrôle et la traçabilité | Les six étapes, inchangées. Avec « consultation », l'étape 2 (des idées aux motifs, avant les thèmes) relit les motifs plusieurs fois au lieu d'une : livre de codes, seconde relecture, réconciliation, balayage. Tout se fait dans une seule analyse | Gardé ; plus long avec « consultation » |
 | Comptages par ton | Échelle d'avis, « fragile », « à vérifier », tous calculés par le code | Prolongé (13/10, 17/10) |
 
 ## Une référence pour repenser la méthode
