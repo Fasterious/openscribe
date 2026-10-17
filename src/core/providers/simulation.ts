@@ -122,6 +122,7 @@ export function createSimulationProvider(faults: SimulationFaults = {}): LlmProv
       }
       case 'review':
       case 'unanimity':
+      case 'sweep':
         // La simulation garde le rangement et le ton du regroupement.
         return { changes: [] }
       case 'support':

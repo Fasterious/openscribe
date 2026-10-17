@@ -111,6 +111,17 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     lines.push(
       `Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme positif, comme négatif, et ce qui ne compte pas comme un avis. Cette définition figure sous le titre du motif ; le positif et le négatif y obéissent, et le lecteur peut la contester.${state.reconciled?.pairs || state.reconciled?.merges ? ` Le livre de codes a ensuite été relu d'un bloc : ${[state.reconciled.pairs && `${state.reconciled.pairs} paire${state.reconciled.pairs > 1 ? 's' : ''} de motifs voisins relue${state.reconciled.pairs > 1 ? 's' : ''} ensemble avec une règle de partage`, state.reconciled.merges && `${state.reconciled.merges} fusion${state.reconciled.merges > 1 ? 's' : ''} de motifs qui traitaient le même objet`].filter(Boolean).join(' ; ')}.` : ''}`,
     )
+  if (state.swept?.motifs) {
+    const w = state.swept
+    const done = [
+      w.copied && `${w.copied} avis rangé${w.copied > 1 ? 's' : ''} ailleurs y ${w.copied > 1 ? 'comptent' : 'compte'} aussi`,
+      w.moved && `${w.moved} avis y ${w.moved > 1 ? 'ont' : 'a'} été déplacé${w.moved > 1 ? 's' : ''}`,
+      w.retoned && `${w.retoned} ton${w.retoned > 1 ? 's' : ''} corrigé${w.retoned > 1 ? 's' : ''}`,
+    ].filter(Boolean)
+    lines.push(
+      `Balayage par définition : ${w.motifs} motif${w.motifs > 1 ? 's' : ''} du résumé ${w.motifs > 1 ? 'ont' : 'a'} été confronté${w.motifs > 1 ? 's' : ''}, avec leur définition, à tous les avis rangés ailleurs ; ${done.length ? done.join(', ') : 'aucun avis mal rangé n’a été trouvé'}.`,
+    )
+  }
   if (state.support)
     lines.push(
       `Renvois vérifiés : chaque phrase des synthèses a été confrontée par le moteur d'IA aux verbatims qu'elle cite (${state.support.checked} phrases) ; ${state.support.fixed || 'aucune'} corrigée${state.support.fixed > 1 ? 's' : ''}, ${state.support.dropped || 'aucune'} retirée${state.support.dropped > 1 ? 's' : ''} faute d'appui${state.support.added ? ` ; le moteur d'IA en a ajouté ${state.support.added} pour un sujet ou un camp d'avis qui manquait` : ''}.${state.campsAdded ? ` Le code en a écrit ${state.campsAdded} pour un camp d'avis encore absent de la synthèse de son motif.` : ''}`,

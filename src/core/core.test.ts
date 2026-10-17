@@ -548,6 +548,71 @@ describe('codage en double, de bout en bout', () => {
   })
 })
 
+describe('balayage par définition', () => {
+  // Le moteur définit chaque motif à la relecture ; au balayage, il propose quatre changements, dont deux interdits.
+  const run = async (multiCoding: boolean) => {
+    const corpus = surveyCorpus()
+    const base = createSimulationProvider()
+    let sweep: { motifs: { id: string; ideas: { id: string }[] }[]; pool: { id: string }[] } | undefined
+    const spy: LlmProvider = {
+      ...base,
+      fingerprint: base.fingerprint,
+      label: base.label,
+      async complete(req) {
+        const res = await base.complete(req)
+        // Trois motifs assez peuplés pour figurer au résumé (le petit corpus en donne sinon une trentaine à un avis).
+        if (req.task === 'group') {
+          const out = JSON.parse(res.text) as { groups: { title: string; items: string[] }[] }
+          const items = out.groups.flatMap((g) => g.items)
+          const third = Math.ceil(items.length / 3)
+          return { ...res, text: JSON.stringify({ groups: [{ title: 'Accueil', items: items.slice(0, third) }, { title: 'Horaires', items: items.slice(third, 2 * third) }, { title: 'Tarifs', items: items.slice(2 * third) }] }) }
+        }
+        if (req.task === 'review' && !req.user.includes('"rule"')) {
+          const data = readDataBlock<{ groups: { id: string }[] }>(req.user)
+          const out = JSON.parse(res.text) as { changes: unknown[] }
+          return { ...res, text: JSON.stringify({ definitions: data.groups.map((g) => ({ id: g.id, positive: 'le juger utile', negative: 'le juger inutile' })), ...out }) }
+        }
+        if (req.task !== 'sweep') return res
+        sweep ??= readDataBlock(req.user)
+        const data = readDataBlock<{ motifs: { id: string; ideas: { id: string }[] }[]; pool: { id: string }[] }>(req.user)
+        const [m] = data.motifs
+        const [a, b] = data.pool
+        return {
+          ...res,
+          text: JSON.stringify({
+            changes: [
+              { id: a.id, also: m.id, category: 'negative' }, // accepté avec l'option
+              { id: b.id, to: m.id, category: 'positive' }, // accepté
+              { id: b.id, category: 'neutral' }, // refusé : le ton d'une idée qui n'est pas dans le motif balayé
+              { id: m.ideas[0].id, to: 'G999' }, // refusé : la cible n'est pas un motif balayé
+            ],
+          }),
+        }
+      },
+    }
+    const settings = { ...DEFAULT_SETTINGS, method: 'consultation' as const, multiCoding }
+    const state = await runAnalysis(corpus, await newAnalysis(corpus, settings, spy), { provider: spy, cache: new MemoryCache() })
+    return { state, sweep, corpus }
+  }
+  it('confronte les motifs du résumé à tous les avis rangés ailleurs ; le code ne garde que les changements permis', async () => {
+    const { state, sweep, corpus } = await run(true)
+    expect(state.status).toBe('done')
+    expect(sweep).toBeDefined()
+    // Le lot ne reçoit pas ses propres idées dans "pool".
+    const own = new Set(sweep!.motifs.flatMap((m) => m.ideas.map((i) => i.id)))
+    expect(sweep!.pool.some((x) => own.has(x.id))).toBe(false)
+    expect(state.swept).toMatchObject({ copied: 1, moved: 1 })
+    expect(state.swept!.retoned).toBeLessThanOrEqual(1)
+    expect(state.ideas.some((i) => i.category === 'neutral' && i.id === sweep!.pool[1].id)).toBe(false)
+    expect(reportToMarkdown(state, corpus, 'Test')).toContain('Balayage par définition :')
+  })
+  it('sans codage en double, une copie proposée est refusée, le déplacement reste', async () => {
+    const { state } = await run(false)
+    expect(state.swept).toMatchObject({ copied: 0, moved: 1 })
+    expect(state.ideas.some((i) => i.copyOf)).toBe(false)
+  })
+})
+
 describe('motifs soumis à la question « un ou deux objets ? »', () => {
   it('« et » partout ; « face à » et les motifs partagés de 8 personnes avec la méthode « consultation »', () => {
     const g = (title: string, stance: string, participants: number) => ({ title, metrics: { stance, participants } as unknown as Metrics })

@@ -35,6 +35,7 @@ import {
   reconcilePrompt,
   reconcileSchema,
   unanimityPrompt,
+  sweepPrompt,
   type UnanimityInput,
   reviewSchema,
   supportPrompt,
@@ -967,6 +968,61 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       }
       state.reconciled = { pairs: pairs.length, merges: merges.length }
     }
+    // Méthode qui le demande : chaque motif promis au résumé cherche dans tout le corpus les avis que sa définition réclame.
+    // Les relectures précédentes ne voient qu'un lot ou une paire ; les avis mal rangés restants sont aux frontières qu'elles
+    // ne couvraient pas. C'est la lecture du correcteur, faite avant la note.
+    if (codebook && methodOf(state.settings).sweep && definitions.size && groups.length > 1) {
+      const targets = sweepTargets(groups, ideaById, (g) => definitions.has(titleKey(g.title)))
+      if (targets.length) {
+        s.message = 'Balayage des motifs du résumé'
+        await emit()
+        const home = new Map(groups.flatMap((g) => g.ideaIds.map((id) => [id, g] as const)))
+        const batches: Group[][] = []
+        for (let k = 0; k < targets.length; k += SWEEP_BATCH) batches.push(targets.slice(k, k + SWEEP_BATCH))
+        const responses = await Promise.all(
+          batches.map(async (batch) => {
+            const inBatch = new Set(batch.map((g) => g.id))
+            const pool = state.ideas
+              .filter((i) => (i.category === 'positive' || i.category === 'negative') && home.get(i.id) && !inBatch.has(home.get(i.id)!.id))
+              .map((i) => ({ id: i.id, motif: home.get(i.id)!.title, participant: i.participantId, category: i.category, label: i.label, verbatim: shortExample(i.verbatim, 140) }))
+            const res = await runner.json(
+              sweepPrompt(
+                {
+                  motifs: batch.map((g) => ({
+                    id: g.id,
+                    title: g.title,
+                    definition: definitions.get(titleKey(g.title))!,
+                    ideas: g.ideaIds.map((id) => {
+                      const i = ideaById.get(id)!
+                      return { id, participant: i.participantId, category: i.category, verbatim: shortExample(i.verbatim, 160) }
+                    }),
+                  })),
+                  pool,
+                },
+                state.settings,
+              ),
+              reviewSchema,
+            )
+            // Le code ne garde que ce que le balayage peut faire : corriger le ton d'une idée d'un motif balayé,
+            // ou faire entrer dans un motif balayé (copie ou déplacement) une idée rangée ailleurs.
+            const pooled = new Set(pool.map((x) => x.id))
+            return res.changes.filter((c) => {
+              const target = c.to ?? c.also
+              if (!target) return !!c.category && inBatch.has(home.get(c.id)?.id ?? '')
+              if (!inBatch.has(target) || !pooled.has(c.id)) return false
+              return c.also ? multi.multiCoding : true
+            })
+          }),
+        )
+        const swept = applyReview(state.ideas, groups, responses.flat(), multi)
+        learn(swept.copied)
+        state.retoned = [...state.retoned, ...swept.retoned]
+        state.moved = [...state.moved, ...swept.moved]
+        state.copied = [...(state.copied ?? []), ...swept.copied]
+        state.swept = { motifs: targets.length, copied: swept.copied.length, moved: swept.moved.length, retoned: swept.retoned.length }
+        if (swept.retoned.length || swept.moved.length || swept.copied.length) groups = takeOffTopic(build(swept.groups))
+      }
+    }
     if (definitions.size) groups = groups.map((g) => (definitions.has(titleKey(g.title)) ? { ...g, definition: definitions.get(titleKey(g.title)) } : g))
     s.message = undefined
   }
@@ -1003,6 +1059,30 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
  * Motifs unanimes ou à large majorité (au moins 3 avis), chacun avec les idées de ton contraire rangées
  * dans d'autres motifs : le moteur dira lesquelles jugent le même objet (méthode « contexte »).
  */
+/** Motifs balayés par lot de demandes : chaque demande porte tout le corpus, quelques motifs la partagent. */
+const SWEEP_BATCH = 3
+/** Au plus autant de motifs balayés (sept demandes) : ceux que le résumé citera d'abord. */
+const SWEEP_MAX = 21
+/** Un motif des listes qui réunit autant d'avis est balayé même hors des six premiers : le résumé peut le citer avec son chiffre. */
+const SWEEP_BIG = 12
+
+/**
+ * Motifs promis au résumé : les six premiers de « Ce qui a marché », « Ce qui bloque » et « Ce qui divise » (ce que
+ * montrent les listes), plus tout motif de ces listes qui réunit au moins 12 avis. Les plus peuplés d'abord, sans
+ * doublon, et seulement ceux qui ont une définition.
+ */
+export function sweepTargets(groups: Group[], ideaById: Map<string, Idea>, defined: (g: Group) => boolean): Group[] {
+  const h = highlights(groups, ideaById)
+  const listed = [...h.strengths, ...h.blockers, ...h.divided]
+  const shown = [...h.strengths.slice(0, 6), ...h.blockers.slice(0, 6), ...h.divided.slice(0, 6)]
+  const ids = new Set([...shown, ...listed.filter((x) => x.of >= SWEEP_BIG)].map((x) => x.groupId))
+  const opinions = (g: Group) => g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
+  return groups
+    .filter((g) => ids.has(g.id) && defined(g))
+    .sort((a, b) => opinions(b) - opinions(a) || a.title.localeCompare(b.title))
+    .slice(0, SWEEP_MAX)
+}
+
 export function unanimityCheck(
   groups: Group[],
   ideas: Idea[],

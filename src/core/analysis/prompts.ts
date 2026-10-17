@@ -516,6 +516,43 @@ ${dataBlock(input)}`,
   }
 }
 
+// ─── Balayage par définition : un motif du résumé cherche ses avis dans tout le corpus ──
+
+export interface SweepInput {
+  motifs: {
+    id: string
+    title: string
+    definition: GroupDefinition
+    /** Avis déjà rangés dans le motif : leur ton se vérifie contre la définition. */
+    ideas: { id: string; participant: string; category: IdeaCategory; verbatim: string }[]
+  }[]
+  /** Avis rangés dans les autres motifs, chacun une seule fois. */
+  pool: { id: string; motif: string; participant: string; category: IdeaCategory; label: string; verbatim: string }[]
+}
+
+export function sweepPrompt(input: SweepInput, settings: AnalysisSettings) {
+  const double = settings.multiCoding
+    ? `3. Une idée réclamée qui juge AUSSI l'objet de son propre motif y reste et compte aussi ici, par une copie : {"id":"I0042","also":"G3","category":"negative"}, le ton jugé par rapport à ce motif-ci. Une idée réclamée qui ne juge pas l'objet de son motif d'origine y est déplacée : {"id":"I0042","to":"G3","category":"negative"}.`
+    : `3. Une idée réclamée qui ne juge pas l'objet de son motif d'origine y est déplacée : {"id":"I0042","to":"G3","category":"negative"}, le ton jugé par rapport à ce motif-ci. Une idée qui juge aussi l'objet de son propre motif y reste.`
+  return {
+    task: 'sweep',
+    system: SYSTEM,
+    user: `${context(settings)}Les motifs ci-dessous figurent au résumé : leurs chiffres seront lus et cités. Chacun a une définition (ce qui compte comme positif, comme négatif, et ce qui ne compte pas comme un avis). Vérifie ses comptes contre sa définition, sur tout le corpus.
+
+Règles :
+1. Pour chaque motif, lis sa définition, puis ses idées ("ideas"). Si le ton d'une idée contredit la définition, corrige-le : {"id":"I0042","category":"positive"} ; "neutral" si la définition la met hors camp.
+2. Parcours ensuite tout "pool" : des avis rangés dans d'autres motifs. Retiens une idée seulement si la définition du motif la réclame, c'est-à-dire si elle juge l'objet de ce motif lui-même. Exemple : pour « Attente en caisse » (négatif : se plaindre du temps passé à payer), « vingt minutes de queue pour deux articles », rangée dans « Horaires d'ouverture », est réclamée ; « le magasin ferme trop tôt » ne l'est pas.
+${double}
+4. Un mot en commun ne suffit pas : la définition doit réclamer l'idée. Dans le doute, ne change rien ; la plupart des avis sont bien rangés.
+${methodRules(settings, 'sweep')}${lang(settings)}
+
+Réponds avec : {"changes":[…]}
+
+${dataBlock(input)}`,
+    json: true,
+  }
+}
+
 // ─── Étape 3 : synthèse des groupes ──────────────────────────────────────────
 
 export interface SummaryGroupInput {

@@ -222,6 +222,8 @@ export interface AnalysisState {
   removedSentences?: number
   /** Réconciliation du livre de codes (méthodes qui la demandent) : paires de motifs relues ensemble, fusions appliquées. */
   reconciled?: { pairs: number; merges: number }
+  /** Balayage par définition : motifs du résumé confrontés à tout le corpus, et ce que le code en a appliqué. */
+  swept?: { motifs: number; copied: number; moved: number; retoned: number }
   /** Codage en double : les copies créées à la relecture (identifiant de la copie, motif d'origine, motif d'accueil). */
   copied?: { id: string; from: string; to: string }[]
   /** Bilan de la relecture : textes relus, modifiés, et réécritures refusées par le contrôle. */

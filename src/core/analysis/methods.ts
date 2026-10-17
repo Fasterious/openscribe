@@ -30,7 +30,7 @@ export interface Method {
   /** Après la consolidation, chaque motif porté par une seule personne est proposé au rattachement à un motif existant (ou à aucun). */
   attachSingles: boolean
   /** Règles ajoutées à la fin des règles d'une consigne, pour cette méthode seulement (la référence n'en a aucune). */
-  extraRules: Partial<Record<'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish' | 'unanimity' | 'support', string>>
+  extraRules: Partial<Record<'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish' | 'unanimity' | 'support' | 'sweep', string>>
   /** Au regroupement, chaque libellé arrive avec plusieurs verbatims et leur ton (la référence : un seul exemple). */
   groupingContext?: boolean
   /** Après la relecture, chaque motif unanime ou à large majorité est confronté aux idées de ton contraire rangées ailleurs. */
@@ -57,6 +57,8 @@ export interface Method {
   reconcile?: boolean
   /** La question « un ou deux objets ? » est posée aussi pour un titre « X face à Y » et pour un motif aux avis partagés d'au moins 8 personnes. */
   splitChecks?: boolean
+  /** Balayage par définition : chaque motif promis au résumé est confronté, avec sa définition, à tous les avis du corpus (livre de codes requis). */
+  sweep?: boolean
 }
 
 const REFERENCE: Method = {
@@ -182,6 +184,10 @@ export const METHODS: Record<MethodId, Method> = {
     // d'un côté, ses critiques dans « École publique face au privé » ; la gratuité de l'école contre le coût du supérieur).
     reconcile: true,
     splitChecks: true,
+    // Passe 12 : aux passes 8 à 11, le plafond tombe chaque fois sur une frontière que les paires relues ne couvraient pas
+    // (éloges de l'école publique dans « Expérience globale », plaintes d'éloignement hors de « Proximité »). Le motif du
+    // résumé cherche lui-même, dans tout le corpus, les avis que sa définition réclame : la posture du correcteur.
+    sweep: true,
     offTopic: true,
     scaleInLines: true,
     // Passe 3 (15/10) : une idée déplacée vers un motif voisin faute de mieux (le bon motif était ouvert par un autre lot) y gardait son ton.
@@ -243,7 +249,7 @@ export const METHODS: Record<MethodId, Method> = {
 /** Les règles propres à une méthode pour une consigne, prêtes à insérer (rien pour la référence). */
 export function methodRules(
   settings: Pick<AnalysisSettings, 'method'> & { lightModel?: boolean },
-  prompt: 'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish' | 'unanimity' | 'support',
+  prompt: 'extract' | 'grouping' | 'assign' | 'review' | 'summary' | 'themes' | 'global' | 'polish' | 'unanimity' | 'support' | 'sweep',
 ): string {
   const r = methodOf(settings).extraRules[prompt]
   return r ? `${r}\n` : ''
