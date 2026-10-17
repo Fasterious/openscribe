@@ -2264,8 +2264,15 @@ function verifyNumbers(corpus: Corpus, state: AnalysisState) {
   for (const g of state.groups) ({ text: g.summary, bad: g.unverified } = clean({ text: g.summary, bad: g.unverified }))
   for (const t of state.themes) ({ text: t.summary, bad: t.unverified } = clean({ text: t.summary, bad: t.unverified }))
   // Une phrase de motif ou de thème restée sans renvoi après la vérification n'est pas livrée : rien ne permet de la contrôler.
-  const unreferenced = (text: string) => {
-    const r = dropUnreferenced(text)
+  // Sauf la phrase qui dit le compte du motif (« les 5 personnes qui donnent un avis (unanime) ») : ses chiffres sont ceux du code
+  // (passe 16, la relecture avait coupé de ses renvois la première phrase d'un motif).
+  const unreferenced = (text: string, metrics?: Metrics) => {
+    const own = metrics ? allowedNumbers([metrics], []) : null
+    const counted = (x: string) => {
+      const found = numbersIn(x)
+      return !!own && /qui donnent un avis/.test(x) && found.length > 0 && found.every((n) => own.has(n.value))
+    }
+    const r = dropUnreferenced(text, counted)
     removed += r.removed
     return r.text
   }
@@ -2281,7 +2288,7 @@ function verifyNumbers(corpus: Corpus, state: AnalysisState) {
     removed += r.removed + d.removed
     return d.text
   }
-  for (const g of state.groups) g.summary = countsInDigits(unreferenced(quoted(g.summary)))
+  for (const g of state.groups) g.summary = countsInDigits(unreferenced(quoted(g.summary), g.metrics))
   for (const t of state.themes) t.summary = countsInDigits(unreferenced(quoted(t.summary)))
   state.globalSummary = countsInDigits(quoted(state.globalSummary))
   ;({ text: state.globalSummary, bad: state.globalUnverified } = clean({ text: state.globalSummary, bad: state.globalUnverified }))
@@ -2361,11 +2368,11 @@ export function dropNearDuplicates(text: string): { text: string; removed: numbe
   return removed ? { text: paragraphs.map((p) => p.join(' ')).filter(Boolean).join('\n\n'), removed } : { text, removed: 0 }
 }
 
-/** Retire les phrases sans renvoi, paragraphe par paragraphe, sans jamais vider le texte. */
-export function dropUnreferenced(text: string): { text: string; removed: number } {
+/** Retire les phrases sans renvoi, paragraphe par paragraphe, sans jamais vider le texte (sauf celles que `keep` garde). */
+export function dropUnreferenced(text: string, keep: (sentence: string) => boolean = () => false): { text: string; removed: number } {
   if (!text || !/I\d{4,}/.test(text)) return { text, removed: 0 }
   const paragraphs = sentencesOf(text)
-  const keptParts = paragraphs.map((p) => dropWithDependents(p, (x) => !/I\d{4,}/.test(x)))
+  const keptParts = paragraphs.map((p) => dropWithDependents(p, (x) => !/I\d{4,}/.test(x) && !keep(x)))
   const removed = paragraphs.flat().length - keptParts.flat().length
   return { text: keptParts.map((p) => p.join(' ')).filter(Boolean).join('\n\n'), removed }
 }

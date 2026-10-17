@@ -404,8 +404,9 @@ export function refsToPeople(
       .replace(/\s+([.,])/g, '$1')
       // Deux renvois identiques dans la même phrase : on ne garde que le dernier.
       .replace(/\s*\(((?:notamment )?)([^()]*P\d+[^()]*)\)(?=[^.!?]*\(\1\2\))/g, '')
-      // Un renvoi qui suit un chiffre entre parenthèses entre dans la même parenthèse : « (29 des 34 participants ; notamment P13) ».
-      .replace(/\(([^()]*\d[^()]*)\)\s*\(((?:notamment )?[^()]*P\d+[^()]*)\)/g, (all, figure: string, refs: string) =>
+      // Un renvoi qui suit un chiffre ou le mot de l'échelle entre parenthèses entre dans la même parenthèse :
+      // « (29 des 34 participants ; notamment P13) », « (large majorité, fragile ; notamment P41) ».
+      .replace(/\(([^()]*(?:\d|unanime|majorité|fragile|partagés|peu d'avis)[^()]*)\)\s*\(((?:notamment )?[^()]*P\d+[^()]*)\)/g, (all, figure: string, refs: string) =>
         /P\d+/.test(figure) ? all : `(${figure} ; ${refs})`,
       )
   )

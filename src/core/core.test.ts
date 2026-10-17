@@ -1240,6 +1240,11 @@ describe('phrase qui dépend d’une phrase retirée', () => {
     )
     expect(dropUnreferenced('Le tri plaît. Six critiquent en revanche le délai [I0001]. Le site est lent [I0002].').text).toBe('Le site est lent [I0002].')
     expect(dropUnreferenced('Le tri plaît [I0001]. Elles soulignent la rapidité [I0002].').text).toBe('Le tri plaît [I0001]. Elles soulignent la rapidité [I0002].')
+    // La phrase qui dit le compte du motif reste, même sans renvoi, si le code l'en juge appuyée.
+    const counted = (x: string) => /qui donnent un avis/.test(x)
+    expect(dropUnreferenced('La piscine déçoit les 5 personnes qui donnent un avis (unanime). 2 regrettent les horaires [I0001].', counted).text).toBe(
+      'La piscine déçoit les 5 personnes qui donnent un avis (unanime). 2 regrettent les horaires [I0001].',
+    )
     // Une reprise (« Cette dernière », « La seconde ») part avec la phrase qu'elle reprend.
     expect(dropUnreferenced('Une personne juge le site lent. Cette dernière propose un mode hors ligne [I0001]. Le tri plaît [I0002].').text).toBe(
       'Le tri plaît [I0002].',
@@ -1766,6 +1771,9 @@ describe('phrases écrites par le code', () => {
     const byId = new Map(['I0001', 'I0002'].map((id, k) => [id, { id, participantId: `P${k + 1}` } as Idea]))
     expect(refsToPeople('Une large majorité critique les horaires (9 des 10 participants qui donnent un avis) [I0001, I0002].', byId)).toBe(
       'Une large majorité critique les horaires (9 des 10 participants qui donnent un avis ; notamment P1, P2).',
+    )
+    expect(refsToPeople('La piscine est critiquée par 9 des 10 personnes qui donnent un avis (large majorité, fragile) [I0001, I0002].', byId)).toBe(
+      'La piscine est critiquée par 9 des 10 personnes qui donnent un avis (large majorité, fragile ; notamment P1, P2).',
     )
     // Deux renvois de suite ne fusionnent pas.
     expect(refsToPeople('Deux personnes le disent [I0001] [I0002].', byId)).toBe('Deux personnes le disent (P1) (P2).')
