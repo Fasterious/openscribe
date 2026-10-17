@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 
 const shot = (page: Page, name: string) => page.screenshot({ path: `e2e/screenshots/${test.info().project.name}-${name}.png`, fullPage: true })
@@ -51,29 +51,39 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await noHorizontalScroll(page)
   await shot(page, '1-accueil')
 
-  // Un clic sur une étude de l'Observatoire ouvre sa version interactive, dans l'application.
+  // Un clic sur une étude de l'Observatoire ouvre l'article : tout le rapport sur une page, qui se déplie au toucher.
   await page.getByRole('link', { name: /L'école vue par les familles/ }).click()
-  await expect(page).toHaveURL(/#\/observatoire\/ecole-grand-debat-2019$/)
+  await expect(page).toHaveURL(/\/observatoire\/ecole-grand-debat-2019\/$/)
+  await expect(page.getByText('Méthode et limites').first()).toBeVisible()
+  await noHorizontalScroll(page)
+  const tap = async (l: Locator) => (testInfo.project.name === 'mobile' ? l.tap() : l.click())
+  const group = page.locator('section.group').nth(1)
+  // La définition du motif est pliée : la synthèse se lit d'abord.
+  await expect(group.locator('details.def')).not.toHaveAttribute('open', '')
+  // Un renvoi (P12) déplie ses verbatims ; un verbatim, sa réponse entière avec le passage cité en gras.
+  await tap(group.locator('a.ref').first())
+  await expect(group.locator('.panel .q').first()).toBeVisible()
+  await tap(group.locator('.panel .q').first())
+  await expect(group.locator('.panel .ctx strong').first()).toBeVisible()
+  // Un « ? » déplie l'explication d'une étiquette.
+  await tap(group.locator('button.help').first())
+  await expect(group.locator('.panel .tip').first()).toContainText('donnent un avis')
+  // Les deux versions se répondent : l'application, puis retour à l'article.
+  await page.getByRole('link', { name: "Ouvrir dans l'application" }).click()
   await expect(page.getByRole('heading', { name: 'En bref' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
   await noHorizontalScroll(page)
-  // Un motif se déplie ; un verbatim montre la réponse entière, son passage cité en gras.
   const motif = page.locator('details').filter({ has: page.locator('h3, h4') }).nth(2)
   await motif.locator('h3, h4').first().click()
-  const quote = motif.getByRole('button', { name: /^«/ }).first()
-  if (testInfo.project.name === 'mobile') await quote.tap()
-  else await quote.click()
+  await tap(motif.getByRole('button', { name: /^«/ }).first())
   await expect(motif.locator('mark').first()).toBeVisible()
-  await expect(motif.getByRole('button', { name: 'Replier' })).toBeVisible()
-  // Les deux versions se répondent : document, puis retour à l'interactive.
-  await page.getByRole('link', { name: 'Version document' }).click()
+  await page.getByRole('link', { name: 'Lire en une page' }).click()
   await expect(page.getByText('Méthode et limites').first()).toBeVisible()
-  await noHorizontalScroll(page)
-  await page.getByRole('link', { name: 'Explorer la version interactive' }).click()
+  await page.getByRole('link', { name: "Ouvrir dans l'application" }).click()
   await expect(page.getByRole('heading', { name: 'En bref' })).toBeVisible()
   await page.getByRole('link', { name: "Toutes les études de l'Observatoire" }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText("L'Observatoire")
-  await page.getByRole('link', { name: 'Version document' }).first().click()
+  await page.getByRole('link', { name: /L'école vue par les familles/ }).click()
   await page.getByRole('link', { name: "← Toutes les études de l'Observatoire" }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText("L'Observatoire")
   await page.getByRole('navigation', { name: 'Menu' }).getByRole('link', { name: 'Accueil' }).click()

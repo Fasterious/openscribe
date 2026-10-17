@@ -4,7 +4,8 @@ import { presetById } from '../providers/presets'
 import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, MINORITY_HELP, STANCE_HELP } from './glossary'
 import { dividedFragile, fragileShown, highlights, labelDoubt, type Highlight, type Highlights } from './highlights'
 import { withCurrentMetrics } from './metrics'
-import { maskNames } from './names'
+import { maskNames, maskWithOffsets } from './names'
+import { ARTICLE_SCRIPT, scriptJson } from './article'
 import { describeTheme } from './pipeline'
 import type { AnalysisState, Group, GroupDefinition, Idea, IdeaCategory, Metrics } from './types'
 
@@ -361,7 +362,8 @@ const REFS = /\[(I\d{4,}(?:\s*,\s*I\d{4,})*)\]/g
 export function refsToPeople(
   text: string,
   byId: Map<string, Idea>,
-  link?: (who: string, idea: Idea) => string,
+  /** `ideas` : toutes les idées de cette personne citées par le renvoi (la page HTML les déplie au clic). */
+  link?: (who: string, idea: Idea, ideas: Idea[]) => string,
   /** Combien de personnes donnent un avis sur le motif d'une idée : « toutes les personnes » ne se renvoie sans « notamment » que si toutes sont citées. */
   sizeOf?: (ideaId: string) => number,
 ): string {
@@ -380,16 +382,16 @@ export function refsToPeople(
         const claimed = claimedPeople(sentence)
         const tag = (claimed || universal) > cited ? 'notamment ' : ''
         return sentence.replace(REFS, (_, ids: string) => {
-          const seen = new Map<string, Idea>()
+          const seen = new Map<string, Idea[]>()
           for (const id of ids.split(/\s*,\s*/)) {
             const idea = byId.get(id)
-            if (idea && !seen.has(idea.participantId)) seen.set(idea.participantId, idea)
+            if (idea) seen.set(idea.participantId, [...(seen.get(idea.participantId) ?? []), idea])
           }
           if (!seen.size) return ''
           const people = [...seen].sort(([a], [b]) => a.localeCompare(b, 'fr', { numeric: true }))
           // « notamment » annonce des exemples, pas une liste : trois personnes au plus (plume, passe 8 : jusqu'à douze).
           const shown = tag ? people.slice(0, 3) : people
-          return `(${tag}${shown.map(([who, idea]) => (link ? link(who, idea) : who)).join(', ')})`
+          return `(${tag}${shown.map(([who, ideas]) => (link ? link(who, ideas[0], ideas) : who)).join(', ')})`
         })
       })
       .join('')
@@ -558,7 +560,7 @@ const BAR_WORD: Record<IdeaCategory, [string, string]> = {
 
 /** « 3 avis positifs (dont 1 mitigé), 1 suggestion » : ce que dit la barre, pour un lecteur d'écran ou une infobulle. */
 export function categoryBarLabel(m: Metrics): string {
-  return `Participants par liste : ${categoryBar(m)
+  return `Participants par catégorie : ${categoryBar(m)
     .map(({ cat, people }) => {
       const mixed = cat === 'positive' || cat === 'negative' ? m.mixed.length : 0
       return `${people} ${BAR_WORD[cat][people > 1 ? 1 : 0]}${mixed ? ` (dont ${mixed} mitigé${mixed > 1 ? 's' : ''})` : ''}`
@@ -854,7 +856,36 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
   const sizeOf = motifSizes(state)
   const alsoIn = alsoInOf(state)
   // Chaque référence d'une synthèse devient le code du participant, relié à son verbatim (survol : la citation).
-  const link = (who: string, i: Idea) => `<a href="#${e(i.id)}" title="« ${e(v.text(i.verbatim))} »">${e(who)}</a>`
+  // Un clic sur le renvoi déplie les verbatims de cette personne sous le paragraphe (sans script : saut vers le verbatim).
+  const link = (who: string, i: Idea, all: Idea[]) =>
+    `<a class="ref" href="#${e(i.id)}" data-i="${e(all.map((x) => x.id).join(','))}" title="« ${e(v.text(i.verbatim))} »" aria-expanded="false">${e(who)}</a>`
+  // Les réponses entières autour des verbatims affichés, prénoms masqués comme le reste (positions recalculées).
+  const names = state.settings.maskNames ? state.names : undefined
+  const contributionById = new Map(corpus.contributions.map((c) => [c.id, c]))
+  const questions: string[] = []
+  const context: { q: string[]; c: Record<string, [number, string]>; i: Record<string, [string, [number, number][]]> } = { q: questions, c: {}, i: {} }
+  const offsets = new Map<string, (pos: number) => number>()
+  const withContext = (i: Idea) => {
+    const c = contributionById.get(i.contributionId)
+    if (!c) return
+    if (!offsets.has(c.id)) {
+      const m = maskWithOffsets(c.text, names)
+      offsets.set(c.id, m.at)
+      const prompt = c.prompt?.replace(/^[^\p{L}\p{N}]+/u, '')
+      let q = prompt ? questions.indexOf(prompt) : -1
+      if (prompt && q < 0) q = questions.push(prompt) - 1
+      context.c[c.id] = [q, m.text]
+    }
+    const at = offsets.get(c.id)!
+    context.i[i.id] = [c.id, (i.parts ?? [i.span]).map((p) => [at(p.start), at(p.end)])]
+  }
+  // Un verbatim : cliquable, il déplie sa réponse entière.
+  const quote = (i: Idea) => {
+    withContext(i)
+    return `<span id="${e(i.id)}" class="q" role="button" tabindex="0" aria-expanded="false">« ${e(v.text(i.verbatim))} »</span>`
+  }
+  // Une explication : au survol (title) et au toucher (bouton « ? »).
+  const help = (text: string) => ` <button type="button" class="help" data-help="${e(text)}" title="${e(text)}" aria-label="Explication">?</button>`
   const para = (text: string) =>
     v
       .text(text)
@@ -892,7 +923,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
                   const q = v.question(i)
                   const ctx = full.has(i.id) ? v.context(i) : undefined
                   const origin = [q, ctx && `en réponse à « ${ctx} »`, alsoIn(i) && `aussi dans « ${alsoIn(i)} »`].filter(Boolean).join(', ')
-                  return `<span id="${e(i.id)}">« ${e(v.text(i.verbatim))} »</span>${origin ? ` <span class="origin">${e(origin)}</span>` : ''}`
+                  return `${quote(i)}${origin ? ` <span class="origin">${e(origin)}</span>` : ''}`
                 })
                 .join(' ; ')}</li>`,
           )
@@ -901,18 +932,20 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
       .join('')
     const note = both.size ? `<p class="facts">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>` : ''
     const dominant = dominantVoice(ideasOf(g, byId))
-    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts" title="${e(stanceTitle(g.metrics))}">${e(metricsLine(g.metrics))}</p>${g.definition ? `<p class="facts">${e(definitionLine(g.definition))}</p>` : ''}${labelDoubt(g, byId) ? `<p class="facts" title="${e(helpText({ ...DOUBT_HELP, what: '' }))}"><strong>${e(cap(labelDoubt(g, byId)!))}.</strong></p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
+    // La synthèse se lit en premier ; la définition du motif, explication secondaire, reste pliée (remarque d'Arnaud, 17/10).
+    const doubt = labelDoubt(g, byId)
+    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}${help(stanceTitle(g.metrics))}</p>${doubt ? `<p class="facts"><strong>${e(cap(doubt))}.</strong>${help(helpText({ ...DOUBT_HELP, what: '' }))}</p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="synth">${para(g.summary)}</div>` : ''}${g.definition ? `<details class="def"><summary>Ce qui compte comme positif ou négatif dans ce motif</summary><p>${e(definitionLine(g.definition))}</p></details>` : ''}${blocks}${note}</section>`
   }
 
   if (opts.stale) parts.push(`<p class="facts"><strong>${e(STALE_NOTE)}</strong></p>`)
   const sections = highlightSections(state)
   const doubts = summaryDoubts(sections)
-  if (state.globalSummary) parts.push(`<h2>Résumé</h2>${para(state.globalSummary)}${doubts ? `<p class="facts" title="${e(helpText({ ...DOUBT_HELP, what: '' }))}">${e(doubts)}</p>` : ''}`)
+  if (state.globalSummary) parts.push(`<h2>Résumé</h2>${para(state.globalSummary)}${doubts ? `<p class="facts">${e(doubts)}${help(helpText({ ...DOUBT_HELP, what: '' }))}</p>` : ''}`)
   for (const sec of sections) {
     const items = sec.items
       .map(
         (x) =>
-          `<li class="${SECTION_CLASS[sec.key]}"><strong>${e(x.title)}</strong> — ${e(x.detail)}${x.fragile ? ` · <abbr title="${e(helpText(FRAGILE_HELP))}">fragile</abbr>` : ''}${x.doubt ? ` · <abbr title="${e(helpText(DOUBT_HELP))}">${e(x.doubt)}</abbr>` : ''}${x.quotes.length ? `<ul>${x.quotes.map((q) => `<li class="quote">« ${e(q.text)} » <span class="who">${e(q.who)}</span></li>`).join('')}</ul>` : ''}</li>`,
+          `<li class="${SECTION_CLASS[sec.key]}"><strong>${e(x.title)}</strong> — ${e(x.detail)}${x.fragile ? ` · <button type="button" class="mark" data-help="${e(helpText(FRAGILE_HELP))}" title="${e(helpText(FRAGILE_HELP))}">fragile</button>` : ''}${x.doubt ? ` · <button type="button" class="mark" data-help="${e(helpText(DOUBT_HELP))}" title="${e(helpText(DOUBT_HELP))}">${e(x.doubt)}</button>` : ''}${x.quotes.length ? `<ul>${x.quotes.map((q) => `<li class="quote">« ${e(q.text)} » <span class="who">${e(q.who)}</span></li>`).join('')}</ul>` : ''}</li>`,
       )
       .join('')
     const more = sec.more.length ? `<li class="more">Et aussi : ${e(sec.more.join(' · '))}</li>` : ''
@@ -940,7 +973,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
   if (off.ideas)
     parts.push(
       `<section class="group"><h2>Hors question</h2><p class="facts">${e(OFF_TOPIC_INTRO)}</p><ul>${off.lines
-        .map((l) => `<li class="neutral"><span class="who">${e(l.participantId)}</span> ${l.ideas.map((i) => `<span id="${e(i.id)}">« ${e(v.text(i.verbatim))} »</span>`).join(' ; ')}</li>`)
+        .map((l) => `<li class="neutral"><span class="who">${e(l.participantId)}</span> ${l.ideas.map(quote).join(' ; ')}</li>`)
         .join('')}</ul></section>`,
     )
   parts.push(
@@ -962,7 +995,13 @@ h3{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line)}h4{margin-t
 .facts{color:var(--muted);font-size:.9rem;margin:.3rem 0}
 .bar{display:flex;height:.55rem;max-width:16rem;border-radius:99px;overflow:hidden;background:var(--line);margin:.4rem 0 .2rem;gap:2px}
 [id]{scroll-margin-top:5rem}.b-positive{background:var(--pos)}.b-negative{background:var(--neg)}.b-suggestion{background:var(--sug)}.b-question{background:var(--que)}.b-neutral{background:var(--neu)}
-.summary{background:var(--card);border-radius:.5rem;padding:.2rem 1rem;margin:.6rem 0}
+.synth{margin:.6rem 0}
+.def{margin:.2rem 0 .6rem}.def>summary{font-weight:500;font-size:.85rem;color:var(--muted)}.def>p{background:var(--card);border-radius:.4rem;padding:.5rem .8rem;margin:.3rem 0;font-size:.9rem;color:var(--muted)}
+.ref,.q{cursor:pointer}.q{border-bottom:1px dotted var(--line)}.q:hover,.q[aria-expanded=true]{border-bottom-color:var(--brand)}
+.help,.mark{font:inherit;color:var(--brand);background:none;border:0;padding:0;cursor:pointer}.help{display:inline-flex;align-items:center;justify-content:center;width:1.15rem;height:1.15rem;border:1px solid var(--line);border-radius:99px;font-size:.75rem;vertical-align:.05rem}.mark{border-bottom:1px dotted var(--brand)}
+.panel{margin:.4rem 0 .6rem;padding-left:.8rem;border-left:2px solid var(--brand)}.panel p{margin:.25rem 0}
+.ctx-q{color:var(--muted);font-size:.85rem;font-style:italic}.ctx-t{white-space:pre-wrap;color:var(--muted)}.ctx-t strong{color:var(--ink)}.tip{color:var(--muted);font-size:.9rem}
+.fold{font:inherit;font-size:.85rem;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 details{margin:.6rem 0}summary{cursor:pointer;font-weight:600;font-size:.95rem}
 .cat-positive>summary{color:var(--pos)}.cat-negative>summary{color:var(--neg)}.cat-suggestion>summary{color:var(--sug)}.cat-question>summary{color:var(--que)}.cat-neutral>summary{color:var(--muted)}
 ul{padding-left:0}li{margin:.35rem 0;list-style:none}
@@ -971,10 +1010,12 @@ li.positive{border-color:var(--pos)}li.negative{border-color:var(--neg)}li.sugge
 li.quote{font-style:italic;margin-left:.8rem;border-color:var(--line)}li.more{color:var(--muted)}
 .who{display:inline-block;min-width:2.2rem;font-weight:600;color:var(--muted);font-size:.8rem}.origin{color:var(--muted);font-size:.8rem}
 a{color:var(--brand);text-decoration:none;border-bottom:1px dotted var(--brand)}:target{background:#fff3c4}
-@media print{details{display:block}details>summary{list-style:none}a{color:inherit;border:0}.bar,li,.summary{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media print{details{display:block}details>summary{list-style:none}a{color:inherit;border:0}.panel,.help,.fold{display:none}.bar,li,.def>p{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style></head><body>
 <h1>${e(title)}</h1>
 ${parts.join('\n')}
 <footer><p class="facts">Rapport produit avec OpenScribe, outil libre de recherche utilisateur.</p></footer>
+<script type="application/json" id="os-data">${scriptJson(context)}</script>
+<script>${ARTICLE_SCRIPT}</script>
 </body></html>`
 }

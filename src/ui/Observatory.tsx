@@ -10,7 +10,7 @@ const paras = (t: string) => t.split(/\n+/).filter((p) => p.trim())
 
 /**
  * Une étude de l'Observatoire lue dans l'application : le rapport de Synthèse, en lecture seule, avec sa fiche.
- * Le fichier publié est déjà masqué (prénoms) ; la version document reste à un lien, pour lire d'un trait ou imprimer.
+ * Le fichier publié est déjà masqué (prénoms) ; l'article (« Lire en une page ») reste à un lien, pour lire d'un trait ou imprimer.
  */
 export function ObservatoryPage({ slug }: { slug: string }) {
   const [study, setStudy] = useState<PublishedStudy | null | undefined>(undefined)
@@ -45,7 +45,7 @@ export function ObservatoryPage({ slug }: { slug: string }) {
         <div className="space-y-1">
           <h1 className="text-2xl font-bold sm:text-3xl">{study.title}</h1>
           <p className="text-sm text-muted-foreground">
-            Publié le {date(study.publishedAt)}
+            Publiée le {date(study.publishedAt)}
             {study.news && ` · ${study.news}`}
           </p>
         </div>
@@ -54,7 +54,7 @@ export function ObservatoryPage({ slug }: { slug: string }) {
             href={`/observatoire/${study.slug}/`}
             className="inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-card px-3 text-sm font-medium hover:bg-accent"
           >
-            <FileText className="size-4" /> Version document
+            <FileText className="size-4" /> Lire en une page
           </a>
           <div id={TAB_ACTIONS} className="flex flex-wrap items-center gap-2" />
         </div>

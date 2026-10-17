@@ -598,6 +598,22 @@ describe('explications des marques de méthode', () => {
     const html = reportToHtml(state, corpus, 'Test')
     expect(html).toContain(`title="${helpText(STANCE_HELP[state.groups[0].metrics.stance]).slice(0, 40)}`)
   })
+  it('la page article : renvois et verbatims dépliables, réponses entières masquées, définition pliée', async () => {
+    const corpus = surveyCorpus()
+    const provider = createSimulationProvider()
+    const state = await runAnalysis(corpus, await newAnalysis(corpus, DEFAULT_SETTINGS, provider), { provider, cache: new MemoryCache() })
+    // Un mot d'une réponse joue le prénom à masquer.
+    const word = corpus.contributions.map((c) => c.text.match(/\p{Lu}\p{Ll}{4,}/u)?.[0]).find(Boolean)!
+    const html = reportToHtml({ ...state, names: [word], settings: { ...state.settings, maskNames: true } }, corpus, 'Test')
+    const data = JSON.parse(html.match(/<script type="application\/json" id="os-data">([\s\S]*?)<\/script>/)![1].replace(/\\u003c/g, '<'))
+    expect(Object.keys(data.i).length).toBeGreaterThan(0)
+    expect(JSON.stringify(data)).not.toMatch(new RegExp(`(?<![\\p{L}])${word}(?![\\p{L}])`, 'u'))
+    expect(html).toContain('class="q" role="button"')
+    expect(html).not.toContain('class="summary"')
+    // Chaque idée affichée retrouve sa réponse : le passage cité tient dans le texte.
+    for (const [, [c, spans]] of Object.entries(data.i) as [string, [string, [number, number][]]][])
+      for (const [a, b] of spans) expect(b).toBeLessThanOrEqual(data.c[c][1].length)
+  })
   it('l’explication d’une ligne de chiffres dit aussi ce qu’est une minorité constante', async () => {
     const { MINORITY_HELP } = await import('./analysis/glossary')
     const ideas = [...['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10'].map((p, k) => idea(`I0${k}`, p, 'negative')), ...['P11', 'P12'].map((p, k) => idea(`I1${k}`, p, 'positive'))]
@@ -1785,7 +1801,7 @@ describe('rapport', () => {
     ])
     expect(opinionSquares(m)).toBe('🟥🟥🟥🟩🟩🟪⬜')
     expect(opinionSquares(m, 5)).toBe('')
-    expect(categoryBarLabel(m)).toBe('Participants par liste : 3 avis négatifs (dont 1 mitigé), 2 avis positifs (dont 1 mitigé), 1 suggestion, 1 constat')
+    expect(categoryBarLabel(m)).toBe('Participants par catégorie : 3 avis négatifs (dont 1 mitigé), 2 avis positifs (dont 1 mitigé), 1 suggestion, 1 constat')
   })
 
   it('« notamment » quand la phrase compte plus de personnes que les renvois, numéros triés', () => {

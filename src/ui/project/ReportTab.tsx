@@ -839,7 +839,7 @@ export function ReportTab({
               <span className={`inline-block size-2.5 rounded-full ${BAR[cat]}`} /> {LEGEND[cat]}
             </span>
           ))}
-          <span>(en participants ; une personne mitigée compte dans les deux couleurs d'avis)</span>
+          <span>(nombre de participants ; une personne mitigée compte à la fois en positif et en négatif)</span>
         </div>
         <ul className="grid gap-2 sm:grid-cols-2">
           {overview

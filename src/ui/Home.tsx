@@ -368,7 +368,7 @@ function ObservatoireStudies() {
       {studies.map((s) => (
         <a
           key={s.slug}
-          href={href({ name: 'observatory', slug: s.slug })}
+          href={`/observatoire/${s.slug}/`}
           className="group flex items-start gap-3 rounded-xl border bg-card p-5 transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-ring"
         >
           <span className="mt-0.5 text-primary [&_svg]:size-5">
@@ -376,7 +376,7 @@ function ObservatoireStudies() {
           </span>
           <span className="space-y-1">
             <span className="block font-semibold group-hover:text-primary">{s.title}</span>
-            <span className="block text-sm text-muted-foreground">Publié le {date(s.publishedAt)}</span>
+            <span className="block text-sm text-muted-foreground">Publiée le {date(s.publishedAt)}</span>
             <span className="block text-sm text-muted-foreground">
               {lead(s.summary)} Lire l'étude
               <ArrowRight className="ml-1 inline size-4" aria-hidden />

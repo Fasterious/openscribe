@@ -2,8 +2,9 @@
  * Observatoire : publie une étude sur le site (dossier `public/observatoire/`).
  *
  * Deux versions de chaque étude, prénoms de particuliers masqués partout :
- * - le document (`<slug>/index.html`) : la fiche (actualité, source, question,
+ * - l'article (`<slug>/index.html`) : la fiche (actualité, source, question,
  *   échantillon, précautions de lecture) suivie du rapport complet, en une page ;
+ *   un renvoi ou un verbatim s'y déplie au clic (réponse entière) ;
  * - l'étude lisible dans l'application (`<slug>/etude.json`, ouverte par
  *   `#/observatoire/<slug>`), réponses entières comprises, masquées à la source.
  * Les réponses du moteur et la liste des prénoms restent hors du dépôt.
@@ -16,6 +17,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { remainingNames } from '../../src/core/analysis/names'
 import { reportToHtml } from '../../src/core/analysis/report'
 import { publishedStudy } from '../../src/core/observatoire'
 import { importProject } from '../../src/core/project'
@@ -56,8 +58,6 @@ const paras = (s: string) =>
 const n = (x: number) => x.toLocaleString('fr-FR')
 const date = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
-// Publication grand public : les prénoms de particuliers sont toujours masqués.
-const report = reportToHtml({ ...analysis, settings: { ...analysis.settings, maskNames: true } }, project.corpus, fiche.title)
 
 // Le menu de l'application, sur chaque page publiée : on revient toujours à l'accueil, à Synthèse ou à la liste.
 const menu = (here: 'list' | 'study') => `<header class="obs-menu"><a class="obs-brand" href="/"><img src="/logo.svg" alt="" width="28" height="28"><span>OpenScribe</span></a>
@@ -70,10 +70,19 @@ const menuStyle = `.obs-menu{display:flex;flex-wrap:wrap;align-items:center;just
 @media print{.obs-menu,.obs-nav{display:none}}`
 
 const sampleLine = `${n(fiche.sample)} réponses tirées au sort parmi ${n(fiche.population)} (marge de ± ${fiche.margin} points à 95 %). Un avis partagé par 1 % des contributeurs a ${Math.round((1 - 0.99 ** fiche.sample) * 100)} % de chances d'apparaître au moins une fois dans l'échantillon ; un avis plus rare peut manquer.`
+// Publication grand public : l'étude masquée une fois (prénoms, réponses entières comprises), source des deux versions.
+const study = publishedStudy(project, analysis, {
+  slug: fiche.slug,
+  title: fiche.title,
+  publishedAt: fiche.publishedAt,
+  news: fiche.news,
+  fiche: { summary: fiche.summary, question: fiche.question, source: fiche.source, sample: sampleLine, sampling: fiche.sampling, warnings: fiche.warnings },
+})
+const report = reportToHtml(study.project.analyses[0], study.project.corpus, fiche.title)
 const head = `${menu('study')}
 <nav class="obs-nav"><a href="/observatoire/">← Toutes les études de l'Observatoire</a></nav>
-<p class="obs-switch">Vous lisez la version document, d'un seul tenant, faite pour imprimer. <a href="/#/observatoire/${e(fiche.slug)}">Explorer la version interactive</a> : verbatims à la demande, réponse entière autour de chaque citation.</p>
-<p class="obs-meta">Publié le ${e(date(fiche.publishedAt))} · ${e(fiche.news)}</p>`
+<p class="obs-switch">Touchez un renvoi (P12) pour voir ses verbatims, ou un verbatim pour le relire dans sa réponse complète. Vous préférez parcourir les motifs un à un ? <a href="/#/observatoire/${e(fiche.slug)}">Ouvrir dans l'application</a>.</p>
+<p class="obs-meta">Publiée le ${e(date(fiche.publishedAt))} · ${e(fiche.news)}</p>`
 const card = `<section class="obs-fiche" aria-label="Fiche de l'étude">
 <h2>En bref</h2>
 ${paras(fiche.summary)}
@@ -106,17 +115,11 @@ const page = report
 
 const root = join('public', 'observatoire')
 mkdirSync(join(root, fiche.slug), { recursive: true })
+if (remainingNames(page, analysis.names).length) throw new Error('Prénom encore présent dans la page publiée : publication refusée.')
 writeFileSync(join(root, fiche.slug, 'index.html'), page)
-
-// La version interactive : la même étude, ouverte dans l'application en lecture seule.
-const study = publishedStudy(project, analysis, {
-  slug: fiche.slug,
-  title: fiche.title,
-  publishedAt: fiche.publishedAt,
-  news: fiche.news,
-  fiche: { summary: fiche.summary, question: fiche.question, source: fiche.source, sample: sampleLine, sampling: fiche.sampling, warnings: fiche.warnings },
-})
+// La version application : la même étude, ouverte en lecture seule par #/observatoire/<slug>.
 writeFileSync(join(root, fiche.slug, 'etude.json'), JSON.stringify(study))
+
 
 // La liste des études publiées, la plus récente d'abord.
 const listPath = join(root, 'index.json')
@@ -148,8 +151,8 @@ ${menu('list')}
 ${studies
   .map(
     (s) => `<article>
-<h2><a href="/#/observatoire/${e(s.slug)}">${e(s.title)}</a></h2>
-<p class="meta">Publié le ${e(date(s.publishedAt))} · ${e(s.news)} · <a href="${e(s.slug)}/">Version document</a></p>
+<h2><a href="${e(s.slug)}/">${e(s.title)}</a></h2>
+<p class="meta">Publiée le ${e(date(s.publishedAt))} · ${e(s.news)} · <a href="/#/observatoire/${e(s.slug)}">Ouvrir dans l'application</a></p>
 ${paras(s.summary)}
 </article>`,
   )
