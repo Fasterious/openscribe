@@ -269,8 +269,18 @@ function peopleIn(passage: string, personOf: (ideaId: string) => string | undefi
 /** Le passage qu'un compte annonce : du nombre jusqu'à la voix suivante (« une autre… ») ou la fin de la phrase. */
 export function countSpan(sentence: string, at: number): string {
   const rest = sentence.slice(at)
-  const m = rest.slice(1).match(NEXT_VOICE)
-  return m ? rest.slice(0, (m.index ?? 0) + 1) : rest
+  let from = 1
+  for (;;) {
+    const m = rest.slice(from).match(NEXT_VOICE)
+    if (!m) return rest
+    const cut = from + (m.index ?? 0)
+    // « 2 personnes … : l'une [a], l'autre [b] » : « l'autre » répartit le compte entre ses personnes, il n'ouvre pas une autre voix.
+    if (/^l['’]autre$/i.test(m[0]) && /(?<![\p{L}])l['’]une?(?![\p{L}])/iu.test(rest.slice(0, cut))) {
+      from = cut + m[0].length
+      continue
+    }
+    return rest.slice(0, cut)
+  }
 }
 
 /**

@@ -1657,6 +1657,9 @@ describe('contrôles ajoutés à la certification B9', () => {
     expect(clauseCounts('Deux personnes proposent de filmer [I0001], et une troisième de créer un lien [I0002].', person)).toEqual(['Deux personnes'])
     expect(clauseCounts('Deux personnes proposent : filmer [I0001], ou créer un lien [I0002].', person)).toEqual([])
     expect(clauseCounts('6 des 7 participants qui donnent un avis le critiquent [I0001].', person)).toEqual([])
+    // « l'une …, l'autre … » répartit le compte entre ses deux personnes.
+    expect(clauseCounts("2 personnes trouvent la piscine mal ouverte : l'une le soir [I0001], l'autre le dimanche [I0002].", person)).toEqual([])
+    expect(clauseCounts("2 personnes trouvent la piscine mal ouverte [I0001] ; l'autre le dimanche [I0002].", person)).toEqual(['2 personnes'])
   })
   it('« toutes les personnes » couvre chaque personne qui donne un avis', () => {
     expect(allClaims('Toutes les personnes qui en parlent le jugent tardif [I0001, I0002].', person, 3)).toEqual(['Toutes les personnes'])
