@@ -119,6 +119,32 @@ façon. Le moteur tranche ces cas ; la méthode ne vise pas zéro erreur, elle r
 montre où le doute est permis. Les relectures indépendantes de l'étude école (passe 12) jugent justes 75 à
 77 des 88 avis ajoutés par le balayage, et trouvent trois étiquettes du résumé discutables sur une vingtaine.
 
+## Fidélité à la méthode d'origine
+
+La méthode des idées atomiques d'Arnaud (`docs/VISION.md`, 11-12/10) est le point de départ. Ce tableau dit,
+point par point, ce qui est gardé, ce qui la prolonge, et ce qui s'en écarte. Un écart n'est pas une erreur ;
+il doit être visible et daté.
+
+| Méthode d'origine | Aujourd'hui | Statut |
+|---|---|---|
+| Personne par personne, des idées atomiques : un sujet, un ton, la citation exacte | Étape 1, citation vérifiée mot pour mot par le code | Gardé |
+| Cinq catégories : positif, négatif, suggestion, question, constat | Identiques ; seuls positif et négatif sont des avis | Gardé |
+| Idées regroupées en motifs, avec titre, comptage de personnes par ton et synthèse appuyée sur les citations | Étapes 2 et 3 | Gardé |
+| Le motif est défini par son titre | Chaque motif a aussi une définition écrite (livre de codes) qui fixe ce qui compte comme positif ou négatif | Prolongé (16/10) |
+| Une idée va dans un motif | Avec l'option du chercheur, une idée peut compter dans deux motifs ; le balayage s'appuie sur cette option | Écart assumé (16/10, décision d'Arnaud) |
+| Des motifs aux thèmes, facultatif | Seulement s'il y a beaucoup de motifs | Gardé |
+| Mode libre par défaut, grille imposée possible | Identique | Gardé |
+| Pas de normalisation obligatoire des libellés | Identique | Gardé |
+| Séquençage en étapes, pour les points de contrôle et la traçabilité | Les six étapes ; l'étape 2 compte désormais plusieurs tours de relecture | Gardé, alourdi |
+| Comptages par ton | Échelle d'avis, « fragile », « à vérifier », tous calculés par le code | Prolongé (13/10, 17/10) |
+
+## Une référence pour repenser la méthode
+
+Ce document fixe une méthode de référence, éprouvée par l'humain et la machine sur des corpus réels. Il
+servira un jour de point de comparaison : on pourra laisser un moteur imaginer librement une autre façon de
+comprendre les consensus, les dissensus et les avis d'une population, puis la mesurer contre celle-ci, avec la
+même grille, sur les mêmes corpus (l'école, ÉcoSol). Elle gagnera, ou la référence restera.
+
 ## Où se trouve quoi dans le code
 
 | Étape | Fichier |
