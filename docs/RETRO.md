@@ -2,6 +2,16 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-17 — Résumé et listes : rejouer seulement ce qui change
+
+- **Bien marché** : rejouer le seul résumé depuis le cache (passes 14 et 14b) au lieu de toute l'analyse ; deux
+  relectures courtes ciblées (fidélité et langue du résumé), qui ont convergé sur la même retouche de consigne ;
+  les captures mobiles, qui ont montré la pastille à 47 à côté de « 46 avis » et la phrase qui débordait.
+- **Coûté pour rien** : 8 à 9 demandes de vérification rejouées à chaque retouche du résumé, parce que le résumé
+  partage un lot de vérification avec d'autres textes et décale tous les lots quand sa longueur change.
+- **On change** : le résumé sera vérifié dans un lot à lui (à faire avant le prochain rejeu, pas maintenant :
+  changer les lots ferait tout rejouer).
+
 ## 2026-10-17 — Observatoire : lecture, couleurs, deux versions
 
 - **Bien marché** : mesurer avant de corriger (tailles de police en caractères par taille, largeurs du menu à

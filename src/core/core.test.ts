@@ -576,7 +576,13 @@ describe('étiquettes à vérifier', () => {
     // Sans le nombre, ou avec un camp mêlé : les seules idées citées.
     expect(wholeCamp('Une personne salue l’accueil ', ['I0000'], groups, byId)).toBeUndefined()
     expect(wholeCamp('5 personnes ', ['I0000', 'I0009'], groups, byId)).toBeUndefined()
+    // Le camp sans les mitigés : P9 critique aussi, « 4 personnes » compte les seuls positifs.
+    const mixedIdeas = [...ideas, idea('I0010', 'P1', 'negative')]
+    const byId2 = new Map(mixedIdeas.map((i) => [i.id, i]))
+    const groups2 = [{ id: 'G1', title: 'Accueil', ideaIds: mixedIdeas.map((i) => i.id) }] as unknown as Group[]
+    expect(wholeCamp('4 personnes saluent l’accueil ', ['I0001'], groups2, byId2)).toEqual({ ids: ['I0001', 'I0002', 'I0003', 'I0004'], people: 4 })
     expect(leadSentence('Le tri plaît beaucoup [I0001, I0002]. Une personne le juge lent [I0003].')).toBe('Le tri plaît beaucoup.')
+    expect(leadSentence('Le tri plaît [I0001]. 3 personnes le jugent lent [I0003].')).toBe('Le tri plaît.')
   })
   it('ne dit pas « fragile » d’un avis unanime : une voix de moins, la conclusion tient', () => {
     const m = computeMetrics(['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I0${k}`, p, 'negative')))

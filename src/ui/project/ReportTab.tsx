@@ -254,9 +254,11 @@ function HighlightLine({
   const [open, setOpen] = useState(false)
   const group = groupById.get(item.groupId)
   const camp = SECTION_CAMP[section]
-  const ideas = (group?.ideaIds ?? [])
-    .map((id) => ctx.ideaById.get(id)!)
-    .filter((i) => i && camp.includes(i.category) && (!ctx.segment || ctx.segment.has(i.participantId)))
+  const inGroup = (group?.ideaIds ?? []).map((id) => ctx.ideaById.get(id)!).filter((i) => i && (!ctx.segment || ctx.segment.has(i.participantId)))
+  // « 46 avis positifs » compte les seuls positifs : une personne mitigée n'est pas déroulée sous « Ce qui a marché ».
+  const opposite = section === 'strengths' ? 'negative' : section === 'blockers' ? 'positive' : undefined
+  const mixed = new Set(opposite ? inGroup.filter((i) => i.category === opposite).map((i) => i.participantId) : [])
+  const ideas = inGroup.filter((i) => camp.includes(i.category) && !mixed.has(i.participantId))
   const people = new Set(ideas.map((i) => i.participantId)).size
   const lead = group?.summary && !ctx.segment ? leadSentence(group.summary) : ''
   return (

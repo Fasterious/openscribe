@@ -619,12 +619,20 @@ export function wholeCamp(before: string, ids: string[], groups: Group[], byId: 
   if (!cited.length || cited.some((i) => i.category !== cited[0].category)) return undefined
   const g = groups.find((x) => cited.every((i) => x.ideaIds.includes(i.id)))
   if (!g) return undefined
-  const camp = g.ideaIds.map((id) => byId.get(id)).filter((i): i is Idea => !!i && i.category === cited[0].category)
-  const people = new Set(camp.map((i) => i.participantId)).size
-  if (people <= new Set(cited.map((i) => i.participantId)).size) return undefined
+  const cat = cited[0].category
+  const all = g.ideaIds.map((id) => byId.get(id)).filter((i): i is Idea => !!i)
+  const camp = all.filter((i) => i.category === cat)
+  // Un avis : le camp se compte avec ou sans les mitigés (« 46 personnes » = les seuls positifs, « 48 » = avec eux).
+  const other = cat === 'positive' ? 'negative' : cat === 'negative' ? 'positive' : undefined
+  const mixed = new Set(other ? all.filter((i) => i.category === other).map((i) => i.participantId) : [])
   const sentence = before.split(/(?<=[.!?])\s+/).pop() ?? ''
   const numbers = [...sentence.matchAll(/(?<![\p{L}\d-])(\d+|\p{L}+(?:-\p{L}+)*)(?![\p{L}\d])/gu)].map((m) => (/^\d+$/.test(m[1]) ? Number(m[1]) : frenchNumber(m[1])))
-  return numbers.includes(people) ? { ids: camp.map((i) => i.id), people } : undefined
+  const citedPeople = new Set(cited.map((i) => i.participantId)).size
+  for (const ideas of [camp, camp.filter((i) => !mixed.has(i.participantId))]) {
+    const people = new Set(ideas.map((i) => i.participantId)).size
+    if (people > citedPeople && numbers.includes(people)) return { ids: ideas.map((i) => i.id), people }
+  }
+  return undefined
 }
 
 /** Les idées qu'une ligne des listes déroule au clic : le camp que la liste compte (avis positifs pour « Ce qui a marché »…). */
@@ -639,7 +647,8 @@ export const SECTION_CAMP: Record<keyof Highlights, IdeaCategory[]> = {
 /** La première phrase d'un texte rédigé, sans ses renvois : le résumé d'un motif en une ligne, sous son titre dans les listes. */
 export function leadSentence(text: string): string {
   const clean = text.split(/\n\s*\n/)[0].replace(/\s*\[I\d{4,}(?:\s*,\s*I\d{4,})*\]/g, '').trim()
-  const m = clean.match(/^.+?[.!?](?=\s+\p{Lu}|\s*$)/su)
+  // Une phrase peut commencer par un chiffre (« 3 personnes… ») ou un guillemet.
+  const m = clean.match(/^.+?[.!?](?=\s+[\p{Lu}\d«]|\s*$)/su)
   return (m ? m[0] : clean).replace(/\s+([.,;:])/g, '$1')
 }
 

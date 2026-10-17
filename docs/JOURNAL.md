@@ -2,6 +2,31 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — Observatoire dans l'application : menu, résumé, listes, chiffres (retours d'Arnaud)
+
+- **Arnaud préfère la version application.** Un clic sur l'étude l'ouvre dans l'application ; la liste des études
+  y est aussi (même menu partout) ; l'article reste à un bouton (« Lire en une page »), gardé tant qu'on n'est
+  pas sûr.
+- **Menu** : des icônes ; la page active dit son nom ; les modules à venir sont présents, grisés. Synthèse :
+  des calques (ni bécher, ni entonnoir trop « filtre ») ; Observatoire : un télescope.
+- **En-tête d'étude** : une seule ligne grise (date, actualité, participants, idées) ; plus de « Rapport du » en
+  double ni de « En bref » à côté du « Résumé ». L'écart 378 / 366 est dit dans « Avant de lire » : 12 réponses,
+  trop brèves, ne donnent aucune idée.
+- **Chiffres partout** : tout compte de personnes en chiffres, en tête de phrase comme ailleurs, nombres composés
+  compris (« 46 personnes ») ; « une personne » reste en lettres. Appliqué par le code (`countsInDigits`).
+- **Listes du résumé, uniformes** : la phrase qui ouvre la synthèse du motif, puis ❝ N, qui déroule les verbatims
+  des N participants comptés ; plus de citations choisies. Dans le résumé, une pastille qui suit un nombre
+  (« 46 personnes… ❝ 46 ») déroule tout le camp compté (`wholeCamp`). Tous les déroulés ont la même forme : une
+  ligne par participant, chaque verbatim dépliable dans sa réponse entière.
+- **Résumé plus qualitatif** (consigne « consultation ») : la première phrase dit qui pense quoi, en personnes,
+  et plus « X expriment au moins une critique » ; la base « qui donnent un avis » une fois par paragraphe ;
+  l'échelle entre parenthèses (« 12 sur 14 (large majorité, fragile) ») ; « fragile » n'est plus donné au moteur
+  pour un « unanime ». École rejouée sur le seul résumé (passes 14 et 14b) : analyse identique ; `methodologue` :
+  mêmes 2 erreurs qu'en passe 13, aucune nouvelle, première phrase « bien plus utile » ; `plume` : 7/10 au
+  résumé (6,5 pour le rapport entier en passe 13).
+- **Reste** : les synthèses des motifs disent encore « de ceux qui en parlent » (leur consigne, changée, coûterait
+  un rejeu complet) ; l'article n'a pas encore les listes uniformes ; les deux erreurs viennent des motifs eux-mêmes.
+
 ## 2026-10-17 — Passe `testeur` sur la version application de l'Observatoire
 
 - **Trouvé** : l'application n'affichait ni la définition d'un motif ni la mention « aussi dans » d'une citation

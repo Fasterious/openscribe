@@ -72,7 +72,7 @@ export function ObservatoryPage({ slug }: { slug: string }) {
           <h1 className="text-2xl font-bold sm:text-3xl">{study.title}</h1>
           <p className="text-sm text-muted-foreground">
             Publiée le {date(study.publishedAt)}
-            {study.news && ` · ${study.news}`} · {people.toLocaleString('fr-FR')} participants · {ideas.toLocaleString('fr-FR')} idées
+            {study.news && ` · ${study.news.replace(/\.$/, '')}`} · {people.toLocaleString('fr-FR')} participants · {ideas.toLocaleString('fr-FR')} idées
           </p>
         </div>
         <div className="no-print flex flex-wrap items-center gap-2">
