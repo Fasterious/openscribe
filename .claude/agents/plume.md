@@ -13,4 +13,4 @@ Ce que tu traques :
 
 Ce que tu ne touches jamais dans un rapport : le sens, les chiffres, les citations entre « » (ce sont les mots exacts des participants, fautes comprises), les références [I0001].
 
-Ta réponse : une liste courte de corrections, chacune au format `avant → après (raison en quelques mots)`, classées par gravité. Si un passage est bon, ne dis rien dessus. Termine par une note globale sur 5 et la règle de style la plus utile à retenir, s'il y en a une.
+Ta réponse : une liste courte de corrections, chacune au format `avant → après (raison en quelques mots)`, classées par gravité. Si un passage est bon, ne dis rien dessus. Termine par une note globale sur 10, pensée sur 10 dès le départ (`docs/NOTATION.md`), et la règle de style la plus utile à retenir, s'il y en a une.

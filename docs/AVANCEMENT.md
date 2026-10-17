@@ -108,7 +108,7 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Mise en ligne (hébergement statique)
 - ⏳ Module Entretiens et tests (transcription, vidéo synchronisée), puis Personas
 - ⏳ Stratégie d'acquisition (une fois l'expérience validée)
-- ✅ L'Observatoire : première étude publiée (école, Grand débat 2019, passe 12 avec Opus 5.5 et la méthode « consultation » : 6,5/10 aux deux lectures `methodologue`, langue 7/10), avec la section Méthode, ses limites et 10 étiquettes marquées « à vérifier » par le code (`public/observatoire/ecole-grand-debat-2019/`) ; méthode expliquée étape par étape dans `docs/METHODE.md`
+- ✅ L'Observatoire : première étude publiée (école, Grand débat 2019, passe 12 avec Opus 5.5 et la méthode « consultation » : moyennes 3,33/5 aux deux lectures `methodologue`, langue 3,5/5, à re-noter sur 10), avec la section Méthode, ses limites et 10 étiquettes marquées « à vérifier » par le code (`public/observatoire/ecole-grand-debat-2019/`) ; méthode expliquée étape par étape dans `docs/METHODE.md`
 
 ## Itération 7 — Offres gratuites et modèles locaux (13-14/10)
 

@@ -13,8 +13,9 @@ peut lui-même se tromper. Elle sert à situer un moteur ou une méthode par rap
 corpus et avec le même évaluateur. Le changement d'évaluateur du 14/10 l'a montré : la même synthèse de
 Sonnet est passée de 4,5 à 3 sur 5, sans avoir changé.
 
-- **Échelle sur 10**, pour plus de finesse : la note globale est la moyenne des six critères multipliée par 2,
-  arrondie au demi-point (moyenne 3,33 sur 5 : 6,5/10). Les critères restent notés de 0 à 5.
+- **Échelle sur 10**, pour plus de finesse : l'évaluateur note directement chaque critère de 0 à 10, en
+  pensant sur 10 dès le départ ; la note globale est la moyenne des six critères, arrondie au demi-point. On
+  ne multiplie pas une note sur 5 : une note pensée sur 5 puis doublée garde la grossièreté de son échelle.
 - **Le plafond devient un compte.** Au lieu de bloquer la note à 3/5 dès qu'un avis est dans le mauvais camp
   sur un motif du résumé, l'évaluateur donne ce nombre à côté de la note : « 6,5/10 · 3 étiquettes du
   résumé fausses ». Le plafond binaire masquait les progrès (cinq erreurs ou une donnaient la même note).
@@ -23,16 +24,17 @@ Sonnet est passée de 4,5 à 3 sur 5, sans avoir changé.
 - **Aucun seuil de publication.** Une étude de l'Observatoire se publie avec le meilleur moteur dont on dispose
   (Claude Opus 5.5 aujourd'hui), la méthode décrite dans le rapport, ses limites et les mentions « à vérifier »
   calculées par le code. À chaque nouveau moteur, on refait le repère.
-- **Pour proposer un moteur dans l'application**, le repère reste le niveau de Gemini Flash-Lite (2,5/5,
-  soit 5/10), idéalement celui de la référence.
+- **Pour proposer un moteur dans l'application**, le repère reste le niveau de Gemini Flash-Lite, idéalement
+  celui de la référence, mesurés sur 10 au prochain essai.
 
-Repères actuels, convertis (moyennes sans plafond) : sur ÉcoSol, Gemini Flash-Lite 5/10 (sa note de 2,5/5),
-Sonnet avec la référence 6,5/10 (trois lectures du 14/10) ; sur l'école, la méthode « consultation » avec Opus 5.5 6,5/10 aux deux lectures de la passe 12, langue
-7/10.
+Les notes données avant le 17/10 sont sur 5 et ne se convertissent pas : elles restent des repères sur
+l'ancienne échelle (sur ÉcoSol, Gemini Flash-Lite 2,5/5, Sonnet avec la référence 3/5 ; sur l'école, passe 12
+avec Opus 5.5, moyennes 3,33/5 aux deux lectures, langue 3,5/5). Chaque repère sera re-noté sur 10 au prochain
+essai.
 
-## `methodologue` : la méthode (note sur 5)
+## `methodologue` : la méthode (note sur 10)
 
-Chaque critère est noté de 0 à 5, en lisant le rapport ET les réponses brutes.
+Chaque critère est noté de 0 à 10, au demi-point, en lisant le rapport ET les réponses brutes.
 
 | # | Critère | Ce qu'on vérifie |
 |---|---|---|
@@ -50,12 +52,12 @@ motifs à une personne, ou un fourre-tout de plus du tiers des idées) la plafon
 
 Rendre aussi : le temps de relecture humaine estimé pour rendre le rapport présentable.
 
-## `plume` : la langue (note sur 5)
+## `plume` : la langue (note sur 10)
 
 Sur les seuls textes écrits par le moteur d'IA (titres, synthèses, intros, résumé ; les verbatims
 sont hors champ) : naturel (aucun calque de l'anglais), précision (chaque phrase nomme son sujet),
-hiérarchie (l'essentiel d'abord), concision, cohérence du vocabulaire. Depuis le 17/10, la note se donne sur 10
-(moyenne des critères multipliée par 2) et s'écrit « 7/10 ».
+hiérarchie (l'essentiel d'abord), concision, cohérence du vocabulaire. Depuis le 17/10, chaque critère et la
+note se donnent directement sur 10, et la note s'écrit « 7/10 ».
 
 ## Variabilité de l'évaluateur
 

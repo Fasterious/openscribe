@@ -544,7 +544,8 @@ personnes et interdit de recopier les chiffres de "facts", contradiction signal�
 moteur.
 
 **Décision d'Arnaud (17/10) : pas de passe 13.** La note devient un repère relatif sur 10 (`docs/NOTATION.md`) :
-sur l'école, passe 12 à 6,5/10 aux deux lectures, langue 7/10, avec 3 étiquettes du résumé jugées fausses.
+sur l'école, la passe 12 garde ses notes sur 5 (moyennes 3,33 aux deux lectures, langue 3,5, avec 3 étiquettes du
+résumé jugées fausses) jusqu'à une lecture sur 10.
 L'étude est publiée telle quelle, avec ses limites, et les étiquettes qui dépendent d'avis comptés dans deux
 motifs sont marquées « à vérifier » par le code. La méthode, étape par étape : `docs/METHODE.md`.
 
