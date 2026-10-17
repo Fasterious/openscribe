@@ -523,6 +523,9 @@ export interface SweepInput {
     id: string
     title: string
     definition: GroupDefinition
+    /** Personnes du motif qui en disent seulement du bien, seulement du mal : le camp le plus petit est celui qui manque le plus souvent. */
+    positive: number
+    negative: number
     /** Avis déjà rangés dans le motif : leur ton se vérifie contre la définition. */
     ideas: { id: string; participant: string; category: IdeaCategory; verbatim: string }[]
   }[]
@@ -542,8 +545,9 @@ export function sweepPrompt(input: SweepInput, settings: AnalysisSettings) {
 Règles :
 1. Pour chaque motif, lis sa définition, puis ses idées ("ideas"). Si le ton d'une idée contredit la définition, corrige-le : {"id":"I0042","category":"positive"} ; "neutral" si la définition la met hors camp.
 2. Parcours ensuite tout "pool" : des avis rangés dans d'autres motifs. Retiens une idée seulement si la définition du motif la réclame, c'est-à-dire si elle juge l'objet de ce motif lui-même. Exemple : pour « Attente en caisse » (négatif : se plaindre du temps passé à payer), « vingt minutes de queue pour deux articles », rangée dans « Horaires d'ouverture », est réclamée ; « le magasin ferme trop tôt » ne l'est pas.
-${double}
-4. Un mot en commun ne suffit pas : la définition doit réclamer l'idée. Dans le doute, ne change rien ; la plupart des avis sont bien rangés.
+3. Cherche d'abord les avis du camp le moins nombreux du motif ("positive" et "negative" donnent les deux camps) : ce sont eux qui manquent le plus souvent, et un seul peut changer ce que dit le résumé. Un éloge rangé ailleurs compte autant qu'une critique. Pour le camp le plus nombreux, ne retiens un avis que s'il juge clairement cet objet.
+${double.replace(/^3\./, '4.')}
+5. Un mot en commun ne suffit pas, ni une idée qui ne parle de l'objet qu'en passant ou pour expliquer autre chose : la définition doit la réclamer. Dans le doute, ne change rien ; la plupart des avis sont bien rangés.
 ${methodRules(settings, 'sweep')}${lang(settings)}
 
 Réponds avec : {"changes":[…]}

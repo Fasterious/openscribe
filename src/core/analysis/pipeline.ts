@@ -992,6 +992,8 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
                     id: g.id,
                     title: g.title,
                     definition: definitions.get(titleKey(g.title))!,
+                    positive: g.metrics.positiveOnly.length,
+                    negative: g.metrics.negativeOnly.length,
                     ideas: g.ideaIds.map((id) => {
                       const i = ideaById.get(id)!
                       return { id, participant: i.participantId, category: i.category, verbatim: shortExample(i.verbatim, 160) }
@@ -1075,12 +1077,12 @@ export function sweepTargets(groups: Group[], ideaById: Map<string, Idea>, defin
   const h = highlights(groups, ideaById)
   const listed = [...h.strengths, ...h.blockers, ...h.divided]
   const shown = [...h.strengths.slice(0, 6), ...h.blockers.slice(0, 6), ...h.divided.slice(0, 6)]
-  const ids = new Set([...shown, ...listed.filter((x) => x.of >= SWEEP_BIG)].map((x) => x.groupId))
   const opinions = (g: Group) => g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
-  return groups
-    .filter((g) => ids.has(g.id) && defined(g))
-    .sort((a, b) => opinions(b) - opinions(a) || a.title.localeCompare(b.title))
-    .slice(0, SWEEP_MAX)
+  const byId = new Map(groups.map((g) => [g.id, g]))
+  const big = listed.filter((x) => x.of >= SWEEP_BIG).map((x) => byId.get(x.groupId)!)
+  // Ce que montrent les listes passe d'abord, petit motif compris (passe 12 : « Proximité », 8 avis, écartée par un tri par taille).
+  const ordered = [...shown.map((x) => byId.get(x.groupId)!), ...big.sort((a, b) => opinions(b) - opinions(a) || a.title.localeCompare(b.title))]
+  return [...new Set(ordered)].filter((g) => g && defined(g)).slice(0, SWEEP_MAX)
 }
 
 export function unanimityCheck(
