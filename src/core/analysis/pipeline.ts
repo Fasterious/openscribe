@@ -1648,15 +1648,8 @@ async function writeGlobalSummary(corpus: Corpus, state: AnalysisState, runner: 
   const respondents = activeParticipants(corpus).length
   const lang = state.settings.language
   const checks = methodOf(state.settings).summaryChecks === true
-  // Méthode qui le demande : l'équilibre des avis, compté en personnes, pour que le résumé ne s'ouvre pas sur une force isolée.
-  const b = opinionBalance(state)
-  const balance = checks
-    ? lang === 'en'
-      ? ` Of ${b.speakers} people, ${b.critics} voice at least one criticism, ${b.satisfied} at least one satisfaction, ${b.both} both.`
-      : ` Sur ${b.speakers} participants, ${b.critics} expriment au moins une critique, ${b.satisfied} au moins une satisfaction, ${b.both} les deux.`
-    : ''
-  const facts =
-    (lang === 'en' ? `${all.participants} people out of ${respondents} who answered.` : `${all.participants} participants sur ${respondents} ayant répondu.`) + balance
+  // L'équilibre global des avis (« X expriment au moins une critique ») n'est plus donné : il disait combien, pas qui pense quoi (Arnaud, 17/10).
+  const facts = lang === 'en' ? `${all.participants} people out of ${respondents} who answered.` : `${all.participants} participants sur ${respondents} ayant répondu.`
   const h = highlights(state.groups, new Map(state.ideas.map((i) => [i.id, i])))
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
   // Méthode qui le demande : l'exemple d'une ligne est la première idée de son camp citée par la synthèse du motif
@@ -1774,14 +1767,14 @@ export function withDivided(summary: string, groups: Group[], lang: 'fr' | 'en' 
           ? [
               lang === 'en'
                 ? `Opinions are split on ${shown}.`
-                : `Les avis sont partagés sur ${shownSplit.length > 1 ? `${NUMBER_WORDS_FR[shownSplit.length]} sujets` : 'un sujet'} : ${shown}.`,
+                : `Les avis sont partagés sur ${shownSplit.length > 1 ? `${shownSplit.length} sujets` : 'un sujet'} : ${shown}.`,
             ]
           : []),
         ...(rest > 0
           ? [
               lang === 'en'
                 ? `${rest > 1 ? `${rest} other topics divide` : 'One other topic divides'} too (see “What divides”).`
-                : spellLeadingNumbers(`${rest > 1 ? `${rest} autres sujets divisent` : 'Un autre sujet divise'} aussi (voir « Ce qui divise »).`),
+                : countsInDigits(`${rest > 1 ? `${rest} autres sujets divisent` : 'Un autre sujet divise'} aussi (voir « Ce qui divise »).`),
             ]
           : []),
         // Une seule phrase pour toutes les propositions contraires (plume, passe 8 : trois phrases de même forme à la suite).
@@ -1983,7 +1976,6 @@ export function applySupport(
   return { text: out.join('\n\n'), fixed, dropped, added: additions.length }
 }
 
-const NUMBER_WORDS_FR: Record<number, string> = { 2: 'deux', 3: 'trois', 4: 'quatre', 5: 'cinq', 6: 'six', 7: 'sept', 8: 'huit', 9: 'neuf', 10: 'dix' }
 
 /** Les camps d'avis d'un motif (positif, négatif) que sa synthèse ne cite par aucune idée. */
 export function missingCamps(g: Group, ideaById: Map<string, Idea>): { side: 'positive' | 'negative'; people: string[]; ideaIds: string[] }[] {
@@ -2164,7 +2156,7 @@ function ensureCamps(state: AnalysisState) {
     if (!g.summary) continue
     for (const c of missingCamps(g, ideaById)) {
       const n = c.people.length
-      const who = n > 1 ? `${NUMBER_WORDS_FR[n] ?? n} personnes` : 'Une personne'
+      const who = n > 1 ? `${n} personnes` : 'Une personne'
       // L'objet est nommé : ajoutée en fin de texte, « le critiquent » n'a pas d'antécédent sûr.
       const verb = `${n > 1 ? 'portent' : 'porte'} un avis ${c.side === 'positive' ? 'positif' : 'critique'} sur « ${g.title} »`
       const sentence = `${who.charAt(0).toUpperCase()}${who.slice(1)} ${verb} [${c.ideaIds.join(', ')}].`
@@ -2266,48 +2258,45 @@ function verifyNumbers(corpus: Corpus, state: AnalysisState) {
     removed += r.removed + d.removed
     return d.text
   }
-  for (const g of state.groups) g.summary = spellLeadingNumbers(unreferenced(quoted(g.summary)))
-  for (const t of state.themes) t.summary = spellLeadingNumbers(unreferenced(quoted(t.summary)))
-  state.globalSummary = spellLeadingNumbers(quoted(state.globalSummary))
+  for (const g of state.groups) g.summary = countsInDigits(unreferenced(quoted(g.summary)))
+  for (const t of state.themes) t.summary = countsInDigits(unreferenced(quoted(t.summary)))
+  state.globalSummary = countsInDigits(quoted(state.globalSummary))
   ;({ text: state.globalSummary, bad: state.globalUnverified } = clean({ text: state.globalSummary, bad: state.globalUnverified }))
   state.removedSentences = removed
 }
 
-const LEADING: Record<string, string> = {
-  '2': 'Deux',
-  '3': 'Trois',
-  '4': 'Quatre',
-  '5': 'Cinq',
-  '6': 'Six',
-  '7': 'Sept',
-  '8': 'Huit',
-  '9': 'Neuf',
-  '10': 'Dix',
-  '11': 'Onze',
-  '12': 'Douze',
-  '13': 'Treize',
-  '14': 'Quatorze',
-  '15': 'Quinze',
-  '16': 'Seize',
-  '20': 'Vingt',
+const UNITS: Record<string, number> = { un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, onze: 11, douze: 12, treize: 13, quatorze: 14, quinze: 15, seize: 16 }
+const TENS: Record<string, number> = { dix: 10, vingt: 20, vingts: 20, trente: 30, quarante: 40, cinquante: 50, soixante: 60 }
+
+/** « quarante-six » → 46, « soixante-dix » → 70, « quatre-vingt-deux » → 82 ; autre chose → undefined. */
+export function frenchNumber(word: string): number | undefined {
+  const parts = word.toLowerCase().split('-').filter((p) => p !== 'et')
+  let total = 0
+  for (let i = 0; i < parts.length; i++) {
+    const p = parts[i]
+    if (p === 'quatre' && /^vingts?$/.test(parts[i + 1] ?? '')) {
+      total += 80
+      i++
+    } else if (p in TENS) total += TENS[p]
+    else if (p in UNITS) total += UNITS[p]
+    else return undefined
+  }
+  return total || undefined
 }
 
-const DIGITS: Record<string, string> = Object.fromEntries(Object.entries(LEADING).map(([n, w]) => [w.toLowerCase(), n]))
-// Le nombre n'est pas la fin d'un composé (« quarante-six », « dix-sept ») : ni lettre ni trait d'union juste avant.
-const COUNTED = /(?<![\p{L}-])(deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|vingt)(?= (?:personnes?|autres|participants?|parents|familles|d['’]entre)(?![\p{L}]))/giu
+// Un compte de personnes écrit en lettres, nombre composé compris (« Quarante-six personnes », « vingt-deux autres »).
+const COUNTED = /(?<![\p{L}-])(\p{L}+(?:-\p{L}+)*)(?= (?:personnes?|autres|participants?|parents|familles|d['’]entre)(?![\p{L}]))/gu
 
 /**
- * Un nombre en tête de phrase s'écrit en lettres (« Trois personnes… ») ; au milieu d'une phrase, un compte de
- * personnes s'écrit en chiffres (« 3 personnes… ») : règle typographique appliquée par le code, pas laissée au moteur
- * (plume, passe 11 : 16 comptes en lettres au milieu des phrases).
+ * Les comptes de personnes s'écrivent en chiffres, en tête de phrase comme ailleurs (« 46 personnes… ») :
+ * décision d'Arnaud (17/10), pour la précision et l'homogéneité. Appliqué par le code, pas laissé au moteur.
+ * « Une personne » reste en lettres : c'est un article autant qu'un nombre.
  */
-export function spellLeadingNumbers(text: string): string {
-  const digits = text.replace(COUNTED, (word, _w, offset: number) => {
-    const before = text.slice(0, offset)
-    const startsSentence = /(^|[.!?]\s+|\n\s*\n|[«(]\s?)$/.test(before)
-    return startsSentence ? word : DIGITS[word.toLowerCase()] ?? word
+export function countsInDigits(text: string): string {
+  return text.replace(COUNTED, (word: string) => {
+    const n = frenchNumber(word)
+    return n && n >= 2 ? String(n) : word
   })
-  return digits.replace(/(^|[.!?]\s+|\n\s*\n)(\d{1,2})(?= )/g, (all, before: string, n: string) => (LEADING[n] ? `${before}${LEADING[n]}` : all))
 }
 
 /**

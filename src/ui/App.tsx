@@ -1,9 +1,9 @@
-import { FlaskConical, House, KeyRound, Mic, Newspaper, PenTool, UserRound } from 'lucide-react'
+import { House, KeyRound, Layers, Mic, PenTool, Telescope, UserRound } from 'lucide-react'
 import { useEngines } from '@/app/engines'
 import { href, useRoute } from '@/app/router'
 import { Home } from './Home'
-import { ObservatoryPage } from './Observatory'
-import { cn, Tooltip } from './primitives'
+import { ObservatoryList, ObservatoryPage } from './Observatory'
+import { cn, Explain, Tooltip } from './primitives'
 import { ProjectPage } from './project/ProjectPage'
 import { SettingsPage } from './Settings'
 import { SynthesisPage } from './Synthesis'
@@ -20,45 +20,47 @@ export function App() {
       <header className="no-print sticky top-0 z-30 border-b bg-background/90 backdrop-blur">
         {/* À gauche, les modules (où je suis, où je peux aller) ; à droite, les moteurs d'IA, communs à tous les modules. */}
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
-          <nav aria-label="Modules" className="flex min-w-0 items-center gap-1">
-            <a href={href({ name: 'home' })} className="mr-2 flex shrink-0 items-center gap-2 font-semibold" aria-label="OpenScribe, accueil">
+          {/* Des icônes ; la page où l'on est dit son nom (demande d'Arnaud, 17/10). Les modules à venir restent visibles, grisés. */}
+          <nav aria-label="Modules" className="flex min-w-0 items-center gap-0.5 sm:gap-1">
+            <a href={href({ name: 'home' })} className="mr-1 hidden shrink-0 items-center gap-2 font-semibold sm:flex" aria-label="OpenScribe, accueil">
               <img src="/logo.svg" alt="" className="h-7 w-7" />
               <span className="hidden lg:inline">OpenScribe</span>
             </a>
-            {/* Sur mobile, le logo mène à l'accueil : l'icône en double laisse la place à l'Observatoire. */}
-            <NavLink href={href({ name: 'home' })} active={route.name === 'home'} className="hidden sm:flex">
-              <House className="size-4" /> Accueil
-            </NavLink>
-            <NavLink href={href({ name: 'synthesis' })} active={inSynthesis}>
-              <FlaskConical className="size-4" /> Synthèse
-            </NavLink>
-            {/* Les études publiées : des pages à part, qui portent ce même menu pour revenir. */}
-            <NavLink href="/observatoire/" active={route.name === 'observatory'}>
-              <Newspaper className="size-4" /> <span className="sr-only sm:not-sr-only">Observatoire</span>
-            </NavLink>
-            <SoonLink icon={<Mic className="size-4" />} label="Entretiens" />
-            <SoonLink icon={<UserRound className="size-4" />} label="Personas" />
-            <SoonLink icon={<PenTool className="size-4" />} label="Ateliers" />
+            <NavItem href={href({ name: 'home' })} active={route.name === 'home'} icon={<House />} label="Accueil" />
+            <NavItem href={href({ name: 'synthesis' })} active={inSynthesis} icon={<Layers />} label="Synthèse" />
+            <NavItem href={href({ name: 'observatories' })} active={route.name === 'observatory' || route.name === 'observatories'} icon={<Telescope />} label="Observatoire" />
+            <SoonItem icon={<Mic />} label="Entretiens" />
+            <SoonItem icon={<UserRound />} label="Personas" />
+            <SoonItem icon={<PenTool />} label="Ateliers" />
           </nav>
           <nav aria-label="Réglages" className="flex shrink-0 items-center">
-            <NavLink href={href({ name: 'settings' })} active={route.name === 'settings'}>
+            <a
+              href={href({ name: 'settings' })}
+              aria-current={route.name === 'settings' ? 'page' : undefined}
+              aria-label={`Moteurs d'IA : ${engine ? `${engine.name}${engineOk ? '' : ', à vérifier'}` : 'à choisir'}`}
+              className={cn(
+                'relative flex h-9 items-center gap-1.5 rounded-md px-2 text-sm font-medium transition-colors hover:bg-accent sm:px-2.5',
+                route.name === 'settings' && 'bg-accent text-accent-foreground',
+              )}
+            >
               <KeyRound className="size-4" />
-              <span className="sr-only whitespace-nowrap min-[380px]:not-sr-only">Moteurs d'IA</span>
+              <span className={cn('whitespace-nowrap', route.name === 'settings' ? '' : 'hidden md:inline')}>Moteurs d'IA</span>
               {loaded && (
                 <span
                   className={cn(
-                    'flex items-center gap-1 rounded-full px-2 py-0.5 text-xs',
-                    engine && engineOk ? 'bg-positive/15 text-positive' : 'bg-warning/25 text-foreground',
+                    'flex items-center gap-1 rounded-full text-xs',
+                    'max-sm:absolute max-sm:top-1.5 max-sm:right-1 sm:px-2 sm:py-0.5',
+                    engine && engineOk ? 'sm:bg-positive/15 sm:text-positive' : 'sm:bg-warning/25 sm:text-foreground',
                   )}
+                  aria-hidden
                 >
-                  <span className={cn('size-1.5 rounded-full', engine && engineOk ? 'bg-positive' : 'bg-warning')} aria-hidden />
+                  <span className={cn('size-1.5 rounded-full max-sm:size-2', engine && engineOk ? 'bg-positive' : 'bg-warning')} />
                   <span className="hidden whitespace-nowrap sm:inline">
                     {engine ? `${engine.name.replace(/ \(.*\)$/, '')}${engineOk ? '' : ' · à vérifier'}` : 'à choisir'}
                   </span>
-                  <span className="sr-only sm:hidden">{engine ? `Moteur : ${engine.name}${engineOk ? '' : ', à vérifier'}` : 'Moteur à choisir'}</span>
                 </span>
               )}
-            </NavLink>
+            </a>
           </nav>
         </div>
       </header>
@@ -68,6 +70,7 @@ export function App() {
         {route.name === 'settings' && <SettingsPage back={route.back} />}
         {route.name === 'project' && <ProjectPage id={route.id} tab={route.tab} />}
         {route.name === 'observatory' && <ObservatoryPage slug={route.slug} />}
+        {route.name === 'observatories' && <ObservatoryList />}
         {route.name === 'not-found' && (
           <p>
             Page introuvable.{' '}
@@ -79,7 +82,7 @@ export function App() {
       </main>
       <footer className="no-print mt-12 border-t py-5 text-center text-xs text-muted-foreground">
         OpenScribe, logiciel libre de recherche utilisateur (AGPL-3.0) · Vos données restent dans votre navigateur ·{' '}
-        <a href="/observatoire/" className="underline hover:text-foreground">
+        <a href={href({ name: 'observatories' })} className="underline hover:text-foreground">
           L'Observatoire
         </a>
       </footer>
@@ -87,33 +90,33 @@ export function App() {
   )
 }
 
-/** Un module annoncé mais pas encore disponible : visible pour situer la suite, grisé, expliqué au survol. */
-function SoonLink({ icon, label }: { icon: React.ReactNode; label: string }) {
+/** Un module annoncé mais pas encore disponible : visible pour situer la suite, grisé, expliqué au survol et au toucher. */
+function SoonItem({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <Tooltip content={`${label} : ce module n'est pas encore disponible.`}>
-      <button
-        type="button"
-        aria-disabled="true"
-        className="hidden cursor-not-allowed items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-muted-foreground/60 md:flex"
-      >
-        {icon} {label}
-      </button>
-    </Tooltip>
+    <Explain content={`${label} : ce module n'est pas encore disponible.`}>
+      <span aria-label={`${label}, bientôt`} className="flex h-9 cursor-not-allowed items-center rounded-md px-2 text-muted-foreground/50 sm:px-2.5 [&_svg]:size-4">
+        {icon}
+      </span>
+    </Explain>
   )
 }
 
-function NavLink({ href, active, className, children }: { href: string; active: boolean; className?: string; children: React.ReactNode }) {
+/** Une entrée du menu : l'icône seule ; la page où l'on est affiche aussi son nom. */
+function NavItem({ href, active, icon, label }: { href: string; active: boolean; icon: React.ReactNode; label: string }) {
   return (
-    <a
-      href={href}
-      aria-current={active ? 'page' : undefined}
-      className={cn(
-        'flex h-9 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors hover:bg-accent',
-        active && 'bg-accent text-accent-foreground',
-        className,
-      )}
-    >
-      {children}
-    </a>
+    <Tooltip content={label}>
+      <a
+        href={href}
+        aria-current={active ? 'page' : undefined}
+        aria-label={label}
+        className={cn(
+          'flex h-9 shrink-0 items-center gap-1.5 rounded-md px-2 text-sm font-medium transition-colors hover:bg-accent sm:px-2.5 [&_svg]:size-4',
+          active && 'bg-accent text-accent-foreground',
+        )}
+      >
+        {icon}
+        {active && <span className="whitespace-nowrap">{label}</span>}
+      </a>
+    </Tooltip>
   )
 }

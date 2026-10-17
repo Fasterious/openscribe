@@ -25,7 +25,8 @@ import {
   dropNearDuplicates,
   degenerateGrouping,
   checkOpposed,
-  spellLeadingNumbers,
+  countsInDigits,
+  frenchNumber,
   withDivided,
   missingCamps,
   describeMetrics,
@@ -47,7 +48,7 @@ import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
 import { emptyCorpus, promptsOf, removeSource, renameSource } from './corpus'
 import { maskNames, verifiedNames } from './analysis/names'
 import { dividedFragile, fragileShown, highlightLine, highlights, labelDoubt } from './analysis/highlights'
-import { categoryBar, categoryBarLabel, fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext, stanceTitle, summaryDoubts } from './analysis/report'
+import { categoryBar, categoryBarLabel, fullQuestionIds, leadSentence, wholeCamp, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext, stanceTitle, summaryDoubts } from './analysis/report'
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
@@ -564,6 +565,18 @@ describe('étiquettes à vérifier', () => {
     expect(summaryDoubts(sec([]))).toBeUndefined()
     expect(summaryDoubts(sec(['Accueil']))).toMatch(/^À vérifier avant de citer cette étiquette : « Accueil »\. Elle dépend/)
     expect(summaryDoubts(sec(['Accueil', 'Horaires', 'Tarifs']))).toContain('« Accueil », « Horaires » et « Tarifs ». Elles dépendent')
+  })
+  it('une pastille du résumé déroule tout le camp quand la phrase en donne le nombre', () => {
+    const ideas = [...['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I000${k}`, p, 'positive')), idea('I0009', 'P9', 'negative')]
+    const byId = new Map(ideas.map((i) => [i.id, i]))
+    const groups = [{ id: 'G1', title: 'Accueil', ideaIds: ideas.map((i) => i.id) }] as unknown as Group[]
+    // « 5 personnes » : le camp positif compte 5 participants, la pastille les déroule tous.
+    expect(wholeCamp('Bilan. 5 personnes saluent l’accueil ', ['I0000'], groups, byId)).toEqual({ ids: ['I0000', 'I0001', 'I0002', 'I0003', 'I0004'], people: 5 })
+    expect(wholeCamp('Cinq personnes saluent l’accueil ', ['I0000'], groups, byId)?.people).toBe(5)
+    // Sans le nombre, ou avec un camp mêlé : les seules idées citées.
+    expect(wholeCamp('Une personne salue l’accueil ', ['I0000'], groups, byId)).toBeUndefined()
+    expect(wholeCamp('5 personnes ', ['I0000', 'I0009'], groups, byId)).toBeUndefined()
+    expect(leadSentence('Le tri plaît beaucoup [I0001, I0002]. Une personne le juge lent [I0003].')).toBe('Le tri plaît beaucoup.')
   })
   it('ne dit pas « fragile » d’un avis unanime : une voix de moins, la conclusion tient', () => {
     const m = computeMetrics(['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I0${k}`, p, 'negative')))
@@ -1690,8 +1703,8 @@ describe('contrôles ajoutés à la certification B9', () => {
     expect(out.endsWith('Ils le sont encore sur 2 autres sujets (voir « Ce qui divise »).')).toBe(true)
     // Méthode « consultation » : une seule phrase, la base au premier sujet, les camps seuls ensuite.
     const compact = withDivided('A.\n\nB.', [g('G1', 'Un'), g('G2', 'Deux'), g('G3', 'Trois'), g('G4', 'Quatre'), g('G5', 'Cinq')], 'fr', false, undefined, true)
-    expect(compact).toContain('Les avis sont partagés sur trois sujets : cinq (2 positifs et 2 négatifs parmi les 4 participants qui donnent un avis), deux (2 positifs et 2 négatifs) et quatre (2 positifs et 2 négatifs).')
-    expect(compact.endsWith('Deux autres sujets divisent aussi (voir « Ce qui divise »).')).toBe(true)
+    expect(compact).toContain('Les avis sont partagés sur 3 sujets : cinq (2 positifs et 2 négatifs parmi les 4 participants qui donnent un avis), deux (2 positifs et 2 négatifs) et quatre (2 positifs et 2 négatifs).')
+    expect(compact.endsWith('2 autres sujets divisent aussi (voir « Ce qui divise »).')).toBe(true)
     // Les propositions contraires de plusieurs motifs tiennent en une phrase.
     const o = (id: string, title: string, about: string) =>
       ({
@@ -1706,19 +1719,15 @@ describe('contrôles ajoutés à la certification B9', () => {
     expect(two).toContain('Des propositions vont en sens contraire sur les horaires [I0001, I0002] et sur le prix [I0001, I0002].')
     expect(two.match(/sens contraire/g)).toHaveLength(1)
   })
-  it('un nombre en tête de phrase s’écrit en lettres', () => {
-    expect(spellLeadingNumbers('3 personnes regrettent X. Puis 4 autres.\n\n2 personnes proposent Y.')).toBe(
-      'Trois personnes regrettent X. Puis 4 autres.\n\nDeux personnes proposent Y.',
-    )
-  })
-  it('un compte de personnes au milieu d’une phrase s’écrit en chiffres', () => {
-    expect(spellLeadingNumbers('Trois personnes saluent X, tandis que deux personnes et cinq autres le déplorent. Deux d’entre elles hésitent.')).toBe(
-      'Trois personnes saluent X, tandis que 2 personnes et 5 autres le déplorent. Deux d’entre elles hésitent.',
-    )
-    // Un nombre qui ne compte pas des personnes reste en lettres : « à deux vitesses », « en deux temps ».
-    expect(spellLeadingNumbers('Une école à deux vitesses, en deux temps.')).toBe('Une école à deux vitesses, en deux temps.')
-    // Un nombre composé reste entier (plume, passe 12 : « Quarante-6 personnes »).
-    expect(spellLeadingNumbers('Quarante-six personnes le saluent, et vingt-deux autres le critiquent.')).toBe('Quarante-six personnes le saluent, et vingt-deux autres le critiquent.')
+  it('un compte de personnes s’écrit en chiffres, en tête de phrase comme ailleurs (décision d’Arnaud)', () => {
+    expect(countsInDigits('Trois personnes saluent X, tandis que deux personnes et cinq autres le déplorent.')).toBe('3 personnes saluent X, tandis que 2 personnes et 5 autres le déplorent.')
+    // Un nombre composé, entier.
+    expect(countsInDigits('Quarante-six personnes le saluent, et vingt-deux autres le critiquent.')).toBe('46 personnes le saluent, et 22 autres le critiquent.')
+    // « Une personne » reste en lettres ; un nombre qui ne compte pas des personnes aussi.
+    expect(countsInDigits('Une personne regrette X. Une école à deux vitesses, en deux temps.')).toBe('Une personne regrette X. Une école à deux vitesses, en deux temps.')
+    // Un mot qui n'est pas un nombre ne bouge pas.
+    expect(countsInDigits('Les autres personnes et quelques parents.')).toBe('Les autres personnes et quelques parents.')
+    expect([frenchNumber('soixante-dix'), frenchNumber('quatre-vingt-deux'), frenchNumber('vingt-et-un'), frenchNumber('dix-sept')]).toEqual([70, 82, 21, 17])
   })
 })
 

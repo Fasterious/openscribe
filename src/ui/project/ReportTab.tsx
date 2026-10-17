@@ -15,6 +15,10 @@ import {
   categoryOrder,
   categoryBarLabel,
   highlightSections,
+  leadSentence,
+  wholeCamp,
+  SECTION_CAMP,
+  type HighlightSection,
   summaryDoubts,
   metricsLine,
   originOf,
@@ -173,27 +177,31 @@ const BAR: Record<IdeaCategory, string> = {
  * Affiche un texte en rendant cliquables les références [I0001, I0002] : un
  * clic déplie les verbatims juste en dessous, sans quitter la lecture.
  */
-function CitedText({ text, ctx }: { text: string; ctx: Ctx }) {
+/** `camps` (le résumé) : une pastille qui suit un nombre annoncé déroule tout le camp compté (`wholeCamp`). */
+function CitedText({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: Group[] }) {
   // Un texte rédigé peut compter plusieurs paragraphes (le résumé en trois temps).
   const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim())
   if (paragraphs.length > 1)
     return (
       <div className="space-y-3">
         {paragraphs.map((p, i) => (
-          <CitedParagraph key={i} text={p.trim()} ctx={ctx} />
+          <CitedParagraph key={i} text={p.trim()} ctx={ctx} camps={camps} />
         ))}
       </div>
     )
-  return <CitedParagraph text={text} ctx={ctx} />
+  return <CitedParagraph text={text} ctx={ctx} camps={camps} />
 }
 
-function CitedParagraph({ text, ctx }: { text: string; ctx: Ctx }) {
+function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: Group[] }) {
   const [open, setOpen] = useState<number | null>(null)
   const parts = text.split(/(\[I\d{4,}(?:\s*,\s*I\d{4,})*\])/g)
-  const refs = parts.map((part) => {
+  const cited = parts.map((part) => {
     const m = part.match(/^\[(.*)\]$/)
     return m ? m[1].split(/\s*,\s*/).filter((id) => ctx.ideaById.has(id)) : null
   })
+  // Le camp entier, quand la phrase en annonce le nombre ; sinon les idées citées.
+  const whole = cited.map((ids, i) => (ids && camps ? wholeCamp(parts.slice(0, i).join(''), ids, camps, ctx.ideaById) : undefined))
+  const refs = cited.map((ids, i) => whole[i]?.ids ?? ids)
   return (
     <div>
       <p className="leading-relaxed">
@@ -211,10 +219,10 @@ function CitedParagraph({ text, ctx }: { text: string; ctx: Ctx }) {
                 className={`mx-0.5 inline-flex min-h-6 cursor-pointer items-center gap-0.5 rounded-full px-2 py-0 align-baseline text-sm font-medium sm:min-h-0 sm:px-1.5 ${
                   isOpen ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'
                 }`}
-                aria-label={`${isOpen ? 'Masquer' : 'Voir'} ${plural(ids.length, 'verbatim')}`}
+                aria-label={`${isOpen ? 'Masquer' : 'Voir'} ${whole[i] ? `les verbatims de ${plural(whole[i]!.people, 'participant')}` : plural(ids.length, 'verbatim')}`}
               >
                 <Quote className="size-3" />
-                {ids.length}
+                {whole[i]?.people ?? ids.length}
               </button>
             </Tooltip>
           )
@@ -222,6 +230,59 @@ function CitedParagraph({ text, ctx }: { text: string; ctx: Ctx }) {
       </p>
       {open !== null && refs[open] && <QuotesPanel ids={refs[open]!} ctx={ctx} onClose={() => setOpen(null)} />}
     </div>
+  )
+}
+
+/**
+ * Une ligne des listes du résumé : le titre et les chiffres, la phrase qui ouvre la synthèse du motif, et un bouton
+ * ❝ N qui déroule les verbatims des N participants comptés (le camp de la liste), sans cadre, sous la ligne
+ * (demande d'Arnaud, 17/10 : les verbatims viennent en appui, pas des citations choisies).
+ */
+function HighlightLine({
+  section,
+  item,
+  ctx,
+  groupById,
+  children,
+}: {
+  section: HighlightSection['key']
+  item: HighlightSection['items'][number]
+  ctx: Ctx
+  groupById: Map<string, Group>
+  children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(false)
+  const group = groupById.get(item.groupId)
+  const camp = SECTION_CAMP[section]
+  const ideas = (group?.ideaIds ?? [])
+    .map((id) => ctx.ideaById.get(id)!)
+    .filter((i) => i && camp.includes(i.category) && (!ctx.segment || ctx.segment.has(i.participantId)))
+  const people = new Set(ideas.map((i) => i.participantId)).size
+  const lead = group?.summary && !ctx.segment ? leadSentence(group.summary) : ''
+  return (
+    <>
+      {children}
+      {(lead || people > 0) && (
+        <span className="mt-1 block text-[15px] leading-relaxed">
+          {lead && <span>{ctx.mask(lead)} </span>}
+          {people > 0 && (
+            <button
+              type="button"
+              onClick={() => setOpen((o) => !o)}
+              aria-expanded={open}
+              aria-label={`${open ? 'Masquer' : 'Voir'} les verbatims de ${plural(people, 'participant')}`}
+              className={`inline-flex min-h-6 cursor-pointer items-center gap-0.5 rounded-full px-2 py-0 align-baseline text-sm font-medium sm:min-h-0 sm:px-1.5 ${
+                open ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'
+              }`}
+            >
+              <Quote className="size-3" />
+              {people}
+            </button>
+          )}
+        </span>
+      )}
+      {open && <QuotesPanel ids={ideas.map((i) => i.id)} ctx={ctx} onClose={() => setOpen(false)} />}
+    </>
   )
 }
 
@@ -234,25 +295,35 @@ function TabActions({ children }: { children: React.ReactNode }) {
 
 /** Au survol d'une référence : les passages qui fondent la phrase, dans leur texte d'origine. */
 function QuotesPreview({ ids, ctx }: { ids: string[]; ctx: Ctx }) {
-  const ideas = ids.map((id) => ctx.ideaById.get(id)).filter((i): i is Idea => !!i)
+  const all = ids.map((id) => ctx.ideaById.get(id)).filter((i): i is Idea => !!i)
+  // Au survol, trois passages au plus : le clic les déroule tous.
+  const ideas = all.slice(0, 3)
   return (
     <div className="space-y-3">
       {ideas.map((idea) => (
         <SourceContext key={idea.id} idea={idea} ctx={ctx} excerpt={ideas.length > 1 ? 90 : 180} />
       ))}
-      <p className="text-xs text-muted-foreground">Cliquer pour garder ces passages ouverts.</p>
+      <p className="text-xs text-muted-foreground">
+        {all.length > 3 ? `Et ${all.length - 3} autres : cliquer pour tout dérouler.` : 'Cliquer pour garder ces passages ouverts.'}
+      </p>
     </div>
   )
 }
 
-/** Les verbatims d'une référence, dépliés sur place, avec leur contexte. */
+/**
+ * Les verbatims qu'une pastille déroule, sous le texte : une ligne par participant, par catégorie, sans cadre ;
+ * chaque verbatim se déplie à son tour dans sa réponse entière (même forme partout : synthèses, résumé, listes).
+ */
 function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: () => void }) {
+  const ideas = ids.map((id) => ctx.ideaById.get(id)).filter((i): i is Idea => !!i)
+  const cats = [...new Set(ideas.map((i) => i.category))]
   return (
-    <div className="mt-2 space-y-2">
-      {ids.map((id) => {
-        const idea = ctx.ideaById.get(id)
-        return idea ? <SourceContext key={id} idea={idea} ctx={ctx} card /> : null
-      })}
+    <div className="mt-2 space-y-1.5">
+      {cats.map((cat) =>
+        personLines(ideas.filter((i) => i.category === cat)).map((l) => (
+          <PersonLine key={`${cat}-${l.participantId}`} line={l} cat={cat} other={false} full={new Set()} ctx={ctx} />
+        )),
+      )}
       <button type="button" onClick={onClose} className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
         Replier
       </button>
@@ -637,7 +708,8 @@ export function ReportTab({
 
   return (
     <article className="space-y-6">
-      <p className="text-base text-muted-foreground">
+      {/* Une étude publiée dit sa date et ses chiffres dans son en-tête : pas de seconde ligne (remarque d'Arnaud, 17/10). */}
+      <p className={published && !segment ? 'hidden' : 'text-base text-muted-foreground'}>
         Rapport du {formatDate(analysis.updatedAt)} · {plural(all.participants, 'participant')} · {plural(all.mentions, 'occurrence')}
         {names.length > 0 &&
           (masked
@@ -780,7 +852,7 @@ export function ReportTab({
             Résumé
           </h2>
           <div className="max-w-3xl text-base">
-            <CitedText text={analysis.globalSummary} ctx={ctx} />
+            <CitedText text={analysis.globalSummary} ctx={ctx} camps={analysis.groups} />
             <Unverified items={analysis.globalUnverified} />
             {summaryDoubts(sectionsHL) && <p className="mt-2 text-sm text-muted-foreground">{summaryDoubts(sectionsHL)}</p>}
           </div>
@@ -810,6 +882,7 @@ export function ReportTab({
                     <ul className="space-y-2 text-base">
                       {sec.items.map((x) => (
                         <li key={x.title} className={`border-l-[3px] pl-2.5 ${look.line}`}>
+                          <HighlightLine section={sec.key} item={x} ctx={ctx} groupById={groupById}>
                           <span className="font-medium">{x.title}</span>
                           <span className="block text-sm text-muted-foreground">
                             {x.detail}
@@ -830,11 +903,7 @@ export function ReportTab({
                               </>
                             )}
                           </span>
-                          {x.quotes.map((q, i) => (
-                            <span key={i} className="mt-1 block text-sm">
-                              <span className="italic">«&nbsp;{q.text}&nbsp;»</span> <span className="font-semibold text-muted-foreground">{q.who}</span>
-                            </span>
-                          ))}
+                          </HighlightLine>
                         </li>
                       ))}
                     </ul>
@@ -845,7 +914,8 @@ export function ReportTab({
             })}
           </div>
           <p className="text-sm text-muted-foreground">
-            Listes établies par le code à partir des chiffres de chaque motif, sans rédaction de l'IA, sur {plural(all.participants, 'participant')}.
+            Listes établies par le code à partir des chiffres de chaque motif, sur {plural(all.participants, 'participant')} ; la phrase sous chaque
+            motif ouvre sa synthèse, et ❝ déroule les verbatims qu'elle compte.
           </p>
         </section>
       )}

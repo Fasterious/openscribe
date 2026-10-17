@@ -6,7 +6,7 @@ import { dividedFragile, fragileShown, highlights, labelDoubt, type Highlight, t
 import { withCurrentMetrics } from './metrics'
 import { maskNames, maskWithOffsets } from './names'
 import { ARTICLE_SCRIPT, scriptJson } from './article'
-import { describeTheme } from './pipeline'
+import { describeTheme, frenchNumber } from './pipeline'
 import type { AnalysisState, Group, GroupDefinition, Idea, IdeaCategory, Metrics } from './types'
 
 /**
@@ -588,7 +588,8 @@ export interface HighlightSection {
   /** Ce que comptent les chiffres de la liste, dit une seule fois. */
   intro?: string
   /** Verbatims montrés sous une ligne, avec leur auteur ; `fragile` et `doubt` : les marques de méthode, que l'affichage explique. */
-  items: { title: string; detail: string; quotes: { who: string; text: string }[]; fragile?: boolean; doubt?: string }[]
+  /** `groupId` : le motif de la ligne (l'application déroule ses verbatims au clic). */
+  items: { groupId: string; title: string; detail: string; quotes: { who: string; text: string }[]; fragile?: boolean; doubt?: string }[]
   /** Motifs au-delà des premiers, nommés sans détail : une liste n'est jamais coupée en silence. */
   more: string[]
 }
@@ -606,6 +607,40 @@ export function summaryDoubts(sections: HighlightSection[]): string | undefined 
   return q.length > 1
     ? `À vérifier avant de citer ces étiquettes : ${list}. Elles dépendent d'avis comptés aussi dans un autre motif ; le détail est dans les listes ci-dessous.`
     : `À vérifier avant de citer cette étiquette : ${list}. Elle dépend d'avis comptés aussi dans un autre motif ; le détail est dans les listes ci-dessous.`
+}
+
+/**
+ * Une phrase du résumé qui annonce un nombre (« 46 personnes », « 27 sur 28 ») et cite des idées d'un même motif et
+ * d'un même camp : sa pastille déroule tout le camp, pas les seuls exemples cités (demande d'Arnaud, 17/10 : « je
+ * clique sur 46, les 46 se déroulent »). Sinon, rien : la pastille garde les idées citées.
+ */
+export function wholeCamp(before: string, ids: string[], groups: Group[], byId: Map<string, Idea>): { ids: string[]; people: number } | undefined {
+  const cited = ids.map((id) => byId.get(id)).filter((i): i is Idea => !!i)
+  if (!cited.length || cited.some((i) => i.category !== cited[0].category)) return undefined
+  const g = groups.find((x) => cited.every((i) => x.ideaIds.includes(i.id)))
+  if (!g) return undefined
+  const camp = g.ideaIds.map((id) => byId.get(id)).filter((i): i is Idea => !!i && i.category === cited[0].category)
+  const people = new Set(camp.map((i) => i.participantId)).size
+  if (people <= new Set(cited.map((i) => i.participantId)).size) return undefined
+  const sentence = before.split(/(?<=[.!?])\s+/).pop() ?? ''
+  const numbers = [...sentence.matchAll(/(?<![\p{L}\d-])(\d+|\p{L}+(?:-\p{L}+)*)(?![\p{L}\d])/gu)].map((m) => (/^\d+$/.test(m[1]) ? Number(m[1]) : frenchNumber(m[1])))
+  return numbers.includes(people) ? { ids: camp.map((i) => i.id), people } : undefined
+}
+
+/** Les idées qu'une ligne des listes déroule au clic : le camp que la liste compte (avis positifs pour « Ce qui a marché »…). */
+export const SECTION_CAMP: Record<keyof Highlights, IdeaCategory[]> = {
+  strengths: ['positive'],
+  blockers: ['negative'],
+  divided: ['positive', 'negative'],
+  proposals: ['suggestion'],
+  questions: ['question'],
+}
+
+/** La première phrase d'un texte rédigé, sans ses renvois : le résumé d'un motif en une ligne, sous son titre dans les listes. */
+export function leadSentence(text: string): string {
+  const clean = text.split(/\n\s*\n/)[0].replace(/\s*\[I\d{4,}(?:\s*,\s*I\d{4,})*\]/g, '').trim()
+  const m = clean.match(/^.+?[.!?](?=\s+\p{Lu}|\s*$)/su)
+  return (m ? m[0] : clean).replace(/\s+([.,;:])/g, '$1')
 }
 
 export function highlightSections(state: AnalysisState): HighlightSection[] {
@@ -643,6 +678,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
       heading: 'Ce qui a marché',
       intro: INTRO,
       items: s1.shown.map((x) => ({
+        groupId: x.groupId,
         title: x.title,
         detail: opinion(x, 'positif'),
         ...marks(x.groupId),
@@ -655,6 +691,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
       heading: 'Ce qui bloque',
       intro: INTRO,
       items: s2.shown.map((x) => ({
+        groupId: x.groupId,
         title: x.title,
         detail: opinion(x, 'négatif'),
         ...marks(x.groupId),
@@ -674,12 +711,13 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
           const n = Math.max(g.metrics.positiveOnly.length, g.metrics.negativeOnly.length)
           const total = g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
           return {
+            groupId: x.groupId,
             title: x.title,
             detail: `${n} avis ${side}${n > 1 ? 's' : ''} sur ${total}, mais deux propositions s'opposent sur ${x.opposed.about}`,
             quotes: [quote(x.opposed.a), quote(x.opposed.b)],
           }
         }
-        return { title: x.title, detail: describeOpinions(g) + (x.opposed ? ` ; pistes opposées : ${x.opposed.about}` : ''), quotes: [], ...marks(x.groupId) }
+        return { groupId: x.groupId, title: x.title, detail: describeOpinions(g) + (x.opposed ? ` ; pistes opposées : ${x.opposed.about}` : ''), quotes: [], ...marks(x.groupId) }
       }),
       more: s3.more,
     },
@@ -687,6 +725,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
       key: 'proposals',
       heading: 'Ce que proposent les participants',
       items: s4.shown.map((x) => ({
+        groupId: x.groupId,
         title: x.title,
         detail: `${x.people} participant${pl(x.people)}`,
         // Deux propositions au plus, de deux personnes différentes si possible, les plus parlantes (les plus longues).
@@ -701,6 +740,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
       key: 'questions',
       heading: 'Questions soulevées',
       items: s5.shown.map((x) => ({
+        groupId: x.groupId,
         title: x.title,
         detail: `${x.people} participant${pl(x.people)}`,
         quotes: pickQuotes(

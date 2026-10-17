@@ -61,7 +61,7 @@ const date = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR'
 
 // Le menu de l'application, sur chaque page publiée : on revient toujours à l'accueil, à Synthèse ou à la liste.
 const menu = (here: 'list' | 'study') => `<header class="obs-menu"><a class="obs-brand" href="/"><img src="/logo.svg" alt="" width="28" height="28"><span>OpenScribe</span></a>
-<nav aria-label="Menu"><a href="/">Accueil</a><a href="/#/synthese">Synthèse</a><a href="/observatoire/"${here === 'list' ? ' aria-current="page"' : ''}>Observatoire</a></nav></header>`
+<nav aria-label="Menu"><a href="/">Accueil</a><a href="/#/synthese">Synthèse</a><a href="/#/observatoire"${here === 'list' ? ' aria-current="page"' : ''}>Observatoire</a></nav></header>`
 const menuStyle = `.obs-menu{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1rem;padding-bottom:.8rem;margin-bottom:1.2rem;border-bottom:1px solid var(--line)}
 .obs-menu a,.obs-nav a{border:0;text-decoration:none}
 .obs-brand{display:flex;align-items:center;gap:.5rem;font-weight:700;color:var(--ink);text-decoration:none}
@@ -69,7 +69,10 @@ const menuStyle = `.obs-menu{display:flex;flex-wrap:wrap;align-items:center;just
 .obs-menu nav a:hover{background:var(--card)}.obs-menu nav a[aria-current]{background:var(--card);color:var(--brand)}
 @media print{.obs-menu,.obs-nav{display:none}}`
 
-const sampleLine = `${n(fiche.sample)} réponses tirées au sort parmi ${n(fiche.population)} (marge de ± ${fiche.margin} points à 95 %). Un avis partagé par 1 % des contributeurs a ${Math.round((1 - 0.99 ** fiche.sample) * 100)} % de chances d'apparaître au moins une fois dans l'échantillon ; un avis plus rare peut manquer.`
+// 378 réponses tirées, 366 participants dans le rapport : l'écart se dit (remarque d'Arnaud, 17/10).
+const speakers = new Set(analysis.ideas.map((i) => i.participantId)).size
+const silent = fiche.sample - speakers
+const sampleLine = `${n(fiche.sample)} réponses tirées au sort parmi ${n(fiche.population)} (marge de ± ${fiche.margin} points à 95 %).${silent > 0 ? ` ${n(silent)} d'entre elles, trop brèves ou sans avis sur la question, ne donnent aucune idée : le rapport porte sur ${n(speakers)} participants.` : ''} Un avis partagé par 1 % des contributeurs a ${Math.round((1 - 0.99 ** fiche.sample) * 100)} % de chances d'apparaître au moins une fois dans l'échantillon ; un avis plus rare peut manquer.`
 // Publication grand public : l'étude masquée une fois (prénoms, réponses entières comprises), source des deux versions.
 const study = publishedStudy(project, analysis, {
   slug: fiche.slug,
@@ -80,8 +83,8 @@ const study = publishedStudy(project, analysis, {
 })
 const report = reportToHtml(study.project.analyses[0], study.project.corpus, fiche.title)
 const head = `${menu('study')}
-<nav class="obs-nav"><a href="/observatoire/">← Toutes les études de l'Observatoire</a></nav>
-<p class="obs-switch">Touchez un renvoi (P12) pour voir ses verbatims, ou un verbatim pour le relire dans sa réponse complète. Vous préférez parcourir les motifs un à un ? <a href="/#/observatoire/${e(fiche.slug)}">Ouvrir dans l'application</a>.</p>
+<nav class="obs-nav"><a href="/#/observatoire">← Toutes les études de l'Observatoire</a></nav>
+<p class="obs-switch">Touchez un renvoi (P12) pour voir ses verbatims, ou un verbatim pour le relire dans sa réponse complète. <a href="/#/observatoire/${e(fiche.slug)}">Revenir à l'étude dans l'application</a>.</p>
 <p class="obs-meta">Publiée le ${e(date(fiche.publishedAt))} · ${e(fiche.news)}</p>`
 const card = `<section class="obs-fiche" aria-label="Fiche de l'étude">
 <h2>En bref</h2>
@@ -151,8 +154,8 @@ ${menu('list')}
 ${studies
   .map(
     (s) => `<article>
-<h2><a href="${e(s.slug)}/">${e(s.title)}</a></h2>
-<p class="meta">Publiée le ${e(date(s.publishedAt))} · ${e(s.news)} · <a href="/#/observatoire/${e(s.slug)}">Ouvrir dans l'application</a></p>
+<h2><a href="/#/observatoire/${e(s.slug)}">${e(s.title)}</a></h2>
+<p class="meta">Publiée le ${e(date(s.publishedAt))} · ${e(s.news)} · <a href="${e(s.slug)}/">Lire en une page</a></p>
 ${paras(s.summary)}
 </article>`,
   )

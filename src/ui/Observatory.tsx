@@ -1,4 +1,5 @@
-import { ArrowLeft, FileText } from 'lucide-react'
+import { ArrowLeft, ArrowRight, FileText } from 'lucide-react'
+import { href } from '@/app/router'
 import { useEffect, useState } from 'react'
 import type { PublishedStudy } from '@/core/observatoire'
 import { Disclosure } from './primitives'
@@ -35,7 +36,7 @@ export function ObservatoryPage({ slug }: { slug: string }) {
   }, [study])
 
   const back = (
-    <a href="/observatoire/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+    <a href={href({ name: 'observatories' })} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
       <ArrowLeft className="size-4" /> Toutes les études de l'Observatoire
     </a>
   )
@@ -60,6 +61,9 @@ export function ObservatoryPage({ slug }: { slug: string }) {
 
   const analysis = study.project.analyses[0]
   const f = study.fiche
+  // Les chiffres de l'en-tête : les personnes qui disent au moins une chose sur la question, les idées sans les copies du codage en double.
+  const people = new Set(analysis.ideas.map((i) => i.participantId)).size
+  const ideas = analysis.ideas.filter((i) => !i.copyOf).length
   return (
     <div className="space-y-6">
       <div className="space-y-3">
@@ -68,7 +72,7 @@ export function ObservatoryPage({ slug }: { slug: string }) {
           <h1 className="text-2xl font-bold sm:text-3xl">{study.title}</h1>
           <p className="text-sm text-muted-foreground">
             Publiée le {date(study.publishedAt)}
-            {study.news && ` · ${study.news}`}
+            {study.news && ` · ${study.news}`} · {people.toLocaleString('fr-FR')} participants · {ideas.toLocaleString('fr-FR')} idées
           </p>
         </div>
         <div className="no-print flex flex-wrap items-center gap-2">
@@ -82,16 +86,6 @@ export function ObservatoryPage({ slug }: { slug: string }) {
         </div>
       </div>
 
-      <section aria-labelledby="en-bref" className="max-w-3xl space-y-2">
-        <h2 id="en-bref" className="text-xl font-semibold">
-          En bref
-        </h2>
-        {paras(f.summary).map((p, i) => (
-          <p key={i} className="text-base">
-            {p}
-          </p>
-        ))}
-      </section>
 
       <Disclosure flat summary={<span className="text-base font-semibold">Avant de lire : la question, les données, les limites</span>}>
         <div className="max-w-3xl space-y-3 text-base">
@@ -115,6 +109,55 @@ export function ObservatoryPage({ slug }: { slug: string }) {
       </Disclosure>
 
       <ReportTab project={study.project} analysis={analysis} published />
+    </div>
+  )
+}
+
+/** Une ligne de la liste publiée (`public/observatoire/index.json`). */
+type ListedStudy = { slug: string; title: string; publishedAt: string; news: string; summary: string }
+
+/** La liste des études de l'Observatoire, dans l'application : le même menu que partout ailleurs. */
+export function ObservatoryList() {
+  const [studies, setStudies] = useState<ListedStudy[] | null | undefined>(undefined)
+  useEffect(() => {
+    fetch('/observatoire/index.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setStudies)
+      .catch(() => setStudies(null))
+  }, [])
+  return (
+    <div className="max-w-3xl space-y-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold sm:text-3xl">L'Observatoire</h1>
+        <p className="text-muted-foreground">
+          L'analyse publique de consultations citoyennes en données ouvertes, réalisée avec OpenScribe. Le moteur d'IA propose, le code vérifie : chaque
+          chiffre se recompte, chaque citation renvoie à la réponse d'origine.
+        </p>
+      </div>
+      {studies === undefined && <p className="text-sm text-muted-foreground">Chargement…</p>}
+      {studies === null && <p>La liste des études n'a pas pu être chargée.</p>}
+      {studies?.map((s) => (
+        <article key={s.slug} className="space-y-2 border-b pb-6">
+          <h2 className="text-xl font-semibold">
+            <a href={href({ name: 'observatory', slug: s.slug })} className="hover:text-primary">
+              {s.title}
+            </a>
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Publiée le {date(s.publishedAt)}
+            {s.news && ` · ${s.news}`}
+          </p>
+          <p>{paras(s.summary)[0]}</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium">
+            <a href={href({ name: 'observatory', slug: s.slug })} className="inline-flex items-center gap-1 text-primary hover:underline">
+              Lire l'étude <ArrowRight className="size-4" aria-hidden />
+            </a>
+            <a href={`/observatoire/${s.slug}/`} className="text-muted-foreground hover:text-foreground hover:underline">
+              Lire en une page
+            </a>
+          </div>
+        </article>
+      ))}
     </div>
   )
 }

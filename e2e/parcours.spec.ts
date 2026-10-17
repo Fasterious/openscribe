@@ -51,50 +51,49 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await noHorizontalScroll(page)
   await shot(page, '1-accueil')
 
-  // Un clic sur une étude de l'Observatoire ouvre l'article : tout le rapport sur une page, qui se déplie au toucher.
-  await page.getByRole('link', { name: /L'école vue par les familles/ }).click()
-  await expect(page).toHaveURL(/\/observatoire\/ecole-grand-debat-2019\/$/)
-  await expect(page.getByText('Méthode et limites').first()).toBeVisible()
-  await noHorizontalScroll(page)
+  // Un clic sur une étude de l'Observatoire l'ouvre dans l'application, avec le même menu que partout.
   const tap = async (l: Locator) => (testInfo.project.name === 'mobile' ? l.tap() : l.click())
-  const group = page.locator('section.group').nth(1)
-  // La définition du motif est pliée : la synthèse se lit d'abord.
-  await expect(group.locator('details.def')).not.toHaveAttribute('open', '')
-  // Un renvoi (P12) déplie ses verbatims ; un verbatim, sa réponse entière avec le passage cité en gras.
-  await tap(group.locator('a.ref').first())
-  await expect(group.locator('.panel .q').first()).toBeVisible()
-  await tap(group.locator('.panel .q').first())
-  await expect(group.locator('.panel .ctx strong').first()).toBeVisible()
-  // Un « ? » déplie l'explication d'une étiquette.
-  await tap(group.locator('button.help').first())
-  await expect(group.locator('.panel .tip').first()).toContainText('donnent un avis')
-  // Les deux versions se répondent : l'application, puis retour à l'article.
-  await page.getByRole('link', { name: "Ouvrir dans l'application" }).click()
-  await expect(page.getByRole('heading', { name: 'En bref' })).toBeVisible()
+  await page.getByRole('link', { name: /L'école vue par les familles/ }).click()
+  await expect(page).toHaveURL(/#\/observatoire\/ecole-grand-debat-2019$/)
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
+  // Un seul résumé, et les chiffres dans la ligne grise de l'en-tête.
+  await expect(page.getByRole('heading', { name: 'En bref' })).toHaveCount(0)
+  await expect(page.getByText(/Publiée le .* participants · .* idées/)).toBeVisible()
+  await expect(page).toHaveTitle(/L'Observatoire OpenScribe/)
   await noHorizontalScroll(page)
+  // Une ligne des listes : sa phrase, et ❝ N déroule les verbatims des N participants comptés.
+  const line = page.locator('#saillants').locator('..').getByRole('button', { name: /Voir les verbatims de \d+ participants?/ }).first()
+  await tap(line)
+  await expect(page.locator('#saillants').locator('..').getByRole('button', { name: /^«/ }).first()).toBeVisible()
+  // Dans le résumé, une pastille qui suit un nombre déroule tout le camp compté.
+  await expect(page.locator('section[aria-labelledby="resume"]').getByRole('button', { name: /les verbatims de \d+ participants/ }).first()).toBeVisible()
+  // Un motif : sa définition pliée, un verbatim qui se replace dans sa réponse.
   const motif = page.locator('details').filter({ has: page.locator('h3, h4') }).nth(2)
   await motif.locator('h3, h4').first().click()
-  // La définition du motif est là, pliée, sous sa synthèse.
   await expect(motif.getByText('Ce qui compte comme positif ou négatif dans ce motif')).toBeVisible()
   await tap(motif.getByRole('button', { name: /^«/ }).first())
   await expect(motif.locator('mark').first()).toBeVisible()
-  await expect(page).toHaveTitle(/L'Observatoire OpenScribe/)
+  // L'article reste à un bouton : renvois et verbatims s'y déplient aussi.
   await page.getByRole('link', { name: 'Lire en une page' }).click()
   await expect(page.getByText('Méthode et limites').first()).toBeVisible()
-  await page.getByRole('link', { name: "Ouvrir dans l'application" }).click()
-  await expect(page.getByRole('heading', { name: 'En bref' })).toBeVisible()
+  await noHorizontalScroll(page)
+  const group = page.locator('section.group').nth(1)
+  await expect(group.locator('details.def')).not.toHaveAttribute('open', '')
+  await tap(group.locator('a.ref').first())
+  await tap(group.locator('.panel .q').first())
+  await expect(group.locator('.panel .ctx strong').first()).toBeVisible()
+  await tap(group.locator('button.help').first())
+  await expect(group.locator('.panel .tip').first()).toContainText('donnent un avis')
+  await page.getByRole('link', { name: "Revenir à l'étude dans l'application" }).click()
+  await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
+  // La liste des études est dans l'application ; le menu ramène partout.
   await page.getByRole('link', { name: "Toutes les études de l'Observatoire" }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText("L'Observatoire")
-  await page.getByRole('link', { name: /L'école vue par les familles/ }).click()
-  await page.getByRole('link', { name: "← Toutes les études de l'Observatoire" }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText("L'Observatoire")
-  await page.getByRole('navigation', { name: 'Menu' }).getByRole('link', { name: 'Accueil' }).click()
+  await page.getByRole('navigation', { name: 'Modules' }).getByRole('link', { name: 'Accueil', exact: true }).click()
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Des verbatims au rapport')
-  // Le menu de l'application mène à la liste des études.
   await page.getByRole('navigation', { name: 'Modules' }).getByRole('link', { name: 'Observatoire' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText("L'Observatoire")
-  await page.getByRole('navigation', { name: 'Menu' }).getByRole('link', { name: 'Synthèse' }).click()
+  await page.getByRole('navigation', { name: 'Modules' }).getByRole('link', { name: 'Synthèse' }).click()
   await expect(page.getByRole('heading', { name: 'Vos synthèses' })).toBeVisible()
   await page.goto('/')
 
@@ -136,6 +135,8 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
     .click()
   await expect(page.getByRole('button', { name: /Masquer \d+ verbatims?/ })).toHaveAttribute('aria-expanded', 'true')
   await expect(page.getByRole('dialog')).toHaveCount(0)
+  // Une ligne par participant ; un verbatim se replace dans sa réponse, le passage cité en gras.
+  await page.locator('article').getByRole('button', { name: /^«/ }).first().click()
   await expect(page.locator('article mark').first()).toBeVisible()
   await shot(page, '4-verbatims')
 

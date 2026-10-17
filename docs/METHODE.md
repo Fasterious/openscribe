@@ -91,8 +91,15 @@ introduction pour chacun. Un thème rapproche des motifs voisins ; on n'y additi
 
 Le code prépare les listes « Ce qui a marché », « Ce qui bloque », « Ce qui divise », « Ce que proposent
 les participants » et « Questions soulevées » : des motifs classés par le code, avec leurs chiffres. Le
-moteur rédige le résumé à partir de ces listes et des synthèses. Le code vérifie que chaque nombre du résumé
-correspond à un chiffre calculé ; sinon la phrase est signalée « à vérifier » ou retirée.
+moteur rédige le résumé à partir de ces listes et des synthèses : sa première phrase dit qui pense quoi, en
+nombre de personnes (le jugement d'ensemble, puis la critique ou l'éloge le plus partagé), jamais un compte global
+des critiques. Le code vérifie que chaque nombre du résumé correspond à un chiffre calculé ; sinon la phrase est
+signalée « à vérifier » ou retirée.
+
+Dans l'application, chaque ligne des listes donne la phrase qui ouvre la synthèse de son motif, puis un bouton
+❝ N qui déroule les verbatims des N participants comptés. Dans le résumé, un bouton qui suit un nombre
+(« 46 personnes… ❝ 46 ») déroule tout le camp compté, pas seulement les exemples cités ; sinon, il déroule les
+idées citées. Les verbatims viennent en appui de ce qu'on lit, jamais choisis au hasard.
 
 ## 6. Relire la langue
 
@@ -100,8 +107,8 @@ Le moteur relit les synthèses, les introductions et le résumé pour qu'ils se 
 refuse toute réécriture qui perd un renvoi ou change un chiffre. Le moteur vérifie ensuite que chaque phrase
 s'appuie bien sur les verbatims qu'elle cite, et corrige les renvois ; une phrase dont un nombre ou un compte
 n'est pas appuyé est retirée par le code. Quelques règles d'écriture sont appliquées par le code, pas par le
-moteur : un nombre en tête de phrase s'écrit en lettres, un compte de personnes au milieu d'une phrase en
-chiffres.
+moteur : tout compte de personnes s'écrit en chiffres, en tête de phrase comme ailleurs (« 46 personnes… »,
+décision d'Arnaud du 17/10, pour la précision) ; « une personne » reste en lettres.
 
 ## Ce que le rapport signale lui-même
 

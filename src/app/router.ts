@@ -12,6 +12,8 @@ export type Route =
   | { name: 'project'; id: string; tab: 'data' | 'analysis' | 'report' }
   /** Une étude publiée de l'Observatoire, lue dans l'application (lecture seule). */
   | { name: 'observatory'; slug: string }
+  /** La liste des études publiées. */
+  | { name: 'observatories' }
   | { name: 'not-found' }
 
 export function parseRoute(hash: string): Route {
@@ -20,6 +22,7 @@ export function parseRoute(hash: string): Route {
   if (path === '/' || path === '') return { name: 'home' }
   if (path === '/synthese') return { name: 'synthesis' }
   if (path === '/moteurs' || path === '/reglages') return { name: 'settings', back: params.get('retour') ?? undefined }
+  if (path === '/observatoire') return { name: 'observatories' }
   const o = path.match(/^\/observatoire\/([a-z0-9-]+)$/)
   if (o) return { name: 'observatory', slug: o[1] }
   const m = path.match(/^\/etude\/([^/]+)(?:\/(donnees|analyse|rapport))?$/)
@@ -40,6 +43,8 @@ export function href(route: Route): string {
       return route.back ? `#/moteurs?retour=${encodeURIComponent(route.back)}` : '#/moteurs'
     case 'project':
       return `#/etude/${encodeURIComponent(route.id)}/${route.tab === 'analysis' ? 'analyse' : route.tab === 'report' ? 'rapport' : 'donnees'}`
+    case 'observatories':
+      return '#/observatoire'
     case 'observatory':
       return `#/observatoire/${route.slug}`
     default:

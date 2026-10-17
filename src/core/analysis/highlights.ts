@@ -54,7 +54,8 @@ export function highlights(groups: Group[], ideas?: Map<string, Idea>): Highligh
         of: opinions(g),
         ideaIds: ofCategory(g, side),
         stance: g.metrics.stance,
-        fragile: g.metrics.fragile,
+        // Le moteur ne reçoit pas « fragile » pour un « unanime » (sinon « unanimes, mais fragiles » dans le résumé).
+        fragile: fragileShown(g.metrics),
       }))
       // À nombre égal, le motif le plus net d'abord (4 sur 4 avant 4 sur 5).
       .sort((a, b) => b.people - a.people || b.people / b.of - a.people / a.of || a.title.localeCompare(b.title))
