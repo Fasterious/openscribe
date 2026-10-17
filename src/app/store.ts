@@ -62,7 +62,13 @@ export function useProjects() {
   const [projects, setProjects] = useState<Project[] | null>(null)
   useEffect(() => {
     let alive = true
-    const refresh = () => listProjects().then((p) => alive && setProjects(p))
+    // Deux lectures peuvent se croiser (dupliquer puis supprimer) : seule la dernière demandée s'affiche, sinon une
+    // lecture d'avant la suppression, arrivée après, ferait réapparaître l'étude supprimée.
+    let latest = 0
+    const refresh = () => {
+      const n = ++latest
+      return listProjects().then((p) => alive && n === latest && setProjects(p))
+    }
     refresh()
     const off = subscribe('*', refresh)
     return () => {
@@ -77,7 +83,11 @@ export function useProject(id: string) {
   const [project, setProject] = useState<Project | null | undefined>(undefined)
   useEffect(() => {
     let alive = true
-    const refresh = () => getProject(id).then((p) => alive && setProject(p ?? null))
+    let latest = 0
+    const refresh = () => {
+      const n = ++latest
+      return getProject(id).then((p) => alive && n === latest && setProject(p ?? null))
+    }
     refresh()
     const off = subscribe(id, refresh)
     return () => {
