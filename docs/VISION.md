@@ -79,6 +79,15 @@ bloqué sur ça. » Concrètement :
 - **La langue fait partie de la qualité** (12/10) : un rapport qui sonne
   traduit n'est pas fini, dans chaque langue. Mais la fidélité aux données
   passe avant.
+- **Une note relative, pas une barrière** (17/10) : la note d'un moteur ou d'une méthode est un repère
+  sur 10, posé par un évaluateur qui peut se tromper ; on la refait à chaque nouveau moteur. Une étude de
+  l'Observatoire se publie sans seuil, avec le meilleur moteur du moment, la méthode et ses limites
+  expliquées, et les étiquettes discutables marquées « à vérifier » par le code. Arnaud ne relit pas chaque
+  étude : la transparence remplace la relecture.
+- **L'ambiguïté est dans les données** (17/10) : une même idée peut relever de plusieurs motifs, se découper
+  autrement, ou se ranger dans une famille plus large ou plus fine ; un humain ne tranche pas toujours mieux,
+  et l'effort de concentration qu'exige un corpus entier joue en faveur de la machine. On ne vise pas zéro
+  erreur : on montre où le doute est permis.
 
 ## Architecture et modèle économique
 

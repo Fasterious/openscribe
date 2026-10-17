@@ -13,6 +13,13 @@ import { analyzeCsv } from './import/csv'
 
 const PRIVATE = 'fixtures/private'
 const N = 6
+/**
+ * L'Observatoire publie, par construction, des réponses de consultations en données ouvertes (Licence Ouverte,
+ * prénoms masqués) : ses corpus peuvent figurer dans les pages publiées `public/observatoire/`, et nulle part
+ * ailleurs. Les corpus des autres études (ÉcoSol…) n'y figurent jamais : ils restent contrôlés partout.
+ */
+const OPEN_DATA = join(PRIVATE, 'observatoire')
+const PUBLISHED = join('public', 'observatoire')
 
 const words = (t: string) =>
   t
@@ -33,33 +40,41 @@ const walk = (d: string): string[] =>
 // il est écarté et nommé, pour qu'on sache ce qui n'est pas contrôlé.
 const MAX_BYTES = 20 * 1024 * 1024
 
-function privateAnswers(): string[] {
+function privateAnswers(): { open: boolean; text: string }[] {
   const csv = walk(PRIVATE).filter((f) => f.endsWith('.csv'))
   const tooBig = csv.filter((f) => statSync(f).size > MAX_BYTES)
   if (tooBig.length) console.warn(`Confidentialité : fichiers trop gros, non contrôlés : ${tooBig.join(', ')}`)
   return csv
     .filter((f) => !tooBig.includes(f))
-    .flatMap((f) => analyzeCsv(readFileSync(f, 'utf8')).table.rows.flat())
-    .filter((cell) => words(cell).length >= N)
+    .flatMap((f) => analyzeCsv(readFileSync(f, 'utf8')).table.rows.flat().map((text) => ({ open: f.startsWith(OPEN_DATA), text })))
+    .filter((cell) => words(cell.text).length >= N)
 }
 
 describe('confidentialité', () => {
   const answers = privateAnswers()
   it.skipIf(!answers.length)('aucune suite de six mots d’une réponse réelle dans le dépôt', () => {
-    const grams = new Set<string>()
+    // Suites de six mots, avec leur provenance : `true` si elles ne viennent que de données ouvertes de l'Observatoire.
+    const grams = new Map<string, boolean>()
     for (const a of answers) {
-      const w = words(a)
-      for (let i = 0; i + N <= w.length; i++) if (meaningful(w.slice(i, i + N))) grams.add(w.slice(i, i + N).join(' '))
+      const w = words(a.text)
+      for (let i = 0; i + N <= w.length; i++) {
+        if (!meaningful(w.slice(i, i + N))) continue
+        const g = w.slice(i, i + N).join(' ')
+        grams.set(g, (grams.get(g) ?? true) && a.open)
+      }
     }
     const files = [...walk('src'), ...walk('e2e'), ...walk('docs'), ...walk('public'), ...walk('scripts'), 'CLAUDE.md'].filter((f) =>
       /\.(ts|tsx|md|json|css|html)$/.test(f),
     )
     const leaks: string[] = []
     for (const f of files) {
+      const published = f.startsWith(PUBLISHED)
       const w = words(readFileSync(f, 'utf8'))
       for (let i = 0; i + N <= w.length; i++) {
         const g = w.slice(i, i + N).join(' ')
-        if (grams.has(g)) leaks.push(`${f} : « ${g} »`)
+        const openOnly = grams.get(g)
+        if (openOnly === undefined || (published && openOnly)) continue
+        leaks.push(`${f} : « ${g} »`)
       }
     }
     expect(leaks).toEqual([])

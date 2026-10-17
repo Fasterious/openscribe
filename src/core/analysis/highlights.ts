@@ -1,4 +1,5 @@
-import type { Group, Idea } from './types'
+import { computeMetrics, stanceOf } from './metrics'
+import type { Group, Idea, Metrics } from './types'
 
 /**
  * Ce qui a marché, ce qui bloque, ce qui divise, ce que proposent les
@@ -107,4 +108,46 @@ export function highlightLine(h: Highlight, kind: keyof Highlights, lang: 'fr' |
     return `${h.title} : ${word ? `${word}${h.fragile ? ' (fragile)' : ''}, ` : ''}${count}`
   }
   return `${h.title} : ${h.people} des ${h.of} personnes qui donnent un avis`
+}
+
+const STANCE_WORD: Record<Metrics['stance'], string> = {
+  unanimous: 'unanime',
+  consensus: 'large majorité',
+  majority: 'majorité',
+  lean: 'pas de majorité',
+  divided: 'avis partagés',
+  thin: "peu d'avis",
+  none: 'aucun avis',
+}
+
+/**
+ * Étiquette à vérifier : elle tient à des avis comptés aussi dans un autre motif (codage en double, balayage).
+ * Le code mesure l'écart, le lecteur tranche en relisant les citations (décision d'Arnaud, 17/10). Un repère,
+ * une seule cause : une étiquette qui tient à une voix se dit « fragile » (voir `dividedFragile`).
+ */
+export function labelDoubt(g: Group, ideas: Map<string, Idea>): string | undefined {
+  const own = g.ideaIds.filter((id) => !ideas.get(id)?.copyOf)
+  const copies = g.ideaIds.length - own.length
+  if (!copies) return undefined
+  const without = computeMetrics(own.map((id) => ideas.get(id)!).filter(Boolean)).stance
+  if (without === g.metrics.stance) return undefined
+  return copies > 1
+    ? `à vérifier : ${copies} de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « ${STANCE_WORD[without]} »`
+    : `à vérifier : 1 de ces avis compte aussi dans un autre motif ; sans lui, ce serait « ${STANCE_WORD[without]} »`
+}
+
+/** Des avis partagés qu'une seule voix ferait basculer : « fragile », comme pour les autres étiquettes (`isFragile` ne les teste pas). */
+export function dividedFragile(g: Group): boolean {
+  if (g.metrics.stance !== 'divided') return false
+  const P = g.metrics.positiveOnly.length
+  const N = g.metrics.negativeOnly.length
+  const M = g.metrics.mixed.length
+  return [
+    [P - 1, N + 1, M],
+    [P + 1, N - 1, M],
+    [P - 1, N, M + 1],
+    [P, N - 1, M + 1],
+  ]
+    .filter(([p, n]) => p >= 0 && n >= 0)
+    .some(([p, n, m]) => stanceOf(p, n, m) !== 'divided')
 }

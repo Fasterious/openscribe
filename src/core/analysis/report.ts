@@ -1,7 +1,7 @@
 import type { Corpus } from '../corpus'
 import { activeParticipants, duplicateContributions, promptsOf } from '../corpus'
 import { presetById } from '../providers/presets'
-import { highlights, type Highlight, type Highlights } from './highlights'
+import { dividedFragile, highlights, labelDoubt, type Highlight, type Highlights } from './highlights'
 import { withCurrentMetrics } from './metrics'
 import { maskNames } from './names'
 import { describeTheme } from './pipeline'
@@ -47,6 +47,8 @@ function alsoInOf(state: AnalysisState): (i: Idea) => string | undefined {
     return other ? titleOfIdea.get(other) : undefined
   }
 }
+
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
 
 /** Le livre de codes d'un motif, en une ligne sous son titre : ce qui y compte comme positif, négatif ou pas comme un avis. */
 export function definitionLine(d: GroupDefinition): string {
@@ -100,7 +102,7 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     const pl = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`
     if (moved || retoned)
       lines.push(
-        `Relecture des motifs par le moteur d'IA : ${[moved && pl(moved, 'idée déplacée vers le motif dont elle parle vraiment', 'idées déplacées vers le motif dont elles parlent vraiment'), retoned && pl(retoned, "idée changée de camp après un nouvel examen de son ton au regard de l'objet du motif", "idées changées de camp après un nouvel examen de leur ton au regard de l'objet du motif")].filter(Boolean).join(' ; ')}. Une personne n'est « mitigée » que si elle dit du bien et du mal du même objet.`,
+        `Relecture des motifs par le moteur d'IA : ${[moved && pl(moved, 'idée déplacée vers le motif dont elle parle vraiment', 'idées déplacées vers le motif dont elles parlent vraiment'), retoned && pl(retoned, "idée qui a changé de ton une fois jugée par rapport à l'objet du motif", "idées qui ont changé de ton une fois jugées par rapport à l'objet du motif")].filter(Boolean).join(' ; ')}. Une personne n'est « mitigée » que si elle dit du bien et du mal du même objet.`,
       )
   }
   if (state.copied?.length)
@@ -115,14 +117,19 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     const w = state.swept
     const pl = (n: number) => (n > 1 ? 's' : '')
     const done = [
-      w.copied && `${w.copied} y compte${w.copied > 1 ? 'nt' : ''} aussi${state.copied?.length ? ` (elle${pl(w.copied)} fai${w.copied > 1 ? 'sent' : 't'} partie des ${state.copied.length} idées du codage en double)` : ''}`,
+      w.copied && `${w.copied} y compte${w.copied > 1 ? 'nt' : ''} aussi${state.copied?.length ? ` (elle${pl(w.copied)} ${w.copied > 1 ? 'font' : 'fait'} partie des ${state.copied.length} idées du codage en double)` : ''}`,
       w.moved && `${w.moved} y ${w.moved > 1 ? 'ont' : 'a'} été déplacée${pl(w.moved)}`,
       w.retoned && `${w.retoned} ${w.retoned > 1 ? 'ont' : 'a'} changé de ton`,
     ].filter(Boolean)
     lines.push(
-      `Balayage par définition : les idées rangées dans les autres motifs ont été relues à la lumière de la définition de${w.motifs > 1 ? 's' : ''} ${w.motifs} motif${pl(w.motifs)} du résumé ; ${done.length ? done.join(', ') : 'aucune n’y manquait'}.`,
+      `Balayage par définition : les idées rangées dans les autres motifs ont été relues au regard de la définition de${w.motifs > 1 ? 's' : ''} ${w.motifs} motif${pl(w.motifs)} du résumé ; ${done.length ? done.join(', ') : 'aucune n’y manquait'}.`,
     )
   }
+  const doubtful = state.groups.filter((g) => labelDoubt(g, new Map(state.ideas.map((i) => [i.id, i]))))
+  if (doubtful.length)
+    lines.push(
+      `Étiquettes à vérifier : ${doubtful.length} motif${doubtful.length > 1 ? 's' : ''} ${doubtful.length > 1 ? 'portent' : 'porte'} la mention « à vérifier », parce que ${doubtful.length > 1 ? 'leur étiquette dépend' : 'son étiquette dépend'} d'avis comptés aussi dans un autre motif. Le code mesure cet écart ; c'est au lecteur de trancher, en relisant les citations.`,
+    )
   if (state.support)
     lines.push(
       `Renvois vérifiés : chaque phrase des synthèses a été confrontée par le moteur d'IA aux verbatims qu'elle cite (${state.support.checked} phrases) ; ${state.support.fixed || 'aucune'} corrigée${state.support.fixed > 1 ? 's' : ''}, ${state.support.dropped || 'aucune'} retirée${state.support.dropped > 1 ? 's' : ''} faute d'appui${state.support.added ? ` ; le moteur d'IA en a ajouté ${state.support.added} pour un sujet ou un camp d'avis qui manquait` : ''}.${state.campsAdded ? ` Le code en a écrit ${state.campsAdded} pour un camp d'avis encore absent de la synthèse de son motif.` : ''}`,
@@ -141,6 +148,9 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     lines.push(
       `Sources : ${kinds.join(' ; ')}. Un entretien compte pour une personne, comme une ligne de questionnaire : on compte des personnes, pas la longueur de ce qu'elles disent.`,
     )
+  lines.push(
+    "Limites : selon la façon dont on la lit, une même idée peut relever de plusieurs motifs, se découper en plusieurs idées ou se ranger dans un motif plus large ou plus fin ; deux lecteurs humains ne trancheraient pas toujours de la même façon. Le moteur d'IA tranche ces cas, le code les rend vérifiables : chaque citation se consulte et chaque motif affiche sa définition.",
+  )
   lines.push(
     'Principe : restituer ce que les participants ont dit, avec le moins de déformation possible. Les verbatims sont recopiés tels quels, sans correction ; seule une coupure « […] » peut sauter un passage sans rapport, jamais une négation ou une réserve. Le texte complet reste consultable dans OpenScribe.',
   )
@@ -559,6 +569,13 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
     while (k > 0 && k < list.length && list[k].people === list[k - 1].people && list[k].of === list[k - 1].of) k++
     return { shown: list.slice(0, k), more: list.slice(k).map((x) => x.title) }
   }
+  // Une étiquette discutable le dit à côté de son chiffre : le lecteur sait où relire les citations.
+  const groupOf = new Map(state.groups.map((g) => [g.id, g]))
+  const withDoubt = (detail: string, groupId: string) => {
+    const g = groupOf.get(groupId)!
+    const doubt = labelDoubt(g, byId)
+    return [detail, dividedFragile(g) && 'fragile', doubt].filter(Boolean).join(' · ')
+  }
   const s1 = cut(h.strengths)
   const s2 = cut(h.blockers)
   // Une critique partagée aux remèdes opposés reste toujours visible dans « Ce qui divise ».
@@ -572,7 +589,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
       intro: INTRO,
       items: s1.shown.map((x) => ({
         title: x.title,
-        detail: opinion(x, 'positif'),
+        detail: withDoubt(opinion(x, 'positif'), x.groupId),
         quotes: [],
       })),
       more: s1.more,
@@ -583,7 +600,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
       intro: INTRO,
       items: s2.shown.map((x) => ({
         title: x.title,
-        detail: opinion(x, 'négatif'),
+        detail: withDoubt(opinion(x, 'négatif'), x.groupId),
         quotes: [],
       })),
       more: s2.more,
@@ -605,7 +622,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
             quotes: [quote(x.opposed.a), quote(x.opposed.b)],
           }
         }
-        return { title: x.title, detail: describeOpinions(g) + (x.opposed ? ` ; pistes opposées : ${x.opposed.about}` : ''), quotes: [] }
+        return { title: x.title, detail: withDoubt(describeOpinions(g) + (x.opposed ? ` ; pistes opposées : ${x.opposed.about}` : ''), x.groupId), quotes: [] }
       }),
       more: s3.more,
     },
@@ -706,6 +723,8 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
     const squares = opinionSquares(g.metrics)
     out.push(`${level} ${g.title}`, '', `${squares ? `${squares}  ` : ''}*${metricsLine(g.metrics)}*`, '')
     if (g.definition) out.push(`*${definitionLine(g.definition)}*`, '')
+    const doubt = labelDoubt(g, byId)
+    if (doubt) out.push(`**${cap(doubt)}.**`, '')
     const dominant = dominantVoice(ideasOf(g, byId))
     if (dominant) out.push(`*${dominant}*`, '')
     if (g.summary) out.push(`> ${prose(g.summary).replace(/\n\s*\n/g, '\n>\n> ')}`, '')
@@ -829,7 +848,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
       .join('')
     const note = both.size ? `<p class="facts">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>` : ''
     const dominant = dominantVoice(ideasOf(g, byId))
-    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}</p>${g.definition ? `<p class="facts">${e(definitionLine(g.definition))}</p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
+    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}</p>${g.definition ? `<p class="facts">${e(definitionLine(g.definition))}</p>` : ''}${labelDoubt(g, byId) ? `<p class="facts"><strong>${e(cap(labelDoubt(g, byId)!))}.</strong></p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="summary">${para(g.summary)}</div>` : ''}${blocks}${note}</section>`
   }
 
   if (opts.stale) parts.push(`<p class="facts"><strong>${e(STALE_NOTE)}</strong></p>`)

@@ -543,6 +543,11 @@ les méthodes, à roder d'abord sur les caches ÉcoSol) ; la consigne de synthè
 personnes et interdit de recopier les chiffres de "facts", contradiction signalée par plusieurs lots du
 moteur.
 
+**Décision d'Arnaud (17/10) : pas de passe 13.** La note devient un repère relatif sur 10 (`docs/NOTATION.md`) :
+sur l'école, passe 12 à 6,5/10 aux deux lectures, langue 7/10, avec 3 étiquettes du résumé jugées fausses.
+L'étude est publiée telle quelle, avec ses limites, et les étiquettes qui dépendent d'avis comptés dans deux
+motifs sont marquées « à vérifier » par le code. La méthode, étape par étape : `docs/METHODE.md`.
+
 Gardé dans la méthode « consultation » (décision d'Arnaud) : le
 dédoublonnage corrigé (une erreur du code, pas une règle de plus), le livre de codes (une demande, zéro
 étape de plus, transparence jugée réelle par les deux lectures), la réconciliation (une demande plus une

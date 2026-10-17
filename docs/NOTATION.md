@@ -6,6 +6,30 @@ pour chaque passe : sinon les notes ne se comparent pas.
 
 Seuil pour proposer un moteur : le niveau de Gemini Flash-Lite (3,5/5 sur l'ancienne échelle, **2,5/5 sur cette grille**), mesuré par le même évaluateur ; idéalement le niveau de la référence. Voir « Variabilité » plus bas.
 
+## Une note relative, sur 10 (décision d'Arnaud, 17/10/2026)
+
+La note n'est pas une vérité : c'est un **repère relatif**, posé par un évaluateur (Opus 5.5 aujourd'hui) qui
+peut lui-même se tromper. Elle sert à situer un moteur ou une méthode par rapport aux autres, sur le même
+corpus et avec le même évaluateur. Le changement d'évaluateur du 14/10 l'a montré : la même synthèse de
+Sonnet est passée de 4,5 à 3 sur 5, sans avoir changé.
+
+- **Échelle sur 10**, pour plus de finesse : la note globale est la moyenne des six critères multipliée par 2,
+  arrondie au demi-point (moyenne 3,33 sur 5 : 6,5/10). Les critères restent notés de 0 à 5.
+- **Le plafond devient un compte.** Au lieu de bloquer la note à 3/5 dès qu'un avis est dans le mauvais camp
+  sur un motif du résumé, l'évaluateur donne ce nombre à côté de la note : « 6,5/10 · 3 étiquettes du
+  résumé fausses ». Le plafond binaire masquait les progrès (cinq erreurs ou une donnaient la même note).
+  Le plafond de structure (plus de la moitié des motifs à une personne, ou un fourre-tout de plus du tiers des
+  idées) reste un compte du même genre.
+- **Aucun seuil de publication.** Une étude de l'Observatoire se publie avec le meilleur moteur dont on dispose
+  (Claude Opus 5.5 aujourd'hui), la méthode décrite dans le rapport, ses limites et les mentions « à vérifier »
+  calculées par le code. À chaque nouveau moteur, on refait le repère.
+- **Pour proposer un moteur dans l'application**, le repère reste le niveau de Gemini Flash-Lite (2,5/5,
+  soit 5/10), idéalement celui de la référence.
+
+Repères actuels, convertis (moyennes sans plafond) : sur ÉcoSol, Gemini Flash-Lite 5/10 (sa note de 2,5/5),
+Sonnet avec la référence 6,5/10 (trois lectures du 14/10) ; sur l'école, la méthode « consultation » avec Opus 5.5 6,5/10 aux deux lectures de la passe 12, langue
+7/10.
+
 ## `methodologue` : la méthode (note sur 5)
 
 Chaque critère est noté de 0 à 5, en lisant le rapport ET les réponses brutes.
@@ -30,7 +54,8 @@ Rendre aussi : le temps de relecture humaine estimé pour rendre le rapport pré
 
 Sur les seuls textes écrits par le moteur d'IA (titres, synthèses, intros, résumé ; les verbatims
 sont hors champ) : naturel (aucun calque de l'anglais), précision (chaque phrase nomme son sujet),
-hiérarchie (l'essentiel d'abord), concision, cohérence du vocabulaire. Une note s'écrit « 3,5/5 ».
+hiérarchie (l'essentiel d'abord), concision, cohérence du vocabulaire. Depuis le 17/10, la note se donne sur 10
+(moyenne des critères multipliée par 2) et s'écrit « 7/10 ».
 
 ## Variabilité de l'évaluateur
 

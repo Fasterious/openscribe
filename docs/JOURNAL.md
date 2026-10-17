@@ -2,6 +2,12 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — Note relative sur 10, publication sans seuil, étude école publiée
+
+- **Décisions d'Arnaud** : la note est un repère relatif, posé par un évaluateur qui peut se tromper (le changement d'évaluateur du 14/10 a fait passer la même synthèse de 4,5 à 3 sur 5) ; elle passe sur 10 pour plus de finesse ; aucun seuil de publication : une étude se publie avec le meilleur moteur du moment, la méthode et ses limites expliquées, et les doutes signalés. Arnaud ne relit pas chaque étude. Pas de passe 13. Un document de méthode, étape par étape, est tenu à jour.
+- **Fait** : grille sur 10 (`docs/NOTATION.md` : moyenne des critères × 2 ; le plafond devient un compte d'erreurs du résumé) ; mention « à vérifier » calculée par le code quand l'étiquette d'un motif dépend d'avis comptés aussi dans un autre motif, et « fragile » étendu aux avis partagés qu'une voix ferait basculer, dans les listes et sous les titres ; paragraphe « Limites » dans la section Méthode ; `docs/METHODE.md` ; étude école (passe 12) publiée dans `public/observatoire/`, fiche relue par la `plume`.
+- **Test de confidentialité** : il accepte désormais les réponses des corpus de l'Observatoire (données ouvertes) dans les seules pages publiées de l'Observatoire ; partout ailleurs, et pour tout autre corpus, il refuse toujours une suite de six mots (vérifié en plaçant un extrait réel dans `docs/`).
+
 ## 2026-10-17 — Observatoire, école : passe 12 (balayage par définition), non publiée
 
 - **Demande d'Arnaud** : jouer le balayage par définition, après un bilan avant / après des passes 8 à 11.

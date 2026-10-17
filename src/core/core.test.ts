@@ -46,7 +46,7 @@ import { uncoveredPassages, uncoveredWithContext } from './analysis/coverage'
 import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
 import { emptyCorpus, promptsOf, removeSource, renameSource } from './corpus'
 import { maskNames, verifiedNames } from './analysis/names'
-import { highlightLine, highlights } from './analysis/highlights'
+import { dividedFragile, highlightLine, highlights, labelDoubt } from './analysis/highlights'
 import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext } from './analysis/report'
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
@@ -545,6 +545,29 @@ describe('codage en double, de bout en bout', () => {
       }
     }
     for (const c of state.copied!) expect(ids.has(c.id)).toBe(true)
+  })
+})
+
+describe('étiquettes à vérifier', () => {
+  const group = (ideas: Idea[]) => ({ id: 'G1', title: 'Gratuité', ideaIds: ideas.map((i) => i.id), summary: '', metrics: computeMetrics(ideas) }) as Group
+  it('signale une étiquette qui tient à des avis copiés d’un autre motif', () => {
+    const own = ['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I00${k}`, p, 'positive'))
+    const copies = ['P6', 'P7', 'P8'].map((p, k) => ({ ...idea(`I10${k}`, p, 'negative'), copyOf: `I90${k}` }))
+    const all = [...own, ...copies]
+    const doubt = labelDoubt(group(all), new Map(all.map((i) => [i.id, i])))
+    expect(doubt).toBe('à vérifier : 3 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime »')
+    // Sans copie, rien à signaler.
+    expect(labelDoubt(group(own), new Map(own.map((i) => [i.id, i])))).toBeUndefined()
+  })
+  it('dit « fragile » des avis partagés qu’une seule voix ferait basculer', () => {
+    const ideas = [...['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I0${k}`, p, 'positive')), ...['P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15'].map((p, k) => idea(`I1${k}`, p, 'negative'))]
+    const g = group(ideas)
+    expect(g.metrics.stance).toBe('divided')
+    expect(dividedFragile(g)).toBe(true)
+    expect(labelDoubt(g, new Map(ideas.map((i) => [i.id, i])))).toBeUndefined()
+    // Huit contre huit : il en faudrait plus d'une.
+    const even = [...['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8'].map((p, k) => idea(`I0${k}`, p, 'positive')), ...['P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P16'].map((p, k) => idea(`I1${k}`, p, 'negative'))]
+    expect(dividedFragile(group(even))).toBe(false)
   })
 })
 

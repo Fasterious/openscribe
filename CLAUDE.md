@@ -78,6 +78,8 @@ Règles apprises :
 - Un exemple de consigne ou de test ne vient jamais du corpus de certification (sinon le test n'est plus indépendant) ; `src/core/privacy.test.ts` le vérifie.
 - Un défaut trouvé se corrige par une étape, une consigne ou un contrôle du processus, pas à la main dans le rapport.
 - Une amélioration se prouve en trois passes au plus, avec deux lectures `methodologue` dès la première (la limite protège les jetons, pas le résultat : sans gain net on s'arrête et on cherche la cause en amont). On garde ce qui a corrigé un défaut observé, on retire ce qui n'a rien changé. Avant de coder, on chiffre la cause sur le cache ; quand le levier suivant est une décision de méthode, on la soumet à Arnaud au lieu de jouer la passe.
+- La note est un repère relatif sur 10 (moyenne des critères × 2) ; les erreurs du résumé se comptent à côté, sans plafond. Une étude se publie sans seuil, avec le meilleur moteur, ses limites et les mentions « à vérifier » du code (`docs/NOTATION.md`).
+- Une étape qui ajoute ou déplace des avis se juge aux étiquettes qu'elle change : comparer par script les étiquettes avant et après, avant de payer l'aval.
 - Une méthode par famille de modèles : une nouvelle part de la meilleure, et un apport ne passe à une autre méthode que si sa note monte (`docs/METHODES.md`).
 - Un moteur d'IA n'est proposé qu'au niveau de Gemini Flash-Lite au moins sur ÉcoSol (grille `docs/NOTATION.md`, deux lectures `methodologue` sur Opus), idéalement à celui de la référence, et s'il n'est pas pénible à utiliser.
 - « Gratuit, sans carte » ne s'affiche qu'après un parcours réel dans la console du fournisseur, daté dans `docs/PARCOURS-FOURNISSEURS.md`.
@@ -105,7 +107,9 @@ Règles apprises :
 - Aucun code copié d'un projet dont la licence n'est pas compatible AGPL-3.0.
 - **Données de participants réelles : jamais dans le dépôt.** Elles vont dans
   `fixtures/private/` (ignoré par git). Les données publiques de test sont
-  fictives (`fixtures/*.csv`).
+  fictives (`fixtures/*.csv`). Seule exception : les pages publiées de
+  l'Observatoire (`public/observatoire/`), faites de consultations en données
+  ouvertes, prénoms masqués.
 - Pas de clé API dans le code, les tests ou les commits.
 
 ## Technique

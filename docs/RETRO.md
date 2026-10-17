@@ -2,6 +2,12 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-17 — Sortir de la course au plafond
+
+- **Bien marché** : poser la question à Arnaud au lieu de jouer une passe 13 ; transformer la limite de la machine en signal pour le lecteur (« à vérifier »), calculé par le code et non écrit à la main ; régénérer le rapport depuis le cache, sans un appel au moteur ; la relecture `plume` de la fiche, qui a trouvé une faute de conjugaison dans un texte injecté.
+- **Coûté pour rien** : douze passes jugées par une note binaire qui ne pouvait pas bouger ; l'échelle aurait dû être questionnée dès que trois passes de suite plafonnaient pour des causes différentes.
+- **On change** : quand une note ne bouge plus alors que les défauts changent, on interroge la mesure avant de rejouer la méthode.
+
 ## 2026-10-17 — Passe 12 : contrôler avant de payer l'aval
 
 - **Bien marché** : le contrôle par script juste après le balayage (comptes avant / après sur les motifs qui plafonnaient) a écarté un premier essai faux avant les synthèses ; un défaut de code signalé par un lot du moteur (propositions changées en critiques) corrigé avant que l'étape ne s'applique ; les deux lectures concordent exactement.
@@ -185,7 +191,7 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 
 - **Bien marché** : une règle chiffrée (3,5/5) se code en une donnée par modèle, et un test garantit qu'aucun moteur n'est proposé sans note ni écarté sans raison.
 - **Coûté pour rien** : un formateur lancé sans configuration du dépôt a réécrit deux fichiers entiers (annulé) ; ne formater qu'avec l'outil du projet.
-- **On change** : une note s'écrit toujours « 3,5/5 », dans les badges comme dans les phrases (relecture `plume`).
+- **On change** : une note s'écrit toujours avec son échelle, « 3,5/5 » hier, « 7/10 » depuis le 17/10, dans les badges comme dans les phrases (relecture `plume`).
 
 ## Regroupement en contexte (14/10, nuit)
 
