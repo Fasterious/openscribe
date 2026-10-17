@@ -108,7 +108,7 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Mise en ligne (hébergement statique)
 - ⏳ Module Entretiens et tests (transcription, vidéo synchronisée), puis Personas
 - ⏳ Stratégie d'acquisition (une fois l'expérience validée)
-- 🔄 L'Observatoire : première étude (école, Grand débat 2019) à 3/5 plafonné après 11 passes (seuil 3,5 ; moyennes 3,17 à 3,5 à la passe 11) ; codage en double livré en option du chercheur ; outil de publication prêt (`scripts/observatoire/publier.ts`) ; non publiée ; levier suivant (balayage par définition) à trancher par Arnaud (`docs/METHODES.md`, « Passes 10 et 11 »)
+- 🔄 L'Observatoire : première étude (école, Grand débat 2019) à 3/5 plafonné après 12 passes (seuil 3,5 ; moyennes 3,33 à la passe 12) ; codage en double et balayage par définition livrés ; outil de publication prêt (`scripts/observatoire/publier.ts`) ; non publiée ; levier suivant (relire les copies qui changent une étiquette) proposé à Arnaud (`docs/METHODES.md`, « Passe 12 »)
 
 ## Itération 7 — Offres gratuites et modèles locaux (13-14/10)
 

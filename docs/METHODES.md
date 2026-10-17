@@ -342,6 +342,7 @@ Le découpage est repris du cache jusqu'à la passe 7, pour ne faire varier que 
 | 9 | « un ou deux objets ? » pour « X face à Y » et les motifs partagés ; livre de codes relu d'un bloc (fusions, règles de partage, paires relues ensemble) | 3 et 3 (3,42 et 3,17) | 3,5 | même mécanisme déplacé : éloges de l'école publique dans « Expérience globale », critiques de la qualité des enseignants dans « Contrôle des enseignants défaillants » |
 | 10 | codage en double (option du chercheur) : une idée qui répond à deux définitions est copiée dans le second motif | 3 et 3 (3,08 et 3,0) | 4 | passe invalidée : un bug de code appliquait les fusions de la réconciliation aux mauvais motifs (renumérotation) ; une copie revenue chez son original |
 | 11 | rejeu corrigé : fusions par titre, copie chez son original retirée, définitions des motifs cibles fournies aux relectures | 3 et 3 (3,5 et 3,17) | 3,5 | handicap et administration corrigés ; éloges de l'école publique toujours dans « Expérience globale », plaintes d'éloignement hors de « Proximité » : aucune paire relue ne couvrait ces frontières |
+| 12 | balayage par définition : les 21 motifs promis au résumé confrontés, avec leur définition, à tous les avis rangés ailleurs | 3 et 3 (3,33 et 3,33) | 3,5 | les quatre défauts des passes 8 à 11 levés ; le balayage crée trois fausses lignes « divise » (Gratuité de l'école reçoit le coût du supérieur) |
 
 **Verdict à la passe 7 : palier, non publié.** La moyenne monte doucement (3,25 → 3,67) mais chaque
 passe bute sur une ou deux idées limites, différentes d'une passe à l'autre ; aucune n'a changé le sens
@@ -503,6 +504,44 @@ chaque motif du Résumé, chercher dans les autres motifs les idées qui remplis
 (ou les déplacer). C'est une décision de méthode et un coût (une demande par motif du Résumé, une quinzaine,
 avec tous les libellés d'idées) : soumise à Arnaud. Sans elle, la méthode « consultation » sur ce corpus vaut
 3 à 3,5 selon la lecture, et l'étude reste non publiée (seuil 3,5 sans plafond).
+
+### Passe 12 (17/10/2026) : le balayage par définition
+
+**Le levier.** Proposé le 16/10 et accepté par Arnaud le 17/10 : faire entrer la posture du correcteur dans
+la chaîne. Après la réconciliation, chaque motif promis au résumé (six premiers de chaque liste, plus tout
+motif listé d'au moins 12 avis, 21 au plus) reçoit sa définition, la taille de ses deux camps et tous les avis
+rangés ailleurs, par lots de trois motifs (7 demandes d'environ 60 000 jetons). Le code ne garde que le ton
+d'une idée d'un motif balayé, et l'entrée d'un avis rangé ailleurs dans un motif balayé (copie avec le codage
+en double, sinon déplacement) ; une proposition ou une question garde sa catégorie.
+
+**Premier essai, écarté avant les synthèses par un contrôle par script.** « Proximité » (8 avis) n'était pas
+balayée, sortie des 21 par un tri par taille ; 78 copies, presque toutes du camp déjà majoritaire ; aucun
+éloge du public ajouté. Corrigé : les motifs montrés par les listes passent d'abord ; la consigne donne la
+taille des deux camps et fait chercher d'abord le plus petit. Ce contrôle a évité de payer l'aval sur un état
+faux.
+
+**Résultat** (88 copies, 3 déplacements, 3 tons corrigés). Notes 3 et 3 (plafond ; moyennes 3,33 et 3,33),
+langue 3,5. Les quatre défauts qui plafonnaient les passes 8 à 11 sont levés aux deux lectures : les éloges
+de l'école publique comptent dans « École publique face au privé » (10 contre 24), les plaintes d'éloignement
+dans « Proximité » (qui quitte « Ce qui divise »), « Enseignement privé » n'est plus dit unanime (12 sur 14),
+le regret de la carte scolaire compte en sa faveur. Sur les 88 copies relues une à une, 75 à 77 sont justes.
+
+**Le nouveau plafond vient du balayage lui-même.** La règle « cherche d'abord le camp le moins nombreux »
+pousse à remplir un camp vide : « Gratuité de l'école » reçoit cinq critiques du coût des études supérieures
+et passe d'unanime à « divise », ce qui défait la séparation de la passe 9 ; « Accès aux services
+administratifs » et « Écoles rurales » deviennent « divise » par des copies à sens unique. Le premier essai,
+sans cette règle, gonflait le camp majoritaire. Les deux biais sont symétriques : le moteur ne sait pas
+doser seul.
+
+**Levier suivant, à soumettre à Arnaud.** Une relecture des seules copies qui changent une étiquette du
+résumé (ici 7 motifs, une demande ou deux) : le motif avant et après, les copies en cause, la question
+« la définition les réclame-t-elle sans doute possible ? ». C'est le geste du correcteur sur le résidu, au
+coût le plus bas, mais l'aval (synthèses, résumé, appuis) est à rejouer : environ 5 millions de jetons pour
+une passe 13. Deux points relevés en passant : « fragile » ne s'applique jamais à « avis partagés »
+(`isFragile`), ce que la règle « une voix change l'étiquette » couvrirait pourtant (décision commune à toutes
+les méthodes, à roder d'abord sur les caches ÉcoSol) ; la consigne de synthèse demande le nombre exact de
+personnes et interdit de recopier les chiffres de "facts", contradiction signalée par plusieurs lots du
+moteur.
 
 Gardé dans la méthode « consultation » (décision d'Arnaud) : le
 dédoublonnage corrigé (une erreur du code, pas une règle de plus), le livre de codes (une demande, zéro

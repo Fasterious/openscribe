@@ -2,6 +2,13 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — Observatoire, école : passe 12 (balayage par définition), non publiée
+
+- **Demande d'Arnaud** : jouer le balayage par définition, après un bilan avant / après des passes 8 à 11.
+- **Fait** : étape `sweep` de la méthode « consultation » (motifs promis au résumé confrontés à tous les avis rangés ailleurs ; le code filtre ce qui est permis). Premier essai écarté par un contrôle par script avant les synthèses, corrigé (motifs montrés d'abord, camp le moins nombreux cherché en premier, propositions intouchables).
+- **Résultat** : 3/5 plafonné aux deux lectures (moyennes 3,33), langue 3,5. Les quatre défauts des passes 8 à 11 sont levés ; le plafond vient de copies du balayage qui changent à tort trois étiquettes. Détail : `docs/METHODES.md`, « Passe 12 ».
+- **Décision** : non publiée. Proposition à Arnaud : relire les seules copies qui changent une étiquette du résumé (passe 13, environ 5 millions de jetons).
+
 ## 2026-10-17 — Observatoire, école : passes 10 et 11 (codage en double), un bug de fusion corrigé, non publiée
 
 - **Demande d'Arnaud** : jouer la passe 10 avec le codage en double.

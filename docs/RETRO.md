@@ -2,6 +2,12 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-17 — Passe 12 : contrôler avant de payer l'aval
+
+- **Bien marché** : le contrôle par script juste après le balayage (comptes avant / après sur les motifs qui plafonnaient) a écarté un premier essai faux avant les synthèses ; un défaut de code signalé par un lot du moteur (propositions changées en critiques) corrigé avant que l'étape ne s'applique ; les deux lectures concordent exactement.
+- **Coûté pour rien** : un premier balayage complet (environ 1,2 million de jetons) parce que la liste des motifs était triée par taille ; une règle « cherche d'abord le camp le moins nombreux » qui a remplacé un biais par son contraire.
+- **On change** : une étape qui ajoute des avis se juge sur les étiquettes qu'elle change, pas sur le nombre d'avis ajoutés ; le contrôle par script compare les étiquettes avant et après, motif par motif, avant de lancer l'aval.
+
 ## 2026-10-17 — Passes 10 et 11 : une passe invalidée par le code, pas par la méthode
 
 - **Bien marché** : deux lectures indépendantes qui trouvent le même bug par la même preuve (la raison d'une fusion ne parlait pas du motif fusionné) ; vérifier le soupçon sur les fichiers de la passe avant de toucher au code ; des tests de bout en bout qui échouent sans le correctif et passent avec ; le rejeu depuis le cache (le découpage et le regroupement n'ont pas été refaits).
