@@ -2,6 +2,17 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-17 — Observatoire : lecture, couleurs, deux versions
+
+- **Bien marché** : mesurer avant de corriger (tailles de police en caractères par taille, largeurs du menu à
+  360 et 390 px) ; une capture mobile à chaque étape, qui a montré l'ordre des listes incohérent avec la barre ;
+  le masquage contrôlé sur les 1 051 citations réelles avant de publier.
+- **Coûté pour rien** : un commit poussé avec un test qui ne compilait pas, parce que la chaîne avant le commit ne
+  vérifiait que la confidentialité ; une version interactive construite avant qu'Arnaud ne dise ce qu'il
+  préférait (elle reste utile, mais l'article amélioré est devenu la version principale).
+- **On change** : avant chaque commit, la chaîne est `npm run build && npx vitest run && test de confidentialité`,
+  toujours dans cet ordre ; sur une question d'interface ouverte, on montre une maquette avant de construire.
+
 ## 2026-10-17 — Passe finale et mise en ligne
 
 - **Bien marché** : une passe rejouée depuis le cache (zéro jeton de moteur) qui prouve la reproductibilité ;

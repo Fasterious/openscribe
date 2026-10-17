@@ -2,6 +2,20 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — L'article de l'Observatoire devient interactif
+
+- **Proposition d'Arnaud** : l'article se lit mieux (tout le texte, sans cadres) ; il lui manque l'interactivité
+  de Synthèse. Et la synthèse d'un motif, dans son encadré gris, se lit moins bien que la définition du motif,
+  qui est secondaire : on échange.
+- **Fait** : dans la page HTML du rapport (Observatoire et export de Synthèse), un renvoi « P12 » déplie ses
+  verbatims sous le paragraphe ; un verbatim, sa réponse entière avec la question et le passage cité en gras ;
+  un « ? » ou une marque, son explication. La synthèse se lit sans encadré ; « ce qui compte comme positif ou
+  négatif » est plié et s'ouvre en gris. Sans script (impression), la page reste complète, tout déplié.
+- **Deux versions, nommées par l'usage** : « Lire en une page » (l'article, version principale) et « Ouvrir dans
+  l'application » (motifs repliés, filtres). Arnaud comparera avant d'en garder une.
+- **Une seule source** : l'article et l'application sont générés de la même étude masquée ; la publication
+  échoue si un prénom subsiste dans la page ou dans le fichier.
+
 ## 2026-10-17 — L'Observatoire en deux versions : interactive et document
 
 - **Demande d'Arnaud** : la page publiée se lit mieux (sans cadres, texte large), mais elle n'est pas

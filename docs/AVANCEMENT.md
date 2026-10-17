@@ -109,7 +109,7 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Module Entretiens et tests (transcription, vidéo synchronisée), puis Personas
 - ⏳ Stratégie d'acquisition (une fois l'expérience validée)
 - ✅ L'Observatoire : étude école publiée et reliée depuis l'accueil (passe 13, finale, avec Opus 5.5 et la méthode « consultation » : **7/10** aux deux lectures `methodologue`, 2 erreurs du résumé signalées et corrigées dans la fiche, langue **6,5/10**), avec la section Méthode, ses limites, les mentions « à vérifier » et « fragile » du code et leurs explications au survol et au toucher (`public/observatoire/ecole-grand-debat-2019/`) ; méthode expliquée étape par étape dans `docs/METHODE.md`
-- 🔄 L'Observatoire en deux versions : interactive (rapport de Synthèse en lecture seule, prénoms masqués à la source, réponse entière autour de chaque verbatim) et document ; à comparer par Arnaud avant d'en garder une
+- 🔄 L'Observatoire en deux versions : l'article interactif (« Lire en une page » : renvois et verbatims dépliables, réponse entière, définitions pliées) et l'application en lecture seule ; prénoms masqués à la source ; à comparer par Arnaud avant d'en garder une
 
 ## Itération 7 — Offres gratuites et modèles locaux (13-14/10)
 
