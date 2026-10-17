@@ -197,7 +197,7 @@ function CitedParagraph({ text, ctx }: { text: string; ctx: Ctx }) {
                 type="button"
                 onClick={() => setOpen(isOpen ? null : i)}
                 aria-expanded={isOpen}
-                className={`mx-0.5 inline-flex min-h-6 cursor-pointer items-center gap-0.5 rounded-full px-2 py-0 align-baseline text-xs font-medium sm:min-h-0 sm:px-1.5 ${
+                className={`mx-0.5 inline-flex min-h-6 cursor-pointer items-center gap-0.5 rounded-full px-2 py-0 align-baseline text-sm font-medium sm:min-h-0 sm:px-1.5 ${
                   isOpen ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'
                 }`}
                 aria-label={`${isOpen ? 'Masquer' : 'Voir'} ${plural(ids.length, 'verbatim')}`}
@@ -229,7 +229,7 @@ function QuotesPreview({ ids, ctx }: { ids: string[]; ctx: Ctx }) {
       {ideas.map((idea) => (
         <SourceContext key={idea.id} idea={idea} ctx={ctx} excerpt={ideas.length > 1 ? 90 : 180} />
       ))}
-      <p className="text-[11px] text-muted-foreground">Cliquer pour garder ces passages ouverts.</p>
+      <p className="text-xs text-muted-foreground">Cliquer pour garder ces passages ouverts.</p>
     </div>
   )
 }
@@ -242,7 +242,7 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
         const idea = ctx.ideaById.get(id)
         return idea ? <SourceContext key={id} idea={idea} ctx={ctx} card /> : null
       })}
-      <button type="button" onClick={onClose} className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+      <button type="button" onClick={onClose} className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
         Replier
       </button>
     </div>
@@ -286,14 +286,14 @@ function SourceContext({ idea, ctx, excerpt, card = false }: { idea: Idea; ctx: 
   const where = c ? [ctx.sourceName(c.id), ctx.origin(c.id)].filter((x, i, a) => x && a.indexOf(x) === i) : []
   return (
     <div className={`space-y-2 border-l-[3px] pl-3 ${BORDER[idea.category]} ${card ? 'rounded-r-lg border-y border-r bg-card py-3 pr-3 shadow-sm' : ''}`}>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
         <span className="font-semibold text-foreground">{idea.participantId}</span>
         <Badge tone={CATEGORY[idea.category].tone}>{CATEGORY[idea.category].label}</Badge>
         {where.length > 0 && <span className="text-muted-foreground">{where.join(' · ')}</span>}
       </div>
-      {c?.prompt && <p className="text-xs font-medium text-muted-foreground">« {c.prompt.replace(/^[^\p{L}\p{N}]+/u, '')} »</p>}
+      {c?.prompt && <p className="text-sm font-medium text-muted-foreground">« {c.prompt.replace(/^[^\p{L}\p{N}]+/u, '')} »</p>}
       {c ? (
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+        <p className="whitespace-pre-wrap text-base leading-relaxed text-muted-foreground">
           {pieces.map((x, i) =>
             x.marked ? (
               <mark key={i} className="bg-transparent font-semibold text-foreground">
@@ -306,8 +306,8 @@ function SourceContext({ idea, ctx, excerpt, card = false }: { idea: Idea; ctx: 
         </p>
       ) : (
         <>
-          <p className="text-sm">«&nbsp;{ctx.mask(idea.verbatim)}&nbsp;»</p>
-          <p className="text-xs text-muted-foreground">Sa source a été retirée de la synthèse depuis ce rapport : le texte d'origine n'est plus disponible.</p>
+          <p className="text-base">«&nbsp;{ctx.mask(idea.verbatim)}&nbsp;»</p>
+          <p className="text-sm text-muted-foreground">Sa source a été retirée de la synthèse depuis ce rapport : le texte d'origine n'est plus disponible.</p>
         </>
       )}
     </div>
@@ -318,7 +318,7 @@ function SourceContext({ idea, ctx, excerpt, card = false }: { idea: Idea; ctx: 
 function Unverified({ items }: { items?: string[] }) {
   if (!items?.length) return null
   return (
-    <p className="text-xs text-muted-foreground">
+    <p className="text-sm text-muted-foreground">
       <span className="rounded bg-warning/30 px-1 font-medium">À vérifier</span> {items.map((x) => `« ${x} »`).join(', ')} ne correspond
       {items.length > 1 ? 'ent' : ''} à aucun chiffre calculé ni cité.
     </p>
@@ -338,12 +338,12 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
     <Disclosure
       summary={
         <span className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
-          <H className="text-sm font-semibold">{group.title}</H>
+          <H className="text-base font-semibold">{group.title}</H>
           <span className="flex flex-wrap items-center gap-2">
             <span className="block w-14 sm:w-20">
               <OpinionBar m={m} />
             </span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               <Users className="mr-0.5 inline size-3" />
               {m.participants}
             </span>
@@ -362,12 +362,12 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
         </span>
       }
     >
-      <div className="space-y-3 text-sm">
+      <div className="space-y-3 text-base">
         <div className="max-w-sm">
           <OpinionBar m={m} />
         </div>
-        <p className="text-xs text-muted-foreground">{metricsLine(m)}</p>
-        {dominantVoice(ideas) && <p className="text-xs text-muted-foreground">{dominantVoice(ideas)}</p>}
+        <p className="text-sm text-muted-foreground">{metricsLine(m)}</p>
+        {dominantVoice(ideas) && <p className="text-sm text-muted-foreground">{dominantVoice(ideas)}</p>}
         {group.summary && !ctx.segment && (
           <>
             <CitedText text={group.summary} ctx={ctx} />
@@ -383,8 +383,8 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
             const polar = cat === 'positive' || cat === 'negative'
             return (
               <div key={cat} className="space-y-1.5">
-                <p className="text-xs font-semibold">
-                  <Badge tone={CATEGORY[cat].tone}>
+                <p className="text-sm font-semibold">
+                  <Badge tone={CATEGORY[cat].tone} className="text-sm">
                     {categoryHeading(
                       cat,
                       lines.map((l) => l.participantId),
@@ -401,7 +401,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
             )
           })}
         </div>
-        {both.size > 0 && <p className="text-xs text-muted-foreground">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>}
+        {both.size > 0 && <p className="text-sm text-muted-foreground">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>}
       </div>
     </Disclosure>
   )
@@ -433,7 +433,7 @@ function PersonLine({
         if (e.key === 'Escape' && open) setOpen(null)
       }}
     >
-      <span className="w-9 shrink-0 pt-px text-xs font-semibold text-muted-foreground">
+      <span className="w-9 shrink-0 pt-px text-sm font-semibold text-muted-foreground">
         {line.participantId}
         {other && ' *'}
       </span>
@@ -456,7 +456,7 @@ function PersonLine({
                     «&nbsp;{ctx.mask(i.verbatim)}&nbsp;»
                   </button>
                 </Tooltip>
-                {origin && <span className="text-xs text-muted-foreground"> {origin}</span>}
+                {origin && <span className="text-sm text-muted-foreground"> {origin}</span>}
                 {k < line.ideas.length - 1 && ' ;'}
               </span>{' '}
             </Fragment>
@@ -465,7 +465,7 @@ function PersonLine({
         {open && (
           <div className="mt-2 space-y-1">
             <SourceContext idea={line.ideas.find((i) => i.id === open)!} ctx={ctx} card />
-            <button type="button" onClick={() => setOpen(null)} className="mt-1 cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+            <button type="button" onClick={() => setOpen(null)} className="mt-1 cursor-pointer text-sm text-muted-foreground hover:text-foreground">
               Replier
             </button>
           </div>
@@ -478,7 +478,7 @@ function PersonLine({
 function MinorityNote({ minority, ctx }: { minority: NonNullable<Metrics['minority']>; ctx: Ctx }) {
   const [open, setOpen] = useState(false)
   return (
-    <Alert tone="info" className="text-xs">
+    <Alert tone="info" className="text-sm">
       Minorité constante ({minority.side === 'positive' ? 'avis positifs' : 'avis négatifs'}) : {minority.participantIds.join(', ')}.{' '}
       <button className="cursor-pointer text-primary underline" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {open ? 'Masquer leurs verbatims' : 'Voir leurs verbatims'}
@@ -600,7 +600,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
 
   return (
     <article className="space-y-6">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-base text-muted-foreground">
         Rapport du {formatDate(analysis.updatedAt)} · {plural(all.participants, 'participant')} · {plural(all.mentions, 'occurrence')}
         {names.length > 0 &&
           (masked
@@ -665,7 +665,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
         )}
         {names.length > 0 && (
           <Tooltip content="Remplace les prénoms cités dans les réponses par « [prénom] », à l'écran et dans les exports. Les verbatims restent sinon tels quels.">
-            <label className="flex h-8 cursor-pointer items-center gap-1.5 rounded-md border border-input bg-card px-2.5 text-xs">
+            <label className="flex h-8 cursor-pointer items-center gap-1.5 rounded-md border border-input bg-card px-2.5 text-sm">
               <input type="checkbox" checked={masked} onChange={() => setMaskChoice(!masked)} />
               Masquer les prénoms
             </label>
@@ -739,7 +739,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
           <h2 id="resume" className="text-xl font-semibold">
             Résumé
           </h2>
-          <div className="max-w-3xl text-[15px]">
+          <div className="max-w-3xl text-base">
             <CitedText text={analysis.globalSummary} ctx={ctx} />
             <Unverified items={analysis.globalUnverified} />
             {summaryDoubts(sectionsHL) && <p className="mt-2 text-sm text-muted-foreground">{summaryDoubts(sectionsHL)}</p>}
@@ -760,18 +760,18 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
               return (
                 <Card key={sec.key} className={`mb-3 break-inside-avoid border-t-4 ${look.top}`}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-base">
+                    <CardTitle className="flex items-center gap-2 text-lg">
                       <Icon className={`size-4 ${look.text}`} aria-hidden />
                       {sec.heading}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {sec.intro && <p className="mb-2 text-xs text-muted-foreground">{sec.intro}</p>}
-                    <ul className="space-y-2 text-sm">
+                    {sec.intro && <p className="mb-2 text-sm text-muted-foreground">{sec.intro}</p>}
+                    <ul className="space-y-2 text-base">
                       {sec.items.map((x) => (
                         <li key={x.title} className={`border-l-[3px] pl-2.5 ${look.line}`}>
                           <span className="font-medium">{x.title}</span>
-                          <span className="block text-xs text-muted-foreground">
+                          <span className="block text-sm text-muted-foreground">
                             {x.detail}
                             {x.fragile && (
                               <>
@@ -791,20 +791,20 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
                             )}
                           </span>
                           {x.quotes.map((q, i) => (
-                            <span key={i} className="mt-1 block text-xs">
+                            <span key={i} className="mt-1 block text-sm">
                               <span className="italic">«&nbsp;{q.text}&nbsp;»</span> <span className="font-semibold text-muted-foreground">{q.who}</span>
                             </span>
                           ))}
                         </li>
                       ))}
                     </ul>
-                    {sec.more.length > 0 && <p className="mt-2 text-xs text-muted-foreground">Et aussi : {sec.more.join(' · ')}</p>}
+                    {sec.more.length > 0 && <p className="mt-2 text-sm text-muted-foreground">Et aussi : {sec.more.join(' · ')}</p>}
                   </CardContent>
                 </Card>
               )
             })}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Listes établies par le code à partir des chiffres de chaque motif, sans rédaction de l'IA, sur {plural(all.participants, 'participant')}.
           </p>
         </section>
@@ -814,7 +814,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
         <h2 id="vue" className="text-xl font-semibold">
           Vue d'ensemble
         </h2>
-        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
           <span className="flex max-w-full flex-wrap items-center gap-1">
             <span className="inline-block size-2.5 rounded-full bg-positive" /> positifs
           </span>
@@ -843,8 +843,8 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
                   }}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <span className="text-sm font-medium">{s.title}</span>
-                    <span className="shrink-0 text-xs text-muted-foreground">{plural(s.shown.participants, 'participant')}</span>
+                    <span className="text-base font-medium">{s.title}</span>
+                    <span className="shrink-0 text-sm text-muted-foreground">{plural(s.shown.participants, 'participant')}</span>
                   </div>
                   <div className="mt-2">
                     <OpinionBar m={s.shown} />
@@ -860,9 +860,9 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
             ))}
         </ul>
         {overview.some((s) => s.shown.participants === 1) && (
-          <div className="rounded-lg border border-dashed bg-card p-3 text-sm">
+          <div className="rounded-lg border border-dashed bg-card p-3 text-base">
             <p className="font-medium">Avis isolés</p>
-            <p className="text-xs text-muted-foreground">Portés chacun par un seul participant : à lire comme des signaux, pas comme des tendances.</p>
+            <p className="text-sm text-muted-foreground">Portés chacun par un seul participant : à lire comme des signaux, pas comme des tendances.</p>
             <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
               {overview
                 .filter((s) => s.shown.participants === 1)
@@ -900,10 +900,10 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
                 <div key={t.id} id={`sec-${t.id}`} className="scroll-mt-20 space-y-3">
                   <div className="space-y-1">
                     <h2 className="text-xl font-semibold">{t.title}</h2>
-                    <p className="text-xs text-muted-foreground">{describeTheme({ metrics: m }, shownGroups(t.groups))}</p>
+                    <p className="text-sm text-muted-foreground">{describeTheme({ metrics: m }, shownGroups(t.groups))}</p>
                   </div>
                   {t.summary && !segment && (
-                    <div className="max-w-3xl text-sm">
+                    <div className="max-w-3xl text-base">
                       <CitedText text={t.summary} ctx={ctx} />
                       <Unverified items={t.unverified} />
                     </div>
@@ -917,7 +917,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
                   </div>
                   {t.groups.some((g) => g.metrics.participants <= 1) && (
                     <div className="space-y-2">
-                      <p className="text-xs font-medium text-muted-foreground">Signaux isolés · un seul participant chacun</p>
+                      <p className="text-sm font-medium text-muted-foreground">Signaux isolés · un seul participant chacun</p>
                       {t.groups
                         .filter((g) => g.metrics.participants <= 1)
                         .map((g) => (

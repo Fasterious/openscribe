@@ -94,7 +94,7 @@ export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLab
   return <label className={cn('text-sm font-medium leading-none', className)} {...props} />
 }
 
-const badgeVariants = cva('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium', {
+const badgeVariants = cva('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[13px] font-medium', {
   variants: {
     tone: {
       default: 'border-transparent bg-accent text-accent-foreground',
@@ -272,7 +272,7 @@ export function Explain({ content, children }: { content: React.ReactNode; child
             collisionPadding={12}
             // Un toucher ailleurs ferme la bulle (Radix) ; sur l'étiquette elle-même, c'est le clic qui décide.
             onPointerDownOutside={(e) => trigger.current?.contains(e.target as Node) && e.preventDefault()}
-            className="z-50 max-w-72 rounded-md border bg-card px-3 py-2 text-xs leading-relaxed text-foreground shadow-lg"
+            className="z-50 max-w-80 rounded-md border bg-card px-3 py-2 text-sm leading-relaxed text-foreground shadow-lg"
           >
             {content}
           </TooltipPrimitive.Content>
@@ -303,7 +303,7 @@ export function Tooltip({
             side={side}
             sideOffset={6}
             collisionPadding={12}
-            className={`z-50 ${wide ? 'max-h-[70vh] max-w-lg overflow-y-auto' : 'max-w-72'} rounded-md border bg-card px-3 py-2 text-xs leading-relaxed text-foreground shadow-lg`}
+            className={`z-50 ${wide ? 'max-h-[70vh] max-w-lg overflow-y-auto' : 'max-w-80'} rounded-md border bg-card px-3 py-2 text-sm leading-relaxed text-foreground shadow-lg`}
           >
             {content}
           </TooltipPrimitive.Content>

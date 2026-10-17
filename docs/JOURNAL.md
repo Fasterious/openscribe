@@ -2,6 +2,15 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — Rapport de Synthèse : la taille de lecture de l'Observatoire
+
+- **Remarque d'Arnaud** : la page de l'Observatoire se lit mieux, la police du rapport de Synthèse est trop
+  petite, surtout sur mobile. Mesuré : l'Observatoire met 78 % de son texte en 16 px ; le rapport de Synthèse
+  était surtout en 14 px, avec une part en 12 px.
+- **Fait** : même échelle que l'Observatoire, 16 px pour ce qu'on lit (résumé, synthèses, verbatims, listes,
+  réponse d'origine), 14 px pour les chiffres et les repères, plus rien en 12 px ; pastilles en 13 px,
+  infobulles en 14 px.
+
 ## 2026-10-17 — Passe finale de l'école, notée sur 10 ; nouveau site en ligne
 
 - **Demande d'Arnaud** : finaliser, une seule passe notée sur 10 (on garde la note obtenue), fusionner et mettre
