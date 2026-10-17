@@ -122,5 +122,15 @@
   "note_langue": 4,
   "publie": false,
   "raison": "Passe invalidée par un bug de code : après la relecture des paires, les motifs sont renumérotés et les trois fusions se sont appliquées aux motifs qui portaient ces numéros (handicap fondu dans les démarches d'inscription, encadrement administratif dans la qualité des enseignants). Une copie du codage en double est revenue dans le motif de son original (citation en double). Corrigé dans le code (fusions par titre, copie chez elle retirée), rejoué en passe 11. Le codage en double est utile pour 13 copies sur 20 ; Proximité de l'école et Contrôle des enseignants défaillants corrigés ; éloges du public hors d'« École publique face au privé » persistent (paire non proposée par la réconciliation). Langue : meilleure note à ce jour (ligne Méthode et « aussi dans » corrigés à la source)."
+ },
+ {
+  "date": "2026-10-17",
+  "run": "run-opus-11",
+  "methode": "consultation (passe 11 : rejeu de la passe 10 après correction du bug de fusion ; codage en double, définitions des motifs cibles aux relectures)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_methode": "3 / 3 (moyennes 3,5 et 3,17, plafond dans les deux lectures)",
+  "note_langue": 3.5,
+  "publie": false,
+  "raison": "Fusions justes (Qualité + Motivation des enseignants ; Démarches + Pièces à fournir), 30 copies (24 à 26 justes, 2 dans le mauvais camp, 3 redondantes), 6 paires. Corrigés : administration hors de Qualité des enseignants, handicap au Résumé (18 sur 18). Plafond : éloges de l'école publique restés dans Expérience globale (8 idées), plaintes d'éloignement hors de Proximité ; aucune paire relue ne couvrait ces frontières. Cycle de trois passes clos ; levier suivant (balayage par définition des motifs du Résumé) soumis à Arnaud. Notations : notation-methodologue-1/2.md, notation-plume.md."
  }
 ]

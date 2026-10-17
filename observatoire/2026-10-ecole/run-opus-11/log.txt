@@ -1,0 +1,84 @@
+Colonnes : Région → attribute | Si vous avez été amené à scolariser votr → open
+19:18:17 extract:running 0/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:17 extract:running 10/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:17 extract:running 20/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:17 extract:running 30/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 40/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 50/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 60/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 70/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 80/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 90/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 100/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 110/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 120/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 130/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 140/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:18 extract:running 150/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 160/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 170/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 180/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 190/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 200/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 210/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 220/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 230/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 240/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 250/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 260/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:19 extract:running 270/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 280/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 290/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 300/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 310/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 320/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 330/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 340/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 350/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 360/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 370/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:running 378/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:done 378/378 group:pending summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:done 378/378 group:running summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:done 378/378 group:running 350/893 summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:done 378/378 group:running 550/893 summarize:pending themes:pending report:pending polish:pending
+19:18:20 extract:done 378/378 group:running 750/893 summarize:pending themes:pending report:pending polish:pending
+19:18:21 extract:done 378/378 group:running 893/893 summarize:pending themes:pending report:pending polish:pending
+19:18:21 extract:done 378/378 group:running 893/893 summarize:pending themes:pending report:pending polish:pending
+19:21:23 extract:done 378/378 group:running 893/893 summarize:pending themes:pending report:pending polish:pending
+19:23:11 extract:done 378/378 group:running 893/893 summarize:pending themes:pending report:pending polish:pending
+19:26:03 extract:done 378/378 group:done 893/893 summarize:pending themes:pending report:pending polish:pending
+19:26:03 extract:done 378/378 group:done 893/893 summarize:running 0/73 themes:pending report:pending polish:pending
+19:28:08 extract:done 378/378 group:done 893/893 summarize:running 1/73 themes:pending report:pending polish:pending
+19:28:30 extract:done 378/378 group:done 893/893 summarize:running 2/73 themes:pending report:pending polish:pending
+19:28:32 extract:done 378/378 group:done 893/893 summarize:running 4/73 themes:pending report:pending polish:pending
+19:28:40 extract:done 378/378 group:done 893/893 summarize:running 7/73 themes:pending report:pending polish:pending
+19:28:42 extract:done 378/378 group:done 893/893 summarize:running 10/73 themes:pending report:pending polish:pending
+19:28:46 extract:done 378/378 group:done 893/893 summarize:running 13/73 themes:pending report:pending polish:pending
+19:28:48 extract:done 378/378 group:done 893/893 summarize:running 14/73 themes:pending report:pending polish:pending
+19:28:50 extract:done 378/378 group:done 893/893 summarize:running 15/73 themes:pending report:pending polish:pending
+19:28:52 extract:done 378/378 group:done 893/893 summarize:running 28/73 themes:pending report:pending polish:pending
+19:29:14 extract:done 378/378 group:done 893/893 summarize:running 33/73 themes:pending report:pending polish:pending
+19:29:24 extract:done 378/378 group:done 893/893 summarize:running 50/73 themes:pending report:pending polish:pending
+19:29:48 extract:done 378/378 group:done 893/893 summarize:running 54/73 themes:pending report:pending polish:pending
+19:30:02 extract:done 378/378 group:done 893/893 summarize:running 65/73 themes:pending report:pending polish:pending
+19:30:42 extract:done 378/378 group:done 893/893 summarize:running 73/73 themes:pending report:pending polish:pending
+19:30:42 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:pending report:pending polish:pending
+19:30:42 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:running 0/73 report:pending polish:pending
+19:33:36 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:pending polish:pending
+19:33:36 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:running polish:pending
+19:35:12 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:running 0/84
+19:36:38 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:running 12/84
+19:36:54 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:running 24/84
+19:36:54 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:running 36/84
+19:36:57 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:running 48/84
+19:37:01 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:running 60/84
+19:37:01 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:running 72/84
+19:37:09 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:running 84/84
+19:37:09 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:done 84/84
+19:37:09 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:done 84/84
+19:39:47 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:done 84/84
+19:39:47 extract:done 378/378 group:done 893/893 summarize:done 73/73 themes:done 73/73 report:done polish:done 84/84
+Terminé : done  972 idées, 73 groupes, 10 thèmes, 0 citations écartées
+Demandes sans réponse : 0
+Étude exportée : /home/user/openscribe/fixtures/private/observatoire/2026-10-ecole/run-opus-11/ecole-grand-debat-2019.openscribe.json
