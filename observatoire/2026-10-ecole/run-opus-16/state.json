@@ -1,7 +1,7 @@
 {
  "id": "an_6q0y3j2b0z5d",
  "createdAt": "2026-10-17T16:19:46.358Z",
- "updatedAt": "2026-10-17T16:37:08.362Z",
+ "updatedAt": "2026-10-17T16:38:16.386Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -14257,7 +14257,7 @@
     "I0994",
     "I0995"
    ],
-   "summary": "Les enseignants laissent des souvenirs opposés : 23 personnes dénoncent l'incompétence, les fautes d'orthographe, les absences, le manque de motivation ou les comportements blessants de certains, et une qualité trop inégale d'un enseignant à l'autre [I0015, I0080, I0081, I0134, I0181, I0197, I0226, I0296, I0355, I0413, I0494, I0499, I0517, I0616, I0752, I0817, I0818, I0833, I0897, I0987, I0989, I0992, I0993, I0994, I0995]. À l'inverse, 22 personnes saluent des enseignants compétents, expérimentés et impliqués, parfois malgré des moyens limités [I0002, I0004, I0005, I0012, I0013, I0044, I0065, I0070, I0196, I0285, I0307, I0361, I0387, I0402, I0439, I0477, I0557, I0608, I0655, I0746, I0956, I0778, I0784, I0871, I0946, I0962]. 6 personnes sont mitigées : elles ont connu d'excellents enseignants, mais aussi des enseignants démotivés, irresponsables ou incompétents, parfois impossibles à écarter [I0158, I0988, I0214, I0215, I0216, I0359, I0990, I0455, I0459, I0573, I0991, I0691, I0692]. Une personne propose d'améliorer la qualité du corps enseignant, faute de résultats suffisants [I0490].",
+   "summary": "Les participants gardent des enseignants des souvenirs opposés : 23 personnes dénoncent l'incompétence, les fautes d'orthographe, les absences, le manque de motivation ou les comportements blessants de certains, et une qualité trop inégale d'un enseignant à l'autre [I0015, I0080, I0081, I0134, I0181, I0197, I0226, I0296, I0355, I0413, I0494, I0499, I0517, I0616, I0752, I0817, I0818, I0833, I0897, I0987, I0989, I0992, I0993, I0994, I0995]. À l'inverse, 22 personnes saluent des enseignants compétents, expérimentés et impliqués, parfois malgré des moyens limités [I0002, I0004, I0005, I0012, I0013, I0044, I0065, I0070, I0196, I0285, I0307, I0361, I0387, I0402, I0439, I0477, I0557, I0608, I0655, I0746, I0956, I0778, I0784, I0871, I0946, I0962]. 6 personnes nuancent : elles ont connu d'excellents enseignants, mais aussi des enseignants démotivés, irresponsables ou incompétents, parfois impossibles à écarter [I0158, I0988, I0214, I0215, I0216, I0359, I0990, I0455, I0459, I0573, I0991, I0691, I0692]. Une personne propose d'améliorer la qualité du corps enseignant, faute de résultats suffisants [I0490].",
    "metrics": {
     "mentions": 67,
     "participants": 52,
@@ -14458,7 +14458,7 @@
     "I0926",
     "I0964"
    ],
-   "summary": "46 des 48 personnes qui donnent un avis (large majorité) se disent satisfaites de la scolarité de leurs enfants [I0014, I0043, I0047, I0063, I0094, I0112, I0139, I0185, I0189, I0190, I0199, I0212, I0248, I0268, I0291, I0293, I0303, I0320, I0351, I0354, I0362, I0383, I0406, I0411, I0426, I0445, I0461, I0463, I0469, I0539, I0605, I0613, I0698, I0724, I0739, I0757, I0762, I0768, I0822, I0826, I0843, I0845, I0859, I0889, I0915, I0926, I0964]. L'école publique et la qualité de son enseignement sont saluées par 9 personnes, parfois de la maternelle aux études supérieures [I0190, I0320, I0426, I0463, I0605, I0613, I0757, I0843, I0859]. 5 personnes nuancent toutefois leur satisfaction, qu'elles lient à une petite commune, à une scolarité qui commence à peine ou à l'absence de situation particulière [I0189, I0199, I0351, I0889, I0915]. Une personne est mitigée : la scolarité de sa fille a été aisée, mais son fils a vécu « en enfer » à l'école élémentaire avant de s'épanouir au lycée [I0414, I0415, I0421, I0422] ; une autre dit partager « l'angoisse des parents » [I0866].",
+   "summary": "La scolarité de leurs enfants satisfait 46 des 48 personnes qui donnent un avis (large majorité) [I0014, I0043, I0047, I0063, I0094, I0112, I0139, I0185, I0189, I0190, I0199, I0212, I0248, I0268, I0291, I0293, I0303, I0320, I0351, I0354, I0362, I0383, I0406, I0411, I0426, I0445, I0461, I0463, I0469, I0539, I0605, I0613, I0698, I0724, I0739, I0757, I0762, I0768, I0822, I0826, I0843, I0845, I0859, I0889, I0915, I0926, I0964]. 9 personnes saluent l'école publique et la qualité de son enseignement, parfois de la maternelle aux études supérieures [I0190, I0320, I0426, I0463, I0605, I0613, I0757, I0843, I0859]. 5 personnes nuancent toutefois leur satisfaction, qu'elles lient à une petite commune, à une scolarité qui commence à peine ou à l'absence de situation particulière [I0189, I0199, I0351, I0889, I0915]. Une personne a un avis mitigé : la scolarité de sa fille a été aisée, mais son fils a vécu « en enfer » à l'école élémentaire avant de s'épanouir au lycée [I0414, I0415, I0421, I0422] ; une autre dit partager « l'angoisse des parents » [I0866].",
    "metrics": {
     "mentions": 54,
     "participants": 50,
@@ -14647,7 +14647,7 @@
     "I1032",
     "I1033"
    ],
-   "summary": "L'école publique sort perdante de la comparaison avec le privé pour 24 des 34 personnes qui donnent un avis (majorité) : 18 la jugent défaillante ou moins bonne que le privé (niveau, manque de professeurs, climat, enseignement de l'anglais) [I0062, I0104, I0120, I0286, I0430, I0488, I0518, I0570, I0714, I0728, I0729, I0805, I0961, I1027, I1028, I1030, I1031, I1032, I1033], 6 dénoncent le cloisonnement et l'inégalité entre les deux secteurs, comme la sélection des élèves par le privé malgré un financement public commun ou des passages difficiles de l'un à l'autre [I0275, I0276, I0302, I0481, I0482, I1029, I0708, I0709, I0737]. À l'inverse, 10 personnes saluent la qualité de l'école publique ou son rôle républicain, ou voient un bienfait dans l'émulation entre les deux systèmes [I0069, I0882, I1019, I1020, I1021, I1022, I1023, I1024, I1025, I1026]. 2 personnes proposent de remettre l'école publique au centre ou de faciliter les passages du privé vers le public [I0077, I0721]. Enfin, 7 personnes racontent un passage au privé sans le juger ou rappellent le rôle de l'école dans la formation du citoyen [I0116, I0213, I0255, I0500, I0694, I0879, I0913].",
+   "summary": "L'école publique sort perdante de la comparaison avec le privé pour 24 des 34 personnes qui donnent un avis (majorité) : 18 la jugent défaillante ou moins bonne que le privé (niveau, manque de professeurs, climat, enseignement de l'anglais) [I0062, I0104, I0120, I0286, I0430, I0488, I0518, I0570, I0714, I0728, I0729, I0805, I0961, I1027, I1028, I1030, I1031, I1032, I1033], et 6 dénoncent le cloisonnement et l'inégalité entre les deux secteurs, comme la sélection des élèves par le privé malgré un financement public commun, ou des passages difficiles de l'un à l'autre [I0275, I0276, I0302, I0481, I0482, I1029, I0708, I0709, I0737]. À l'inverse, 10 personnes saluent la qualité de l'école publique ou son rôle républicain, ou voient un bienfait dans l'émulation entre les deux systèmes [I0069, I0882, I1019, I1020, I1021, I1022, I1023, I1024, I1025, I1026]. 2 personnes proposent de remettre l'école publique au centre ou de faciliter les passages du privé vers le public [I0077, I0721]. Enfin, 7 personnes racontent un passage au privé sans le juger ou rappellent le rôle de l'école dans la formation du citoyen [I0116, I0213, I0255, I0500, I0694, I0879, I0913].",
    "metrics": {
     "mentions": 47,
     "participants": 42,
@@ -14815,7 +14815,7 @@
     "I0985",
     "I0986"
    ],
-   "summary": "Les démarches d'inscription sont jugées lourdes, répétitives ou opaques par 24 des 34 personnes qui donnent un avis (majorité) [I0136, I0141, I0164, I0178, I0179, I0239, I0260, I0261, I0324, I0393, I0394, I0444, I0467, I0487, I0506, I0508, I0661, I0712, I0713, I0717, I0718, I0767, I0770, I0802, I0810, I0828, I0837, I0838, I0984, I0985, I0986]. 11 personnes regrettent de fournir chaque année les mêmes documents ou de donner les mêmes informations à la mairie, à l'école, à la cantine et au périscolaire [I0141, I0164, I0178, I0239, I0261, I0393, I0444, I0467, I0487, I0661, I0984]. Les critiques visent aussi les formulaires papier (3 personnes) [I0179, I0506, I0508, I0717], des sites d'inscription lents ou défaillants (3 personnes) [I0718, I0767, I0802], des horaires d'inscription incompatibles avec le travail (2 personnes) [I0136, I0324] et des changements d'établissement laborieux après un déménagement ou une demande de dérogation (3 personnes) [I0712, I0713, I0837, I0838, I0986]. À l'inverse, 10 personnes saluent des inscriptions simples, rapides ou fluides, parfois en ligne ou reconduites automatiquement [I0033, I0282, I0404, I0558, I0560, I0618, I0722, I0855, I0856, I0955, I0983] ; pour alléger ces démarches, 4 personnes proposent de conserver les données d'une année sur l'autre [I0142, I0295, I0468, I0662] et une personne suggère des journées d'inscription le week-end [I0137].",
+   "summary": "Les démarches d'inscription sont jugées lourdes, répétitives ou opaques par 24 des 34 personnes qui donnent un avis (majorité) [I0136, I0141, I0164, I0178, I0179, I0239, I0260, I0261, I0324, I0393, I0394, I0444, I0467, I0487, I0506, I0508, I0661, I0712, I0713, I0717, I0718, I0767, I0770, I0802, I0810, I0828, I0837, I0838, I0984, I0985, I0986]. 11 personnes regrettent de fournir chaque année les mêmes documents ou de donner les mêmes informations à la mairie, à l'école, à la cantine et au périscolaire [I0141, I0164, I0178, I0239, I0261, I0393, I0444, I0467, I0487, I0661, I0984]. Les critiques visent aussi les formulaires papier (3 personnes) [I0179, I0506, I0508, I0717], des sites d'inscription lents ou défaillants (3 personnes) [I0718, I0767, I0802], des horaires d'inscription incompatibles avec le travail (2 personnes) [I0136, I0324] et des changements d'établissement laborieux après un déménagement ou une demande de dérogation (3 personnes) [I0712, I0713, I0837, I0838, I0986]. À l'inverse, 10 personnes saluent des inscriptions simples, rapides ou fluides, parfois en ligne ou reconduites automatiquement [I0033, I0282, I0404, I0558, I0560, I0618, I0722, I0855, I0856, I0955, I0983]. Pour alléger ces démarches, 4 personnes proposent de conserver les données d'une année sur l'autre [I0142, I0295, I0468, I0662], et une personne suggère des journées d'inscription le week-end [I0137].",
    "metrics": {
     "mentions": 49,
     "participants": 35,
@@ -14972,7 +14972,7 @@
     "I0947",
     "I0949"
    ],
-   "summary": "La carte scolaire est critiquée par 24 des 29 personnes qui donnent un avis (large majorité) [I0053, I0054, I0061, I0091, I0122, I0201, I0257, I0306, I0331, I0429, I0448, I0451, I0492, I0588, I0644, I0650, I0660, I0686, I0797, I0800, I0896, I0919, I0936, I0947] : 15 regrettent qu'un découpage rigide leur impose une école, souvent plus loin que l'établissement voisin [I0053, I0054, I0061, I0091, I0122, I0257, I0306, I0331, I0448, I0588, I0686, I0797, I0800, I0896, I0919], et 5 décrivent des dérogations obligatoires, refusées, payantes ou longues à obtenir [I0060, I0589, I0644, I0650, I0798]. 3 personnes dénoncent des passe-droits ou des détournements de la carte [I0332, I0919, I0947], 3 la relient à la mixité sociale sans s'accorder sur son effet [I0429, I0452, I0492], et 3 évoquent le recours au privé [I0450, I0660, I0936]. À l'inverse, 4 personnes défendent la sectorisation ou en apprécient la souplesse, de la liberté de choix à une dérogation obtenue sans peine [I0092, I0342, I0352, I0949] ; une personne est mitigée : elle salue une option qui permet l'inscription dans un lycée mais dénonce des passe-droits [I0241, I0242]. 4 personnes font des propositions : 3 demandent de supprimer la carte scolaire pour laisser le libre choix de l'école [I0207, I0671, I0685], une autre de tenir compte du domicile des grands-parents [I0064].",
+   "summary": "La carte scolaire est critiquée par 24 des 29 personnes qui donnent un avis (large majorité) [I0053, I0054, I0061, I0091, I0122, I0201, I0257, I0306, I0331, I0429, I0448, I0451, I0492, I0588, I0644, I0650, I0660, I0686, I0797, I0800, I0896, I0919, I0936, I0947] : 15 regrettent qu'un découpage rigide leur impose une école, souvent plus loin que l'établissement voisin [I0053, I0054, I0061, I0091, I0122, I0257, I0306, I0331, I0448, I0588, I0686, I0797, I0800, I0896, I0919], et 5 décrivent des dérogations obligatoires, refusées, payantes ou longues à obtenir [I0060, I0589, I0644, I0650, I0798]. 3 personnes dénoncent des passe-droits ou des détournements de la carte [I0332, I0919, I0947], 3 la relient à la mixité sociale sans s'accorder sur son effet [I0429, I0452, I0492], et 3 évoquent le recours au privé [I0450, I0660, I0936]. À l'inverse, 4 personnes défendent la sectorisation ou en apprécient la souplesse, de la liberté de choix à une dérogation obtenue sans peine [I0092, I0342, I0352, I0949] ; une personne nuance : elle salue une option qui permet l'inscription dans un lycée, mais dénonce des passe-droits [I0241, I0242]. 4 personnes font des propositions : 3 demandent de supprimer la carte scolaire pour laisser le libre choix de l'école [I0207, I0671, I0685], une autre de tenir compte du domicile des grands-parents [I0064].",
    "metrics": {
     "mentions": 45,
     "participants": 33,
@@ -15142,7 +15142,7 @@
     "I0980",
     "I0981"
    ],
-   "summary": "L'orientation des élèves est critiquée par 27 des 28 personnes qui donnent un avis (large majorité) : 12 regrettent de devoir se débrouiller seules, faute de conseillers compétents, d'une information à jour ou d'un service ouvert [I0234, I0236, I0240, I0310, I0322, I0419, I0547, I0548, I0549, I0550, I0581, I0603, I0614, I0615, I0796, I0903], et 6 trouvent le parcours complexe, opaque ou trop lent [I0035, I0143, I0788, I0801, I0980, I0981]. 8 personnes dénoncent une orientation imposée, tournée vers le bac général au détriment de l'apprentissage et des métiers manuels [I0040, I0129, I0233, I0349, I0374, I0568, I0677, I0730, I0731], et 4 regrettent des formations sans débouchés, déconnectées du monde du travail [I0078, I0079, I0126, I0127, I0583, I0584, I0819, I0820]. Seule une personne se félicite que sa fille ait été acceptée dans l'école de son choix après le bac [I0979], et une autre constate que les jeunes savent rarement ce qu'ils veulent faire [I0927]. Pour l'améliorer, 3 personnes proposent de revaloriser les métiers manuels et les filières courtes [I0204, I0350, I0861], 4 de mieux orienter les élèves, vers les métiers qui recrutent et en partant des métiers plutôt que des diplômes [I0203, I0582, I0821, I0860], et une personne, qui donne elle-même des cours sur la recherche d'apprentissage en 3e, voudrait les rendre obligatoires [I0151, I0152].",
+   "summary": "L'orientation des élèves est critiquée par 27 des 28 personnes qui donnent un avis (large majorité) : 12 regrettent de devoir se débrouiller seules, faute de conseillers compétents, d'une information à jour ou d'un service ouvert [I0234, I0236, I0240, I0310, I0322, I0419, I0547, I0548, I0549, I0550, I0581, I0603, I0614, I0615, I0796, I0903], et 6 trouvent le parcours complexe, opaque ou trop lent [I0035, I0143, I0788, I0801, I0980, I0981]. 8 personnes dénoncent une orientation imposée, tournée vers le bac général au détriment de l'apprentissage et des métiers manuels [I0040, I0129, I0233, I0349, I0374, I0568, I0677, I0730, I0731], et 4 regrettent des formations sans débouchés, déconnectées du monde du travail [I0078, I0079, I0126, I0127, I0583, I0584, I0819, I0820]. Seule une personne se félicite que sa fille ait été acceptée dans l'école de son choix après le bac [I0979], et une autre constate que les jeunes savent rarement ce qu'ils veulent faire [I0927]. Pour améliorer l'orientation, 3 personnes proposent de revaloriser les métiers manuels et les filières courtes [I0204, I0350, I0861], 4 de mieux orienter les élèves, vers les métiers qui recrutent et en partant des métiers plutôt que des diplômes [I0203, I0582, I0821, I0860], et une personne, qui assure des cours sur la recherche d'apprentissage en 3e, voudrait les rendre obligatoires [I0151, I0152].",
    "metrics": {
     "mentions": 50,
     "participants": 32,
@@ -15281,7 +15281,7 @@
     "I1017",
     "I1018"
    ],
-   "summary": "19 des 30 personnes qui donnent un avis (avis partagés) critiquent l'accès aux services administratifs : 9 dénoncent des délais trop longs, des demandes restées sans réponse ou des dossiers égarés et erronés [I0171, I0243, I0245, I0370, I0507, I0509, I0914, I1014, I1016, I1017, I1018]. Pour 5 personnes, la mairie est absente ou mal coordonnée avec l'école [I0222, I0304, I0347, I0367, I0852], et 5 autres décrivent des services difficiles d'accès : rectorat débordé, inspection injoignable, horaires incompatibles avec un travail, interlocuteurs retranchés derrière les consignes [I0392, I0522, I0599, I0711, I1015]. À l'inverse, 10 personnes saluent des démarches simples et rapides, surtout en mairie et pour une inscription ou un changement d'école [I0188, I0208, I0386, I0587, I1008, I1009, I1010, I1011, I1012, I1013] ; une personne trouve l'inscription rapide mais le rendez-vous à la caisse d'allocations familiales long à obtenir [I0034, I1007]. 3 personnes font des propositions : un guichet unique, un service public adapté à ceux qui travaillent, une enquête auprès des expatriés de retour en France [I0138, I0244, I0305].",
+   "summary": "L'accès aux services administratifs est critiqué par 19 des 30 personnes qui donnent un avis (avis partagés) : 9 dénoncent des délais trop longs, des demandes restées sans réponse ou des dossiers égarés et erronés [I0171, I0243, I0245, I0370, I0507, I0509, I0914, I1014, I1016, I1017, I1018]. Pour 5 personnes, la mairie est absente ou mal coordonnée avec l'école [I0222, I0304, I0347, I0367, I0852], et 5 autres décrivent des services difficiles d'accès : rectorat débordé, inspection injoignable, horaires incompatibles avec un travail, interlocuteurs retranchés derrière les consignes [I0392, I0522, I0599, I0711, I1015]. À l'inverse, 10 personnes saluent des démarches simples et rapides, surtout en mairie et pour une inscription ou un changement d'école [I0188, I0208, I0386, I0587, I1008, I1009, I1010, I1011, I1012, I1013] ; une personne trouve l'inscription rapide, mais le rendez-vous à la caisse d'allocations familiales long à obtenir [I0034, I1007]. 3 personnes font des propositions : un guichet unique, un service public adapté à ceux qui travaillent, une enquête auprès des expatriés de retour en France [I0138, I0244, I0305].",
    "metrics": {
     "mentions": 36,
     "participants": 31,
@@ -15418,7 +15418,7 @@
     "I1047",
     "I1048"
    ],
-   "summary": "Le système éducatif et ses réformes sont sévèrement jugés par 20 des 24 personnes qui donnent un avis (large majorité) : 8 le disent en échec, défaillant, mal organisé, voire catastrophique [I0162, I0230, I0298, I0309, I0750, I0885, I1041, I1042], et 8 le trouvent lourd, rigide, immobile, déconnecté de la vie réelle ou plus soucieux des personnels que des élèves [I0287, I0301, I0390, I0391, I0672, I1040, I1043, I1044, I1045]. 5 personnes critiquent des réformes : 3 visent la réforme du bac, des changements de programmes permanents ou une mesure jugée inutile et incomprise [I0057, I0546, I1048], et 2 s'opposent sur les rythmes du primaire, l'une jugeant irréfléchie la semaine de 4,5 jours, l'autre aberrant son abandon [I1046, I1047]. À contre-courant, 4 personnes saluent la qualité et l'organisation de l'école publique ou des réformes récentes utiles à l'apprentissage du français et des mathématiques [I0475, I0484, I0504, I0542]. Pour l'avenir, 3 personnes réclament enfin une réforme en profondeur, l'une avec plus de budget [I0086, I0231, I0346] ; 2 autres veulent que les enseignants acceptent les réformes ou que l'école renonce à la loi du marché [I0495, I0566], et une personne s'interroge sur la réforme du bac que vivra sa fille [I0846].",
+   "summary": "Le système éducatif et ses réformes sont sévèrement jugés par 20 des 24 personnes qui donnent un avis (large majorité) : 8 le disent en échec, défaillant, mal organisé, voire catastrophique [I0162, I0230, I0298, I0309, I0750, I0885, I1041, I1042], et 8 le trouvent lourd, rigide, immobile, déconnecté de la vie réelle ou plus soucieux des personnels que des élèves [I0287, I0301, I0390, I0391, I0672, I1040, I1043, I1044, I1045]. 5 personnes critiquent des réformes : 3 visent la réforme du bac, des changements de programmes permanents ou une mesure jugée inutile et incomprise [I0057, I0546, I1048], et 2 s'opposent sur les rythmes du primaire, l'une jugeant irréfléchie la semaine de 4,5 jours, l'autre aberrant son abandon [I1046, I1047]. À contre-courant, 4 personnes saluent la qualité et l'organisation de l'école publique, ou des réformes récentes utiles à l'apprentissage du français et des mathématiques [I0475, I0484, I0504, I0542]. Pour l'avenir, 3 personnes réclament enfin une réforme en profondeur, l'une avec plus de budget [I0086, I0231, I0346] ; 2 autres veulent que les enseignants acceptent les réformes ou que l'école renonce à la loi du marché [I0495, I0566], et une personne s'interroge sur la réforme du bac que vivra sa fille [I0846].",
    "metrics": {
     "mentions": 32,
     "participants": 29,
@@ -15799,7 +15799,7 @@
     "I1038",
     "I1039"
    ],
-   "summary": "19 des 20 personnes qui donnent un avis (large majorité) jugent insuffisants les moyens des écoles [I0022, I0068, I0071, I0221, I0341, I0376, I0485, I0515, I0532, I0623, I0720, I0761, I0781, I0789, I0793, I0939, I0948, I1037, I1038, I1039]. Le manque d'enseignants ou de personnel, jusqu'aux médecins et psychologues scolaires, est cité par 6 personnes [I0341, I0515, I0761, I0793, I1038, I1039]. Les critiques portent aussi sur le matériel (2 personnes) [I0221, I0781], la faiblesse ou la baisse des crédits communaux (2 personnes) [I0376, I0939] et le suivi des élèves en grande difficulté (2 personnes) [I0948, I1037] ; 4 personnes ajoutent que l'école ou ses enseignants tiennent malgré ces manques [I0071, I0485, I0623, I0720]. Une seule personne estime au contraire que « La France fait beaucoup pour l'éducation » [I0489], et 2 personnes proposent davantage d'enseignants [I0072, I0434].",
+   "summary": "Les moyens des écoles sont jugés insuffisants par 19 des 20 personnes qui donnent un avis (large majorité) [I0022, I0068, I0071, I0221, I0341, I0376, I0485, I0515, I0532, I0623, I0720, I0761, I0781, I0789, I0793, I0939, I0948, I1037, I1038, I1039]. 6 personnes citent le manque d'enseignants ou de personnel, jusqu'aux médecins et psychologues scolaires [I0341, I0515, I0761, I0793, I1038, I1039]. Les critiques portent aussi sur le matériel (2 personnes) [I0221, I0781], la faiblesse ou la baisse des crédits communaux (2 personnes) [I0376, I0939] et le suivi des élèves en grande difficulté (2 personnes) [I0948, I1037] ; 4 personnes ajoutent que l'école ou ses enseignants tiennent malgré ces manques [I0071, I0485, I0623, I0720]. Une seule personne estime au contraire que « La France fait beaucoup pour l'éducation » [I0489], et 2 personnes proposent davantage d'enseignants [I0072, I0434].",
    "metrics": {
     "mentions": 24,
     "participants": 22,
@@ -15920,7 +15920,7 @@
     "I0894",
     "I0895"
    ],
-   "summary": "Les 18 personnes qui donnent un avis (unanime) déplorent les conditions de scolarisation des enfants handicapés [I0003, I0087, I0088, I0089, I0090, I0206, I0246, I0247, I0283, I0284, I0318, I0395, I0408, I0520, I0524, I0526, I0527, I0555, I0620, I0621, I0649, I0689, I0690, I0782, I0840, I0841, I0842, I0844, I0891, I0892, I0893, I0894, I0895]. 6 personnes dénoncent le manque d'accompagnants ou d'aide en classe, avec des auxiliaires de vie scolaire absents, mal formés ou précaires [I0089, I0090, I0206, I0520, I0526, I0689, I0690, I0782], et 4 personnes le manque de places ou de structures, parfois très éloignées [I0003, I0088, I0841, I0893]. Les démarches administratives sont jugées interminables ou éprouvantes par 3 personnes [I0246, I0247, I0318, I0395], et 3 personnes décrivent le combat ou l'angoisse des parents [I0408, I0524, I0620]. L'école inclusive divise : 2 personnes la rejettent [I0555, I0842], une personne la juge catastrophique sans moyens [I0527] et une autre regrette au contraire l'absence d'inclusion des enfants à besoins particuliers [I0283] ; 3 personnes font chacune une proposition : des structures adaptées, des inspecteurs ayant l'expérience du handicap, le retour des aides personnelles [I0032, I0409, I0519].",
+   "summary": "Les 18 personnes qui donnent un avis (unanime) déplorent les conditions de scolarisation des enfants handicapés [I0003, I0087, I0088, I0089, I0090, I0206, I0246, I0247, I0283, I0284, I0318, I0395, I0408, I0520, I0524, I0526, I0527, I0555, I0620, I0621, I0649, I0689, I0690, I0782, I0840, I0841, I0842, I0844, I0891, I0892, I0893, I0894, I0895]. 6 personnes dénoncent le manque d'accompagnants ou d'aide en classe, avec des auxiliaires de vie scolaire absents, mal formés ou précaires [I0089, I0090, I0206, I0520, I0526, I0689, I0690, I0782], et 4 le manque de places ou de structures, parfois très éloignées [I0003, I0088, I0841, I0893]. 3 personnes jugent les démarches administratives interminables ou éprouvantes [I0246, I0247, I0318, I0395], et 3 décrivent le combat ou l'angoisse des parents [I0408, I0524, I0620]. L'école inclusive divise : 2 personnes la rejettent [I0555, I0842], une personne la juge catastrophique sans moyens [I0527], et une autre regrette au contraire l'absence d'inclusion des enfants à besoins particuliers [I0283]. 3 personnes font chacune une proposition : des structures adaptées, des inspecteurs ayant l'expérience du handicap, le retour des aides personnelles [I0032, I0409, I0519].",
    "metrics": {
     "mentions": 36,
     "participants": 20,
@@ -17212,7 +17212,7 @@
     "I0867",
     "I0868"
    ],
-   "summary": "Le coût des études est jugé trop lourd par 10 des 11 personnes qui donnent un avis (large majorité), au point de devenir « un luxe » ou de freiner l'égalité des chances pour 2 d'entre elles [I0039, I0228]. 6 personnes visent l'enseignement supérieur : classes préparatoires payantes, université coûteuse pour les familles, surtout loin de chez soi, étudiants peu aidés, coûts variables pour un même diplôme, et l'une demande à l'État des financements à taux réduits [I0144, I0187, I0238, I0280, I0473, I0867, I0868]. Les frais d'une école privée ou d'un lycée français à l'étranger pèsent sur 2 autres personnes [I0474, I0651]. Une personne se montre mitigée, qui juge coûteux l'accès aux écoles de son choix mais salue les grands corps de l'État, où les étudiants sont payés [I0812, I0814] ; une autre propose de verser à chaque famille le coût d'une année de maternelle publique, à dépenser dans l'école de son choix [I0031].",
+   "summary": "10 des 11 personnes qui donnent un avis (large majorité) jugent le coût des études trop lourd, au point d'en faire « un luxe » ou de freiner l'égalité des chances pour 2 d'entre elles [I0039, I0228]. 6 personnes visent l'enseignement supérieur : classes préparatoires payantes, université coûteuse pour les familles, surtout loin de chez soi, étudiants peu aidés, coûts variables pour un même diplôme ; l'une d'elles demande à l'État des financements à taux réduits [I0144, I0187, I0238, I0280, I0473, I0867, I0868]. Les frais d'une école privée ou d'un lycée français à l'étranger pèsent sur 2 autres personnes [I0474, I0651]. Une personne nuance : l'accès aux écoles de son choix lui paraît coûteux, mais elle salue les grands corps de l'État, où les étudiants sont payés [I0812, I0814]. Une autre propose de verser à chaque famille le coût d'une année de maternelle publique, à dépenser dans l'école de son choix [I0031].",
    "metrics": {
     "mentions": 14,
     "participants": 12,
@@ -17290,7 +17290,7 @@
     "I0910",
     "I0942"
    ],
-   "summary": "Formation et recrutement des enseignants laissent à désirer pour 4 des 5 personnes qui donnent un avis (large majorité) : 3 regrettent une formation pédagogique insuffisante ou trop « scolaire », l'une s'interrogeant aussi sur le sens du métier et le travail en équipe [I0155, I0514, I0675, I0676], une autre un recrutement de profils très éloignés des attentes [I0180]. Une personne est mitigée, qui salue le bon niveau technique des professeurs mais regrette le manque de formation en pédagogie [I0908, I0910]. 4 personnes proposent de recruter des candidats désireux de transmettre, de rendre la formation obligatoire, d'exiger 3 ans d'expérience hors de l'Éducation nationale ou de former à la motivation plutôt qu'à la sanction [I0082, I0161, I0266, I0562].",
+   "summary": "Formation et recrutement des enseignants laissent à désirer pour 4 des 5 personnes qui donnent un avis (large majorité) : 3 regrettent une formation pédagogique insuffisante ou trop « scolaire », l'une s'interrogeant aussi sur le sens du métier et le travail en équipe [I0155, I0514, I0675, I0676] ; la quatrième regrette le recrutement de profils très éloignés des attentes [I0180]. Une personne nuance : elle salue le bon niveau technique des professeurs mais regrette le manque de formation en pédagogie [I0908, I0910]. 4 personnes proposent de recruter des candidats désireux de transmettre, de rendre la formation obligatoire, d'exiger 3 ans d'expérience hors de l'Éducation nationale ou de former à la motivation plutôt qu'à la sanction [I0082, I0161, I0266, I0562].",
    "metrics": {
     "mentions": 12,
     "participants": 10,
@@ -17359,7 +17359,7 @@
     "I0876",
     "I0937"
    ],
-   "summary": "L'administration de l'Éducation nationale est jugée rigide, opaque ou distante par 8 des 9 personnes qui donnent un avis (large majorité) [I0051, I0329, I0345, I0371, I0647, I0648, I0876, I0937]. 3 personnes lui reprochent sa rigidité, jusqu'à l'absence de souplesse face aux territoires [I0647, I0648, I0876], et 5 la décrivent comme opaque, éloignée des problèmes, inefficace ou sans humanité [I0051, I0329, I0330, I0345, I0371, I0937]. Une personne salue au contraire la direction de l'école de son enfant [I0045], une autre propose de moderniser un management qu'elle juge resté dans les années 1950 [I0356].",
+   "summary": "8 des 9 personnes qui donnent un avis (large majorité) jugent l'administration de l'Éducation nationale rigide, opaque ou distante [I0051, I0329, I0345, I0371, I0647, I0648, I0876, I0937]. 3 personnes lui reprochent sa rigidité, jusqu'à l'absence de souplesse face aux territoires [I0647, I0648, I0876], et 5 la décrivent comme opaque, éloignée des problèmes, inefficace ou sans humanité [I0051, I0329, I0330, I0345, I0371, I0937]. Une personne salue au contraire la direction de l'école de son enfant [I0045]. Une autre propose de moderniser un management qu'elle juge resté dans les années 1950 [I0356].",
    "metrics": {
     "mentions": 11,
     "participants": 10,
@@ -17502,7 +17502,7 @@
     "I0764",
     "I0940"
    ],
-   "summary": "Les 7 personnes qui donnent un avis (unanime) critiquent les rythmes scolaires, d'abord pour leur manque de cohérence [I0049, I0184, I0377, I0619, I0654, I0763, I0940]. 3 personnes dénoncent des horaires qui varient d'une commune à l'autre, voire au sein d'une même école [I0049, I0184, I0654], et 2 les revirements entre semaine de 4 jours et de 4 jours et demi, qu'elles attribuent à la démagogie ou à une réforme irréfléchie [I0619, I0763, I0764]. Une personne juge les vacances trop fréquentes et trop longues pour qui travaille [I0377, I0378], une autre des horaires de mauvaise qualité qui obligent à recourir au centre de loisirs [I0940]. 2 personnes font des propositions : faire passer le rythme des enfants avant celui des professeurs [I0348] et réduire le nombre de cours [I0433].",
+   "summary": "Les 7 personnes qui donnent un avis (unanime) critiquent les rythmes scolaires, d'abord pour leur manque de cohérence [I0049, I0184, I0377, I0619, I0654, I0763, I0940]. 3 personnes dénoncent des horaires qui varient d'une commune à l'autre, voire au sein d'une même école [I0049, I0184, I0654] ; 2 autres, les revirements entre la semaine de 4 jours et celle de 4 jours et demi, qu'elles attribuent à la démagogie ou à une réforme irréfléchie [I0619, I0763, I0764]. Une personne juge les vacances trop fréquentes et trop longues pour qui travaille [I0377, I0378] ; une autre critique des horaires de mauvaise qualité qui obligent à recourir au centre de loisirs [I0940]. 2 personnes font des propositions : faire passer le rythme des enfants avant celui des professeurs [I0348] et réduire le nombre de cours [I0433].",
    "metrics": {
     "mentions": 12,
     "participants": 9,
@@ -17570,7 +17570,7 @@
     "I0974",
     "I0975"
    ],
-   "summary": "La gratuité de l'enseignement est saluée par 5 des 9 personnes qui donnent un avis (avis partagés), l'une vantant un enseignement de haut niveau à un coût imbattable [I0024, I0191, I0600, I0823, I0909]. 3 personnes jugent au contraire les études trop chères, de l'éducation devenue « un luxe » à la « fortune » dépensée pour une prépa et une école de commerce [I0971, I0972, I0973]. Une personne est mitigée : il faut selon elle beaucoup d'argent pour envoyer ses enfants dans les écoles de leur choix, alors que les grands corps de l'État offrent de belles carrières à un coût abordable [I0974, I0975].",
+   "summary": "5 des 9 personnes qui donnent un avis (avis partagés) saluent la gratuité de l'enseignement, l'une vantant un enseignement de haut niveau à un coût imbattable [I0024, I0191, I0600, I0823, I0909]. 3 personnes jugent au contraire les études trop chères, de l'éducation devenue « un luxe » à la « fortune » dépensée pour une classe préparatoire et une école de commerce [I0971, I0972, I0973]. Une personne nuance : selon elle, il faut beaucoup d'argent pour envoyer ses enfants dans les écoles de leur choix, alors que les grands corps de l'État offrent de belles carrières à un coût abordable [I0974, I0975].",
    "metrics": {
     "mentions": 10,
     "participants": 9,
@@ -17642,7 +17642,7 @@
     "I0853",
     "I0854"
    ],
-   "summary": "3 des 5 personnes qui donnent un avis (majorité) critiquent le numérique à l'école, des services en ligne jugés mal conçus à une salle informatique hors service pendant toute l'école primaire [I0357, I0606, I0853]. Une personne salue des enseignants qui se sont adaptés aux bureaux numériques [I0443], une autre est mitigée : elle trouve la plateforme des collégiens et lycéens correcte mais peu intuitive [I0829, I0830]. Les propositions de 3 personnes vont vers davantage de numérique, une formation généralisée à l'informatique et aux dangers d'internet, et un meilleur suivi en ligne [I0435, I0541, I0815].",
+   "summary": "3 des 5 personnes qui donnent un avis (majorité) critiquent le numérique à l'école, des services en ligne jugés mal conçus à une salle informatique hors service pendant toute l'école primaire [I0357, I0606, I0853]. Une personne salue des enseignants qui se sont adaptés aux bureaux numériques [I0443]. Une autre nuance : elle trouve la plateforme des collégiens et lycéens correcte mais peu intuitive [I0829, I0830]. 3 personnes proposent davantage de numérique, une formation généralisée à l'informatique et aux dangers d'internet, et un meilleur suivi en ligne [I0435, I0541, I0815].",
    "metrics": {
     "mentions": 10,
     "participants": 8,
@@ -17778,7 +17778,7 @@
     "I0933",
     "I0934"
    ],
-   "summary": "Bulletins partiaux, élèves culpabilisés, préparation insuffisante : les 5 personnes qui donnent un avis (unanime) critiquent l'évaluation des élèves [I0262, I0540, I0773, I0921, I0933]. 2 personnes reprochent à certains professeurs des remarques partiales sur des bulletins qui suivent l'élève et varient d'un enseignant à l'autre [I0262, I0933, I0934]. Les 3 autres dénoncent la culpabilisation des élèves [I0540], la place toujours faite au redoublement [I0773] ou, dans un lycée public, des devoirs non corrigés et moins de bacs blancs que dans le privé [I0921, I0922, I0924]. 2 pistes s'opposent : limiter le bulletin à des encouragements [I0264] ou revenir au classement dans chaque classe [I0561] ; une autre personne propose un bilan de connaissances à l'entrée des enfants [I0645].",
+   "summary": "Bulletins partiaux, élèves culpabilisés, préparation insuffisante : les 5 personnes qui donnent un avis (unanime) critiquent l'évaluation des élèves [I0262, I0540, I0773, I0921, I0933]. 2 personnes reprochent à certains professeurs des remarques partiales sur des bulletins qui suivent l'élève et varient d'un enseignant à l'autre [I0262, I0933, I0934]. Les 3 autres dénoncent la culpabilisation des élèves [I0540], la place toujours faite au redoublement [I0773] ou, dans un lycée public, des devoirs non corrigés et moins de bacs blancs que dans le privé [I0921, I0922, I0924]. 2 propositions s'opposent : une personne veut limiter le bulletin à des encouragements [I0264], une autre revenir au classement dans chaque classe [I0561]. Une autre personne encore propose un bilan de connaissances à l'entrée des enfants [I0645].",
    "metrics": {
     "mentions": 11,
     "participants": 7,
@@ -17849,7 +17849,7 @@
     "I0604",
     "I0693"
    ],
-   "summary": "À l'université, les 7 personnes qui donnent un avis (unanime) relèvent des défaillances, à commencer par le manque de moyens [I0038, I0165, I0169, I0379, I0403, I0604, I0693]. 3 personnes décrivent des moyens insuffisants, voire des locaux vétustes, l'une s'indignant de devoir payer encore par des fondations après des années d'impôts [I0379, I0380, I0604, I0693]. Les 4 autres évoquent l'entrée des entreprises privées dans les cursus [I0038], le manque de suivi des doctorants [I0165], des modalités changées en cours de cursus [I0403] et des statuts trop disparates entre fonctionnaires et vacataires, que cette personne propose de fondre en un statut intermédiaire [I0167, I0168, I0169].",
+   "summary": "À l'université, les 7 personnes qui donnent un avis (unanime) relèvent des défaillances, à commencer par le manque de moyens [I0038, I0165, I0169, I0379, I0403, I0604, I0693]. 3 personnes décrivent des moyens insuffisants, voire des locaux vétustes ; l'une s'indigne de devoir encore payer, par des fondations, après des années d'impôts [I0379, I0380, I0604, I0693]. Les 4 autres évoquent l'entrée des entreprises privées dans les cursus [I0038], le manque de suivi des doctorants [I0165], des modalités changées en cours de cursus [I0403] et des statuts trop disparates entre fonctionnaires et vacataires, que la dernière propose de fondre en un statut intermédiaire [I0167, I0168, I0169].",
    "metrics": {
     "mentions": 11,
     "participants": 7,
@@ -17915,7 +17915,7 @@
     "I0607",
     "I0725"
    ],
-   "summary": "La composition des classes est critiquée par 4 des 5 personnes qui donnent un avis (large majorité) : 3 visent les classes à double ou triple niveau, difficiles à suivre pour les élèves comme pour l'enseignant [I0125, I0530, I0534], et une autre regrette que les élèves qui travaillent soient freinés par ceux qui ont des lacunes [I0099, I0101]. 2 personnes proposent de regrouper les élèves par niveau [I0098, I0431]. Une personne salue au contraire la mixité sociale de son arrondissement parisien [I0725], et une autre décrit sans la juger la scolarité de ses enfants en classes à plusieurs niveaux dans une école rurale [I0607].",
+   "summary": "4 des 5 personnes qui donnent un avis (large majorité) critiquent la composition des classes : 3 visent les classes à double ou triple niveau, difficiles à suivre pour les élèves comme pour l'enseignant [I0125, I0530, I0534] ; la quatrième regrette que les élèves qui travaillent soient freinés par ceux qui ont des lacunes [I0099, I0101]. 2 personnes proposent de regrouper les élèves par niveau [I0098, I0431]. Une personne salue au contraire la mixité sociale de son arrondissement parisien [I0725]. Une autre décrit, sans la juger, la scolarité de ses enfants en classes à plusieurs niveaux dans une école rurale [I0607].",
    "metrics": {
     "mentions": 10,
     "participants": 7,
@@ -17977,7 +17977,7 @@
     "I0571",
     "I0659"
    ],
-   "summary": "Les 6 personnes qui donnent un avis (unanime) déplorent le manque de discipline dans les établissements, que 2 d'entre elles relient à une absence d'autorité ou à un laxisme ancien de l'Éducation nationale et de la justice [I0115, I0382]. Des élèves perturbateurs troublent les classes et mettent en insécurité les élèves sages, selon 2 autres personnes [I0177, I0462]. La recherche d'un établissement calme préoccupe 2 personnes, dont l'une a choisi le privé pour éviter « la loi de la jungle » [I0319, I0571]. Une personne propose de confier des tâches de nettoyage aux élèves perturbateurs et de supprimer les aides familiales de leurs parents [I0659].",
+   "summary": "Les 6 personnes qui donnent un avis (unanime) déplorent le manque de discipline dans les établissements, que 2 d'entre elles relient à une absence d'autorité ou à un laxisme ancien de l'Éducation nationale et de la justice [I0115, I0382]. 2 autres personnes estiment que des élèves perturbateurs troublent les classes et mettent en insécurité les élèves sages [I0177, I0462]. 2 personnes se soucient de trouver un établissement calme ; l'une d'elles a choisi le privé pour échapper à « la loi de la jungle » [I0319, I0571]. Une personne propose de confier des tâches de nettoyage aux élèves perturbateurs et de supprimer les aides familiales de leurs parents [I0659].",
    "metrics": {
     "mentions": 7,
     "participants": 7,
@@ -18750,7 +18750,7 @@
     "I0290",
     "I0323"
    ],
-   "summary": "La maternelle paraît mal adaptée aux tout-petits à 3 personnes, pour des raisons contraires : 2 y voient un formatage et une pression excessive sur des enfants pas tous prêts à 3 ans, l'une y situant le début de l'échec scolaire [I0083, I0085, I0323], la troisième la juge plus proche d'une crèche que d'une préparation à la scolarité [I0133]. 2 personnes proposent de former les enseignants de maternelle au développement de l'enfant plutôt qu'à l'évaluation, ou de placer un agent spécialisé des écoles maternelles dans chaque classe [I0084, I0290].",
+   "summary": "Pour 3 personnes, la maternelle paraît mal adaptée aux tout-petits, pour des raisons opposées : 2 y voient un formatage et une pression excessive sur des enfants qui ne sont pas tous prêts à 3 ans, l'une y situant le début de l'échec scolaire [I0083, I0085, I0323] ; la troisième la juge plus proche d'une crèche que d'une préparation à la scolarité [I0133]. 2 personnes proposent de former les enseignants de maternelle au développement de l'enfant plutôt qu'à l'évaluation, ou de placer un agent spécialisé des écoles maternelles dans chaque classe [I0084, I0290].",
    "metrics": {
     "mentions": 6,
     "participants": 4,
@@ -18912,7 +18912,7 @@
     "I0958",
     "I0959"
    ],
-   "summary": "Les grèves des enseignants gênent les 4 personnes qui donnent un avis (unanime), par le nombre de jours perdus ou par une gêne plus forte au collège et au lycée [I0153, I0917, I0958, I0959]. 2 personnes y ajoutent l'absentéisme des professeurs, qui rend selon elles la scolarité instable et sacrifie les élèves les plus fragiles [I0958, I0959].",
+   "summary": "Les grèves des enseignants gênent les 4 personnes qui donnent un avis (unanime), par le nombre de jours perdus ou parce qu'elles pèsent davantage au collège et au lycée [I0153, I0917, I0958, I0959]. 2 personnes y ajoutent l'absentéisme des professeurs, qui rend selon elles la scolarité instable et sacrifie les élèves les plus fragiles [I0958, I0959].",
    "metrics": {
     "mentions": 4,
     "participants": 4,
@@ -18966,7 +18966,7 @@
     "I0747",
     "I0783"
    ],
-   "summary": "Les enseignants ne sont pas reconnus à leur juste valeur, estiment 3 personnes, notamment par leur hiérarchie [I0008, I0747, I0783]. Une personne propose que les élèves et leurs parents puissent contribuer à cette reconnaissance [I0658].",
+   "summary": "3 personnes estiment que les enseignants ne sont pas reconnus à leur juste valeur, notamment par leur hiérarchie [I0008, I0747, I0783]. Une personne propose que les élèves et leurs parents puissent contribuer à cette reconnaissance [I0658].",
    "metrics": {
     "mentions": 4,
     "participants": 4,
@@ -19072,7 +19072,7 @@
     "I0904",
     "I0905"
    ],
-   "summary": "La gestion des établissements est mise en cause par 2 personnes : absence de hiérarchie entre la direction et les professeurs, conflits entre enseignants et administration qui fragilisent tout un collège sans réaction du rectorat, pourtant prévenu depuis des années [I0849, I0904, I0905]. Une personne est mitigée : elle garde confiance dans les établissements publics bien gérés, tout en notant que tous ne le sont pas [I0544, I0545].",
+   "summary": "2 personnes mettent en cause la gestion des établissements : absence de hiérarchie entre la direction et les professeurs, conflits entre enseignants et administration qui fragilisent tout un collège sans réaction du rectorat, pourtant prévenu depuis des années [I0849, I0904, I0905]. Une personne nuance : elle garde confiance dans les établissements publics bien gérés, tout en notant que tous ne le sont pas [I0544, I0545].",
    "metrics": {
     "mentions": 5,
     "participants": 3,
@@ -19125,7 +19125,7 @@
     "I0428",
     "I0529"
    ],
-   "summary": "Face au décrochage, 2 personnes regrettent l'absence de solution : un élève qui décroche entre 14 et 17 ans n'a d'autre choix que le parcours classique, et rescolariser un jeune adulte a tourné au « cauchemar », jusqu'à payer une faculté privée faute de réponse du public [I0529, I0427, I0428]. Une personne s'alarme du nombre de décrochages, sans évoquer leur prise en charge [I0232].",
+   "summary": "Face au décrochage, 2 personnes regrettent l'absence de solution : un élève qui décroche entre 14 et 17 ans n'a d'autre choix que le parcours classique, et rescolariser un jeune adulte a tourné au « cauchemar », jusqu'à payer une faculté privée faute de réponse dans le public [I0529, I0427, I0428]. Une personne s'alarme du nombre de décrochages, sans évoquer leur prise en charge [I0232].",
    "metrics": {
     "mentions": 4,
     "participants": 3,
@@ -19176,7 +19176,7 @@
     "I0808",
     "I0925"
    ],
-   "summary": "Sur les langues régionales, 2 personnes critiquent l'école en sens contraire : l'une regrette qu'elle les enseigne, à rebours de l'école de Jules Ferry [I0632], l'autre dénonce la correction de l'accent de ses enfants après un déménagement de Marseille [I0808]. 2 pistes s'opposent : la première personne propose de retirer ces langues de l'Éducation nationale pour réduire les coûts, une autre souhaite inscrire ses enfants en classe bilingue français-occitan [I0633, I0925].",
+   "summary": "Sur les langues régionales, 2 personnes critiquent l'école en sens opposé : l'une regrette qu'elle les enseigne, à rebours de l'école de Jules Ferry [I0632] ; l'autre dénonce la correction de l'accent de ses enfants après un déménagement depuis Marseille [I0808]. 2 pistes s'opposent : la première personne propose de retirer ces langues de l'Éducation nationale pour réduire les coûts, une autre souhaite inscrire ses enfants en classe bilingue français-occitan [I0633, I0925].",
    "metrics": {
     "mentions": 4,
     "participants": 3,
@@ -19232,7 +19232,7 @@
     "I0780",
     "I0950"
    ],
-   "summary": "Aux yeux des 3 personnes qui donnent un avis, les enseignants sont trop peu payés : l'une juge les salaires « indécemment bas », une autre y voit, avec les changements, une source de démotivation [I0760, I0780, I0950].",
+   "summary": "Les 3 personnes qui donnent un avis jugent les enseignants trop peu payés : l'une trouve les salaires « indécemment bas », une autre y voit, avec les changements, une source de démotivation [I0760, I0780, I0950].",
    "metrics": {
     "mentions": 3,
     "participants": 3,
@@ -19283,7 +19283,7 @@
     "I0502",
     "I0825"
    ],
-   "summary": "L'insécurité dans les établissements ou à leurs abords inquiète les 3 personnes qui donnent un avis, et l'une d'elles a dû déménager à cause de problèmes de sécurité dans un collège de banlieue parisienne [I0368, I0502, I0825].",
+   "summary": "L'insécurité dans les établissements ou à leurs abords inquiète les 3 personnes qui donnent un avis ; l'une d'elles a dû déménager à cause de problèmes de sécurité dans un collège de banlieue parisienne [I0368, I0502, I0825].",
    "metrics": {
     "mentions": 3,
     "participants": 3,
@@ -19338,7 +19338,7 @@
     "I0669",
     "I0813"
    ],
-   "summary": "Les écoles de commerce essuient les critiques de 2 personnes : l'une y voit une « jungle » tournée vers le profit, avec des vacataires mal payés, des frais de scolarité opaques et des contrats abusifs [I0664, I0665, I0666, I0667], l'autre les juge inaccessibles aux classes moyennes [I0813]. La première demande qu'elles soient réglementées, contrôlées et sanctionnées [I0668, I0669].",
+   "summary": "2 personnes critiquent les écoles de commerce : l'une y voit une « jungle » tournée vers le profit, avec des vacataires mal payés, des frais de scolarité opaques et des contrats abusifs [I0664, I0665, I0666, I0667] ; l'autre les juge inaccessibles aux classes moyennes [I0813]. La première demande qu'elles soient réglementées, contrôlées et sanctionnées [I0668, I0669].",
    "metrics": {
     "mentions": 7,
     "participants": 2,
@@ -21884,7 +21884,7 @@
   {
    "id": "polish",
    "state": "running",
-   "done": 24,
+   "done": 60,
    "total": 84
   }
  ],
@@ -22343,9 +22343,9 @@
  ],
  "status": "running",
  "polish": {
-  "checked": 24,
-  "changed": 13,
-  "refused": 1
+  "checked": 60,
+  "changed": 42,
+  "refused": 2
  },
  "names": [
   "Guillaume"
