@@ -1,7 +1,7 @@
 {
  "id": "an_6q0y3j2b0z5d",
  "createdAt": "2026-10-17T16:19:46.358Z",
- "updatedAt": "2026-10-17T16:38:16.386Z",
+ "updatedAt": "2026-10-17T16:39:32.605Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -14398,7 +14398,8 @@
     "negative": "dénoncer l'incompétence, le désengagement ou le comportement d'enseignants",
     "neutral": "rappeler l'importance des enseignants sans juger ceux rencontrés"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Expérience globale de scolarisation",
@@ -14594,7 +14595,8 @@
     "negative": "décrire une scolarité globalement difficile, décevante ou mal vécue",
     "neutral": "constater un fait ou énoncer un principe général sur l'école"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "École publique face au privé",
@@ -14760,7 +14762,8 @@
     "negative": "juger le public défaillant, déplorer le cloisonnement ou l'inégalité public-privé",
     "neutral": "constater un passage au privé ou énoncer un principe général"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Démarches d'inscription",
@@ -14921,7 +14924,8 @@
     "negative": "juger les inscriptions lourdes, répétitives, sur papier ou opaques",
     "neutral": "décrire une situation d'inscription sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Carte scolaire",
@@ -15086,7 +15090,10 @@
     "negative": "rejeter la sectorisation, en subir les refus, trajets ou passe-droits",
     "neutral": "constater un effet de la sectorisation sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "4 personnes"
+   ]
   },
   {
    "title": "Orientation des élèves",
@@ -15239,7 +15246,8 @@
     "negative": "juger l'orientation insuffisante, opaque ou imposée, ou les filières sans débouchés",
     "neutral": "décrire une démarche ou un constat sans juger l'orientation offerte"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Accès aux services administratifs",
@@ -15380,7 +15388,8 @@
     "negative": "subir des délais, des erreurs ou des interlocuteurs injoignables",
     "neutral": "énoncer un principe général sur l'administration sans juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Réforme du système éducatif",
@@ -15522,7 +15531,8 @@
     "negative": "rejeter les réformes ou juger le système défaillant et immobile",
     "neutral": "énoncer un principe général sur l'école sans juger le système"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Absences des enseignants",
@@ -15646,7 +15656,10 @@
     "negative": "déplorer des absences fréquentes, non remplacées ou mal remplacées",
     "neutral": "constater un fait ou poser une question sans juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "25 personnes"
+   ]
   },
   {
    "title": "Effectifs par classe",
@@ -15769,7 +15782,8 @@
     "negative": "déplorer des classes surchargées ou demander des effectifs réduits",
     "neutral": "énoncer un principe général sur la taille des classes"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Moyens des écoles",
@@ -15878,7 +15892,10 @@
     "negative": "juger insuffisants les moyens, le personnel ou le matériel des écoles",
     "neutral": "énoncer un principe sur l'éducation sans juger ses moyens"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "20 personnes"
+   ]
   },
   {
    "title": "Scolarisation des enfants handicapés",
@@ -15994,7 +16011,8 @@
     "negative": "déplorer le manque de places, d'accompagnants ou de structures",
     "neutral": "énoncer un principe général sur l'inclusion sans juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Accès à l'enseignement supérieur",
@@ -16023,7 +16041,7 @@
     "I1035",
     "I1036"
    ],
-   "summary": "L'accès à l'enseignement supérieur suscite les critiques de 17 des 20 personnes qui donnent un avis (large majorité) [I0105, I0166, I0174, I0175, I0194, I0219, I0281, I0292, I0294, I0405, I0594, I0864, I0898, I0931, I0932, I0957, I1034, I1035, I1036]. 7 personnes critiquent la procédure d'admission post-bac, d'APB à Parcoursup, pour sa complexité, le stress qu'elle crée et l'obligation de multiplier les candidatures [I0105, I0175, I0194, I0219, I0281, I0405, I0594], et 4 autres jugent le passage après le bac compliqué ou opaque [I0898, I0931, I0957, I1035]. Le manque de places et la sélection sur dossier sont dénoncés par 4 personnes [I0166, I0174, I0292, I0932], et 2 personnes regrettent que les grandes écoles restent concentrées à Paris ou plus accessibles aux lycéens parisiens [I0294, I1036] ; une personne dont l'enfant, faute de dossier scolaire, n'a été accepté dans aucun IUT demande d'assouplir ces règles [I0864, I0865]. À contre-courant, 3 personnes saluent une admission dans l'école choisie, un passage sans problème par APB ou de bonnes classes préparatoires [I0156, I0742, I0847].",
+   "summary": "L'accès à l'enseignement supérieur est critiqué par 17 des 20 personnes qui donnent un avis (large majorité) [I0105, I0166, I0174, I0175, I0194, I0219, I0281, I0292, I0294, I0405, I0594, I0864, I0898, I0931, I0932, I0957, I1034, I1035, I1036]. 7 personnes reprochent à la procédure d'admission post-bac, d'APB à Parcoursup, sa complexité, le stress qu'elle crée et l'obligation de multiplier les candidatures [I0105, I0175, I0194, I0219, I0281, I0405, I0594], et 4 autres jugent le passage après le bac compliqué ou opaque [I0898, I0931, I0957, I1035]. 4 personnes dénoncent le manque de places et la sélection sur dossier [I0166, I0174, I0292, I0932], et 2 regrettent que les grandes écoles restent concentrées à Paris ou plus accessibles aux lycéens parisiens [I0294, I1036] ; une personne dont l'enfant, faute de dossier scolaire, n'a été accepté dans aucun institut universitaire de technologie demande d'assouplir ces règles [I0864, I0865]. À contre-courant, 3 personnes saluent une admission dans l'école choisie, un passage sans problème par APB ou de bonnes classes préparatoires [I0156, I0742, I0847].",
    "metrics": {
     "mentions": 23,
     "participants": 20,
@@ -16112,7 +16130,8 @@
     "negative": "critiquer la sélection, le manque de places ou les procédures d'admission",
     "neutral": "évoquer l'après-bac sans juger les conditions d'accès"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Services périscolaires",
@@ -16143,7 +16162,7 @@
     "I0997",
     "I0998"
    ],
-   "summary": "Les services périscolaires plaisent à 9 personnes pour la qualité de la garderie, du centre de loisirs, des activités ou des repas faits maison, pour des horaires adaptés aux parents qui travaillent, ou pour des services municipaux efficaces, de la régie de paiement aux aides pour la cantine et à la garde gratuite les jours de grève [I0046, I0096, I0124, I0269, I0270, I0442, I0759, I0857, I0858, I0870, I0998]. 9 autres les critiquent (avis partagés) : 3 visent les horaires trop courts, le manque de places ou l'absence de garde quand l'enfant est malade [I0195, I0638, I0639, I0996], 3 le prix de la garderie ou la cantine, de la facturation des repas malgré la maladie à l'absence de menus végétariens [I0025, I0249, I0250, I0827], et 3 la rigidité de l'organisation, des formalités jugées inutiles ou le désengagement de l'Éducation nationale [I0325, I0850, I0997]. L'une de ces personnes souhaite pouvoir inscrire son enfant le mercredi de façon occasionnelle [I0326], une autre voudrait que l'Éducation nationale pilote le périscolaire avec les moyens de la mairie [I0851].",
+   "summary": "9 personnes apprécient les services périscolaires : la qualité de la garderie, du centre de loisirs, des activités ou des repas faits maison, des horaires adaptés aux parents qui travaillent, ou des services municipaux efficaces, de la régie de paiement aux aides pour la cantine et à la garde gratuite les jours de grève [I0046, I0096, I0124, I0269, I0270, I0442, I0759, I0857, I0858, I0870, I0998]. 9 autres les critiquent (avis partagés) : 3 visent les horaires trop courts, le manque de places ou l'absence de garde quand l'enfant est malade [I0195, I0638, I0639, I0996], 3 le prix de la garderie ou de la cantine, de la facturation des repas malgré la maladie à l'absence de menus végétariens [I0025, I0249, I0250, I0827], et 3 la rigidité de l'organisation, des formalités jugées inutiles ou le désengagement de l'Éducation nationale [I0325, I0850, I0997]. L'une de ces personnes souhaite pouvoir inscrire son enfant le mercredi de façon occasionnelle [I0326], une autre voudrait que l'Éducation nationale pilote le périscolaire avec les moyens de la mairie [I0851].",
    "metrics": {
     "mentions": 25,
     "participants": 19,
@@ -16217,7 +16236,8 @@
     "negative": "critiquer le coût, les horaires, les places ou l'organisation périscolaire",
     "neutral": "mentionner le périscolaire sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Proximité de l'école",
@@ -16242,7 +16262,7 @@
     "I1005",
     "I1006"
    ],
-   "summary": "L'éloignement de l'école est critiqué par 11 des 17 personnes qui donnent un avis (majorité), dont 6 qui reprochent à la carte scolaire, au regroupement ou aux règles d'accès de les écarter de l'établissement le plus proche, parfois à quelques minutes à pied [I0945, I0951, I0952, I1002, I1004, I1006]. 5 personnes évoquent des lycées, des filières ou des structures lointaines, des levers très matinaux et des classes rurales fermées qui obligent à changer de village [I0186, I0327, I0953, I1003, I1005]. À l'inverse, 5 personnes apprécient d'avoir une école ou une filière proche, ou une commune qui garde son école [I0205, I0360, I0556, I0999, I1000]. Une personne est mitigée : ses 2 enfants les plus jeunes ont une école proche, mais un autre de ses enfants fait 4 heures de route par jour pour rejoindre un institut médico-éducatif, faute de structures [I0001, I1001].",
+   "summary": "L'éloignement de l'école est critiqué par 11 des 17 personnes qui donnent un avis (majorité), dont 6 qui reprochent à la carte scolaire, au regroupement ou aux règles d'accès de les écarter de l'établissement le plus proche, parfois situé à quelques minutes à pied [I0945, I0951, I0952, I1002, I1004, I1006]. 5 personnes évoquent des lycées, des filières ou des structures lointaines, des levers très matinaux et des classes rurales fermées qui obligent à changer de village [I0186, I0327, I0953, I1003, I1005]. À l'inverse, 5 personnes apprécient d'avoir une école ou une filière proche, ou une commune qui garde son école [I0205, I0360, I0556, I0999, I1000]. Une personne nuance : ses 2 enfants les plus jeunes ont une école proche, mais un autre de ses enfants fait 4 heures de route par jour pour rejoindre un institut médico-éducatif, faute de structures [I0001, I1001].",
    "metrics": {
     "mentions": 19,
     "participants": 18,
@@ -16315,7 +16335,10 @@
     "negative": "subir l'éloignement de l'établissement et les trajets qu'il impose",
     "neutral": "constater l'importance de la proximité sans juger sa situation"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "un autre"
+   ]
   },
   {
    "title": "Méthodes pédagogiques",
@@ -16344,7 +16367,7 @@
     "I0791",
     "I0902"
    ],
-   "summary": "Pour 12 des 13 personnes qui donnent un avis (large majorité), les méthodes pédagogiques posent problème, à commencer par l'apprentissage des fondamentaux : 5 visent la lecture et l'orthographe, avec des méthodes jugées trop complexes ou trop changeantes, jusqu'à une dyslexie attribuée à la méthode globale [I0016, I0017, I0334, I0635, I0700, I0701, I0774]. 4 autres regrettent une pédagogie peu différenciée, fermée à d'autres approches ou rarement remise en question, et des enseignants bridés dans leur liberté pédagogique [I0308, I0553, I0673, I0674, I0902] ; 3 jugent les méthodes datées, voire inchangées depuis 30 ans [I0147, I0148, I0198, I0790, I0791]. Une personne salue au contraire des méthodes plus tolérantes, qui ont permis à son enfant de s'en sortir [I0417]. Parmi les propositions, 2 pistes s'opposent, apprendre de manière plus interactive [I0149] ou abandonner les expériences pédagogiques héritées de mai 68 [I0565], tandis que 3 personnes invitent à regarder les méthodes scandinaves, à développer l'esprit critique ou à instruire plutôt qu'élever [I0210, I0373, I0496].",
+   "summary": "Pour 12 des 13 personnes qui donnent un avis (large majorité), les méthodes pédagogiques posent problème, à commencer par l'apprentissage des fondamentaux : 5 visent la lecture et l'orthographe, avec des méthodes jugées trop complexes ou trop changeantes, jusqu'à une dyslexie attribuée à la méthode globale [I0016, I0017, I0334, I0635, I0700, I0701, I0774]. 4 autres regrettent une pédagogie peu différenciée, fermée à d'autres approches ou rarement remise en question, et des enseignants bridés dans leur liberté pédagogique [I0308, I0553, I0673, I0674, I0902] ; 3 jugent les méthodes datées, voire inchangées depuis 30 ans [I0147, I0148, I0198, I0790, I0791]. Une personne salue au contraire des méthodes plus tolérantes, qui ont permis à son enfant de s'en sortir [I0417]. Parmi les propositions, 2 pistes s'opposent : apprendre de manière plus interactive [I0149] ou abandonner les expériences pédagogiques héritées de mai 68 [I0565] ; 3 personnes invitent par ailleurs à regarder les méthodes scandinaves, à développer l'esprit critique ou à instruire plutôt qu'élever [I0210, I0373, I0496].",
    "metrics": {
     "mentions": 23,
     "participants": 17,
@@ -16417,6 +16440,10 @@
      "b": "I0565",
      "about": "les expériences pédagogiques"
     }
+   ],
+   "unverified": [
+    "2",
+    "68"
    ]
   },
   {
@@ -16446,7 +16473,7 @@
     "I0887",
     "I0888"
    ],
-   "summary": "Instables, pauvres ou orientés : 12 des 13 personnes qui donnent un avis (large majorité) critiquent ainsi les programmes scolaires, et 4 visent des changements incessants ou des écarts d'une classe à l'autre [I0007, I0503, I0611, I0794]. Selon 3 personnes, les programmes transmettent des contrevérités, une histoire biaisée par le roman national ou des idéologies au détriment de la lecture, de l'écriture et de la culture générale [I0364, I0807, I0886, I0887, I0888]. 7 personnes les trouvent pauvres ou éloignés de l'essentiel : manque de fondamentaux, de sport, d'éducation à la citoyenneté et à l'environnement, d'ouverture internationale ou de lien avec les besoins des entreprises, français trop littéraire [I0150, I0172, I0563, I0564, I0640, I0776, I0792, I0809]. Une personne salue au contraire les projets nés des liens entre l'école, l'entreprise et la culture [I0267], et 3 proposent d'élargir les contenus : ouverture sur le monde, matières consacrées au développement durable et à la citoyenneté, bilinguisme et nouvelles technologies [I0073, I0074, I0163, I0211].",
+   "summary": "Les programmes scolaires sont jugés instables, pauvres ou orientés par 12 des 13 personnes qui donnent un avis (large majorité) : 4 visent des changements incessants ou des écarts d'une classe à l'autre [I0007, I0503, I0611, I0794]. Selon 3 personnes, les programmes transmettent des contrevérités, une histoire biaisée par le roman national ou des idéologies, au détriment de la lecture, de l'écriture et de la culture générale [I0364, I0807, I0886, I0887, I0888]. 7 personnes les trouvent pauvres ou éloignés de l'essentiel : manque de fondamentaux, de sport, d'éducation à la citoyenneté et à l'environnement, d'ouverture internationale ou de lien avec les besoins des entreprises, français trop littéraire [I0150, I0172, I0563, I0564, I0640, I0776, I0792, I0809]. Une personne salue au contraire les projets nés des liens entre l'école, l'entreprise et la culture [I0267], et 3 proposent d'élargir les contenus : ouverture sur le monde, matières consacrées au développement durable et à la citoyenneté, bilinguisme et nouvelles technologies [I0073, I0074, I0163, I0211].",
    "metrics": {
     "mentions": 23,
     "participants": 17,
@@ -16513,7 +16540,8 @@
     "negative": "critiquer le contenu, la pauvreté ou l'instabilité des programmes",
     "neutral": "énoncer un principe général sans juger les programmes actuels"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Égalité des chances",
@@ -16621,7 +16649,8 @@
     "negative": "dénoncer des chances inégales selon le milieu ou le territoire",
     "neutral": "affirmer un principe d'égalité sans juger la situation"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Suivi des élèves en difficulté",
@@ -16721,7 +16750,8 @@
     "negative": "juger absent, superficiel ou insuffisant le suivi des élèves en difficulté",
     "neutral": "énoncer un principe d'accompagnement sans juger la situation"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Enseignement privé",
@@ -16747,7 +16777,7 @@
     "I0969",
     "I0970"
    ],
-   "summary": "Le privé convainc 12 des 14 personnes qui donnent un avis (large majorité) [I0121, I0274, I0337, I0624, I0634, I0652, I0695, I0880, I0965, I0966, I0967, I0968]. 3 personnes y saluent un encadrement plus attentif et des classes moins chargées [I0337, I0697, I0967], 2 un niveau plus élevé et le goût du travail [I0624, I0625, I0965], et 3 y voient un recours face au public [I0121, I0966, I0968]. Une personne regrette les quotas qui empêchent le privé de répondre à toutes les demandes [I0653], une autre propose de les relever et de mieux rémunérer cet enseignement [I0881]. 2 personnes le critiquent : l'une pour une sélection des élèves que le public ne peut pas pratiquer, l'autre pour un coût de 300 € par mois [I0969, I0970].",
+   "summary": "L'enseignement privé convainc 12 des 14 personnes qui donnent un avis (large majorité) [I0121, I0274, I0337, I0624, I0634, I0652, I0695, I0880, I0965, I0966, I0967, I0968]. 3 personnes y saluent un encadrement plus attentif et des classes moins chargées [I0337, I0697, I0967], 2 un niveau plus élevé et le goût du travail [I0624, I0625, I0965], et 3 y voient un recours face au public [I0121, I0966, I0968]. Une personne regrette les quotas qui empêchent le privé de répondre à toutes les demandes [I0653], une autre propose de les relever et de mieux rémunérer cet enseignement [I0881]. 2 personnes le critiquent : l'une pour une sélection des élèves que le public ne peut pas pratiquer, l'autre pour un coût de 300 € par mois [I0969, I0970].",
    "metrics": {
     "mentions": 20,
     "participants": 14,
@@ -16822,7 +16852,8 @@
     "negative": "critiquer l'enseignement privé, son coût, son niveau ou ses pratiques",
     "neutral": "constater un passage au privé sans juger cet enseignement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Niveau d'exigence scolaire",
@@ -16847,7 +16878,7 @@
     "I0941",
     "I1051"
    ],
-   "summary": "Nivellement par le bas, niveau en baisse, passage automatique en classe supérieure : 13 des 14 personnes qui donnent un avis (large majorité) jugent l'école trop peu exigeante [I0010, I0055, I0093, I0113, I0118, I0209, I0224, I0432, I0453, I0612, I0684, I0758, I0941]. D'abord, 4 personnes dénoncent un nivellement par le bas [I0119, I0209, I0224, I0432], et 5 un niveau trop bas, avec des enfants qui s'ennuient ou entrent en sixième sans savoir lire [I0093, I0113, I0223, I0612, I0758]. 4 autres reprochent à l'école de renoncer à l'effort et à l'ambition, du passage en classe supérieure à l'âge à une école « bienveillante » qui prive du sens de l'effort, en passant par la recherche de la paix sociale et le conformisme [I0010, I0055, I0684, I0941]. Une personne est mitigée : elle se félicite du travail exigé dans le privé mais juge « stupide et suicidaire » d'aligner les enfants sur les plus mauvais, et propose une sélection par le haut [I0626, I0627, I1051].",
+   "summary": "Nivellement par le bas, niveau en baisse, passage automatique en classe supérieure : 13 des 14 personnes qui donnent un avis (large majorité) jugent l'école trop peu exigeante [I0010, I0055, I0093, I0113, I0118, I0209, I0224, I0432, I0453, I0612, I0684, I0758, I0941]. 4 personnes dénoncent d'abord un nivellement par le bas [I0119, I0209, I0224, I0432], et 5 un niveau trop bas, avec des enfants qui s'ennuient ou entrent en sixième sans savoir lire [I0093, I0113, I0223, I0612, I0758]. 4 autres reprochent à l'école de renoncer à l'effort et à l'ambition, du passage en classe supérieure à l'âge à une école « bienveillante » qui prive du sens de l'effort, en passant par la recherche de la paix sociale et le conformisme [I0010, I0055, I0684, I0941]. Une personne nuance : elle se félicite du travail exigé dans le privé, mais juge « stupide et suicidaire » d'aligner les enfants sur les plus mauvais, et propose une sélection par le haut [I0626, I0627, I1051].",
    "metrics": {
     "mentions": 19,
     "participants": 14,
@@ -16912,7 +16943,8 @@
     "negative": "dénoncer le manque d'exigence ou le nivellement par le bas",
     "neutral": "énoncer un principe sur l'exigence sans juger l'école actuelle"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Fermetures de classes",
@@ -16936,7 +16968,7 @@
     "I0877",
     "I0878"
    ],
-   "summary": "10 des 13 personnes qui donnent un avis (majorité) dénoncent les fermetures de classes ou d'écoles, que 2 accusent de faire mourir les villages et les communes [I0423, I0839]. Les motifs de ces fermetures sont contestés par 2 personnes, entre une politique du chiffre aveugle au contexte local et des enseignants mutés vers les zones prioritaires, l'une comptant 7 classes fermées en 8 ans dans sa ville [I0288, I0289, I0753]. Une personne décrit l'obligation de se rendre dans un autre village, avec des enfants et des parents épuisés [I0877, I0878], tandis que 5 personnes signalent des fermetures dans leur village ou leur ville, l'une ironisant sur « l'école de la confiance » [I0313, I0389, I0438, I0552, I0873, I0875]. À contre-courant, 3 personnes se réjouissent que leur commune garde son école ou que les écoles rurales subsistent, l'une s'inquiétant toutefois de la baisse de la démographie [I0130, I0131, I0533, I0641], et une autre propose une école par commune pour redensifier le monde rural [I0486].",
+   "summary": "Les fermetures de classes ou d'écoles sont dénoncées par 10 des 13 personnes qui donnent un avis (majorité) ; 2 les accusent de faire mourir les villages et les communes [I0423, I0839]. 2 personnes contestent les motifs de ces fermetures, entre une politique du chiffre aveugle au contexte local et des enseignants mutés vers les zones prioritaires, l'une comptant 7 classes fermées en 8 ans dans sa ville [I0288, I0289, I0753]. Une personne décrit l'obligation de se rendre dans un autre village, avec des enfants et des parents épuisés [I0877, I0878], tandis que 5 personnes signalent des fermetures dans leur village ou leur ville, l'une ironisant sur « l'école de la confiance » [I0313, I0389, I0438, I0552, I0873, I0875]. À contre-courant, 3 personnes se réjouissent que leur commune garde son école ou que les écoles rurales subsistent, l'une s'inquiétant toutefois de la baisse de la démographie [I0130, I0131, I0533, I0641], et une autre propose une école par commune pour redensifier le monde rural [I0486].",
    "metrics": {
     "mentions": 18,
     "participants": 14,
@@ -17012,7 +17044,10 @@
     "negative": "dénoncer les fermetures de classes ou d'écoles et leurs effets",
     "neutral": "décrire l'évolution des effectifs sans juger les fermetures"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "un autre"
+   ]
   },
   {
    "title": "Contrôle des enseignants défaillants",
@@ -17098,7 +17133,10 @@
     "negative": "regretter l'absence de contrôle ou de sanction des enseignants défaillants",
     "neutral": "évoquer l'évaluation des enseignants sans juger la situation actuelle"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "11 personnes"
+   ]
   },
   {
    "title": "Garde des enfants",
@@ -17122,7 +17160,7 @@
     "I0920",
     "I0930"
    ],
-   "summary": "Trouver une solution de garde reste difficile pour 9 des 11 personnes qui donnent un avis (large majorité), d'abord faute de places en crèche selon 3 personnes, dont une estime que ce manque pousse à scolariser les enfants trop tôt [I0170, I0440, I0771]. 2 personnes peinent à trouver une assistante maternelle, notamment pour des enfants déjà scolarisés, et l'une propose que le département revoie leur gestion [I0106, I0107, I0108, I0109, I0110, I0111, I0340] ; 2 autres jugent la garde trop chère, l'une ayant dû choisir entre quitter son emploi et une école privée à la fin de l'aide de la caisse d'allocations familiales [I0804, I0930]. Une personne évoque aussi la garderie du matin et du soir quand l'enfant est malade [I0491], une autre regrette que l'idée d'adapter le temps de travail des parents à leur charge familiale semble abandonnée, et la défend [I0765, I0766]. À l'inverse, 2 personnes saluent les modes de garde proposés par leur collectivité, dont la garde gratuite les jours de grève [I0916, I0920].",
+   "summary": "Trouver une solution de garde reste difficile pour 9 des 11 personnes qui donnent un avis (large majorité), d'abord faute de places en crèche selon 3 personnes, dont une estime que ce manque pousse à scolariser les enfants trop tôt [I0170, I0440, I0771]. 2 personnes peinent à trouver une assistante maternelle, notamment pour des enfants déjà scolarisés, et l'une propose que le département revoie leur gestion [I0106, I0107, I0108, I0109, I0110, I0111, I0340] ; 2 autres jugent la garde trop chère, l'une ayant dû choisir entre quitter son emploi et une école privée à la fin de l'aide de la caisse d'allocations familiales [I0804, I0930]. Une personne évoque aussi la garderie du matin et du soir quand l'enfant est malade [I0491] ; une autre regrette que l'idée d'adapter le temps de travail des parents à leur charge familiale semble abandonnée, et la défend [I0765, I0766]. À l'inverse, 2 personnes saluent les modes de garde proposés par leur collectivité, dont la garde gratuite les jours de grève [I0916, I0920].",
    "metrics": {
     "mentions": 18,
     "participants": 12,
@@ -17192,7 +17230,8 @@
     "negative": "manquer de solutions de garde, les trouver chères ou inadaptées",
     "neutral": "mentionner la garde des enfants sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Financement des études",
@@ -17272,7 +17311,8 @@
     "negative": "juger les études trop chères ou les aides insuffisantes",
     "neutral": "décrire un coût ou un financement sans le juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Formation des enseignants",
@@ -17342,7 +17382,10 @@
     "negative": "juger la formation ou le recrutement des enseignants insuffisant",
     "neutral": "citer la formation des enseignants sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "5 personnes"
+   ]
   },
   {
    "title": "Encadrement administratif",
@@ -17415,7 +17458,10 @@
     "negative": "subir une administration rigide, opaque, distante ou impuissante",
     "neutral": "décrire l'organisation administrative sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "1950"
+   ]
   },
   {
    "title": "Relations avec les familles",
@@ -17484,7 +17530,8 @@
     "negative": "déplorer un dialogue fermé, absent ou hostile avec les familles",
     "neutral": "énoncer un principe général sur le rôle des familles"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Rythmes scolaires",
@@ -17554,7 +17601,8 @@
     "negative": "subir des horaires, semaines ou vacances inadaptés ou changeants",
     "neutral": "évoquer les rythmes scolaires sans juger la situation"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Gratuité de l'école",
@@ -17626,7 +17674,8 @@
     "negative": "dénoncer des frais restant à la charge des familles",
     "neutral": "rappeler le principe de gratuité sans juger la situation"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Numérique à l'école",
@@ -17693,7 +17742,8 @@
     "negative": "subir des outils numériques défaillants, peu pratiques ou mal utilisés",
     "neutral": "évoquer le numérique sans juger la situation"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Écoles rurales",
@@ -17761,7 +17811,8 @@
     "negative": "critiquer les conditions ou la disparition des écoles rurales",
     "neutral": "évoquer l'école rurale sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Évaluation des élèves",
@@ -17832,7 +17883,8 @@
      "b": "I0561",
      "about": "le classement des élèves"
     }
-   ]
+   ],
+   "unverified": []
   },
   {
    "title": "Fonctionnement de l'université",
@@ -17899,7 +17951,8 @@
     "negative": "déplorer des moyens, statuts ou règles universitaires défaillants",
     "neutral": "évoquer l'université sans juger son fonctionnement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Composition des classes",
@@ -17964,7 +18017,10 @@
     "negative": "subir des classes multiniveaux ou trop hétérogènes",
     "neutral": "décrire la composition des classes sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "5 personnes"
+   ]
   },
   {
    "title": "Discipline dans les établissements",
@@ -18026,7 +18082,10 @@
     "negative": "dénoncer l'indiscipline, le laxisme ou la violence entre élèves",
     "neutral": "énoncer un principe général sur l'autorité sans juger la situation"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "6 personnes"
+   ]
   },
   {
    "title": "Harcèlement scolaire",
@@ -18091,7 +18150,10 @@
     "negative": "subir le harcèlement ou dénoncer l'inaction des équipes",
     "neutral": "évoquer le harcèlement en général sans cas vécu ni jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "6 personnes"
+   ]
   },
   {
    "title": "État des locaux scolaires",
@@ -18152,7 +18214,8 @@
     "negative": "dénoncer des locaux vétustes, délabrés ou mal équipés",
     "neutral": "décrire les locaux sans les juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Transports scolaires",
@@ -18213,7 +18276,8 @@
     "negative": "juger les transports scolaires absents, insuffisants ou mal adaptés",
     "neutral": "décrire les trajets des élèves sans les juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Territoires en difficulté",
@@ -18276,7 +18340,8 @@
     "negative": "dénoncer les inégalités ou les manques subis par son territoire",
     "neutral": "constater des écarts entre territoires sans les juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Information sur l'école",
@@ -18338,7 +18403,8 @@
     "negative": "juger l'information absente, tardive, floue ou difficile à obtenir",
     "neutral": "demander une information précise sans juger celle reçue"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Élèves à profil atypique",
@@ -18397,7 +18463,10 @@
     "negative": "juger l'école rigide ou démunie face aux élèves différents",
     "neutral": "décrire le profil d'un enfant sans juger sa prise en charge"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "5 personnes"
+   ]
   },
   {
    "title": "Accompagnement médical et psychologique",
@@ -18454,7 +18523,8 @@
     "negative": "juger ce suivi insuffisant, lent ou trop lourd administrativement",
     "neutral": "décrire un besoin de santé sans juger sa prise en charge"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Offre d'options",
@@ -18512,7 +18582,8 @@
     "negative": "juger l'offre d'options restreinte, inégale ou incertaine",
     "neutral": "décrire les options suivies sans juger l'offre"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Enseignement des langues étrangères",
@@ -18567,7 +18638,8 @@
     "negative": "juger cet enseignement tardif, inefficace ou mal assuré",
     "neutral": "décrire les langues apprises sans juger l'enseignement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Niveau des élèves",
@@ -18624,7 +18696,8 @@
     "negative": "déplorer la baisse ou la faiblesse du niveau des élèves",
     "neutral": "énoncer un principe sur les savoirs sans juger le niveau"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Attribution des bourses",
@@ -18683,7 +18756,8 @@
     "negative": "juger les bourses tardives, injustes ou trop lourdes à obtenir",
     "neutral": "énoncer un principe sur les aides sans juger leur attribution"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Logement étudiant",
@@ -18738,7 +18812,8 @@
     "negative": "juger les logements étudiants rares, coûteux ou mal encadrés",
     "neutral": "décrire une situation de logement sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Pédagogie en maternelle",
@@ -18793,7 +18868,10 @@
     "negative": "juger la maternelle inadaptée au rythme des tout-petits",
     "neutral": "énoncer un principe sur la petite enfance sans juger l'école"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "3 personnes"
+   ]
   },
   {
    "title": "Places disponibles à l'école",
@@ -18849,7 +18927,10 @@
     "negative": "se voir refuser une inscription faute de place",
     "neutral": "évoquer les inscriptions sans juger le nombre de places"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "4 personnes"
+   ]
   },
   {
    "title": "Conditions de travail des enseignants",
@@ -18902,7 +18983,8 @@
     "negative": "dénoncer la charge, le manque de soutien ou de droits",
     "neutral": "énoncer un principe sur le métier sans juger les conditions"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Grèves des enseignants",
@@ -18956,7 +19038,8 @@
     "negative": "subir la gêne causée par les grèves des enseignants",
     "neutral": "évoquer les enseignants sans juger leurs grèves"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Reconnaissance des enseignants",
@@ -19009,7 +19092,8 @@
     "negative": "déplorer le manque de reconnaissance des enseignants",
     "neutral": "énoncer un principe sur le métier sans juger sa reconnaissance"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Devoirs des parents",
@@ -19061,7 +19145,8 @@
     "negative": "regretter que des parents négligent leurs devoirs envers l'école",
     "neutral": "rappeler un principe général sur le rôle des parents"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Gestion des établissements",
@@ -19115,7 +19200,8 @@
     "negative": "dénoncer une gestion défaillante, des conflits ou l'inaction hiérarchique",
     "neutral": "décrire l'organisation des établissements sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Décrochage scolaire",
@@ -19166,7 +19252,8 @@
     "negative": "déplorer le manque de solutions pour les élèves décrocheurs",
     "neutral": "constater un décrochage sans juger sa prise en charge"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Langues régionales",
@@ -19223,6 +19310,9 @@
      "b": "I0925",
      "about": "l'enseignement des langues régionales à l'école"
     }
+   ],
+   "unverified": [
+    "2 personnes"
    ]
   },
   {
@@ -19274,7 +19364,8 @@
     "negative": "juger les salaires des enseignants trop bas",
     "neutral": "évoquer le métier d'enseignant sans juger son salaire"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Sécurité des établissements",
@@ -19325,7 +19416,8 @@
     "negative": "dénoncer l'insécurité dans les établissements ou à leurs abords",
     "neutral": "évoquer la sécurité en général sans juger la situation"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Écoles de commerce",
@@ -19378,7 +19470,10 @@
     "negative": "dénoncer leur coût, leurs pratiques ou leur inaccessibilité",
     "neutral": "décrire ces écoles sans juger leur fonctionnement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "2 personnes"
+   ]
   },
   {
    "title": "Encadrement des stages",
@@ -19428,7 +19523,10 @@
     "negative": "regretter des stages peu encadrés ou refusés par l'établissement",
     "neutral": "décrire un stage sans juger son encadrement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": [
+    "La seconde"
+   ]
   },
   {
    "title": "Accueil des enfants étrangers",
@@ -19477,7 +19575,8 @@
     "negative": "subir des obstacles à la scolarisation des enfants étrangers",
     "neutral": "décrire la situation de l'enfant sans juger son accueil"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Recherche de stages",
@@ -19525,7 +19624,8 @@
     "negative": "peiner à trouver un stage ou manquer de soutien",
     "neutral": "évoquer les stages sans juger leur recherche"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Sorties scolaires",
@@ -19572,7 +19672,8 @@
     "negative": "regretter des sorties rares, coûteuses ou difficiles à organiser",
     "neutral": "évoquer les activités sans juger les sorties"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Collectivités responsables des écoles",
@@ -19622,7 +19723,8 @@
     "negative": "critiquer un financement éclaté ou inégal entre collectivités",
     "neutral": "décrire le rôle des collectivités sans le juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Reconnaissance des diplômes",
@@ -19670,7 +19772,8 @@
     "negative": "subir l'absence de reconnaissance ou de passerelles entre diplômes",
     "neutral": "décrire un parcours de formation sans juger les diplômes"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Parité chez les enseignants",
@@ -19717,7 +19820,8 @@
     "negative": "regretter le manque d'enseignants de l'un des deux sexes",
     "neutral": "énoncer un principe général sur l'égalité entre les sexes"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Âge d'entrée à l'école",
@@ -19763,7 +19867,8 @@
     "negative": "juger la règle d'âge trop rigide ou injuste",
     "neutral": "indiquer l'âge de l'enfant sans juger la règle"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Poids des cartables",
@@ -19809,7 +19914,8 @@
     "negative": "juger les cartables trop lourds pour les élèves",
     "neutral": "évoquer le matériel scolaire sans juger son poids"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Scolarisation des enfants malades",
@@ -19855,7 +19961,8 @@
     "negative": "subir l'exclusion scolaire d'un enfant malade sans solution",
     "neutral": "constater la santé ou le parcours de l'enfant sans juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Laïcité à l'école",
@@ -19898,7 +20005,8 @@
     "negative": "rejeter la laïcité à l'école ou en subir les contraintes",
     "neutral": "évoquer la laïcité sans juger sa place à l'école"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Mobilité des enseignants",
@@ -19943,7 +20051,8 @@
     "negative": "regretter les changements d'enseignants d'une année à l'autre",
     "neutral": "évoquer les enseignants sans juger leur mobilité"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Soutien scolaire privé",
@@ -19988,7 +20097,8 @@
     "negative": "juger le soutien scolaire privé coûteux, inégalitaire ou indispensable",
     "neutral": "évoquer le soutien scolaire privé sans le juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   }
  ],
  "themes": [
@@ -19999,7 +20109,7 @@
     "G8",
     "G29"
    ],
-   "summary": "La scolarité vécue par ses propres enfants est jugée bien plus favorablement que le système éducatif, que 8 personnes décrivent comme un échec, voire une catastrophe [I0162, I0230, I0298, I0309, I0750, I0885, I1041, I1042]. Parmi les satisfactions, 9 personnes saluent l'école publique, tandis que 5 autres relativisent la leur en la rattachant à une petite commune ou à une scolarité qui débute [I0190, I0320, I0426, I0463, I0605, I0613, I0757, I0843, I0859, I0189, I0199, I0351, I0889, I0915]. Toutes les personnes qui donnent un avis sur les rythmes scolaires les critiquent, des horaires qui changent d'une commune à l'autre aux vacances jugées trop longues [I0049, I0184, I0377, I0619, I0654, I0763, I0940]. Sur la semaine de 4 jours et demi, les attentes sont pourtant contraires : une personne la rejette, une autre en regrette l'abandon [I1046, I1047].",
+   "summary": "La scolarité de ses propres enfants inspire un jugement bien plus favorable que le système éducatif, que 8 personnes décrivent comme un échec, voire une catastrophe [I0162, I0230, I0298, I0309, I0750, I0885, I1041, I1042]. Parmi les satisfactions, 9 personnes saluent l'école publique, tandis que 5 autres relativisent la leur en la rattachant à une petite commune ou à une scolarité qui débute [I0190, I0320, I0426, I0463, I0605, I0613, I0757, I0843, I0859, I0189, I0199, I0351, I0889, I0915]. Toutes les personnes qui donnent un avis sur les rythmes scolaires les critiquent, des horaires qui changent d'une commune à l'autre aux vacances jugées trop longues [I0049, I0184, I0377, I0619, I0654, I0763, I0940]. Sur la semaine de 4 jours et demi, deux attentes s'opposent pourtant : une personne la rejette, une autre en regrette l'abandon [I1046, I1047].",
    "metrics": {
     "mentions": 98,
     "participants": 81,
@@ -20188,7 +20298,8 @@
     "fragile": false,
     "minority": null
    },
-   "id": "T1"
+   "id": "T1",
+   "unverified": []
   },
   {
    "title": "Les enseignants",
@@ -20204,7 +20315,7 @@
     "G67",
     "G72"
    ],
-   "summary": "Si la valeur des enseignants partage les avis, leurs absences et l'absence de contrôle des défaillants sont critiquées par toutes les personnes qui en donnent un avis [I0114, I0154, I0297, I0401, I0412, I0543, I0670, I0832, I0923, I0944, I0982, I0328, I0358, I0574, I0736, I0744, I0901]. Les éloges ne manquent pas pour autant : 22 personnes disent avoir rencontré des enseignants solides et investis [I0002, I0004, I0005, I0012, I0013, I0044, I0065, I0070, I0196, I0285, I0307, I0361, I0387, I0402, I0439, I0477, I0557, I0608, I0655, I0746, I0956, I0778, I0784, I0871, I0946, I0962]. Pour reprendre la main sur les défaillants, 6 personnes proposent d'armer les chefs d'établissement, d'évaluer les professeurs ou de les rémunérer au mérite [I0019, I0160, I0344, I0398, I0399, I0576, I0835]. Le métier, enfin, paraît mal reconnu : 3 personnes jugent les salaires trop bas [I0760, I0780, I0950].",
+   "summary": "La valeur des enseignants divise, mais toutes les personnes qui donnent un avis sur leurs absences et sur l'absence de contrôle des défaillants les critiquent [I0114, I0154, I0297, I0401, I0412, I0543, I0670, I0832, I0923, I0944, I0982, I0328, I0358, I0574, I0736, I0744, I0901]. Les éloges ne manquent pas pour autant : 22 personnes disent avoir rencontré des enseignants solides et investis [I0002, I0004, I0005, I0012, I0013, I0044, I0065, I0070, I0196, I0285, I0307, I0361, I0387, I0402, I0439, I0477, I0557, I0608, I0655, I0746, I0956, I0778, I0784, I0871, I0946, I0962]. Pour reprendre la main sur les défaillants, 6 personnes proposent d'armer les chefs d'établissement, d'évaluer les professeurs ou de les rémunérer au mérite [I0019, I0160, I0344, I0398, I0399, I0576, I0835]. Enfin, le métier semble mal reconnu à 3 personnes, qui jugent les salaires trop bas [I0760, I0780, I0950].",
    "metrics": {
     "mentions": 150,
     "participants": 79,
@@ -20431,7 +20542,8 @@
      ]
     }
    },
-   "id": "T2"
+   "id": "T2",
+   "unverified": []
   },
   {
    "title": "Inégalités d'accès à l'école",
@@ -20445,7 +20557,7 @@
     "G40",
     "G50"
    ],
-   "summary": "Pour 15 personnes, aller à l'école près de chez soi n'a rien d'acquis : le découpage scolaire leur impose un établissement plus lointain que celui du quartier [I0053, I0054, I0061, I0091, I0122, I0257, I0306, I0331, I0448, I0588, I0686, I0797, I0800, I0896, I0919]. L'école de village a ses deux visages : 3 personnes y apprécient l'accueil et les petites classes, 3 autres en critiquent les fermetures [I0437, I0642, I0643, I0978, I0954, I0976, I0977]. Au-delà de la distance, 6 personnes estiment que la réussite dépend du milieu social, et 5 relèvent des écarts entre établissements et entre territoires, de la banlieue au centre-ville, de la province à Paris [I0117, I0235, I0299, I0336, I0596, I0637, I0037, I0493, I0811, I0907, I1050]. Sur la carte scolaire, les attentes s'opposent : 4 personnes en apprécient le principe ou la souplesse, 3 autres veulent la supprimer pour laisser le libre choix [I0092, I0342, I0352, I0949, I0207, I0671, I0685].",
+   "summary": "Pour 15 personnes, aller à l'école près de chez soi n'a rien d'acquis : le découpage scolaire leur impose un établissement plus lointain que celui du quartier [I0053, I0054, I0061, I0091, I0122, I0257, I0306, I0331, I0448, I0588, I0686, I0797, I0800, I0896, I0919]. L'école de village a deux visages : 3 personnes y apprécient l'accueil et les petites classes, 3 autres en critiquent les fermetures [I0437, I0642, I0643, I0978, I0954, I0976, I0977]. Au-delà de la distance, 6 personnes estiment que la réussite dépend du milieu social, et 5 relèvent des écarts entre établissements et entre territoires, de la banlieue au centre-ville, de la province à Paris [I0117, I0235, I0299, I0336, I0596, I0637, I0037, I0493, I0811, I0907, I1050]. Sur la carte scolaire, les attentes s'opposent : 4 personnes en apprécient le principe ou la souplesse, 3 autres veulent la supprimer pour laisser le libre choix [I0092, I0342, I0352, I0949, I0207, I0671, I0685].",
    "metrics": {
     "mentions": 135,
     "participants": 78,
@@ -20668,7 +20780,8 @@
      ]
     }
    },
-   "id": "T3"
+   "id": "T3",
+   "unverified": []
   },
   {
    "title": "Orientation et études supérieures",
@@ -20685,7 +20798,7 @@
     "G63",
     "G66"
    ],
-   "summary": "Du collège aux études supérieures, 12 personnes ont dû s'orienter seules, faute de conseillers compétents ou d'informations à jour [I0234, I0236, I0240, I0310, I0322, I0419, I0547, I0548, I0549, I0550, I0581, I0603, I0614, I0615, I0796, I0903]. Le passage dans le supérieur ajoute son stress : 7 personnes décrivent une admission post-bac, d'APB à Parcoursup, complexe, anxiogène et qui oblige à multiplier les vœux [I0105, I0175, I0194, I0219, I0281, I0405, I0594]. 8 personnes regrettent que l'apprentissage et les métiers manuels passent après le bac général, et 3 proposent de revaloriser ces métiers et les filières courtes [I0040, I0129, I0233, I0349, I0374, I0568, I0677, I0730, I0731, I0204, I0350, I0861]. Le coût des études partage les avis : 5 personnes saluent la gratuité de l'enseignement, 3 autres jugent les études devenues hors de prix [I0024, I0191, I0600, I0823, I0909, I0971, I0972, I0973].",
+   "summary": "Du collège aux études supérieures, 12 personnes ont dû s'orienter seules, faute de conseillers compétents ou d'informations à jour [I0234, I0236, I0240, I0310, I0322, I0419, I0547, I0548, I0549, I0550, I0581, I0603, I0614, I0615, I0796, I0903]. L'entrée dans le supérieur ajoute son stress : 7 personnes décrivent une admission post-bac complexe et anxiogène, d'APB à Parcoursup, qui oblige à multiplier les vœux [I0105, I0175, I0194, I0219, I0281, I0405, I0594]. 8 personnes regrettent que l'apprentissage et les métiers manuels passent après le bac général, et 3 proposent de revaloriser ces métiers et les filières courtes [I0040, I0129, I0233, I0349, I0374, I0568, I0677, I0730, I0731, I0204, I0350, I0861]. Le coût des études divise : 5 personnes saluent la gratuité de l'enseignement, 3 autres jugent les études devenues hors de prix [I0024, I0191, I0600, I0823, I0909, I0971, I0972, I0973].",
    "metrics": {
     "mentions": 140,
     "participants": 70,
@@ -20871,7 +20984,8 @@
      ]
     }
    },
-   "id": "T4"
+   "id": "T4",
+   "unverified": []
   },
   {
    "title": "Démarches et administration",
@@ -20884,7 +20998,7 @@
     "G65",
     "G68"
    ],
-   "summary": "Les démarches autour de l'école pèsent d'abord par leur répétition : 11 personnes doivent redonner chaque année les mêmes pièces à chaque guichet, de la mairie à la cantine [I0141, I0164, I0178, I0239, I0261, I0393, I0444, I0467, I0487, I0661, I0984]. Les services déçoivent aussi par leur lenteur : 9 personnes ont attendu trop longtemps, n'ont reçu aucune réponse ou ont vu leur dossier perdu ou erroné [I0171, I0243, I0245, I0370, I0507, I0509, I0914, I1014, I1016, I1017, I1018]. Les mêmes inscriptions paraissent pourtant simples, rapides ou fluides à 10 personnes, parfois en ligne ou reconduites d'office [I0033, I0282, I0404, I0558, I0560, I0618, I0722, I0855, I0856, I0955, I0983]. 4 personnes demandent que les informations déjà fournies soient conservées d'une rentrée à l'autre [I0142, I0295, I0468, I0662].",
+   "summary": "Les démarches autour de l'école pèsent d'abord par leur répétition : 11 personnes doivent redonner chaque année les mêmes pièces à chaque guichet, de la mairie à la cantine [I0141, I0164, I0178, I0239, I0261, I0393, I0444, I0467, I0487, I0661, I0984]. Les services déçoivent aussi par leur lenteur : 9 personnes ont attendu trop longtemps, n'ont reçu aucune réponse ou ont vu leur dossier perdu ou erroné [I0171, I0243, I0245, I0370, I0507, I0509, I0914, I1014, I1016, I1017, I1018]. Les inscriptions paraissent pourtant simples, rapides ou fluides à 10 personnes, parfois en ligne ou reconduites d'office [I0033, I0282, I0404, I0558, I0560, I0618, I0722, I0855, I0856, I0955, I0983]. 4 personnes demandent que les informations déjà fournies soient conservées d'une rentrée à l'autre [I0142, I0295, I0468, I0662].",
    "metrics": {
     "mentions": 118,
     "participants": 70,
@@ -21097,7 +21211,8 @@
      ]
     }
    },
-   "id": "T5"
+   "id": "T5",
+   "unverified": []
   },
   {
    "title": "Contenus et méthodes d'enseignement",
@@ -21279,7 +21394,10 @@
      ]
     }
    },
-   "id": "T6"
+   "id": "T6",
+   "unverified": [
+    "68"
+   ]
   },
   {
    "title": "Conditions d'accueil des élèves",
@@ -21455,7 +21573,8 @@
      ]
     }
    },
-   "id": "T7"
+   "id": "T7",
+   "unverified": []
   },
   {
    "title": "Élèves à besoins particuliers",
@@ -21468,7 +21587,7 @@
     "G62",
     "G70"
    ],
-   "summary": "Pour les enfants qui sortent du cadre, l'aide humaine fait défaut : 6 personnes signalent des accompagnants d'enfants handicapés trop rares, mal formés ou précaires [I0089, I0090, I0206, I0520, I0526, I0689, I0690, I0782]. Les élèves en difficulté connaissent un sort voisin : 5 personnes racontent un enfant privé d'aide, écarté ou poussé vers la sortie [I0020, I0335, I0420, I0569, I0900]. Les délais s'ajoutent à ce manque : 3 personnes décrivent des démarches liées au handicap sans fin, et 2 des services médicaux et psychologiques surchargés [I0246, I0247, I0318, I0395, I0525, I0536, I0537]. L'inclusion elle-même ne fait pas l'accord : 2 personnes la rejettent, une autre regrette qu'elle manque aux enfants à besoins particuliers [I0555, I0842, I0283].",
+   "summary": "Pour les enfants qui sortent du cadre, l'aide humaine fait défaut : 6 personnes signalent des accompagnants d'enfants handicapés trop rares, mal formés ou précaires [I0089, I0090, I0206, I0520, I0526, I0689, I0690, I0782]. Les élèves en difficulté connaissent un sort voisin : 5 personnes racontent un enfant privé d'aide, écarté ou poussé vers la sortie [I0020, I0335, I0420, I0569, I0900]. Les délais s'ajoutent à ce manque : 3 personnes décrivent des démarches sans fin liées au handicap, et 2 des services médicaux et psychologiques surchargés [I0246, I0247, I0318, I0395, I0525, I0536, I0537]. L'inclusion elle-même ne fait pas consensus : 2 personnes la rejettent, une autre regrette qu'elle manque aux enfants à besoins particuliers [I0555, I0842, I0283].",
    "metrics": {
     "mentions": 76,
     "participants": 48,
@@ -21603,7 +21722,8 @@
      ]
     }
    },
-   "id": "T8"
+   "id": "T8",
+   "unverified": []
   },
   {
    "title": "Public face au privé",
@@ -21733,7 +21853,8 @@
     "fragile": false,
     "minority": null
    },
-   "id": "T9"
+   "id": "T9",
+   "unverified": []
   },
   {
    "title": "L'école et les familles",
@@ -21743,7 +21864,7 @@
     "G28",
     "G54"
    ],
-   "summary": "Le périscolaire partage les avis, alors que la garde des jeunes enfants et le dialogue avec l'école suscitent surtout des regrets [I0170, I0440, I0771, I0454, I0456, I0935]. 9 personnes apprécient la garderie, le centre de loisirs, les repas faits maison ou des horaires pensés pour les parents qui travaillent [I0046, I0096, I0124, I0269, I0270, I0442, I0759, I0857, I0858, I0870, I0998]. Sur le même service, 3 personnes reprochent en revanche le prix de la garderie ou de la cantine, jusqu'aux repas facturés pendant une maladie [I0025, I0249, I0250, I0827]. Les parents sont aussi mis devant leurs responsabilités : 2 personnes veulent leur rappeler leurs devoirs envers l'école [I0629, I0715, I0716].",
+   "summary": "Le périscolaire divise, alors que la garde des jeunes enfants et le dialogue avec l'école suscitent surtout des regrets [I0170, I0440, I0771, I0454, I0456, I0935]. 9 personnes apprécient la garderie, le centre de loisirs, les repas faits maison ou des horaires pensés pour les parents qui travaillent [I0046, I0096, I0124, I0269, I0270, I0442, I0759, I0857, I0858, I0870, I0998]. Sur le même service, 3 personnes critiquent en revanche le prix de la garderie ou de la cantine, jusqu'aux repas facturés pendant une maladie [I0025, I0249, I0250, I0827]. Les parents sont aussi mis devant leurs responsabilités : 2 personnes veulent leur rappeler leurs devoirs envers l'école [I0629, I0715, I0716].",
    "metrics": {
     "mentions": 60,
     "participants": 39,
@@ -21846,10 +21967,11 @@
     "fragile": true,
     "minority": null
    },
-   "id": "T10"
+   "id": "T10",
+   "unverified": []
   }
  ],
- "globalSummary": "46 personnes portent un jugement positif d'ensemble sur la scolarisation de leurs enfants, que certaines nuancent ailleurs [I0094] ; la critique la plus partagée vise l'orientation des élèves : 27 des 28 personnes qui donnent un avis (large majorité) [I0234]. L'enseignement privé recueille les éloges de 12 sur 14 (large majorité, fragile) [I0121].\n\nLes absences des enseignants sont critiquées par 25 des 25 personnes qui donnent un avis (unanime) [I0114]. Viennent ensuite la carte scolaire, critiquée par 24 sur 29 (large majorité, fragile) [I0053], et les démarches d'inscription, par 24 sur 34 (majorité) [I0136]. Dans la comparaison avec le privé, l'école publique est jugée défavorablement par 24 sur 34 (majorité) [I0062]. 20 sur 24 (large majorité, fragile) critiquent le système éducatif et sa réforme [I0162]. Les critiques visent enfin les moyens des écoles, pour 19 sur 20 (large majorité) [I0022], et la scolarisation des enfants handicapés, pour 18 sur 18 (unanime) [I0003].\n\nLes propositions les plus partagées portent sur l'orientation des élèves, avec 6 personnes ; l'une d'elles demande pourquoi des cours utiles ne sont pas obligatoires [I0152]. 6 personnes proposent aussi de mieux contrôler les enseignants défaillants, jusqu'au licenciement pour l'une d'elles [I0019]. Sur les démarches d'inscription, 5 personnes font des propositions, et l'une d'elles imagine des journées d'inscription et de visite le week-end [I0137]. Côté questions, une personne se demande si l'absentéisme des professeurs va changer [I0745], une autre s'interroge sur la réforme du bac que va vivre sa fille [I0846], et une troisième demande si le métier d'enseignant s'exerce seul ou en équipe [I0676].",
+ "globalSummary": "46 personnes portent un jugement positif d'ensemble sur la scolarisation de leurs enfants, que certaines nuancent ailleurs [I0094]. La critique la plus partagée vise l'orientation des élèves : 27 des 28 personnes qui donnent un avis (large majorité) [I0234]. L'enseignement privé recueille les éloges de 12 personnes sur 14 (large majorité, fragile) [I0121].\n\nLes absences des enseignants sont critiquées par les 25 personnes qui donnent un avis (unanime) [I0114]. Viennent ensuite la carte scolaire, critiquée par 24 personnes sur 29 (large majorité, fragile) [I0053], et les démarches d'inscription, par 24 sur 34 (majorité) [I0136]. Dans la comparaison avec le privé, 24 personnes sur 34 (majorité) jugent défavorablement l'école publique [I0062]. 20 sur 24 (large majorité, fragile) critiquent le système éducatif et sa réforme [I0162]. Les critiques visent enfin les moyens des écoles, pour 19 sur 20 (large majorité) [I0022], et la scolarisation des enfants handicapés, pour 18 sur 18 (unanime) [I0003].\n\nLes propositions les plus partagées portent sur l'orientation des élèves (6 personnes) ; l'une d'elles demande pourquoi des cours utiles ne sont pas obligatoires [I0152]. 6 personnes proposent aussi de mieux contrôler les enseignants défaillants, jusqu'au licenciement pour l'une d'elles [I0019]. Sur les démarches d'inscription, 5 personnes font des propositions ; l'une d'elles imagine des journées d'inscription et de visite le week-end [I0137]. Parmi les questions, une personne se demande si l'absentéisme des professeurs va changer [I0745], une autre s'interroge sur la réforme du bac que va vivre sa fille [I0846], et une troisième demande si le métier d'enseignant s'exerce seul ou en équipe [I0676].",
  "steps": [
   {
    "id": "extract",
@@ -21883,9 +22005,10 @@
   },
   {
    "id": "polish",
-   "state": "running",
-   "done": 60,
-   "total": 84
+   "state": "done",
+   "done": 84,
+   "total": 84,
+   "message": "Vérification des renvois"
   }
  ],
  "calls": {
@@ -22343,9 +22466,9 @@
  ],
  "status": "running",
  "polish": {
-  "checked": 60,
-  "changed": 42,
-  "refused": 2
+  "checked": 84,
+  "changed": 59,
+  "refused": 3
  },
  "names": [
   "Guillaume"
@@ -23459,5 +23582,6 @@
   "copied": 88,
   "moved": 3,
   "retoned": 3
- }
+ },
+ "globalUnverified": []
 }
