@@ -105,9 +105,12 @@ chiffres.
 
 ## Ce que le rapport signale lui-même
 
-- **« fragile »** : une seule voix changeant de camp changerait l'étiquette (« large majorité, fragile »).
+- **« fragile »** : une seule voix qui change d'avis changerait la conclusion (« large majorité, fragile »). Pas
+  sur un « unanime » : une voix de moins en fait une « large majorité », la conclusion tient.
 - **« à vérifier »** : l'étiquette dépend d'avis comptés aussi dans un autre motif ; sans eux, elle serait
-  différente. Le rapport dit laquelle. C'est au lecteur de trancher, en relisant les citations.
+  différente. Le rapport dit laquelle, et une ligne sous le résumé rappelle ces étiquettes avant qu'on le
+  cite. C'est au lecteur de trancher, en relisant les citations.
+- **« minorité constante »** : au moins 2 personnes, au plus un quart des avis, à contre-courant sur le motif.
 - **Au survol** (et au clavier), chaque marque de méthode s'explique : les étiquettes d'avis, « fragile »,
   « à vérifier », la minorité et les limites disent ce qu'elles veulent dire, pourquoi la méthode les pose et,
   s'il le faut, quoi faire. Les textes sont dans `src/core/analysis/glossary.ts` ; le rapport exporté les porte
@@ -120,8 +123,9 @@ chiffres.
 Une même idée peut relever de plusieurs motifs selon la façon dont on la lit, se découper autrement, ou se
 ranger dans un motif plus large ou plus fin. Deux lecteurs humains ne trancheraient pas toujours de la même
 façon. Le moteur tranche ces cas ; la méthode ne vise pas zéro erreur, elle rend chaque choix vérifiable et
-montre où le doute est permis. Les relectures indépendantes de l'étude école (passe 12) jugent justes 75 à
-77 des 88 avis ajoutés par le balayage, et trouvent trois étiquettes du résumé discutables sur une vingtaine.
+montre où le doute est permis. Sur l'étude école (passe 13, finale), deux relectures indépendantes donnent 7/10
+à la méthode et trouvent deux phrases fausses dans le résumé, sur des motifs déjà marqués « à vérifier » ; la
+langue est notée 6,5/10.
 
 ## Fidélité à la méthode d'origine
 

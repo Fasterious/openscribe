@@ -51,12 +51,21 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await noHorizontalScroll(page)
   await shot(page, '1-accueil')
 
+  // L'Observatoire se lit depuis l'accueil, et sa page ramène à l'application.
+  await page.getByRole('link', { name: /L'école vue par les familles/ }).click()
+  await expect(page.getByRole('link', { name: /école/i }).first()).toBeVisible()
+  await page.getByRole('link', { name: /école/i }).first().click()
+  await expect(page.getByText('Méthode et limites').first()).toBeVisible()
+  await page.goto('/observatoire/')
+  await page.getByRole('link', { name: 'Analyser vos propres réponses' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Des verbatims au rapport')
+
   // Le module Synthèse est cliquable et mène à son espace.
   await page.getByRole('link', { name: /Ouvrir l'espace Synthèse/ }).click()
   await expect(page.getByRole('heading', { name: 'Vos synthèses' })).toBeVisible()
 })
 
-test('exemple : de l’accueil au rapport, verbatims dépliés sur place et exports', async ({ page }) => {
+test('exemple : de l’accueil au rapport, verbatims dépliés sur place et exports', async ({ page }, testInfo) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Voir un exemple de rapport' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toContainText('médiathèque')
@@ -68,11 +77,19 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   await noHorizontalScroll(page)
   await shot(page, '3-rapport')
 
-  // Une étiquette d'avis s'explique au survol, et au clavier : ce qu'elle veut dire et pourquoi.
-  const label = page.locator('span[tabindex="0"]').filter({ hasText: /unanime|majorité|Avis partagés|Peu d'avis/i }).first()
-  await label.hover()
+  // Une étiquette d'avis s'explique au survol, au clavier et au toucher : ce qu'elle veut dire et pourquoi,
+  // sans déplier le motif qui la porte.
+  const label = page.locator('span[role="button"]').filter({ hasText: /unanime|majorité|Avis partagés|Peu d'avis/i }).first()
+  const motif = page.locator('details').filter({ has: label }).first()
+  const wasOpen = await motif.evaluate((d) => (d as HTMLDetailsElement).open)
+  if (testInfo.project.name === 'mobile') await label.tap()
+  else await label.hover()
   await expect(page.getByRole('tooltip')).toContainText('donnent un avis')
-  await page.mouse.move(0, 0)
+  if (testInfo.project.name === 'mobile') {
+    expect(await motif.evaluate((d) => (d as HTMLDetailsElement).open)).toBe(wasOpen)
+    await label.tap()
+    await expect(page.getByRole('tooltip')).toHaveCount(0)
+  } else await page.mouse.move(0, 0)
 
   // Une référence de la synthèse déplie ses verbatims juste en dessous, sans fenêtre.
   await page

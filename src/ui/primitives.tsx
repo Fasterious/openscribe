@@ -230,6 +230,58 @@ export function Disclosure({
  * Infobulle : s'ouvre au survol et au focus clavier. Elle complète un libellé,
  * elle ne le remplace jamais (sur écran tactile, elle ne s'affiche pas).
  */
+/**
+ * Une explication qui s'ouvre au survol, au clavier ET au toucher (une infobulle seule ne s'ouvre pas au doigt).
+ * Un toucher ou Entrée ouvre et referme ; posée dans un résumé de motif, elle ne le déplie pas.
+ */
+export function Explain({ content, children }: { content: React.ReactNode; children: React.ReactElement }) {
+  const [open, setOpen] = React.useState(false)
+  const pointer = React.useRef('')
+  const trigger = React.useRef<HTMLSpanElement>(null)
+  const toggle = (e: React.SyntheticEvent) => {
+    // preventDefault : ni le motif ne se déplie, ni la bulle ne se referme aussitôt (Radix ferme au clic).
+    e.preventDefault()
+    e.stopPropagation()
+    // À la souris, le survol a déjà ouvert la bulle : le clic la garde ouverte au lieu de la refermer.
+    setOpen((o) => (pointer.current === 'mouse' ? true : !o))
+    pointer.current = ''
+  }
+  return (
+    <TooltipPrimitive.Provider delayDuration={250}>
+      <TooltipPrimitive.Root open={open} onOpenChange={setOpen}>
+        <TooltipPrimitive.Trigger asChild>
+          <span
+            ref={trigger}
+            role="button"
+            tabIndex={0}
+            className="cursor-help rounded focus-visible:outline-2 focus-visible:outline-ring"
+            onPointerDown={(e) => {
+              pointer.current = e.pointerType
+              e.preventDefault()
+            }}
+            onClick={toggle}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggle(e)}
+          >
+            {children}
+          </span>
+        </TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Portal>
+          <TooltipPrimitive.Content
+            side="bottom"
+            sideOffset={6}
+            collisionPadding={12}
+            // Un toucher ailleurs ferme la bulle (Radix) ; sur l'étiquette elle-même, c'est le clic qui décide.
+            onPointerDownOutside={(e) => trigger.current?.contains(e.target as Node) && e.preventDefault()}
+            className="z-50 max-w-72 rounded-md border bg-card px-3 py-2 text-xs leading-relaxed text-foreground shadow-lg"
+          >
+            {content}
+          </TooltipPrimitive.Content>
+        </TooltipPrimitive.Portal>
+      </TooltipPrimitive.Root>
+    </TooltipPrimitive.Provider>
+  )
+}
+
 export function Tooltip({
   content,
   children,

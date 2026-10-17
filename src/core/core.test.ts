@@ -46,8 +46,8 @@ import { uncoveredPassages, uncoveredWithContext } from './analysis/coverage'
 import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
 import { emptyCorpus, promptsOf, removeSource, renameSource } from './corpus'
 import { maskNames, verifiedNames } from './analysis/names'
-import { dividedFragile, highlightLine, highlights, labelDoubt } from './analysis/highlights'
-import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext } from './analysis/report'
+import { dividedFragile, fragileShown, highlightLine, highlights, labelDoubt } from './analysis/highlights'
+import { fullQuestionIds, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext, stanceTitle, summaryDoubts } from './analysis/report'
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
@@ -559,6 +559,19 @@ describe('étiquettes à vérifier', () => {
     // Sans copie, rien à signaler.
     expect(labelDoubt(group(own), new Map(own.map((i) => [i.id, i])))).toBeUndefined()
   })
+  it('rappelle sous le résumé les étiquettes à vérifier, accordées à leur nombre', () => {
+    const sec = (titles: string[]) => [{ key: 'blockers', heading: '', items: titles.map((title) => ({ title, detail: '', quotes: [], doubt: 'à vérifier : …' })), more: [] }] as never
+    expect(summaryDoubts(sec([]))).toBeUndefined()
+    expect(summaryDoubts(sec(['Accueil']))).toMatch(/^À vérifier avant de citer cette étiquette : « Accueil »\. Elle dépend/)
+    expect(summaryDoubts(sec(['Accueil', 'Horaires', 'Tarifs']))).toContain('« Accueil », « Horaires » et « Tarifs ». Elles dépendent')
+  })
+  it('ne dit pas « fragile » d’un avis unanime : une voix de moins, la conclusion tient', () => {
+    const m = computeMetrics(['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I0${k}`, p, 'negative')))
+    expect(m.stance).toBe('unanimous')
+    expect(m.fragile).toBe(true)
+    expect(fragileShown(m)).toBe(false)
+    expect(metricsLine(m)).not.toContain('fragile')
+  })
   it('dit « fragile » des avis partagés qu’une seule voix ferait basculer', () => {
     const ideas = [...['P1', 'P2', 'P3', 'P4', 'P5'].map((p, k) => idea(`I0${k}`, p, 'positive')), ...['P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15'].map((p, k) => idea(`I1${k}`, p, 'negative'))]
     const g = group(ideas)
@@ -584,6 +597,13 @@ describe('explications des marques de méthode', () => {
     const state = await runAnalysis(corpus, await newAnalysis(corpus, DEFAULT_SETTINGS, provider), { provider, cache: new MemoryCache() })
     const html = reportToHtml(state, corpus, 'Test')
     expect(html).toContain(`title="${helpText(STANCE_HELP[state.groups[0].metrics.stance]).slice(0, 40)}`)
+  })
+  it('l’explication d’une ligne de chiffres dit aussi ce qu’est une minorité constante', async () => {
+    const { MINORITY_HELP } = await import('./analysis/glossary')
+    const ideas = [...['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10'].map((p, k) => idea(`I0${k}`, p, 'negative')), ...['P11', 'P12'].map((p, k) => idea(`I1${k}`, p, 'positive'))]
+    const m = computeMetrics(ideas)
+    expect(m.minority).toBeTruthy()
+    expect(stanceTitle(m)).toContain(`Minorité constante : ${MINORITY_HELP.what.charAt(0).toLowerCase()}`)
   })
 })
 

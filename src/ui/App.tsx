@@ -71,7 +71,10 @@ export function App() {
         )}
       </main>
       <footer className="no-print mt-12 border-t py-5 text-center text-xs text-muted-foreground">
-        OpenScribe, logiciel libre de recherche utilisateur (AGPL-3.0) · Vos données restent dans votre navigateur
+        OpenScribe, logiciel libre de recherche utilisateur (AGPL-3.0) · Vos données restent dans votre navigateur ·{' '}
+        <a href="/observatoire/" className="underline hover:text-foreground">
+          L'Observatoire
+        </a>
       </footer>
     </div>
   )

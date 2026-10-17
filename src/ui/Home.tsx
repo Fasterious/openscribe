@@ -7,6 +7,7 @@ import {
   HardDrive,
   KeyRound,
   ListChecks,
+  Newspaper,
   Quote,
   Repeat,
   ScanSearch,
@@ -186,6 +187,29 @@ export function Home() {
             intermédiaires.
           </Feature>
         </div>
+      </section>
+
+      <section aria-labelledby="observatoire" className="space-y-6">
+        <SectionTitle
+          id="observatoire"
+          title="L'Observatoire"
+          lead="Des consultations publiques en données ouvertes, analysées avec OpenScribe et publiées avec leur méthode et leurs limites."
+        />
+        <a
+          href="/observatoire/"
+          className="group flex items-start gap-3 rounded-xl border bg-card p-5 transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-ring"
+        >
+          <span className="mt-0.5 text-primary [&_svg]:size-5">
+            <Newspaper />
+          </span>
+          <span className="space-y-1">
+            <span className="block font-semibold group-hover:text-primary">L'école vue par les familles (Grand débat national, 2019)</span>
+            <span className="block text-sm text-muted-foreground">
+              378 contributions tirées au sort : ce qui satisfait, ce qui bloque et ce qui divise, chaque chiffre relié aux réponses. Lire l'étude
+              <ArrowRight className="ml-1 inline size-4" aria-hidden />
+            </span>
+          </span>
+        </a>
       </section>
 
       <section aria-labelledby="donnees" className="space-y-6">

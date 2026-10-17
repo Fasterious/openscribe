@@ -10,6 +10,7 @@ import {
   dominantVoice,
   engineName,
   highlightSections,
+  summaryDoubts,
   metricsLine,
   originOf,
   personLines,
@@ -27,9 +28,9 @@ import { corpusForAnalysis, type Project } from '@/core/project'
 import { isExample } from '../Synthesis'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, CATEGORY_ORDER, download, formatDate, plural, slug } from '../format'
-import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, Disclosure, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
+import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, Disclosure, DropMenu, MenuItem, MenuSection, Explain, Tooltip } from '../primitives'
 import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, MINORITY_HELP, type LabelHelp } from '@/core/analysis/glossary'
-import { labelDoubt } from '@/core/analysis/highlights'
+import { fragileShown, labelDoubt } from '@/core/analysis/highlights'
 
 /** Classes écrites en entier : Tailwind ne génère pas une classe construite à la volée. */
 const BORDER: Record<IdeaCategory, string> = {
@@ -93,11 +94,7 @@ function Help({ help, lead, children }: { help: LabelHelp | string; lead?: strin
   // Un intitulé qui dit déjà ce que veut dire la marque (lead) dispense de le redire : restent le pourquoi et l'action.
   const text = typeof help === 'string' ? help : lead ? helpText({ ...help, what: '' }) : helpText(help)
   return (
-    <Tooltip content={lead ? `${lead} ${text}` : text}>
-      <span tabIndex={0} className="cursor-help rounded focus-visible:outline-2 focus-visible:outline-ring">
-        {children}
-      </span>
-    </Tooltip>
+    <Explain content={lead ? `${lead} ${text}` : text}>{children}</Explain>
   )
 }
 
@@ -110,7 +107,7 @@ function stanceBadgeOnly(m: Metrics) {
   const pol = m.majority === 'positive' ? 'positif' : 'négatif'
   const fem = m.majority === 'positive' ? 'positive' : 'négative'
   // « Fragile » : une seule voix qui change de camp changerait l'étiquette.
-  const fragile = m.fragile ? ' · fragile' : ''
+  const fragile = fragileShown(m) ? ' · fragile' : ''
   if (m.stance === 'unanimous')
     return (
       <Badge tone={tone}>
@@ -482,7 +479,7 @@ function MinorityNote({ minority, ctx }: { minority: NonNullable<Metrics['minori
   const [open, setOpen] = useState(false)
   return (
     <Alert tone="info" className="text-xs">
-      Position minoritaire mais constante ({minority.side === 'positive' ? 'positive' : 'négative'}) : {minority.participantIds.join(', ')}.{' '}
+      Minorité constante ({minority.side === 'positive' ? 'avis positifs' : 'avis négatifs'}) : {minority.participantIds.join(', ')}.{' '}
       <button className="cursor-pointer text-primary underline" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {open ? 'Masquer leurs verbatims' : 'Voir leurs verbatims'}
       </button>
@@ -745,6 +742,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
           <div className="max-w-3xl text-[15px]">
             <CitedText text={analysis.globalSummary} ctx={ctx} />
             <Unverified items={analysis.globalUnverified} />
+            {summaryDoubts(sectionsHL) && <p className="mt-2 text-sm text-muted-foreground">{summaryDoubts(sectionsHL)}</p>}
           </div>
         </section>
       )}
@@ -971,6 +969,7 @@ export function ReportTab({ project, analysis: saved, onSaveStudy }: { project: 
             Les listes en tête du rapport sont établies par le code, sans rédaction de l'IA. (Indicateurs, version {METRICS_VERSION})
           </p>
           {analysis.groups.some((g) => labelDoubt(g, ctx.ideaById)) && <p>{labelled('« À vérifier »', DOUBT_HELP)}</p>}
+          {analysis.groups.some((g) => g.metrics.minority) && <p>{labelled('« Minorité constante »', MINORITY_HELP)}</p>}
           <p>{labelled('Limites', LIMITS_HELP)}</p>
           <p>
             {plural(analysis.groups.length, 'motif')}

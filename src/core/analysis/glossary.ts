@@ -60,7 +60,7 @@ export const DOUBT_HELP: LabelHelp = {
 }
 
 export const MINORITY_HELP: LabelHelp = {
-  what: "Au moins 2 personnes, au plus un quart des avis, vont à contre-courant sur ce motif, et aucune n'est mitigée.",
+  what: 'Au moins 2 personnes vont à contre-courant sur ce motif, sans dépasser un quart des avis, et aucune ne donne un avis mitigé.',
   why: 'Une minorité constante peut voir ce que les autres ne voient pas : on la montre au lieu de la fondre dans la majorité.',
 }
 

@@ -343,6 +343,7 @@ Le découpage est repris du cache jusqu'à la passe 7, pour ne faire varier que 
 | 10 | codage en double (option du chercheur) : une idée qui répond à deux définitions est copiée dans le second motif | 3 et 3 (3,08 et 3,0) | 4 | passe invalidée : un bug de code appliquait les fusions de la réconciliation aux mauvais motifs (renumérotation) ; une copie revenue chez son original |
 | 11 | rejeu corrigé : fusions par titre, copie chez son original retirée, définitions des motifs cibles fournies aux relectures | 3 et 3 (3,5 et 3,17) | 3,5 | handicap et administration corrigés ; éloges de l'école publique toujours dans « Expérience globale », plaintes d'éloignement hors de « Proximité » : aucune paire relue ne couvrait ces frontières |
 | 12 | balayage par définition : les 21 motifs promis au résumé confrontés, avec leur définition, à tous les avis rangés ailleurs | 3 et 3 (3,33 et 3,33) | 3,5 | les quatre défauts des passes 8 à 11 levés ; le balayage crée trois fausses lignes « divise » (Gratuité de l'école reçoit le coût du supérieur) |
+| 13 | passe finale, sur 10 : même code d'analyse que la passe 12 (rejouée depuis le cache, résultat identique), rapport régénéré avec les mentions « à vérifier » et « fragile » du code | **7/10 et 7/10** (7,17 et 7,0) · 2 erreurs du résumé · structure saine | **6,5/10** | « critique la réforme » pour des personnes qui en réclament ; « École publique face au privé » mêle critiques du public et du privé dans un camp |
 
 **Verdict à la passe 7 : palier, non publié.** La moyenne monte doucement (3,25 → 3,67) mais chaque
 passe bute sur une ou deux idées limites, différentes d'une passe à l'autre ; aucune n'a changé le sens
@@ -556,3 +557,38 @@ par paire), les séparations. Rien n'a changé pour la référence ni pour les a
 filets communs ont bougé (« d'une X à l'autre » n'est plus un compte ; « notamment » : trois exemples au
 plus, et un compte écrit prime sur « tous » ; réponses identiques entre personnes signalées dans la
 Méthode), rodés sur le cache de l'école, à rejouer sur les caches ÉcoSol avant la prochaine certification.
+
+
+### Passe 13 (17/10/2026) : passe finale, notée sur 10
+
+**Demande d'Arnaud.** Une seule passe, avec tout ce qui est prêt, notée directement sur 10 ; on garde la note
+obtenue. Le code d'analyse n'a pas changé depuis la passe 12 : rejouée sur le commit d09a4cb, la passe 13
+reprend toutes ses réponses du cache (aucune demande nouvelle au moteur) et donne les mêmes idées, motifs et
+thèmes. C'est aussi la preuve de reproductibilité : mêmes données, même configuration, même résultat.
+
+**Notes** (lectures indépendantes, sans voir les notations antérieures) : méthode **7/10** aux deux lectures
+(critères 7,5 · 7,5 · 6,5 · 7 · 7,5 · 7 et moyenne 7,0), **2 erreurs du résumé**, structure saine (9 motifs
+sur 73 à une personne, aucun fourre-tout) ; langue **6,5/10**. Relecture humaine estimée : 1 h 30 à 3 h.
+
+**Les deux erreurs, trouvées par les deux lectures.** « Réforme du système éducatif » : le résumé dit que
+20 personnes critiquent la réforme, alors que 14 jugent le système figé et que certaines réclament une
+réforme ; la définition met dans le même camp le refus et la demande. « École publique face au privé » : le
+camp négatif réunit des critiques du public et des critiques du privé. Les deux portent déjà « à vérifier ».
+Signalé aussi : « Accès aux services administratifs » est partagé par des copies à sens unique.
+
+**Ce que les lectures disent des mentions de doute, et ce qui a changé dans l'affichage (sans rejeu).**
+« Fragile » était posé sur chaque « unanime » (29 motifs sur 47) : une voix de moins en fait une « large
+majorité », la conclusion tient ; il n'y est plus affiché (`fragileShown`), et il apparaît désormais dans
+toutes les listes du résumé, pas seulement « Ce qui divise ». « À vérifier » n'apparaissait que dans les
+listes : une ligne du code le rappelle sous le résumé. Un réglage qui retirait « à vérifier » quand
+l'étiquette serait plus nette sans les copies a été essayé puis retiré : il effaçait la mention sur
+« École publique face au privé », l'une des deux erreurs. La note porte sur le rapport d'avant ces retouches
+(`run-opus-13/rapport-note.md`).
+
+**Leviers relevés, non joués (ils changent ce qu'on envoie au moteur, donc une nouvelle passe).**
+- Langue : la règle 7 du résumé impose « de ceux qui en parlent » à chaque ligne (8 fois en 9 phrases) ;
+  poser la base une fois par paragraphe. `highlightLine` écrit « large majorité (fragile) », que le moteur
+  recopie en incise ; et « fragile » y suit encore le calcul brut, « unanime » compris.
+- Méthode : une définition de motif ne doit pas réunir dans un camp deux positions opposées (refuser une
+  réforme et en réclamer une) ; le codage en double doit rester symétrique (copier les inscriptions ratées
+  comme les réussies).

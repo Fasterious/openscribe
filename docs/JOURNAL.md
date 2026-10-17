@@ -2,6 +2,28 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — Passe finale de l'école, notée sur 10 ; nouveau site en ligne
+
+- **Demande d'Arnaud** : finaliser, une seule passe notée sur 10 (on garde la note obtenue), fusionner et mettre
+  en ligne sur Vercel, où les déploiements échouaient ; à la fin, il se connecte au site et voit l'étude.
+- **Passe 13** : code d'analyse inchangé depuis la passe 12, rejouée depuis le cache (aucune demande au moteur,
+  résultat identique). Deux lectures `methodologue` : **7/10 et 7/10**, 2 erreurs du résumé (réforme, école
+  publique face au privé), structure saine ; `plume` : **6,5/10**. Note gardée, comme convenu.
+- **Retouches d'affichage, sans rejeu, sur l'avis des deux lectures** : « fragile » n'est plus posé sur un
+  « unanime » (une voix de moins, la conclusion tient) et paraît dans toutes les listes du résumé ; une ligne
+  du code rappelle sous le résumé les étiquettes « à vérifier ». Essayé puis retiré : taire « à vérifier »
+  quand l'étiquette serait plus nette sans les copies (cela effaçait la mention sur une des deux erreurs).
+- **Fiche corrigée** sur les deux phrases fausses ; elle annonce la note et ses limites.
+- **Infobulles** : explications au survol, au clavier et au toucher (`Explain`) ; au toucher, une infobulle
+  seule ne s'ouvre pas (rapport du `testeur`) ; la minorité constante est expliquée dans la Méthode.
+- **Vercel** : le projet était réglé pour Next.js (l'ancienne application de `main`), d'où l'échec de chaque
+  déploiement de la branche (NEXT_NO_VERSION). `vercel.json` fixe Vite.
+- **Mise en ligne, décision d'Arnaud (« tu merges et tu le mets sur Vercel »)** : l'ancienne application
+  (Next.js, sans historique commun) est archivée sur la branche `archive/application-nextjs` ; `main` reçoit la
+  nouvelle par une fusion qui garde les deux historiques ; `openscribe.fr` sert la nouvelle application. Retour
+  arrière possible en un clic sur Vercel. Le plan du 12/10 (dépôt neuf) est abandonné : un seul dépôt suffit.
+- **L'Observatoire** est désormais relié depuis l'accueil et le pied de page.
+
 ## 2026-10-17 — Note relative sur 10, publication sans seuil, étude école publiée
 
 - **Décisions d'Arnaud** : la note est un repère relatif, posé par un évaluateur qui peut se tromper (le changement d'évaluateur du 14/10 a fait passer la même synthèse de 4,5 à 3 sur 5) ; elle passe sur 10 pour plus de finesse ; aucun seuil de publication : une étude se publie avec le meilleur moteur du moment, la méthode et ses limites expliquées, et les doutes signalés. Arnaud ne relit pas chaque étude. Pas de passe 13. Un document de méthode, étape par étape, est tenu à jour.

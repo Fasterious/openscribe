@@ -2,6 +2,18 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-17 — Passe finale et mise en ligne
+
+- **Bien marché** : une passe rejouée depuis le cache (zéro jeton de moteur) qui prouve la reproductibilité ;
+  les deux lectures sur 10 concordent (7 et 7) et nomment les mêmes erreurs ; le `testeur` a trouvé ce que
+  les tests ne voyaient pas (rien ne s'ouvre au doigt) ; lire le journal de construction de Vercel a donné la
+  cause en une minute, après des jours d'échecs.
+- **Coûté pour rien** : `npx tsc --noEmit -p .` ne vérifie rien dans ce dépôt (configuration à références) :
+  une erreur de type n'est apparue qu'au build ; un réglage de « à vérifier » codé, testé puis retiré, faute
+  d'avoir d'abord compté sur le rapport ce qu'il effaçait.
+- **On change** : la vérification des types se fait par `npm run build` ; un réglage qui retire une marque se
+  compte d'abord sur le rapport réel (combien de marques, lesquelles), avant d'écrire le code.
+
 ## 2026-10-17 — Sortir de la course au plafond
 
 - **Bien marché** : poser la question à Arnaud au lieu de jouer une passe 13 ; transformer la limite de la machine en signal pour le lecteur (« à vérifier »), calculé par le code et non écrit à la main ; régénérer le rapport depuis le cache, sans un appel au moteur ; la relecture `plume` de la fiche, qui a trouvé une faute de conjugaison dans un texte injecté.

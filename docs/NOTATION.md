@@ -30,7 +30,8 @@ Sonnet est passée de 4,5 à 3 sur 5, sans avoir changé.
 Les notes données avant le 17/10 sont sur 5 et ne se convertissent pas : elles restent des repères sur
 l'ancienne échelle (sur ÉcoSol, Gemini Flash-Lite 2,5/5, Sonnet avec la référence 3/5 ; sur l'école, passe 12
 avec Opus 5.5, moyennes 3,33/5 aux deux lectures, langue 3,5/5). Chaque repère sera re-noté sur 10 au prochain
-essai.
+essai. Premier repère sur 10 : l'école, passe 13 (même analyse que la passe 12), **7/10 · 2 erreurs du résumé ·
+structure saine** aux deux lectures, langue **6,5/10**.
 
 ## `methodologue` : la méthode (note sur 10)
 
@@ -45,10 +46,11 @@ Chaque critère est noté de 0 à 10, au demi-point, en lisant le rapport ET les
 | 5 | Synthèses et thèmes | Le camp le plus nombreux d'abord, la minorité ensuite ; aucune surinterprétation ; les thèmes rapprochent des motifs voisins sans faux consensus |
 | 6 | Valeur pour la restitution | Le résumé hiérarchise (ce qui marche, ce qui bloque, ce qui divise, ce qu'on propose) et permet de décider ; un chercheur pourrait le présenter après une relecture courte |
 
-**Note globale** : moyenne des six critères, arrondie au demi-point. Plafonds : une erreur de
-fidélité qui change une conclusion (un avis compté dans le mauvais camp sur un motif du résumé,
-une citation déformée) plafonne la note à 3 ; une structure inutilisable (plus de la moitié des
-motifs à une personne, ou un fourre-tout de plus du tiers des idées) la plafonne à 2.
+**Note globale** : moyenne des six critères, arrondie au demi-point, sans plafond. À côté de la note,
+deux comptes : les erreurs de fidélité qui changent une conclusion (un avis compté dans le mauvais camp sur
+un motif du résumé, une citation déformée), et les défauts de structure (plus de la moitié des motifs à une
+personne, ou un fourre-tout de plus du tiers des idées). Exemple : « 6,5/10 · 3 étiquettes du résumé
+fausses · structure saine ». Les passes notées sur 5 avant le 17/10 appliquaient un plafond (3/5 et 2/5).
 
 Rendre aussi : le temps de relecture humaine estimé pour rendre le rapport présentable.
 

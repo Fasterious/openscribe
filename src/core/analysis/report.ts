@@ -1,8 +1,8 @@
 import type { Corpus } from '../corpus'
 import { activeParticipants, duplicateContributions, promptsOf } from '../corpus'
 import { presetById } from '../providers/presets'
-import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, STANCE_HELP } from './glossary'
-import { dividedFragile, highlights, labelDoubt, type Highlight, type Highlights } from './highlights'
+import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, MINORITY_HELP, STANCE_HELP } from './glossary'
+import { dividedFragile, fragileShown, highlights, labelDoubt, type Highlight, type Highlights } from './highlights'
 import { withCurrentMetrics } from './metrics'
 import { maskNames } from './names'
 import { describeTheme } from './pipeline'
@@ -50,7 +50,14 @@ function alsoInOf(state: AnalysisState): (i: Idea) => string | undefined {
 }
 
 /** L'infobulle d'une ligne de chiffres : ce que veut dire son étiquette, et « fragile » s'il y a lieu. */
-export const stanceTitle = (m: Metrics): string => [helpText(STANCE_HELP[m.stance]), m.fragile && labelled('Fragile', FRAGILE_HELP)].filter(Boolean).join(' ')
+export const stanceTitle = (m: Metrics): string =>
+  [
+    helpText(STANCE_HELP[m.stance]),
+    fragileShown(m) && labelled('Fragile', FRAGILE_HELP),
+    m.minority && m.stance !== 'divided' && labelled('Minorité constante', MINORITY_HELP),
+  ]
+    .filter(Boolean)
+    .join(' ')
 
 const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
 
@@ -234,7 +241,7 @@ export function metricsLine(m: Metrics): string {
     const k = m.minority.participantIds.length
     parts.push(
       // « l'apprécient » se lisait à contresens quand l'objet du motif est déjà négatif (« Fermetures de classes ») : on dit le camp.
-      `à contre-courant : ${n(k, m.minority.side === 'positive' ? 'avis positif' : 'avis négatif')}`,
+      `minorité constante : ${n(k, m.minority.side === 'positive' ? 'avis positif' : 'avis négatif')}`,
     )
   }
   return parts.join(' · ')
@@ -251,7 +258,7 @@ export function scaleWords(m: Metrics, ratio: string): string[] {
   else if (m.stance === 'lean') out.push(`pas de majorité, penche ${neg ? 'vers le négatif' : 'vers le positif'} ${ratio}`)
   else if (m.stance === 'divided') out.push('avis partagés')
   // Le mot seul : la Méthode du rapport l'explique (plume, 15/10 : la définition répétée sur chaque motif alourdissait).
-  if (m.fragile) out.push('fragile')
+  if (fragileShown(m)) out.push('fragile')
   return out
 }
 
@@ -556,6 +563,20 @@ export interface HighlightSection {
 }
 
 /** Les sections calculées du rapport, prêtes à afficher : mêmes chiffres dans l'écran et dans les exports. */
+/**
+ * Sous le résumé, les étiquettes à vérifier avant de le citer : le résumé est rédigé par le moteur d'IA, qui ne
+ * les reprend pas (deux lectures `methodologue`, passe 13) ; le code les rappelle, le détail reste dans les listes.
+ */
+export function summaryDoubts(sections: HighlightSection[]): string | undefined {
+  const titles = [...new Set(sections.flatMap((sec) => sec.items.filter((x) => x.doubt).map((x) => x.title)))]
+  if (!titles.length) return undefined
+  const q = titles.map((t) => `« ${t} »`)
+  const list = q.length > 1 ? `${q.slice(0, -1).join(', ')} et ${q[q.length - 1]}` : q[0]
+  return q.length > 1
+    ? `À vérifier avant de citer ces étiquettes : ${list}. Elles dépendent d'avis comptés aussi dans un autre motif ; le détail est dans les listes ci-dessous.`
+    : `À vérifier avant de citer cette étiquette : ${list}. Elle dépend d'avis comptés aussi dans un autre motif ; le détail est dans les listes ci-dessous.`
+}
+
 export function highlightSections(state: AnalysisState): HighlightSection[] {
   const byId = new Map(state.ideas.map((i) => [i.id, i]))
   const h = highlights(state.groups, byId)
@@ -576,7 +597,8 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
   const marks = (groupId: string) => {
     const g = groupOf.get(groupId)!
     const doubt = labelDoubt(g, byId)
-    return { ...(dividedFragile(g) ? { fragile: true } : {}), ...(doubt ? { doubt } : {}) }
+    const fragile = fragileShown(g.metrics) || dividedFragile(g)
+    return { ...(fragile ? { fragile: true } : {}), ...(doubt ? { doubt } : {}) }
   }
   const s1 = cut(h.strengths)
   const s2 = cut(h.blockers)
@@ -709,10 +731,12 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
   const sizeOf = motifSizes(state)
   const prose = (t: string) => refsToPeople(v.text(t), byId, undefined, sizeOf)
   const alsoIn = alsoInOf(state)
-  if (state.globalSummary) out.push('## Résumé', '', prose(state.globalSummary), '')
+  const sections = highlightSections(state)
+  const doubts = summaryDoubts(sections)
+  if (state.globalSummary) out.push('## Résumé', '', prose(state.globalSummary), '', ...(doubts ? [`*${doubts}*`, ''] : []))
   warn(state.globalUnverified)
 
-  for (const sec of highlightSections(state)) {
+  for (const sec of sections) {
     out.push(`## ${SECTION_MARK[sec.key]} ${sec.heading}`, '')
     if (sec.intro) out.push(`*${sec.intro}*`, '')
     for (const x of sec.items) {
@@ -856,8 +880,10 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
   }
 
   if (opts.stale) parts.push(`<p class="facts"><strong>${e(STALE_NOTE)}</strong></p>`)
-  if (state.globalSummary) parts.push(`<h2>Résumé</h2>${para(state.globalSummary)}`)
-  for (const sec of highlightSections(state)) {
+  const sections = highlightSections(state)
+  const doubts = summaryDoubts(sections)
+  if (state.globalSummary) parts.push(`<h2>Résumé</h2>${para(state.globalSummary)}${doubts ? `<p class="facts" title="${e(helpText({ ...DOUBT_HELP, what: '' }))}">${e(doubts)}</p>` : ''}`)
+  for (const sec of sections) {
     const items = sec.items
       .map(
         (x) =>

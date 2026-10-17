@@ -130,11 +130,20 @@ export function labelDoubt(g: Group, ideas: Map<string, Idea>): string | undefin
   const copies = g.ideaIds.length - own.length
   if (!copies) return undefined
   const without = computeMetrics(own.map((id) => ideas.get(id)!).filter(Boolean)).stance
+  // Même quand l'étiquette serait plus nette sans les copies : un motif nourri de copies se relit (passe 13,
+  // « École publique face au privé », 16 copies sur 34 avis, dont des positions opposées réunies).
   if (without === g.metrics.stance) return undefined
   return copies > 1
     ? `à vérifier : ${copies} de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « ${STANCE_WORD[without]} »`
     : `à vérifier : 1 de ces avis compte aussi dans un autre motif ; sans lui, ce serait « ${STANCE_WORD[without]} »`
 }
+
+/**
+ * « Fragile », tel que le lecteur le voit : une voix ferait changer la conclusion. Un « unanime » qui deviendrait
+ * « large majorité » garde la sienne ; la marque y serait du bruit (deux lectures `methodologue`, passe 13).
+ * `metrics.fragile` reste le calcul brut, envoyé tel quel au moteur (le changer invaliderait les réponses en cache).
+ */
+export const fragileShown = (m: Metrics): boolean => !!m.fragile && m.stance !== 'unanimous'
 
 /** Des avis partagés qu'une seule voix ferait basculer : « fragile », comme pour les autres étiquettes (`isFragile` ne les teste pas). */
 export function dividedFragile(g: Group): boolean {
