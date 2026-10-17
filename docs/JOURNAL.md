@@ -2,6 +2,20 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-17 — Navigation de l'Observatoire
+
+- **Remarque d'Arnaud** : un clic sur l'étude doit mener à l'étude, pas à une page intermédiaire ; et sur les
+  pages de l'Observatoire, on ne pouvait pas revenir.
+- **Fait** : l'accueil liste les dernières études (lues dans `observatoire/index.json`) et chacune mène droit à
+  sa page ; la liste complète est à un lien « Toutes les études de l'Observatoire ». L'Observatoire entre dans
+  le menu du haut de l'application (icône seule sur mobile, faute de place). Les pages publiées portent le
+  même menu (Accueil, Synthèse, Observatoire) et l'étude un lien vers la liste : on n'y est jamais coincé.
+- **Pourquoi le menu plutôt qu'une page à part avec un retour** : l'Observatoire grandit chaque semaine, c'est
+  une destination ; un « retour » dépend d'où l'on vient (un lien partagé arrive sans historique), un menu non.
+- Sur mobile, le logo mène à l'accueil : l'icône « Accueil » en double laisse la place à l'Observatoire ; sous
+  380 px, « Moteurs d'IA » se réduit à son icône et à son état. Test de parcours : à 360 et 390 px, aucun lien
+  du menu n'en recouvre un autre.
+
 ## 2026-10-17 — Rapport de Synthèse : la taille de lecture de l'Observatoire
 
 - **Remarque d'Arnaud** : la page de l'Observatoire se lit mieux, la police du rapport de Synthèse est trop

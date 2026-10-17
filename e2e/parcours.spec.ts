@@ -51,14 +51,21 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await noHorizontalScroll(page)
   await shot(page, '1-accueil')
 
-  // L'Observatoire se lit depuis l'accueil, et sa page ramène à l'application.
+  // Un clic sur une étude de l'Observatoire y mène directement ; ses pages portent le menu, on n'y est jamais coincé.
   await page.getByRole('link', { name: /L'école vue par les familles/ }).click()
-  await expect(page.getByRole('link', { name: /école/i }).first()).toBeVisible()
-  await page.getByRole('link', { name: /école/i }).first().click()
+  await expect(page).toHaveURL(/\/observatoire\/ecole-grand-debat-2019\/$/)
   await expect(page.getByText('Méthode et limites').first()).toBeVisible()
-  await page.goto('/observatoire/')
-  await page.getByRole('link', { name: 'Analyser vos propres réponses' }).click()
+  await noHorizontalScroll(page)
+  await page.getByRole('link', { name: "← Toutes les études de l'Observatoire" }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText("L'Observatoire")
+  await page.getByRole('navigation', { name: 'Menu' }).getByRole('link', { name: 'Accueil' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Des verbatims au rapport')
+  // Le menu de l'application mène à la liste des études.
+  await page.getByRole('navigation', { name: 'Modules' }).getByRole('link', { name: 'Observatoire' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText("L'Observatoire")
+  await page.getByRole('navigation', { name: 'Menu' }).getByRole('link', { name: 'Synthèse' }).click()
+  await expect(page.getByRole('heading', { name: 'Vos synthèses' })).toBeVisible()
+  await page.goto('/')
 
   // Le module Synthèse est cliquable et mène à son espace.
   await page.getByRole('link', { name: /Ouvrir l'espace Synthèse/ }).click()
@@ -415,4 +422,17 @@ test('vos études : renommer, dupliquer et supprimer depuis le menu d’une étu
   await page.getByRole('button', { name: 'Supprimer', exact: true }).click()
   await expect(page.getByRole('link', { name: /Étude rangée \(copie\)/ })).toHaveCount(0)
   await expect(page.getByRole('link', { name: /Étude rangée/ })).toBeVisible()
+})
+
+test('menu : sur un petit téléphone, aucun lien du menu n’en recouvre un autre', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile')
+  for (const width of [360, 390]) {
+    await page.setViewportSize({ width, height: 800 })
+    await page.goto('/')
+    const modules = (await page.getByRole('navigation', { name: 'Modules' }).boundingBox())!
+    const settings = (await page.getByRole('navigation', { name: 'Réglages' }).boundingBox())!
+    expect(modules.x + modules.width).toBeLessThanOrEqual(settings.x)
+    await expect(page.getByRole('navigation', { name: 'Modules' }).getByRole('link', { name: 'Observatoire' })).toBeVisible()
+    await noHorizontalScroll(page)
+  }
 })

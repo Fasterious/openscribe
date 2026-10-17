@@ -22,13 +22,21 @@ li.quote{font-style:italic;margin-left:.8rem;border-color:var(--line)}li.more{co
 a{color:var(--brand);text-decoration:none;border-bottom:1px dotted var(--brand)}:target{background:#fff3c4}
 @media print{details{display:block}details>summary{list-style:none}a{color:inherit;border:0}.bar,li,.summary{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style><style>
+.obs-menu{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1rem;padding-bottom:.8rem;margin-bottom:1.2rem;border-bottom:1px solid var(--line)}
+.obs-menu a,.obs-nav a{border:0;text-decoration:none}
+.obs-brand{display:flex;align-items:center;gap:.5rem;font-weight:700;color:var(--ink);text-decoration:none}
+.obs-menu nav{display:flex;flex-wrap:wrap;gap:.25rem}.obs-menu nav a{padding:.35rem .6rem;border-radius:.4rem;color:var(--ink);text-decoration:none;font-size:.95rem;font-weight:500}
+.obs-menu nav a:hover{background:var(--card)}.obs-menu nav a[aria-current]{background:var(--card);color:var(--brand)}
+@media print{.obs-menu,.obs-nav{display:none}}
 .obs-nav{font-size:.9rem;margin-bottom:1rem}.obs-nav a{color:var(--brand);text-decoration:none;font-weight:600}
 .obs-meta{color:var(--muted);font-size:.9rem;margin-top:0}
 .obs-fiche{background:var(--card);border-radius:.5rem;padding:.4rem 1.2rem 1rem;margin:1.2rem 0 2rem}
 .obs-fiche h2{font-size:1.1rem;margin-top:1.4rem;border:0;padding:0}
 .obs-fiche blockquote{margin:.4rem 0;padding-left:.8rem;border-left:3px solid var(--brand);font-style:italic}
 </style></head><body>
-<nav class="obs-nav"><a href="../">L'Observatoire OpenScribe</a></nav>
+<header class="obs-menu"><a class="obs-brand" href="/"><img src="/logo.svg" alt="" width="28" height="28"><span>OpenScribe</span></a>
+<nav aria-label="Menu"><a href="/">Accueil</a><a href="/#/synthese">Synthèse</a><a href="/observatoire/">Observatoire</a></nav></header>
+<nav class="obs-nav"><a href="/observatoire/">← Toutes les études de l'Observatoire</a></nav>
 <p class="obs-meta">Publié le 17 octobre 2026 · Semaine de mobilisation lycéenne et étudiante (grève nationale du 13 octobre 2026).</p>
 <h1>L&#39;école vue par les familles : ce qu&#39;elles disaient au Grand débat national (2019)</h1>
 <section class="obs-fiche" aria-label="Fiche de l'étude">

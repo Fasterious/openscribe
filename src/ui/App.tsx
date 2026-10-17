@@ -1,4 +1,4 @@
-import { FlaskConical, House, KeyRound, Mic, PenTool, UserRound } from 'lucide-react'
+import { FlaskConical, House, KeyRound, Mic, Newspaper, PenTool, UserRound } from 'lucide-react'
 import { useEngines } from '@/app/engines'
 import { href, useRoute } from '@/app/router'
 import { Home } from './Home'
@@ -24,11 +24,16 @@ export function App() {
               <img src="/logo.svg" alt="" className="h-7 w-7" />
               <span className="hidden lg:inline">OpenScribe</span>
             </a>
-            <NavLink href={href({ name: 'home' })} active={route.name === 'home'}>
-              <House className="size-4" /> <span className="hidden sm:inline">Accueil</span>
+            {/* Sur mobile, le logo mène à l'accueil : l'icône en double laisse la place à l'Observatoire. */}
+            <NavLink href={href({ name: 'home' })} active={route.name === 'home'} className="hidden sm:flex">
+              <House className="size-4" /> Accueil
             </NavLink>
             <NavLink href={href({ name: 'synthesis' })} active={inSynthesis}>
               <FlaskConical className="size-4" /> Synthèse
+            </NavLink>
+            {/* Les études publiées : des pages à part, qui portent ce même menu pour revenir. */}
+            <NavLink href="/observatoire/" active={false}>
+              <Newspaper className="size-4" /> <span className="sr-only sm:not-sr-only">Observatoire</span>
             </NavLink>
             <SoonLink icon={<Mic className="size-4" />} label="Entretiens" />
             <SoonLink icon={<UserRound className="size-4" />} label="Personas" />
@@ -37,7 +42,7 @@ export function App() {
           <nav aria-label="Réglages" className="flex shrink-0 items-center">
             <NavLink href={href({ name: 'settings' })} active={route.name === 'settings'}>
               <KeyRound className="size-4" />
-              <span className="whitespace-nowrap">Moteurs d'IA</span>
+              <span className="sr-only whitespace-nowrap min-[380px]:not-sr-only">Moteurs d'IA</span>
               {loaded && (
                 <span
                   className={cn(
@@ -95,7 +100,7 @@ function SoonLink({ icon, label }: { icon: React.ReactNode; label: string }) {
   )
 }
 
-function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+function NavLink({ href, active, className, children }: { href: string; active: boolean; className?: string; children: React.ReactNode }) {
   return (
     <a
       href={href}
@@ -103,6 +108,7 @@ function NavLink({ href, active, children }: { href: string; active: boolean; ch
       className={cn(
         'flex h-9 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors hover:bg-accent',
         active && 'bg-accent text-accent-foreground',
+        className,
       )}
     >
       {children}

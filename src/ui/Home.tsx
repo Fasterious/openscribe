@@ -18,7 +18,7 @@ import {
   Users,
   Video,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { href } from '@/app/router'
 import { useProjects } from '@/app/store'
 import { formatDate } from './format'
@@ -195,21 +195,7 @@ export function Home() {
           title="L'Observatoire"
           lead="Des consultations publiques en données ouvertes, analysées avec OpenScribe et publiées avec leur méthode et leurs limites."
         />
-        <a
-          href="/observatoire/"
-          className="group flex items-start gap-3 rounded-xl border bg-card p-5 transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-ring"
-        >
-          <span className="mt-0.5 text-primary [&_svg]:size-5">
-            <Newspaper />
-          </span>
-          <span className="space-y-1">
-            <span className="block font-semibold group-hover:text-primary">L'école vue par les familles (Grand débat national, 2019)</span>
-            <span className="block text-sm text-muted-foreground">
-              378 contributions tirées au sort : ce qui satisfait, ce qui bloque et ce qui divise, chaque chiffre relié aux réponses. Lire l'étude
-              <ArrowRight className="ml-1 inline size-4" aria-hidden />
-            </span>
-          </span>
-        </a>
+        <ObservatoireStudies />
       </section>
 
       <section aria-labelledby="donnees" className="space-y-6">
@@ -357,6 +343,51 @@ function ProofDemo() {
         <p className="mt-3 text-xs text-muted-foreground">Cliquez sur la pastille pour voir les verbatims.</p>
       )}
     </Card>
+  )
+}
+
+/** Une étude publiée de l'Observatoire, telle que la liste `public/observatoire/index.json` la décrit. */
+type PublishedStudy = { slug: string; title: string; publishedAt: string; summary: string }
+
+/**
+ * Les dernières études de l'Observatoire : un clic mène droit à l'étude ; la liste complète reste à un lien.
+ * Lues dans `index.json`, écrit à chaque publication : une étude nouvelle apparaît sans toucher au code.
+ */
+function ObservatoireStudies() {
+  const [studies, setStudies] = useState<PublishedStudy[]>([])
+  useEffect(() => {
+    fetch('/observatoire/index.json')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list: PublishedStudy[]) => setStudies(list.slice(0, 3)))
+      .catch(() => setStudies([]))
+  }, [])
+  const date = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const lead = (t: string) => t.split(/(?<=\.)\s/)[0]
+  return (
+    <div className="space-y-3">
+      {studies.map((s) => (
+        <a
+          key={s.slug}
+          href={`/observatoire/${s.slug}/`}
+          className="group flex items-start gap-3 rounded-xl border bg-card p-5 transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-ring"
+        >
+          <span className="mt-0.5 text-primary [&_svg]:size-5">
+            <Newspaper />
+          </span>
+          <span className="space-y-1">
+            <span className="block font-semibold group-hover:text-primary">{s.title}</span>
+            <span className="block text-sm text-muted-foreground">Publié le {date(s.publishedAt)}</span>
+            <span className="block text-sm text-muted-foreground">
+              {lead(s.summary)} Lire l'étude
+              <ArrowRight className="ml-1 inline size-4" aria-hidden />
+            </span>
+          </span>
+        </a>
+      ))}
+      <a href="/observatoire/" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+        Toutes les études de l'Observatoire <ArrowRight className="size-4" aria-hidden />
+      </a>
+    </div>
   )
 }
 

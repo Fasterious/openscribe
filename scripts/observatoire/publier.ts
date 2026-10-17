@@ -56,7 +56,18 @@ const date = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR'
 // Publication grand public : les prénoms de particuliers sont toujours masqués.
 const report = reportToHtml({ ...analysis, settings: { ...analysis.settings, maskNames: true } }, project.corpus, fiche.title)
 
-const head = `<nav class="obs-nav"><a href="../">L'Observatoire OpenScribe</a></nav>
+// Le menu de l'application, sur chaque page publiée : on revient toujours à l'accueil, à Synthèse ou à la liste.
+const menu = (here: 'list' | 'study') => `<header class="obs-menu"><a class="obs-brand" href="/"><img src="/logo.svg" alt="" width="28" height="28"><span>OpenScribe</span></a>
+<nav aria-label="Menu"><a href="/">Accueil</a><a href="/#/synthese">Synthèse</a><a href="/observatoire/"${here === 'list' ? ' aria-current="page"' : ''}>Observatoire</a></nav></header>`
+const menuStyle = `.obs-menu{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1rem;padding-bottom:.8rem;margin-bottom:1.2rem;border-bottom:1px solid var(--line)}
+.obs-menu a,.obs-nav a{border:0;text-decoration:none}
+.obs-brand{display:flex;align-items:center;gap:.5rem;font-weight:700;color:var(--ink);text-decoration:none}
+.obs-menu nav{display:flex;flex-wrap:wrap;gap:.25rem}.obs-menu nav a{padding:.35rem .6rem;border-radius:.4rem;color:var(--ink);text-decoration:none;font-size:.95rem;font-weight:500}
+.obs-menu nav a:hover{background:var(--card)}.obs-menu nav a[aria-current]{background:var(--card);color:var(--brand)}
+@media print{.obs-menu,.obs-nav{display:none}}`
+
+const head = `${menu('study')}
+<nav class="obs-nav"><a href="/observatoire/">← Toutes les études de l'Observatoire</a></nav>
 <p class="obs-meta">Publié le ${e(date(fiche.publishedAt))} · ${e(fiche.news)}</p>`
 const card = `<section class="obs-fiche" aria-label="Fiche de l'étude">
 <h2>En bref</h2>
@@ -71,6 +82,7 @@ ${paras(fiche.sampling)}
 <ul>${fiche.warnings.map((w) => `<li>${e(w)}</li>`).join('')}</ul>
 </section>`
 const style = `<style>
+${menuStyle}
 .obs-nav{font-size:.9rem;margin-bottom:1rem}.obs-nav a{color:var(--brand);text-decoration:none;font-weight:600}
 .obs-meta{color:var(--muted);font-size:.9rem;margin-top:0}
 .obs-fiche{background:var(--card);border-radius:.5rem;padding:.4rem 1.2rem 1rem;margin:1.2rem 0 2rem}
@@ -103,7 +115,7 @@ writeFileSync(
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>L'Observatoire OpenScribe</title>
 <meta name="description" content="Chaque semaine, l'analyse publique d'une consultation citoyenne en données ouvertes.">
-<link rel="icon" href="../favicon.svg">
+<link rel="icon" href="/favicon.svg">
 <style>
 :root{--ink:#1d1f2b;--muted:#5b6078;--line:#e3e5f5;--brand:#2F40C2;--card:#f7f8fd}
 body{font-family:Geist,system-ui,-apple-system,"Segoe UI",sans-serif;max-width:52rem;margin:2rem auto;padding:0 1rem;line-height:1.6;color:var(--ink);background:#fff}
@@ -111,7 +123,9 @@ h1{color:var(--brand);font-size:2rem;margin-bottom:.3rem}.lead{color:var(--muted
 article{background:var(--card);border-radius:.5rem;padding:.6rem 1.2rem 1rem;margin:1.2rem 0}
 article h2{font-size:1.2rem;margin:.6rem 0 .2rem}article h2 a{color:var(--ink)}.meta{color:var(--muted);font-size:.9rem;margin:0 0 .6rem}
 footer{color:var(--muted);font-size:.9rem;margin-top:2.5rem;border-top:1px solid var(--line);padding-top:1rem}footer a{color:var(--brand)}
+${menuStyle}
 </style></head><body>
+${menu('list')}
 <h1>L'Observatoire</h1>
 <p class="lead">Chaque semaine, l'analyse publique d'une consultation citoyenne en données ouvertes, réalisée avec OpenScribe. Le moteur d'IA propose, le code vérifie : chaque chiffre se recompte, chaque citation renvoie à la réponse d'origine.</p>
 ${studies
@@ -123,7 +137,7 @@ ${paras(s.summary)}
 </article>`,
   )
   .join('\n')}
-<footer>OpenScribe, un nouvel outil open source de recherche utilisateur. <a href="../">Analyser vos propres réponses</a>.</footer>
+<footer>OpenScribe, un nouvel outil open source de recherche utilisateur. <a href="/">Analyser vos propres réponses</a>.</footer>
 </body></html>
 `,
 )
