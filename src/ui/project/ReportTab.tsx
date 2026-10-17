@@ -8,7 +8,6 @@ import {
   bothSides,
   categoryHeading,
   dominantVoice,
-  engineName,
   alsoInOf,
   categoryBar,
   definitionLine,
@@ -29,6 +28,9 @@ import {
   reportToHtml,
   reportToMarkdown,
   stanceTitle,
+  methodNote,
+  offTopicLines,
+  OFF_TOPIC_INTRO,
 } from '@/core/analysis/report'
 import { corpusHash } from '@/core/analysis/pipeline'
 import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from '@/core/analysis/types'
@@ -38,7 +40,7 @@ import { isExample } from '../Synthesis'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, download, formatDate, plural, slug } from '../format'
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, Disclosure, DropMenu, MenuItem, MenuSection, Explain, Tooltip } from '../primitives'
-import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, MINORITY_HELP, type LabelHelp } from '@/core/analysis/glossary'
+import { DOUBT_HELP, FRAGILE_HELP, helpText, MINORITY_HELP, type LabelHelp } from '@/core/analysis/glossary'
 import { fragileShown, labelDoubt } from '@/core/analysis/highlights'
 
 /** Classes écrites en entier : Tailwind ne génère pas une classe construite à la volée. */
@@ -700,6 +702,7 @@ export function ReportTab({
     ...analysis,
     settings: { ...analysis.settings, maskNames: masked },
   }
+  const offTopic = offTopicLines(analysis)
   const ctx: Ctx = {
     ideaById: new Map(analysis.ideas.map((i) => [i.id, i])),
     contributionById: new Map(corpus.contributions.map((c) => [c.id, c])),
@@ -1083,58 +1086,31 @@ export function ReportTab({
             ))}
       </section>
 
+      {offTopic.ideas > 0 && (
+        <section aria-labelledby="hors-question" className="space-y-2">
+          <h2 id="hors-question" className="text-xl font-semibold">
+            Hors question
+          </h2>
+          <p className="text-sm text-muted-foreground">{OFF_TOPIC_INTRO}</p>
+          <ul className="space-y-1.5">
+            {offTopic.lines.map((l) => (
+              <PersonLine key={l.participantId} line={l} cat="neutral" other={false} full={new Set()} ctx={ctx} />
+            ))}
+          </ul>
+        </section>
+      )}
+
       <Card className={`max-sm:border-t ${FLAT_CARD}`}>
         <CardHeader className="max-sm:px-0">
           <CardTitle>Méthode</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground max-sm:px-0">
-          <p>
-            Le moteur d'IA ({engineName(analysis.engine.presetId, analysis.engine.model)} · {analysis.engine.model}) a découpé les réponses en idées, proposé
-            les motifs et rédigé les synthèses. Le code a vérifié chaque verbatim mot pour mot dans les réponses, rangé chaque idée exactement une fois, calculé
-            tous les chiffres, puis contrôlé que chaque nombre cité dans les synthèses correspond à un chiffre calculé ou à un verbatim.
-            {analysis.polish &&
-              analysis.polish.changed > 0 &&
-              ` Une relecture a ensuite amélioré la langue de ${plural(analysis.polish.changed, 'synthèse')} ; le code a vérifié qu'aucun verbatim ni aucun chiffre n'avait changé${analysis.polish.refused ? ` et a écarté ${plural(analysis.polish.refused, 'réécriture')} qui ne ${analysis.polish.refused > 1 ? 'respectaient' : 'respectait'} pas cette règle` : ''}.`}
-          </p>
-          <p>
-            Principe : restituer ce que les participants ont dit, avec le moins de déformation possible. Les verbatims sont recopiés tels quels ; seule une
-            coupure « […] » peut sauter un passage sans rapport, jamais une négation ou une réserve. Un clic sur un verbatim le montre dans son texte d'origine.
-            {corpus.sources.length > 1 &&
-              ` Sources : ${corpus.sources
-                .map(
-                  (src) =>
-                    `${src.name} (${plural(new Set(corpus.contributions.filter((c) => c.sourceId === src.id).map((c) => c.participantId)).size, 'participant')})`,
-                )
-                .join(' ; ')}. Un entretien compte pour une personne, comme une ligne de questionnaire.`}
-          </p>
-          <p>
-            On compte des participants. Sur un motif, un participant est « positif » si tout ce qu'il en dit est positif, « négatif » si tout est négatif, «
-            mitigé » s'il dit les deux ; les mitigés comptent dans le total mais dans aucun camp. Suggestions, questions et constats ne sont pas des avis. Le
-            chiffre vient toujours avec le mot : « unanime » quand toutes les personnes qui donnent un avis sont du même côté, « large majorité » à partir de 80
-            %, « majorité » au-dessus de la moitié, « pas de majorité » quand le camp en tête reste sous la moitié, « avis partagés » quand les camps sont
-            proches ou que les mitigés pèsent autant que le camp le plus fort ; en dessous de 4 avis, « peu d'avis ». « Fragile » : une seule voix qui change de
-            camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver. Un thème réunit des motifs différents : on n'y additionne pas les avis.
-            Les listes en tête du rapport sont établies par le code, sans rédaction de l'IA. (Indicateurs, version {METRICS_VERSION})
-          </p>
-          {analysis.groups.some((g) => labelDoubt(g, ctx.ideaById)) && <p>{labelled('« À vérifier »', DOUBT_HELP)}</p>}
-          {analysis.groups.some((g) => g.metrics.minority) && <p>{labelled('« Minorité constante »', MINORITY_HELP)}</p>}
-          <p>{labelled('Limites', LIMITS_HELP)}</p>
-          <p>
-            {plural(analysis.groups.length, 'motif')}
-            {analysis.merges?.length ? `, dont ${plural(analysis.merges.length, 'fusion')} de motifs qui traitaient le même objet` : ''}
-            {names.length > 0 && ` · ${plural(names.length, 'prénom')} de particuliers repéré${names.length > 1 ? 's' : ''} dans les réponses`}
-            {analysis.removedSentences
-              ? ` · ${plural(analysis.removedSentences, 'phrase')} retirée${analysis.removedSentences > 1 ? 's' : ''} des synthèses car ${analysis.removedSentences > 1 ? 'elles citaient' : 'elle citait'} un nombre introuvable`
-              : ''}
-            .
-          </p>
-          <p>
-            {plural(analysis.ideas.length, 'idée retenue', 'idées retenues')} ; {plural(analysis.rejected.length, 'verbatim écarté', 'verbatims écartés')} car
-            introuvable{analysis.rejected.length > 1 ? 's' : ''} tel
-            {analysis.rejected.length > 1 ? 's' : ''} quel
-            {analysis.rejected.length > 1 ? 's' : ''} dans les réponses. Température {analysis.settings.temperature}, graine {analysis.settings.seed} : relancer
-            la même analyse redonne le même résultat.
-          </p>
+        <CardContent className="text-sm text-muted-foreground max-sm:px-0">
+          <ul className="list-disc space-y-1.5 pl-5">
+            {methodNote(analysis, corpus).map((line, k) => (
+              <li key={k}>{line}</li>
+            ))}
+            <li>Indicateurs, version {METRICS_VERSION}.</li>
+          </ul>
         </CardContent>
       </Card>
     </article>

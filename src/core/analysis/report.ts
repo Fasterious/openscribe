@@ -72,7 +72,8 @@ export function definitionLine(d: GroupDefinition): string {
   return `${[`Compte comme positif : ${dot(d.positive)}`, `comme négatif : ${dot(d.negative)}`, ...(d.neutral ? [`ne compte pas comme un avis : ${dot(d.neutral)}`] : [])].join(' · ')}.`
 }
 
-function methodNote(state: AnalysisState, corpus: Corpus): string[] {
+/** La méthode, ligne par ligne : la même dans le rapport de l'application et dans ses exports. */
+export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   const respondents = activeParticipants(corpus).length
   const withIdeas = new Set(state.ideas.map((i) => i.participantId)).size
   const single = state.groups.filter((g) => g.metrics.participants === 1).length
@@ -142,9 +143,14 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     lines.push(
       `Étiquettes à vérifier : ${doubtful.length} motif${doubtful.length > 1 ? 's' : ''} ${doubtful.length > 1 ? 'portent' : 'porte'} la mention « à vérifier », parce que ${doubtful.length > 1 ? 'leur étiquette dépend' : 'son étiquette dépend'} d'avis comptés aussi dans un autre motif. Le code mesure cet écart ; c'est au lecteur de trancher, en relisant les citations.`,
     )
+  if (state.groups.some((g) => g.metrics.minority)) lines.push(labelled('« Minorité constante »', MINORITY_HELP))
   if (state.support)
     lines.push(
       `Renvois vérifiés : chaque phrase des synthèses a été confrontée par le moteur d'IA aux verbatims qu'elle cite (${state.support.checked} phrases) ; ${state.support.fixed || 'aucune'} corrigée${state.support.fixed > 1 ? 's' : ''}, ${state.support.dropped || 'aucune'} retirée${state.support.dropped > 1 ? 's' : ''} faute d'appui${state.support.added ? ` ; le moteur d'IA en a ajouté ${state.support.added} pour un sujet ou un camp d'avis qui manquait` : ''}.${state.campsAdded ? ` Le code en a écrit ${state.campsAdded} pour un camp d'avis encore absent de la synthèse de son motif.` : ''}`,
+    )
+  if (state.polish?.changed)
+    lines.push(
+      `Relecture de la langue : ${state.polish.changed} synthèse${state.polish.changed > 1 ? 's' : ''} récrite${state.polish.changed > 1 ? 's' : ''} ; le code a vérifié qu'aucun verbatim ni aucun chiffre n'avait changé${state.polish.refused ? ` et a écarté ${state.polish.refused} réécriture${state.polish.refused > 1 ? 's' : ''} qui ne ${state.polish.refused > 1 ? 'respectaient' : 'respectait'} pas cette règle` : ''}.`,
     )
   if (state.removedSentences)
     lines.push(
@@ -186,14 +192,14 @@ function methodNote(state: AnalysisState, corpus: Corpus): string[] {
 }
 
 /** Les idées « hors question », par participant : gardées et montrées, jamais comptées dans un motif. */
-function offTopicLines(state: AnalysisState): { ideas: number; people: number; lines: { participantId: string; ideas: Idea[] }[] } {
+export function offTopicLines(state: AnalysisState): { ideas: number; people: number; lines: { participantId: string; ideas: Idea[] }[] } {
   const byId = new Map(state.ideas.map((i) => [i.id, i]))
   const ideas = (state.offTopic ?? []).map((id) => byId.get(id)).filter((i): i is Idea => !!i)
   const lines = personLines(ideas)
   return { ideas: ideas.length, people: lines.length, lines }
 }
 
-const OFF_TOPIC_INTRO = 'Ces idées ne répondent pas à la question posée : gardées pour la transparence, elles ne comptent dans aucun motif.'
+export const OFF_TOPIC_INTRO = 'Ces idées ne répondent pas à la question posée : gardées pour la transparence, elles ne comptent dans aucun motif.'
 
 function ideasOf(group: Group, byId: Map<string, Idea>): Idea[] {
   return group.ideaIds.map((id) => byId.get(id)!).filter(Boolean)

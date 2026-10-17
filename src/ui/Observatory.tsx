@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, FileText } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Printer } from 'lucide-react'
 import { href } from '@/app/router'
 import { useEffect, useState } from 'react'
 import type { PublishedStudy } from '@/core/observatoire'
@@ -11,7 +11,7 @@ const paras = (t: string) => t.split(/\n+/).filter((p) => p.trim())
 
 /**
  * Une étude de l'Observatoire lue dans l'application : le rapport de Synthèse, en lecture seule, avec sa fiche.
- * Le fichier publié est déjà masqué (prénoms) ; l'article (« Lire en une page ») reste à un lien, pour lire d'un trait ou imprimer.
+ * Le fichier publié est déjà masqué (prénoms). L'impression déplie tout le rapport : c'est aussi le PDF.
  */
 export function ObservatoryPage({ slug }: { slug: string }) {
   const [study, setStudy] = useState<PublishedStudy | null | undefined>(undefined)
@@ -76,12 +76,13 @@ export function ObservatoryPage({ slug }: { slug: string }) {
           </p>
         </div>
         <div className="no-print flex flex-wrap items-center gap-2">
-          <a
-            href={`/observatoire/${study.slug}/`}
-            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-input bg-card px-3 text-sm font-medium hover:bg-accent"
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border border-input bg-card px-3 text-sm font-medium hover:bg-accent"
           >
-            <FileText className="size-4" /> Lire en une page
-          </a>
+            <Printer className="size-4" /> Imprimer ou enregistrer en PDF
+          </button>
           <div id={TAB_ACTIONS} className="flex flex-wrap items-center gap-2" />
         </div>
       </div>
@@ -148,14 +149,9 @@ export function ObservatoryList() {
             {s.news && ` · ${s.news}`}
           </p>
           <p>{paras(s.summary)[0]}</p>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium">
-            <a href={href({ name: 'observatory', slug: s.slug })} className="inline-flex items-center gap-1 text-primary hover:underline">
-              Lire l'étude <ArrowRight className="size-4" aria-hidden />
-            </a>
-            <a href={`/observatoire/${s.slug}/`} className="text-muted-foreground hover:text-foreground hover:underline">
-              Lire en une page
-            </a>
-          </div>
+          <a href={href({ name: 'observatory', slug: s.slug })} className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+            Lire l'étude <ArrowRight className="size-4" aria-hidden />
+          </a>
         </article>
       ))}
     </div>

@@ -1,24 +1,20 @@
 /**
  * Observatoire : publie une étude sur le site (dossier `public/observatoire/`).
  *
- * Deux versions de chaque étude, prénoms de particuliers masqués partout :
- * - l'article (`<slug>/index.html`) : la fiche (actualité, source, question,
- *   échantillon, précautions de lecture) suivie du rapport complet, en une page ;
- *   un renvoi ou un verbatim s'y déplie au clic (réponse entière) ;
- * - l'étude lisible dans l'application (`<slug>/etude.json`, ouverte par
- *   `#/observatoire/<slug>`), réponses entières comprises, masquées à la source.
+ * L'étude se lit dans l'application (`#/observatoire/<slug>`), à partir de `<slug>/etude.json` : rapport et réponses
+ * entières, prénoms de particuliers masqués à la source. À l'adresse `/observatoire/<slug>/`, une page légère porte le
+ * titre, le résumé et l'aperçu pour les moteurs de recherche et les réseaux, puis ouvre l'étude dans l'application.
  * Les réponses du moteur et la liste des prénoms restent hors du dépôt.
  *
  * Usage :
  *   npx tsx scripts/observatoire/publier.ts <etude.openscribe.json> <fiche.json>
  *
- * Écrit `public/observatoire/<slug>/index.html` et `etude.json`, puis refait la liste
- * `public/observatoire/index.json` et la page `public/observatoire/index.html`.
+ * Écrit `public/observatoire/<slug>/etude.json` et `index.html`, puis refait la liste
+ * `public/observatoire/index.json` et sa page `public/observatoire/index.html`.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { remainingNames } from '../../src/core/analysis/names'
-import { reportToHtml } from '../../src/core/analysis/report'
 import { publishedStudy } from '../../src/core/observatoire'
 import { importProject } from '../../src/core/project'
 
@@ -59,16 +55,6 @@ const n = (x: number) => x.toLocaleString('fr-FR')
 const date = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
 
-// Le menu de l'application, sur chaque page publiée : on revient toujours à l'accueil, à Synthèse ou à la liste.
-const menu = (here: 'list' | 'study') => `<header class="obs-menu"><a class="obs-brand" href="/"><img src="/logo.svg" alt="" width="28" height="28"><span>OpenScribe</span></a>
-<nav aria-label="Menu"><a href="/">Accueil</a><a href="/#/synthese">Synthèse</a><a href="/#/observatoire"${here === 'list' ? ' aria-current="page"' : ''}>Observatoire</a></nav></header>`
-const menuStyle = `.obs-menu{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1rem;padding-bottom:.8rem;margin-bottom:1.2rem;border-bottom:1px solid var(--line)}
-.obs-menu a,.obs-nav a{border:0;text-decoration:none}
-.obs-brand{display:flex;align-items:center;gap:.5rem;font-weight:700;color:var(--ink);text-decoration:none}
-.obs-menu nav{display:flex;flex-wrap:wrap;gap:.25rem}.obs-menu nav a{padding:.35rem .6rem;border-radius:.4rem;color:var(--ink);text-decoration:none;font-size:.95rem;font-weight:500}
-.obs-menu nav a:hover{background:var(--card)}.obs-menu nav a[aria-current]{background:var(--card);color:var(--brand)}
-@media print{.obs-menu,.obs-nav{display:none}}`
-
 // 378 réponses tirées, 366 participants dans le rapport : l'écart se dit (remarque d'Arnaud, 17/10).
 const speakers = new Set(analysis.ideas.map((i) => i.participantId)).size
 const silent = fiche.sample - speakers
@@ -81,48 +67,44 @@ const study = publishedStudy(project, analysis, {
   news: fiche.news,
   fiche: { summary: fiche.summary, question: fiche.question, source: fiche.source, sample: sampleLine, sampling: fiche.sampling, warnings: fiche.warnings },
 })
-const report = reportToHtml(study.project.analyses[0], study.project.corpus, fiche.title)
-const head = `${menu('study')}
-<nav class="obs-nav"><a href="/#/observatoire">← Toutes les études de l'Observatoire</a></nav>
-<p class="obs-switch">Touchez un renvoi (P12) pour voir ses verbatims, ou un verbatim pour le relire dans sa réponse complète. <a href="/#/observatoire/${e(fiche.slug)}">Revenir à l'étude dans l'application</a>.</p>
-<p class="obs-meta">Publiée le ${e(date(fiche.publishedAt))} · ${e(fiche.news)}</p>`
-const card = `<section class="obs-fiche" aria-label="Fiche de l'étude">
-<h2>En bref</h2>
-${paras(fiche.summary)}
-<h2>La question posée</h2>
-<blockquote>${e(fiche.question)}</blockquote>
-<h2>Les données</h2>
-<p><a href="${e(fiche.source.url)}">${e(fiche.source.name)}</a>, ${e(fiche.source.period)}. ${e(fiche.source.license)}.</p>
-<p>${e(sampleLine)}</p>
-${paras(fiche.sampling)}
-<h2>Avant de lire</h2>
-<ul>${fiche.warnings.map((w) => `<li>${e(w)}</li>`).join('')}</ul>
-</section>`
-const style = `<style>
-${menuStyle}
-.obs-nav{font-size:.9rem;margin-bottom:1rem}.obs-nav a{color:var(--brand);text-decoration:none;font-weight:600}
-.obs-meta{color:var(--muted);font-size:.9rem;margin-top:0}
-.obs-switch{background:var(--card);border-radius:.5rem;padding:.6rem .9rem;font-size:.95rem}.obs-switch a{font-weight:600}
-@media print{.obs-switch{display:none}}
-.obs-fiche{background:var(--card);border-radius:.5rem;padding:.4rem 1.2rem 1rem;margin:1.2rem 0 2rem}
-.obs-fiche h2{font-size:1.1rem;margin-top:1.4rem;border:0;padding:0}
-.obs-fiche blockquote{margin:.4rem 0;padding-left:.8rem;border-left:3px solid var(--brand);font-style:italic}
-</style>`
-
-const marker = /<h1>[\s\S]*?<\/h1>/
-if (!marker.test(report)) throw new Error('Rapport sans titre : gabarit inattendu.')
-const page = report
-  .replace('</head>', `<link rel="icon" href="/favicon.svg">${style}</head>`)
-  .replace('<body>', `<body>\n${head}`)
-  .replace(marker, (h1) => `${h1}\n${card}\n<h2 class="obs-report">Le rapport complet</h2>`)
-
 const root = join('public', 'observatoire')
 mkdirSync(join(root, fiche.slug), { recursive: true })
-if (remainingNames(page, analysis.names).length) throw new Error('Prénom encore présent dans la page publiée : publication refusée.')
-writeFileSync(join(root, fiche.slug, 'index.html'), page)
-// La version application : la même étude, ouverte en lecture seule par #/observatoire/<slug>.
+// publishedStudy refuse déjà une étude où subsiste un prénom ; la page légère est contrôlée à son tour.
 writeFileSync(join(root, fiche.slug, 'etude.json'), JSON.stringify(study))
 
+/**
+ * Une adresse lisible sans application : titre, description et aperçu (moteurs de recherche, réseaux), le résumé en
+ * clair, puis l'ouverture immédiate de l'étude dans l'application. Les anciens liens vers l'article y mènent aussi.
+ */
+const SITE = 'https://openscribe.fr'
+const landing = (o: { path: string; app: string; title: string; description: string; body: string }) => `<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${e(o.title)}</title>
+<meta name="description" content="${e(o.description)}">
+<link rel="canonical" href="${SITE}${o.path}">
+<meta property="og:type" content="article"><meta property="og:site_name" content="OpenScribe">
+<meta property="og:title" content="${e(o.title)}"><meta property="og:description" content="${e(o.description)}"><meta property="og:url" content="${SITE}${o.path}">
+<link rel="icon" href="/favicon.svg">
+<meta http-equiv="refresh" content="0; url=${o.app}">
+<script>location.replace(${JSON.stringify(o.app)})</script>
+<style>body{font-family:Geist,system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem;line-height:1.6;color:#1d1f2b}a{color:#2F40C2}</style>
+</head><body>
+${o.body}
+</body></html>
+`
+const firstPara = (t: string) => t.split(/\n+/).find((p) => p.trim())?.trim() ?? ''
+const studyPage = landing({
+  path: `/observatoire/${fiche.slug}/`,
+  app: `/#/observatoire/${fiche.slug}`,
+  title: `${study.title} — L'Observatoire OpenScribe`,
+  description: firstPara(study.fiche.summary),
+  body: `<h1>${e(study.title)}</h1>
+<p>Publiée le ${e(date(fiche.publishedAt))} · ${e(fiche.news)}</p>
+${paras(study.fiche.summary)}
+<p><a href="/#/observatoire/${e(fiche.slug)}">Lire l'étude dans OpenScribe</a></p>`,
+})
+if (remainingNames(studyPage, analysis.names).length) throw new Error('Prénom encore présent dans la page publiée : publication refusée.')
+writeFileSync(join(root, fiche.slug, 'index.html'), studyPage)
 
 // La liste des études publiées, la plus récente d'abord.
 const listPath = join(root, 'index.json')
@@ -134,34 +116,13 @@ writeFileSync(listPath, `${JSON.stringify(studies, null, 1)}\n`)
 
 writeFileSync(
   join(root, 'index.html'),
-  `<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L'Observatoire OpenScribe</title>
-<meta name="description" content="Chaque semaine, l'analyse publique d'une consultation citoyenne en données ouvertes.">
-<link rel="icon" href="/favicon.svg">
-<style>
-:root{--ink:#1d1f2b;--muted:#5b6078;--line:#e3e5f5;--brand:#2F40C2;--card:#f7f8fd}
-body{font-family:Geist,system-ui,-apple-system,"Segoe UI",sans-serif;max-width:52rem;margin:2rem auto;padding:0 1rem;line-height:1.6;color:var(--ink);background:#fff}
-h1{color:var(--brand);font-size:2rem;margin-bottom:.3rem}.lead{color:var(--muted);margin-top:0}
-article{background:var(--card);border-radius:.5rem;padding:.6rem 1.2rem 1rem;margin:1.2rem 0}
-article h2{font-size:1.2rem;margin:.6rem 0 .2rem}article h2 a{color:var(--ink)}.meta{color:var(--muted);font-size:.9rem;margin:0 0 .6rem}.meta a{color:var(--brand)}
-footer{color:var(--muted);font-size:.9rem;margin-top:2.5rem;border-top:1px solid var(--line);padding-top:1rem}footer a{color:var(--brand)}
-${menuStyle}
-</style></head><body>
-${menu('list')}
-<h1>L'Observatoire</h1>
-<p class="lead">Chaque semaine, l'analyse publique d'une consultation citoyenne en données ouvertes, réalisée avec OpenScribe. Le moteur d'IA propose, le code vérifie : chaque chiffre se recompte, chaque citation renvoie à la réponse d'origine.</p>
-${studies
-  .map(
-    (s) => `<article>
-<h2><a href="/#/observatoire/${e(s.slug)}">${e(s.title)}</a></h2>
-<p class="meta">Publiée le ${e(date(s.publishedAt))} · ${e(s.news)} · <a href="${e(s.slug)}/">Lire en une page</a></p>
-${paras(s.summary)}
-</article>`,
-  )
-  .join('\n')}
-<footer>OpenScribe, un nouvel outil open source de recherche utilisateur. <a href="/">Analyser vos propres réponses</a>.</footer>
-</body></html>
-`,
+  landing({
+    path: '/observatoire/',
+    app: '/#/observatoire',
+    title: "L'Observatoire OpenScribe",
+    description: "L'analyse publique de consultations citoyennes en données ouvertes : chaque chiffre se recompte, chaque citation renvoie à la réponse d'origine.",
+    body: `<h1>L'Observatoire</h1>
+<ul>${studies.map((x) => `<li><a href="/#/observatoire/${e(x.slug)}">${e(x.title)}</a> · publiée le ${e(date(x.publishedAt))}</li>`).join('')}</ul>`,
+  }),
 )
-console.log(`Publié : ${join(root, fiche.slug, 'index.html')} (${studies.length} étude${studies.length > 1 ? 's' : ''} dans l'Observatoire)`)
+console.log(`Publié : ${join(root, fiche.slug, 'etude.json')} (${studies.length} étude${studies.length > 1 ? 's' : ''} dans l'Observatoire)`)

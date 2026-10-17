@@ -1,5 +1,5 @@
 /**
- * L'interactivité de la page HTML du rapport (la version article : export et Observatoire), sans cadre ni
+ * L'interactivité de la page HTML exportée du rapport, sans cadre ni
  * bibliothèque. Un clic sur un renvoi (« P12 ») déplie ses verbatims sous le paragraphe ; un clic sur un verbatim
  * déplie la réponse entière, la question et le passage cité en gras ; un « ? » ou une marque (« fragile »)
  * déplie son explication. Sans script (impression, lecteur hors ligne), la page reste complète.
