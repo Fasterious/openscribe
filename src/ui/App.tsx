@@ -22,8 +22,8 @@ export function App() {
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
           {/* Des icônes ; la page où l'on est dit son nom (demande d'Arnaud, 17/10). Les modules à venir restent visibles, grisés. */}
           <nav aria-label="Modules" className="flex min-w-0 items-center gap-0.5 sm:gap-1">
-            <a href={href({ name: 'home' })} className="mr-1 hidden shrink-0 items-center gap-2 font-semibold sm:flex" aria-label="OpenScribe, accueil">
-              <img src="/logo.svg" alt="" className="h-7 w-7" />
+            <a href={href({ name: 'home' })} className="mr-0.5 flex shrink-0 items-center gap-2 font-semibold sm:mr-1" aria-label="OpenScribe, accueil">
+              <img src="/logo.svg" alt="" className="h-6 w-6 sm:h-7 sm:w-7" />
               <span className="hidden lg:inline">OpenScribe</span>
             </a>
             <NavItem href={href({ name: 'home' })} active={route.name === 'home'} icon={<House />} label="Accueil" />
@@ -94,7 +94,7 @@ export function App() {
 function SoonItem({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <Explain content={`${label} : ce module n'est pas encore disponible.`}>
-      <span aria-label={`${label}, bientôt`} className="flex h-9 cursor-not-allowed items-center rounded-md px-2 text-muted-foreground/50 sm:px-2.5 [&_svg]:size-4">
+      <span aria-label={`${label}, bientôt`} className="flex h-9 cursor-not-allowed items-center rounded-md px-1.5 text-muted-foreground/50 min-[400px]:px-2 sm:px-2.5 [&_svg]:size-4">
         {icon}
       </span>
     </Explain>
@@ -110,7 +110,7 @@ function NavItem({ href, active, icon, label }: { href: string; active: boolean;
         aria-current={active ? 'page' : undefined}
         aria-label={label}
         className={cn(
-          'flex h-9 shrink-0 items-center gap-1.5 rounded-md px-2 text-sm font-medium transition-colors hover:bg-accent sm:px-2.5 [&_svg]:size-4',
+          'flex h-9 shrink-0 items-center gap-1.5 rounded-md px-1.5 text-sm font-medium transition-colors hover:bg-accent min-[400px]:px-2 sm:px-2.5 [&_svg]:size-4',
           active && 'bg-accent text-accent-foreground',
         )}
       >

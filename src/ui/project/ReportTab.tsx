@@ -202,15 +202,15 @@ function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: 
   // Le camp entier, quand la phrase en annonce le nombre ; sinon les idées citées.
   const whole = cited.map((ids, i) => (ids && camps ? wholeCamp(parts.slice(0, i).join(''), ids, camps, ctx.ideaById) : undefined))
   const refs = cited.map((ids, i) => whole[i]?.ids ?? ids)
-  return (
-    <div>
-      <p className="leading-relaxed">
-        {parts.map((part, i) => {
-          const ids = refs[i]
-          if (!ids) return <Fragment key={i}>{ctx.mask(part)}</Fragment>
-          if (!ids.length) return null
-          const isOpen = open === i
-          return (
+  // Les verbatims s'intercalent à l'endroit de la pastille ouverte : le texte qui la suit reprend dessous (Arnaud, 17/10).
+  const piece = (from: number, to: number) =>
+    parts.slice(from, to).map((part, k) => {
+      const i = from + k
+      const ids = refs[i]
+      if (!ids) return <Fragment key={i}>{ctx.mask(part)}</Fragment>
+      if (!ids.length) return null
+      const isOpen = open === i
+      return (
             <Tooltip key={i} wide side="top" content={<QuotesPreview ids={ids} ctx={ctx} />}>
               <button
                 type="button"
@@ -225,10 +225,15 @@ function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: 
                 {whole[i]?.people ?? ids.length}
               </button>
             </Tooltip>
-          )
-        })}
-      </p>
-      {open !== null && refs[open] && <QuotesPanel ids={refs[open]!} ctx={ctx} onClose={() => setOpen(null)} />}
+      )
+    })
+  if (open === null || !refs[open]) return <p className="leading-relaxed">{piece(0, parts.length)}</p>
+  const rest = parts.slice(open + 1).join('').trim()
+  return (
+    <div>
+      <p className="leading-relaxed">{piece(0, open + 1)}</p>
+      <QuotesPanel ids={refs[open]!} ctx={ctx} onClose={() => setOpen(null)} />
+      {rest && <p className="mt-2 leading-relaxed">{piece(open + 1, parts.length)}</p>}
     </div>
   )
 }
@@ -530,7 +535,7 @@ function PersonLine({
         {other && ' *'}
       </span>
       <div className="min-w-0 flex-1">
-        {line.ideas.map((i, k) => {
+        {line.ideas.map((i) => {
           const where = ctx.origin(i.contributionId)
           // Une réponse courte qui est toute la réponse (« Les tarifs ») ne dit son sens qu'avec sa question.
           const question = full.has(i.id) ? ctx.context(i) : undefined
@@ -542,8 +547,9 @@ function PersonLine({
             .filter(Boolean)
             .join(' · ')
           return (
+            // Un verbatim par ligne : plus de point-virgule orphelin entre deux citations d'une même personne.
             <Fragment key={i.id}>
-              <span>
+              <span className={line.ideas.length > 1 ? 'block' : undefined}>
                 <Tooltip wide side="top" content={<SourceContext idea={i} ctx={ctx} excerpt={180} />}>
                   <button
                     type="button"
@@ -555,7 +561,6 @@ function PersonLine({
                   </button>
                 </Tooltip>
                 {origin && <span className="text-sm text-muted-foreground"> {origin}</span>}
-                {k < line.ideas.length - 1 && ' ;'}
               </span>{' '}
             </Fragment>
           )
