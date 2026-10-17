@@ -1,191 +1,60 @@
 # OpenScribe
 
-Open source transcription for researchers. Professional-quality transcription with speaker diarization, powered by Voxtral (Mistral AI).
+**Des verbatims au rapport, preuves à l'appui.**
 
-## Features
+OpenScribe est une boîte à outils libre et gratuite pour la recherche utilisateur et l'analyse qualitative. Elle s'adresse aux chercheurs UX, aux designers, aux journalistes, aux associations et aux collectifs citoyens.
 
-- **Speaker Detection**: Automatic speaker diarization to identify who said what
-- **99+ Languages**: Automatic language detection and transcription
-- **Fast & Accurate**: Powered by Voxtral, Mistral AI's audio transcription model
-- **Simple Interface**: Clean, minimal UI focused on the task at hand
-- **Multiple Export Formats**: TXT, TXT with speakers, JSON
-- **Transcription Metrics**: Audio duration, processing time, and cost displayed after transcription
-- **Internationalization**: Full support for French, English, Spanish, Portuguese, and German UI
-- **Authentication**: Google OAuth via Supabase (MVP)
-- **Feedback System**: Built-in feedback button for user suggestions
+Vous importez les réponses ouvertes de vos participants (questionnaire, transcriptions d'entretiens, notes). OpenScribe en tire les motifs récurrents puis les thèmes, compte qui dit quoi, et relie chaque chiffre du rapport au verbatim exact.
 
-## Quick Start
+## Ce qui le rend différent
 
-### Prerequisites
+- **L'IA lit et rédige, OpenScribe vérifie.** Chaque verbatim cité est retrouvé mot pour mot dans les réponses, sinon il est écarté et vous voyez lequel. Chaque idée est rangée une seule fois. Tous les chiffres sont calculés par le programme, jamais par l'IA. Un nombre cité dans une synthèse qui ne correspond à rien est signalé « À vérifier ».
+- **Des participants, pas seulement des occurrences.** Huit critiques du même participant comptent pour un participant. Les avis partagés et les minorités constantes sont mis en évidence, pas noyés dans une moyenne.
+- **Reproductible.** La même analyse, relancée sur les mêmes données avec les mêmes réglages, donne le même rapport, mot pour mot.
+- **Vos données restent chez vous.** Pas de serveur ni de compte : tout reste dans votre navigateur. Seuls des pseudonymes (P1, P2…) et le texte des réponses partent vers le moteur d'IA que vous choisissez.
+- **Votre moteur, votre clé.** Mistral, Groq, Gemini, OpenRouter, ou Ollama sur votre propre ordinateur. Plusieurs fournisseurs ont une offre gratuite. Vous ne payez que ce que vous consommez chez eux.
+- **Des rapports qui se lisent bien.** Une étape de relecture rend les synthèses fluides et naturelles. Le programme refuse toute réécriture qui toucherait à un verbatim ou à un chiffre.
 
-- Node.js 18+
-- A Mistral AI account with an API key
+## Essayer
 
-### Installation
+Ouvrez l'application, puis cliquez sur **Voir un exemple de rapport** : un rapport complet sur un questionnaire fictif s'affiche, sans clé ni inscription.
+
+Pour analyser vos propres données, choisissez un moteur dans **Moteurs d'IA** : un guide pas à pas vous mène jusqu'à la clé gratuite (Groq, Mistral) ou à l'installation d'Ollama.
+
+## Installer en local
+
+Il faut Node.js 20 ou plus récent.
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/openscribe.git
+git clone https://github.com/Fasterious/openscribe.git
 cd openscribe
-
-# Install dependencies
+git checkout next
 npm install
-
-# Copy environment variables
-cp .env.example .env.local
-```
-
-### Configuration
-
-Edit `.env.local` and add your Mistral API key:
-
-```env
-MISTRAL_API_KEY=your_mistral_api_key
-```
-
-**Métriques de transcription** : Pour enregistrer les temps d'upload et de transcription dans Supabase (analytics), ajoute `SUPABASE_SERVICE_ROLE_KEY` et exécute la migration. Voir [docs/METRICS_SETUP.md](./docs/METRICS_SETUP.md).
-
-### Development
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to use the app.
+Puis ouvrez l'adresse affichée (en général http://localhost:5173).
 
-### Production
+| Commande | Rôle |
+|---|---|
+| `npm run dev` | Application en développement |
+| `npm run build` | Version statique dans `dist/`, à déposer sur n'importe quel hébergement de fichiers |
+| `npm test` | Tests des règles d'analyse |
+| `npm run e2e` | Tests de parcours dans un navigateur (ordinateur et mobile) |
 
-```bash
-npm run build
-npm start
-```
+## Modules
 
-## Tech Stack
+| Module | État |
+|---|---|
+| **Synthèse** : questionnaires et transcriptions → idées, motifs, thèmes, rapport vérifiable | Disponible |
+| **Entretiens et tests** : transcription d'entretiens, vidéo synchronisée avec le texte, étiquetage | Bientôt |
+| **Personas** : profils construits à partir des données | Bientôt |
+| **Atelier en direct**, **tests à distance** | Plus tard |
 
-- **Framework**: Next.js 16+ (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
-- **UI Components**: shadcn/ui + Radix UI
-- **Icons**: Lucide React
-- **Transcription**: Voxtral via Mistral AI API
-- **File Storage**: Mistral Cloud (temporary storage via signed URLs)
-- **Authentication**: Supabase Auth (Google OAuth, Magic Link)
-- **Deployment**: Vercel (optimized for Next.js)
+## Méthode
 
-## Architecture
+OpenScribe s'appuie sur des pratiques reconnues de l'analyse qualitative : unités de sens (idées atomiques), codage ouvert ou par grille, cartographie par affinités, synthèses étayées par les verbatims, et traçabilité de chaque affirmation jusqu'à sa source.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Frontend (Next.js)                           │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │  Upload Zone │  │   Progress   │  │  Transcript  │          │
-│  │ (drag & drop)│  │   Tracker    │  │    Viewer    │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │  Auth Modal  │  │   Language   │  │   Feedback   │          │
-│  │ (OAuth/Magic)│  │   Selector   │  │    Button    │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    API Routes (Next.js)                         │
-│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐    │
-│  │ /api/upload    │  │ /api/transcribe│  │ /api/feedback  │    │
-│  │ (Mistral Cloud)│  │ (Voxtral API)  │  │ (User feedback)│    │
-│  └────────────────┘  └────────────────┘  └────────────────┘    │
-└─────────────────────────────────────────────────────────────────┘
-         │                    │                    │
-         ▼                    ▼                    ▼
-┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────┐
-│     Mistral AI      │  │      Supabase       │  │   Email     │
-│ • Cloud Storage     │  │ • Auth (OAuth)      │  │ (Feedback)  │
-│ • Voxtral           │  │ • Database (future) │  │             │
-└─────────────────────┘  └─────────────────────┘  └─────────────┘
-```
+## Licence
 
-## Project Structure
-
-```
-openscribe/
-├── app/
-│   ├── api/
-│   │   ├── feedback/         # User feedback endpoint
-│   │   ├── transcribe/       # Voxtral transcription
-│   │   │   └── [id]/         # Get transcription by ID
-│   │   └── upload/           # Upload to Mistral Cloud
-│   ├── auth/
-│   │   └── callback/         # Supabase OAuth callback
-│   ├── layout.tsx            # Root layout with i18n provider
-│   ├── page.tsx              # Main page
-│   └── globals.css           # Global styles (Tailwind v4)
-├── components/
-│   ├── auth/                 # Authentication components
-│   │   └── auth-modal.tsx    # Login/signup modal
-│   ├── feedback/             # Feedback components
-│   │   └── feedback-button.tsx
-│   ├── transcription/        # Transcription-specific components
-│   │   ├── progress-tracker.tsx
-│   │   ├── transcript-viewer.tsx
-│   │   └── upload-zone.tsx
-│   └── ui/                   # shadcn/ui components
-│       ├── badge.tsx
-│       ├── button.tsx
-│       ├── card.tsx
-│       ├── language-selector.tsx
-│       └── progress.tsx
-├── lib/
-│   ├── i18n/                 # Internationalization
-│   │   ├── context.tsx       # i18n React context
-│   │   └── translations.ts   # FR/EN/ES/PT/DE translations
-│   ├── supabase/             # Supabase clients
-│   │   ├── client.ts         # Browser client
-│   │   ├── middleware.ts     # Auth middleware utils
-│   │   └── server.ts         # Server client
-│   ├── mistral.ts            # Mistral API client
-│   ├── transcription-cache.ts # Cache for unauthenticated users
-│   └── utils.ts              # Utility functions
-├── scripts/                  # Test scripts
-│   ├── test-mistral-cloud.ts
-│   ├── test-voxtral-local.ts
-│   └── test-voxtral.ts
-├── types/
-│   └── index.ts              # TypeScript types
-├── middleware.ts             # Next.js middleware (auth)
-└── BLUEPRINT.md              # Full PRD and technical specs
-```
-
-## Pricing
-
-Voxtral transcription costs **$0.003/min** of audio. This is displayed in the UI after each transcription along with the audio duration and processing time.
-
-## Roadmap
-
-See [BLUEPRINT.md](./BLUEPRINT.md) for the complete roadmap and technical specifications.
-
-### Phase 1: MVP Core (Current)
-
-- [x] Audio upload (drag & drop)
-- [x] Transcription via Voxtral (Mistral AI)
-- [x] Speaker diarization display
-- [x] Export to TXT/JSON
-- [x] Transcription metrics display
-- [x] Internationalization (FR/EN/ES/PT/DE)
-- [x] Authentication (Supabase - Google OAuth)
-- [x] Transcription preview for unauthenticated users
-- [x] Feedback system
-- [ ] Landing page (hero, features, pricing)
-- [ ] Credit system
-- [ ] Stripe payments
-
-## Auth Email/Password (archived)
-
-Email/password auth with reset is available in branch `feature/email-password-auth` but has known issues (reset link doesn't work). See `docs/AUTH_EMAIL_PASSWORD.md` in that branch for details.
-
-## License
-
-Source-available license. See LICENSE for details.
-
----
-
-Built with transparency and simplicity in mind.
+[AGPL-3.0-or-later](LICENSE). Vous pouvez utiliser, modifier et redistribuer OpenScribe librement. Si vous proposez une version modifiée en service en ligne, vous devez en publier le code.
