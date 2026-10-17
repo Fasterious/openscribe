@@ -1,5 +1,5 @@
 import { CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, Users } from 'lucide-react'
-import { Fragment, useEffect, useMemo, useState, type ReactElement } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactElement } from 'react'
 import { createPortal } from 'react-dom'
 import { computeMetrics, METRICS_VERSION, withCurrentMetrics } from '@/core/analysis/metrics'
 import { maskNames } from '@/core/analysis/names'
@@ -318,20 +318,65 @@ function QuotesPreview({ ids, ctx }: { ids: string[]; ctx: Ctx }) {
 }
 
 /**
+ * Replier ramène le lecteur là où il était quand il a déplié : on note où le volet commençait à l'écran, et s'il a
+ * défilé plus bas pour lire, on remonte d'autant avant de refermer (sinon le texte remonte sous lui, vers un endroit jamais lu).
+ */
+function useFoldBack() {
+  const ref = useRef<HTMLDivElement>(null)
+  const top = useRef(0)
+  useLayoutEffect(() => {
+    top.current = ref.current?.getBoundingClientRect().top ?? 0
+  }, [])
+  const back = () => {
+    const now = ref.current?.getBoundingClientRect().top
+    if (now !== undefined && now < top.current) window.scrollBy({ top: now - top.current, behavior: 'instant' })
+  }
+  return [ref, back] as const
+}
+
+/**
  * Les verbatims qu'une pastille déroule, sous le texte : une ligne par participant, par catégorie, sans cadre ;
  * chaque verbatim se déplie à son tour dans sa réponse entière (même forme partout : synthèses, résumé, listes).
  */
 function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: () => void }) {
   const ideas = ids.map((id) => ctx.ideaById.get(id)).filter((i): i is Idea => !!i)
   const cats = [...new Set(ideas.map((i) => i.category))]
+  const [ref, back] = useFoldBack()
   return (
-    <div className="mt-2 space-y-1.5">
+    <div ref={ref} className="mt-2 space-y-1.5">
       {cats.map((cat) =>
         personLines(ideas.filter((i) => i.category === cat)).map((l) => (
           <PersonLine key={`${cat}-${l.participantId}`} line={l} cat={cat} other={false} full={new Set()} ctx={ctx} />
         )),
       )}
-      <button type="button" onClick={onClose} className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
+      <button
+        type="button"
+        onClick={() => {
+          back()
+          onClose()
+        }}
+        className="cursor-pointer text-sm text-muted-foreground hover:text-foreground"
+      >
+        Replier
+      </button>
+    </div>
+  )
+}
+
+/** La réponse entière autour d'un verbatim, dépliée sous la ligne de la personne. */
+function ContextPanel({ idea, ctx, onClose }: { idea: Idea; ctx: Ctx; onClose: () => void }) {
+  const [ref, back] = useFoldBack()
+  return (
+    <div ref={ref} className="mt-2 space-y-1">
+      <SourceContext idea={idea} ctx={ctx} card />
+      <button
+        type="button"
+        onClick={() => {
+          back()
+          onClose()
+        }}
+        className="mt-1 cursor-pointer text-sm text-muted-foreground hover:text-foreground"
+      >
         Replier
       </button>
     </div>
@@ -565,14 +610,7 @@ function PersonLine({
             </Fragment>
           )
         })}
-        {open && (
-          <div className="mt-2 space-y-1">
-            <SourceContext idea={line.ideas.find((i) => i.id === open)!} ctx={ctx} card />
-            <button type="button" onClick={() => setOpen(null)} className="mt-1 cursor-pointer text-sm text-muted-foreground hover:text-foreground">
-              Replier
-            </button>
-          </div>
-        )}
+        {open && <ContextPanel idea={line.ideas.find((i) => i.id === open)!} ctx={ctx} onClose={() => setOpen(null)} />}
       </div>
     </li>
   )

@@ -50,14 +50,33 @@ const FAMILIES: { id: PresetFamily; title: string; icon: React.ReactNode }[] = [
   { id: 'other', title: 'Autres fournisseurs', icon: <Sparkles /> },
 ]
 
+/**
+ * Depuis le site en ligne, interroger Ollama fait demander au navigateur l'accès aux applications de cet appareil :
+ * on ne le cherche donc que sur demande, sauf si la page tourne déjà sur l'ordinateur ou si l'accès est déjà accordé.
+ */
+async function mayProbeLocally(): Promise<boolean> {
+  if (!originNeedingOllamaPermission()) return true
+  for (const name of ['loopback-network', 'local-network-access']) {
+    try {
+      if ((await navigator.permissions.query({ name } as unknown as PermissionDescriptor)).state === 'granted') return true
+    } catch {
+      // Nom de permission inconnu de ce navigateur.
+    }
+  }
+  return false
+}
+
 function useOllama() {
-  const [status, setStatus] = useState<OllamaStatus | null>(null)
+  // undefined : pas encore cherché ; null : recherche en cours.
+  const [status, setStatus] = useState<OllamaStatus | null | undefined>(undefined)
   const refresh = useCallback(async () => {
     setStatus(null)
     setStatus(await detectOllama(presetById('ollama')!.baseUrl))
   }, [])
   useEffect(() => {
-    refresh()
+    mayProbeLocally().then((ok) => {
+      if (ok) refresh()
+    })
   }, [refresh])
   return { status, refresh }
 }
@@ -324,7 +343,14 @@ function ProviderCard({
   )
 }
 
-function OllamaLine({ status }: { status: OllamaStatus | null }) {
+function OllamaLine({ status }: { status: OllamaStatus | null | undefined }) {
+  if (status === undefined)
+    return (
+      <p className="mt-2 text-xs text-muted-foreground">
+        Pour trouver Ollama, votre navigateur vous demandera d'autoriser OpenScribe à accéder aux applications de cet appareil : c'est ainsi que la
+        page parle à Ollama, sans que rien ne quitte votre ordinateur.
+      </p>
+    )
   if (!status)
     return (
       <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -376,7 +402,7 @@ function SetupDialog({
   onClose,
 }: {
   engine: EngineConfig
-  ollama: { status: OllamaStatus | null; refresh: () => Promise<void> }
+  ollama: { status: OllamaStatus | null | undefined; refresh: () => Promise<void> }
   back: string | null
   onClose: () => void
 }) {
@@ -443,7 +469,7 @@ function SetupDialog({
             <div className="flex items-center justify-between gap-2 rounded-lg border p-3">
               <OllamaLine status={ollama.status} />
               <Button type="button" size="sm" variant="ghost" onClick={ollama.refresh}>
-                <RefreshCw /> Vérifier
+                <RefreshCw /> {ollama.status === undefined ? 'Chercher Ollama' : 'Vérifier'}
               </Button>
             </div>
           )}
@@ -548,7 +574,7 @@ function SetupDialog({
           {state.phase === 'error' && (
             <Alert tone="error" className="space-y-2">
               <p>{state.message}</p>
-              {isOllama && !ollama.status?.running && <p>Suivez les étapes 1 et 2 ci-dessus, puis cliquez sur « Vérifier ».</p>}
+              {isOllama && !ollama.status?.running && <p>Suivez les étapes 1 et 2 ci-dessus, puis cliquez sur « {ollama.status === undefined ? 'Chercher Ollama' : 'Vérifier'} ».</p>}
             </Alert>
           )}
 

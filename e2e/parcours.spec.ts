@@ -153,6 +153,23 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   expect(await page.locator('article details:not([open])').count()).toBe(0)
 })
 
+test('replier des verbatims ramène le lecteur là où il les avait dépliés', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Voir un exemple de rapport' }).click()
+  const pill = page.getByRole('button', { name: /Voir \d+ verbatims?/ }).first()
+  await pill.scrollIntoViewIfNeeded()
+  const before = (await pill.boundingBox())!.y
+  await pill.click()
+  const opened = page.getByRole('button', { name: /Masquer \d+ verbatims?/ }).first()
+  // Le lecteur parcourt les verbatims plus bas, puis replie.
+  await page.mouse.wheel(0, 400)
+  await page.waitForTimeout(200)
+  await page.getByRole('button', { name: 'Replier', exact: true }).first().click()
+  await expect(opened).toHaveCount(0)
+  const after = (await pill.boundingBox())!.y
+  expect(Math.abs(after - before)).toBeLessThan(4)
+})
+
 test('sources multiples : un questionnaire et deux entretiens déposés ensemble, renommés, analysés', async ({ page }) => {
   await newStudy(page, 'Étude mixte')
   const interview = (who: string, said: string) => ({
