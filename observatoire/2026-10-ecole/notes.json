@@ -140,8 +140,32 @@
   "modele": "claude-opus-5-5 (joué par sous-agents)",
   "note_methode": "3 / 3 (moyennes 3,33 et 3,33, plafond dans les deux lectures)",
   "note_langue": 3.5,
-  "publie": true,
+  "publie": false,
   "raison": "Les quatre défauts des passes 8 à 11 sont levés (éloges du public dans École publique face au privé, éloignement dans Proximité, privé non unanime, carte scolaire). 88 copies du balayage relues : 75 à 77 justes. Plafond nouveau, créé par le balayage : Gratuité de l'école reçoit 5 copies sur le coût du supérieur et passe d'unanime à « divise » (séparation de la passe 9 défaite) ; Accès aux services administratifs et Écoles rurales deviennent « divise » par des copies à sens unique. Cause : la consigne fait chercher d'abord le camp le moins nombreux. Premier essai du balayage écarté avant les synthèses (Proximité non balayée, 78 copies presque toutes du camp majoritaire). Notations : notation-methodologue-1/2.md, notation-plume.md. Publiée le 17/10 sur décision d'Arnaud (note relative, pas de seuil), avec la Méthode, ses limites et 10 mentions « à vérifier » calculées par le code ; rapport régénéré depuis le cache avec les dernières corrections de langue.",
-  "note_sur_10": "à re-noter sur 10 (notes de la passe sur 5 : moyennes 3,33 et 3,33, langue 3,5 ; 3 étiquettes du résumé jugées fausses)"
+  "note_sur_10": "à re-noter sur 10 (notes de la passe sur 5 : moyennes 3,33 et 3,33, langue 3,5 ; 3 étiquettes du résumé jugées fausses)",
+  "remplace_par": "run-opus-13"
+ },
+ {
+  "date": "2026-10-17",
+  "run": "run-opus-13",
+  "commit": "d09a4cb",
+  "methode": "consultation (passe 13, finale : code de la passe 12, rejouée depuis le cache, rapport régénéré avec les mentions du code)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_sur_10": {
+   "methode": [
+    7,
+    7
+   ],
+   "moyennes": [
+    7.17,
+    7.0
+   ],
+   "langue": 6.5
+  },
+  "erreurs_du_resume": 2,
+  "structure": "saine",
+  "relecture_humaine": "1 h 30 à 3 h",
+  "publie": true,
+  "raison": "Deux lectures indépendantes notées directement sur 10. Erreurs : Réforme du système éducatif (refus et demande de réforme dans le même camp), École publique face au privé (critiques du public et du privé mêlées) ; toutes deux marquées « à vérifier ». Affichage retouché sans rejeu : « fragile » plus posé sur un unanime, présent dans toutes les listes ; « à vérifier » rappelé sous le résumé. Fiche corrigée sur les deux phrases."
  }
 ]

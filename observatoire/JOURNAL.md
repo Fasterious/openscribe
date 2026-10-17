@@ -1,5 +1,13 @@
 # Journal de l'Observatoire
 
+## 2026-10-17 — École, passe 13 (finale), notée sur 10, publiée
+
+- Code d'analyse de la passe 12 (commit d09a4cb), rejouée depuis le cache : mêmes idées, motifs et thèmes.
+- Méthode 7/10 et 7/10 (2 erreurs du résumé : réforme, école publique face au privé ; structure saine),
+  langue 6,5/10. Notations dans `2026-10-ecole/run-opus-13/` ; le rapport noté est `rapport-note.md`, le
+  rapport publié (mêmes données, marques du code retouchées) est `rapport.md`.
+- Fiche corrigée sur les deux phrases fausses ; publiée depuis la passe 13 (remplace la passe 12).
+
 ## À REGARDER
 
 - 2026-10-17 · École **publiée** (passe 12) dans public/observatoire/, sur décision d'Arnaud : note relative, pas de seuil (notes de la passe sur 5, à re-noter sur 10), limites et mentions « à vérifier » dans le rapport. Fiche mise à jour (résumé tiré du rapport de la passe 12, avertissement « Méthode et limites »).
