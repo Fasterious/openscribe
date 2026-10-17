@@ -79,4 +79,26 @@ describe('confidentialité', () => {
     }
     expect(leaks).toEqual([])
   })
+
+  /**
+   * Un exemple de consigne qui reprend un motif du corpus de certification (« la carte scolaire, par 24 sur 29 ») souffle
+   * la réponse au moteur : le test perd son indépendance. Les titres de motifs des analyses privées (deux mots pleins au
+   * moins) ne figurent donc jamais dans les consignes.
+   */
+  const titles = [
+    ...new Set(
+      walk(PRIVATE)
+        .filter((f) => f.endsWith('.openscribe.json'))
+        .flatMap((f): string[] => {
+          const d = JSON.parse(readFileSync(f, 'utf8'))
+          return ((d.project ?? d).analyses ?? []).flatMap((a: { groups?: { title: string }[] }) => (a.groups ?? []).map((g) => words(g.title).join(' ')))
+        })
+        .filter((t: string) => t.split(' ').filter((w) => w.length >= 5).length >= 2),
+    ),
+  ]
+  it.skipIf(!titles.length)('aucun motif d’un corpus réel dans les exemples des consignes', () => {
+    const prompts = ['src/core/analysis/prompts.ts', 'src/core/analysis/methods.ts'].map((f) => ` ${words(readFileSync(f, 'utf8')).join(' ')} `)
+    const found = titles.filter((t) => prompts.some((p) => p.includes(` ${t} `)))
+    expect(found).toEqual([])
+  })
 })

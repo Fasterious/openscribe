@@ -29,6 +29,7 @@ import {
   frenchNumber,
   withDivided,
   missingCamps,
+  thinCamps,
   describeMetrics,
   describeTheme,
   dropSentences,
@@ -1570,6 +1571,18 @@ describe('vérification des renvois', () => {
     const byId = new Map([i('I0001', 'P1', 'positive'), i('I0002', 'P2', 'negative'), i('I0003', 'P3', 'negative')].map((x) => [x.id, x]))
     const g = { id: 'G1', title: 'x', ideaIds: ['I0001', 'I0002', 'I0003'], summary: 'Une personne apprécie [I0001].' } as unknown as Group
     expect(missingCamps(g, byId)).toEqual([{ side: 'negative', people: ['P2', 'P3'], ideaIds: ['I0002', 'I0003'] }])
+  })
+
+  it('repère un camp d’avis cité seulement en partie', () => {
+    const i = (n: number, c: IdeaCategory) => ({ id: `I000${n}`, participantId: `P${n}`, category: c }) as Idea
+    const ideas = [1, 2, 3, 4, 5].map((n) => i(n, 'positive'))
+    const byId = new Map(ideas.map((x) => [x.id, x]))
+    const g = (summary: string) => ({ id: 'G1', title: 'x', ideaIds: ideas.map((x) => x.id), summary }) as unknown as Group
+    // 2 personnes sur 5 citées : sous les 80 %, le camp est signalé avec les idées des 3 autres.
+    expect(thinCamps(g('2 personnes apprécient la piscine [I0001, I0002].'), byId, 0.8)).toEqual([
+      { side: 'positive', cited: 2, people: 5, ideaIds: ['I0003', 'I0004', 'I0005'] },
+    ])
+    expect(thinCamps(g('4 personnes apprécient la piscine [I0001, I0002, I0003, I0004].'), byId, 0.8)).toEqual([])
   })
 
   it('refuse un renvoi hors du texte, un nombre ajouté, et ne vide jamais le texte', () => {

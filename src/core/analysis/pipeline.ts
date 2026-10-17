@@ -1989,6 +1989,21 @@ export function missingCamps(g: Group, ideaById: Map<string, Idea>): { side: 'po
     .filter((c) => c.ideaIds.length && !c.ideaIds.some((id) => cited.has(id)))
 }
 
+/**
+ * Les camps d'avis qu'une synthèse ne cite qu'en partie : moins de `share` de leurs personnes (4 au moins) dans les renvois.
+ * Un camp absent est l'affaire de `missingCamps`. Les idées données sont celles des personnes du camp qui ne sont pas citées.
+ */
+export function thinCamps(g: Group, ideaById: Map<string, Idea>, share: number): { side: 'positive' | 'negative'; cited: number; people: number; ideaIds: string[] }[] {
+  const cited = new Set((g.summary.match(/I\d{4,}/g) ?? []).map((id) => ideaById.get(id)?.participantId))
+  return (['positive', 'negative'] as const).flatMap((side) => {
+    const ideas = g.ideaIds.map((id) => ideaById.get(id)).filter((i): i is Idea => i?.category === side)
+    const people = new Set(ideas.map((i) => i.participantId))
+    const n = [...people].filter((p) => cited.has(p)).length
+    if (people.size < 4 || n === 0 || n >= share * people.size) return []
+    return [{ side, cited: n, people: people.size, ideaIds: ideas.filter((i) => !cited.has(i.participantId)).map((i) => i.id) }]
+  })
+}
+
 /** Les phrases d'un texte qui contiennent l'un des termes signalés par les contrôles (numéros à partir de 1). */
 function flaggedSentences(text: string, bad?: string[]): number[] {
   if (!bad?.length) return []
@@ -2042,6 +2057,13 @@ async function checkSupport(state: AnalysisState, runner: LlmRunner, emit: () =>
         n: 0,
         problem: `le camp ${c.side === 'positive' ? 'positif' : 'négatif'} (${c.people.length} ${c.people.length > 1 ? 'personnes' : 'personne'} : ${c.ideaIds.join(', ')}) n'est pas cité : ajoute une phrase sur ce qu'il dit`,
       })
+    const share = methodOf(state.settings).campCoverage
+    if (share)
+      for (const c of thinCamps(g, ideaById, share))
+        flags.push({
+          n: 0,
+          problem: `le camp ${c.side === 'positive' ? 'positif' : 'négatif'} n'est cité que pour ${c.cited} de ses ${c.people} personnes : ajoute une phrase sur ce que disent les autres (${c.ideaIds.join(', ')}), avec leur nombre et leurs renvois`,
+        })
     targets.push({ id: `G:${g.id}`, get: () => g.summary, set: (t) => (g.summary = t), allowed: g.ideaIds, flags, addTo: 'last', ...(g.definition ? { definition: g.definition } : {}) })
   }
   for (const t of state.themes)
