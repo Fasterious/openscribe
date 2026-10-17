@@ -50,3 +50,7 @@ Colonnes : Région → attribute | Si vous avez été amené à scolariser votr 
 16:19:50 extract:done 378/378 group:running 893/893 summarize:pending themes:pending report:pending polish:pending
 16:19:50 extract:done 378/378 group:done 893/893 summarize:pending themes:pending report:pending polish:pending
 16:19:50 extract:done 378/378 group:done 893/893 summarize:running 0/73 themes:pending report:pending polish:pending
+16:22:31 extract:done 378/378 group:done 893/893 summarize:running 1/73 themes:pending report:pending polish:pending
+16:23:45 extract:done 378/378 group:done 893/893 summarize:running 2/73 themes:pending report:pending polish:pending
+16:23:45 extract:done 378/378 group:done 893/893 summarize:running 3/73 themes:pending report:pending polish:pending
+16:23:45 extract:done 378/378 group:done 893/893 summarize:running 6/73 themes:pending report:pending polish:pending

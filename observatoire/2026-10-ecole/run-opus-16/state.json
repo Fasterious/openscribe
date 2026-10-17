@@ -1,7 +1,7 @@
 {
  "id": "an_6q0y3j2b0z5d",
  "createdAt": "2026-10-17T16:19:46.358Z",
- "updatedAt": "2026-10-17T16:19:50.759Z",
+ "updatedAt": "2026-10-17T16:23:45.131Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -14397,7 +14397,8 @@
     "positive": "saluer la compétence, l'implication ou le dévouement des enseignants",
     "negative": "dénoncer l'incompétence, le désengagement ou le comportement d'enseignants",
     "neutral": "rappeler l'importance des enseignants sans juger ceux rencontrés"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Expérience globale de scolarisation",
@@ -14457,7 +14458,7 @@
     "I0926",
     "I0964"
    ],
-   "summary": "",
+   "summary": "46 des 48 personnes qui donnent un avis (large majorité) se disent satisfaites de la scolarité de leurs enfants [I0014, I0043, I0047, I0063, I0094, I0112, I0139, I0185, I0189, I0190, I0199, I0212, I0248, I0268, I0291, I0293, I0303, I0320, I0351, I0354, I0362, I0383, I0406, I0411, I0426, I0445, I0461, I0463, I0469, I0539, I0605, I0613, I0698, I0724, I0739, I0757, I0762, I0768, I0822, I0826, I0843, I0845, I0859, I0889, I0915, I0926, I0964]. L'école publique et la qualité de son enseignement sont saluées par 9 personnes, parfois de la maternelle aux études supérieures [I0190, I0320, I0426, I0463, I0605, I0613, I0757, I0843, I0859]. 5 personnes nuancent toutefois leur satisfaction, qu'elles lient à une petite commune, à une scolarité qui commence à peine ou à l'absence de situation particulière [I0189, I0199, I0351, I0889, I0915]. Une personne est mitigée : la scolarité de sa fille a été aisée, mais son fils a vécu « en enfer » à l'école élémentaire avant de s'épanouir au lycée [I0414, I0415, I0421, I0422] ; une autre dit partager « l'angoisse des parents » [I0866].",
    "metrics": {
     "mentions": 54,
     "participants": 50,
@@ -14592,7 +14593,8 @@
     "positive": "se dire satisfait de la scolarité des enfants dans son ensemble",
     "negative": "décrire une scolarité globalement difficile, décevante ou mal vécue",
     "neutral": "constater un fait ou énoncer un principe général sur l'école"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "École publique face au privé",
@@ -14757,7 +14759,8 @@
     "positive": "défendre l'école publique ou l'émulation entre public et privé",
     "negative": "juger le public défaillant, déplorer le cloisonnement ou l'inégalité public-privé",
     "neutral": "constater un passage au privé ou énoncer un principe général"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Démarches d'inscription",
@@ -14812,7 +14815,7 @@
     "I0985",
     "I0986"
    ],
-   "summary": "",
+   "summary": "Les démarches d'inscription sont jugées lourdes, répétitives ou opaques par 24 des 34 personnes qui donnent un avis (majorité) [I0136, I0141, I0164, I0178, I0179, I0239, I0260, I0261, I0324, I0393, I0394, I0444, I0467, I0487, I0506, I0508, I0661, I0712, I0713, I0717, I0718, I0767, I0770, I0802, I0810, I0828, I0837, I0838, I0984, I0985, I0986]. 11 personnes regrettent de fournir chaque année les mêmes documents ou de donner les mêmes informations à la mairie, à l'école, à la cantine et au périscolaire [I0141, I0164, I0178, I0239, I0261, I0393, I0444, I0467, I0487, I0661, I0984]. Les critiques visent aussi les formulaires papier (3 personnes) [I0179, I0506, I0508, I0717], des sites d'inscription lents ou défaillants (3 personnes) [I0718, I0767, I0802], des horaires d'inscription incompatibles avec le travail (2 personnes) [I0136, I0324] et des changements d'établissement laborieux après un déménagement ou une demande de dérogation (3 personnes) [I0712, I0713, I0837, I0838, I0986]. À l'inverse, 10 personnes saluent des inscriptions simples, rapides ou fluides, parfois en ligne ou reconduites automatiquement [I0033, I0282, I0404, I0558, I0560, I0618, I0722, I0855, I0856, I0955, I0983] ; pour alléger ces démarches, 4 personnes proposent de conserver les données d'une année sur l'autre [I0142, I0295, I0468, I0662] et une personne suggère des journées d'inscription le week-end [I0137].",
    "metrics": {
     "mentions": 49,
     "participants": 35,
@@ -14917,7 +14920,8 @@
     "positive": "trouver les inscriptions simples, rapides ou faisables en ligne",
     "negative": "juger les inscriptions lourdes, répétitives, sur papier ou opaques",
     "neutral": "décrire une situation d'inscription sans la juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Carte scolaire",
@@ -14968,7 +14972,7 @@
     "I0947",
     "I0949"
    ],
-   "summary": "",
+   "summary": "La carte scolaire est critiquée par 24 des 29 personnes qui donnent un avis (large majorité) [I0053, I0054, I0061, I0091, I0122, I0201, I0257, I0306, I0331, I0429, I0448, I0451, I0492, I0588, I0644, I0650, I0660, I0686, I0797, I0800, I0896, I0919, I0936, I0947] : 15 regrettent qu'un découpage rigide leur impose une école, souvent plus loin que l'établissement voisin [I0053, I0054, I0061, I0091, I0122, I0257, I0306, I0331, I0448, I0588, I0686, I0797, I0800, I0896, I0919], et 5 décrivent des dérogations obligatoires, refusées, payantes ou longues à obtenir [I0060, I0589, I0644, I0650, I0798]. 3 personnes dénoncent des passe-droits ou des détournements de la carte [I0332, I0919, I0947], 3 la relient à la mixité sociale sans s'accorder sur son effet [I0429, I0452, I0492], et 3 évoquent le recours au privé [I0450, I0660, I0936]. À l'inverse, 4 personnes défendent la sectorisation ou en apprécient la souplesse, de la liberté de choix à une dérogation obtenue sans peine [I0092, I0342, I0352, I0949] ; une personne est mitigée : elle salue une option qui permet l'inscription dans un lycée mais dénonce des passe-droits [I0241, I0242]. 4 personnes font des propositions : 3 demandent de supprimer la carte scolaire pour laisser le libre choix de l'école [I0207, I0671, I0685], une autre de tenir compte du domicile des grands-parents [I0064].",
    "metrics": {
     "mentions": 45,
     "participants": 33,
@@ -15081,7 +15085,8 @@
     "positive": "défendre la sectorisation, ou en apprécier la souplesse et les dérogations",
     "negative": "rejeter la sectorisation, en subir les refus, trajets ou passe-droits",
     "neutral": "constater un effet de la sectorisation sans la juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Orientation des élèves",
@@ -15233,7 +15238,8 @@
     "positive": "apprécier l'accompagnement à l'orientation ou l'accès aux filières souhaitées",
     "negative": "juger l'orientation insuffisante, opaque ou imposée, ou les filières sans débouchés",
     "neutral": "décrire une démarche ou un constat sans juger l'orientation offerte"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Accès aux services administratifs",
@@ -15373,7 +15379,8 @@
     "positive": "trouver les services joignables, rapides et efficaces",
     "negative": "subir des délais, des erreurs ou des interlocuteurs injoignables",
     "neutral": "énoncer un principe général sur l'administration sans juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Réforme du système éducatif",
@@ -15514,7 +15521,8 @@
     "positive": "approuver les réformes engagées ou le fonctionnement du système",
     "negative": "rejeter les réformes ou juger le système défaillant et immobile",
     "neutral": "énoncer un principe général sur l'école sans juger le système"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Absences des enseignants",
@@ -15637,7 +15645,8 @@
     "positive": "saluer des absences rares ou des remplacements rapides",
     "negative": "déplorer des absences fréquentes, non remplacées ou mal remplacées",
     "neutral": "constater un fait ou poser une question sans juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Effectifs par classe",
@@ -15759,7 +15768,8 @@
     "positive": "apprécier des classes aux effectifs raisonnables",
     "negative": "déplorer des classes surchargées ou demander des effectifs réduits",
     "neutral": "énoncer un principe général sur la taille des classes"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Moyens des écoles",
@@ -15789,7 +15799,7 @@
     "I1038",
     "I1039"
    ],
-   "summary": "",
+   "summary": "19 des 20 personnes qui donnent un avis (large majorité) jugent insuffisants les moyens des écoles [I0022, I0068, I0071, I0221, I0341, I0376, I0485, I0515, I0532, I0623, I0720, I0761, I0781, I0789, I0793, I0939, I0948, I1037, I1038, I1039]. Le manque d'enseignants ou de personnel, jusqu'aux médecins et psychologues scolaires, est cité par 6 personnes [I0341, I0515, I0761, I0793, I1038, I1039]. Les critiques portent aussi sur le matériel (2 personnes) [I0221, I0781], la faiblesse ou la baisse des crédits communaux (2 personnes) [I0376, I0939] et le suivi des élèves en grande difficulté (2 personnes) [I0948, I1037] ; 4 personnes ajoutent que l'école ou ses enseignants tiennent malgré ces manques [I0071, I0485, I0623, I0720]. Une seule personne estime au contraire que « La France fait beaucoup pour l'éducation » [I0489], et 2 personnes proposent davantage d'enseignants [I0072, I0434].",
    "metrics": {
     "mentions": 24,
     "participants": 22,
@@ -15867,7 +15877,8 @@
     "positive": "juger suffisants les moyens humains ou matériels alloués aux écoles",
     "negative": "juger insuffisants les moyens, le personnel ou le matériel des écoles",
     "neutral": "énoncer un principe sur l'éducation sans juger ses moyens"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Scolarisation des enfants handicapés",
@@ -15909,7 +15920,7 @@
     "I0894",
     "I0895"
    ],
-   "summary": "",
+   "summary": "Les 18 personnes qui donnent un avis (unanime) déplorent les conditions de scolarisation des enfants handicapés [I0003, I0087, I0088, I0089, I0090, I0206, I0246, I0247, I0283, I0284, I0318, I0395, I0408, I0520, I0524, I0526, I0527, I0555, I0620, I0621, I0649, I0689, I0690, I0782, I0840, I0841, I0842, I0844, I0891, I0892, I0893, I0894, I0895]. 6 personnes dénoncent le manque d'accompagnants ou d'aide en classe, avec des auxiliaires de vie scolaire absents, mal formés ou précaires [I0089, I0090, I0206, I0520, I0526, I0689, I0690, I0782], et 4 personnes le manque de places ou de structures, parfois très éloignées [I0003, I0088, I0841, I0893]. Les démarches administratives sont jugées interminables ou éprouvantes par 3 personnes [I0246, I0247, I0318, I0395], et 3 personnes décrivent le combat ou l'angoisse des parents [I0408, I0524, I0620]. L'école inclusive divise : 2 personnes la rejettent [I0555, I0842], une personne la juge catastrophique sans moyens [I0527] et une autre regrette au contraire l'absence d'inclusion des enfants à besoins particuliers [I0283] ; 3 personnes font chacune une proposition : des structures adaptées, des inspecteurs ayant l'expérience du handicap, le retour des aides personnelles [I0032, I0409, I0519].",
    "metrics": {
     "mentions": 36,
     "participants": 20,
@@ -15982,7 +15993,8 @@
     "positive": "saluer un accueil et un accompagnement adaptés au handicap",
     "negative": "déplorer le manque de places, d'accompagnants ou de structures",
     "neutral": "énoncer un principe général sur l'inclusion sans juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Accès à l'enseignement supérieur",
@@ -16011,7 +16023,7 @@
     "I1035",
     "I1036"
    ],
-   "summary": "",
+   "summary": "L'accès à l'enseignement supérieur suscite les critiques de 17 des 20 personnes qui donnent un avis (large majorité) [I0105, I0166, I0174, I0175, I0194, I0219, I0281, I0292, I0294, I0405, I0594, I0864, I0898, I0931, I0932, I0957, I1034, I1035, I1036]. 7 personnes critiquent la procédure d'admission post-bac, d'APB à Parcoursup, pour sa complexité, le stress qu'elle crée et l'obligation de multiplier les candidatures [I0105, I0175, I0194, I0219, I0281, I0405, I0594], et 4 autres jugent le passage après le bac compliqué ou opaque [I0898, I0931, I0957, I1035]. Le manque de places et la sélection sur dossier sont dénoncés par 4 personnes [I0166, I0174, I0292, I0932], et 2 personnes regrettent que les grandes écoles restent concentrées à Paris ou plus accessibles aux lycéens parisiens [I0294, I1036] ; une personne dont l'enfant, faute de dossier scolaire, n'a été accepté dans aucun IUT demande d'assouplir ces règles [I0864, I0865]. À contre-courant, 3 personnes saluent une admission dans l'école choisie, un passage sans problème par APB ou de bonnes classes préparatoires [I0156, I0742, I0847].",
    "metrics": {
     "mentions": 23,
     "participants": 20,
@@ -16099,7 +16111,8 @@
     "positive": "juger simple ou réussi le passage vers l'enseignement supérieur",
     "negative": "critiquer la sélection, le manque de places ou les procédures d'admission",
     "neutral": "évoquer l'après-bac sans juger les conditions d'accès"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Services périscolaires",
@@ -16203,7 +16216,8 @@
     "positive": "apprécier la cantine, la garderie ou les activités périscolaires",
     "negative": "critiquer le coût, les horaires, les places ou l'organisation périscolaire",
     "neutral": "mentionner le périscolaire sans porter de jugement"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Proximité de l'école",
@@ -16300,7 +16314,8 @@
     "positive": "apprécier d'avoir une école près de chez soi",
     "negative": "subir l'éloignement de l'établissement et les trajets qu'il impose",
     "neutral": "constater l'importance de la proximité sans juger sa situation"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Méthodes pédagogiques",
@@ -16395,7 +16410,8 @@
     "positive": "apprécier les méthodes d'enseignement employées ou leurs effets",
     "negative": "critiquer des méthodes datées, instables ou inadaptées aux élèves",
     "neutral": "énoncer un principe éducatif sans juger les méthodes actuelles"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Programmes scolaires",
@@ -16490,7 +16506,8 @@
     "positive": "apprécier le contenu des programmes ou leur ouverture sur le monde",
     "negative": "critiquer le contenu, la pauvreté ou l'instabilité des programmes",
     "neutral": "énoncer un principe général sans juger les programmes actuels"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Égalité des chances",
@@ -16597,7 +16614,8 @@
     "positive": "reconnaître que l'école réduit les inégalités ou rassemble",
     "negative": "dénoncer des chances inégales selon le milieu ou le territoire",
     "neutral": "affirmer un principe d'égalité sans juger la situation"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Suivi des élèves en difficulté",
@@ -16696,7 +16714,8 @@
     "positive": "apprécier l'aide apportée aux élèves qui rencontrent des difficultés",
     "negative": "juger absent, superficiel ou insuffisant le suivi des élèves en difficulté",
     "neutral": "énoncer un principe d'accompagnement sans juger la situation"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Enseignement privé",
@@ -16796,7 +16815,8 @@
     "positive": "apprécier l'enseignement privé ou regretter ce qui le limite",
     "negative": "critiquer l'enseignement privé, son coût, son niveau ou ses pratiques",
     "neutral": "constater un passage au privé sans juger cet enseignement"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Niveau d'exigence scolaire",
@@ -16885,7 +16905,8 @@
     "positive": "saluer une école exigeante qui pousse les élèves à progresser",
     "negative": "dénoncer le manque d'exigence ou le nivellement par le bas",
     "neutral": "énoncer un principe sur l'exigence sans juger l'école actuelle"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Fermetures de classes",
@@ -16984,7 +17005,8 @@
     "positive": "se réjouir du maintien des classes ou des écoles",
     "negative": "dénoncer les fermetures de classes ou d'écoles et leurs effets",
     "neutral": "décrire l'évolution des effectifs sans juger les fermetures"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Contrôle des enseignants défaillants",
@@ -17069,7 +17091,8 @@
     "positive": "saluer un contrôle des enseignants efficace et suivi d'effets",
     "negative": "regretter l'absence de contrôle ou de sanction des enseignants défaillants",
     "neutral": "évoquer l'évaluation des enseignants sans juger la situation actuelle"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Garde des enfants",
@@ -17162,7 +17185,8 @@
     "positive": "apprécier les solutions de garde disponibles et leur accès",
     "negative": "manquer de solutions de garde, les trouver chères ou inadaptées",
     "neutral": "mentionner la garde des enfants sans porter de jugement"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Financement des études",
@@ -17241,7 +17265,8 @@
     "positive": "trouver le coût des études abordable ou les aides suffisantes",
     "negative": "juger les études trop chères ou les aides insuffisantes",
     "neutral": "décrire un coût ou un financement sans le juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Formation des enseignants",
@@ -17310,7 +17335,8 @@
     "positive": "juger les enseignants bien formés ou bien recrutés",
     "negative": "juger la formation ou le recrutement des enseignants insuffisant",
     "neutral": "citer la formation des enseignants sans la juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Encadrement administratif",
@@ -17382,7 +17408,8 @@
     "positive": "apprécier une direction ou une administration à l'écoute et efficace",
     "negative": "subir une administration rigide, opaque, distante ou impuissante",
     "neutral": "décrire l'organisation administrative sans la juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Relations avec les familles",
@@ -17450,7 +17477,8 @@
     "positive": "apprécier l'écoute et le dialogue de l'école avec les familles",
     "negative": "déplorer un dialogue fermé, absent ou hostile avec les familles",
     "neutral": "énoncer un principe général sur le rôle des familles"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Rythmes scolaires",
@@ -17519,7 +17547,8 @@
     "positive": "apprécier l'organisation des horaires, de la semaine et des vacances",
     "negative": "subir des horaires, semaines ou vacances inadaptés ou changeants",
     "neutral": "évoquer les rythmes scolaires sans juger la situation"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Gratuité de l'école",
@@ -17590,7 +17619,8 @@
     "positive": "apprécier que l'enseignement soit gratuit ou peu coûteux",
     "negative": "dénoncer des frais restant à la charge des familles",
     "neutral": "rappeler le principe de gratuité sans juger la situation"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Numérique à l'école",
@@ -17656,7 +17686,8 @@
     "positive": "apprécier les outils numériques et leur usage à l'école",
     "negative": "subir des outils numériques défaillants, peu pratiques ou mal utilisés",
     "neutral": "évoquer le numérique sans juger la situation"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Écoles rurales",
@@ -17723,7 +17754,8 @@
     "positive": "apprécier le cadre ou le maintien des écoles rurales",
     "negative": "critiquer les conditions ou la disparition des écoles rurales",
     "neutral": "évoquer l'école rurale sans la juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Évaluation des élèves",
@@ -17787,7 +17819,8 @@
     "positive": "apprécier la manière dont les élèves sont notés et évalués",
     "negative": "juger l'évaluation injuste, insuffisante, incohérente ou culpabilisante",
     "neutral": "décrire le fonctionnement de l'évaluation sans le juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Fonctionnement de l'université",
@@ -17853,7 +17886,8 @@
     "positive": "apprécier les moyens, l'accompagnement ou l'organisation de l'université",
     "negative": "déplorer des moyens, statuts ou règles universitaires défaillants",
     "neutral": "évoquer l'université sans juger son fonctionnement"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Composition des classes",
@@ -17917,7 +17951,8 @@
     "positive": "apprécier la répartition des élèves ou la mixité des classes",
     "negative": "subir des classes multiniveaux ou trop hétérogènes",
     "neutral": "décrire la composition des classes sans la juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Discipline dans les établissements",
@@ -17978,7 +18013,8 @@
     "positive": "saluer l'ordre et l'autorité dans les établissements",
     "negative": "dénoncer l'indiscipline, le laxisme ou la violence entre élèves",
     "neutral": "énoncer un principe général sur l'autorité sans juger la situation"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Harcèlement scolaire",
@@ -18042,7 +18078,8 @@
     "positive": "saluer la prise en charge du harcèlement par l'établissement",
     "negative": "subir le harcèlement ou dénoncer l'inaction des équipes",
     "neutral": "évoquer le harcèlement en général sans cas vécu ni jugement"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "État des locaux scolaires",
@@ -18102,7 +18139,8 @@
     "positive": "juger les locaux scolaires en bon état et adaptés",
     "negative": "dénoncer des locaux vétustes, délabrés ou mal équipés",
     "neutral": "décrire les locaux sans les juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Transports scolaires",
@@ -18162,7 +18200,8 @@
     "positive": "apprécier la desserte et l'organisation des transports scolaires",
     "negative": "juger les transports scolaires absents, insuffisants ou mal adaptés",
     "neutral": "décrire les trajets des élèves sans les juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Territoires en difficulté",
@@ -18224,7 +18263,8 @@
     "positive": "saluer l'offre scolaire et éducative de son territoire",
     "negative": "dénoncer les inégalités ou les manques subis par son territoire",
     "neutral": "constater des écarts entre territoires sans les juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Information sur l'école",
@@ -18285,7 +18325,8 @@
     "positive": "saluer l'information donnée aux familles sur l'école",
     "negative": "juger l'information absente, tardive, floue ou difficile à obtenir",
     "neutral": "demander une information précise sans juger celle reçue"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Élèves à profil atypique",
@@ -18343,7 +18384,8 @@
     "positive": "saluer l'accueil fait aux élèves qui sortent de la norme",
     "negative": "juger l'école rigide ou démunie face aux élèves différents",
     "neutral": "décrire le profil d'un enfant sans juger sa prise en charge"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Accompagnement médical et psychologique",
@@ -18399,7 +18441,8 @@
     "positive": "saluer le suivi médical, psychologique ou paramédical des élèves",
     "negative": "juger ce suivi insuffisant, lent ou trop lourd administrativement",
     "neutral": "décrire un besoin de santé sans juger sa prise en charge"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Offre d'options",
@@ -18456,7 +18499,8 @@
     "positive": "apprécier le choix d'options et de langues proposé",
     "negative": "juger l'offre d'options restreinte, inégale ou incertaine",
     "neutral": "décrire les options suivies sans juger l'offre"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Enseignement des langues étrangères",
@@ -18510,7 +18554,8 @@
     "positive": "apprécier l'enseignement des langues étrangères reçu",
     "negative": "juger cet enseignement tardif, inefficace ou mal assuré",
     "neutral": "décrire les langues apprises sans juger l'enseignement"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Niveau des élèves",
@@ -18566,7 +18611,8 @@
     "positive": "constater un bon niveau ou des progrès des élèves",
     "negative": "déplorer la baisse ou la faiblesse du niveau des élèves",
     "neutral": "énoncer un principe sur les savoirs sans juger le niveau"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Attribution des bourses",
@@ -18624,7 +18670,8 @@
     "positive": "apprécier l'attribution et le versement des bourses",
     "negative": "juger les bourses tardives, injustes ou trop lourdes à obtenir",
     "neutral": "énoncer un principe sur les aides sans juger leur attribution"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Logement étudiant",
@@ -18678,7 +18725,8 @@
     "positive": "apprécier l'accès à un logement étudiant abordable",
     "negative": "juger les logements étudiants rares, coûteux ou mal encadrés",
     "neutral": "décrire une situation de logement sans la juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Pédagogie en maternelle",
@@ -18732,7 +18780,8 @@
     "positive": "apprécier la façon dont la maternelle accueille et fait apprendre",
     "negative": "juger la maternelle inadaptée au rythme des tout-petits",
     "neutral": "énoncer un principe sur la petite enfance sans juger l'école"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Places disponibles à l'école",
@@ -18787,7 +18836,8 @@
     "positive": "trouver facilement une place pour son enfant à l'école",
     "negative": "se voir refuser une inscription faute de place",
     "neutral": "évoquer les inscriptions sans juger le nombre de places"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Conditions de travail des enseignants",
@@ -18839,7 +18889,8 @@
     "positive": "juger les conditions de travail des enseignants bonnes ou soutenues",
     "negative": "dénoncer la charge, le manque de soutien ou de droits",
     "neutral": "énoncer un principe sur le métier sans juger les conditions"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Grèves des enseignants",
@@ -18892,7 +18943,8 @@
     "positive": "défendre le droit de grève des enseignants",
     "negative": "subir la gêne causée par les grèves des enseignants",
     "neutral": "évoquer les enseignants sans juger leurs grèves"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Reconnaissance des enseignants",
@@ -18944,7 +18996,8 @@
     "positive": "saluer la considération accordée aux enseignants par l'institution ou la société",
     "negative": "déplorer le manque de reconnaissance des enseignants",
     "neutral": "énoncer un principe sur le métier sans juger sa reconnaissance"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Devoirs des parents",
@@ -18995,7 +19048,8 @@
     "positive": "saluer l'implication des parents dans l'éducation de leurs enfants",
     "negative": "regretter que des parents négligent leurs devoirs envers l'école",
     "neutral": "rappeler un principe général sur le rôle des parents"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Gestion des établissements",
@@ -19048,7 +19102,8 @@
     "positive": "faire confiance à la direction et à l'organisation des établissements",
     "negative": "dénoncer une gestion défaillante, des conflits ou l'inaction hiérarchique",
     "neutral": "décrire l'organisation des établissements sans la juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Décrochage scolaire",
@@ -19098,7 +19153,8 @@
     "positive": "saluer les solutions proposées aux élèves qui décrochent",
     "negative": "déplorer le manque de solutions pour les élèves décrocheurs",
     "neutral": "constater un décrochage sans juger sa prise en charge"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Langues régionales",
@@ -19148,7 +19204,8 @@
     "positive": "défendre ou apprécier la place des langues régionales à l'école",
     "negative": "rejeter leur enseignement ou dénoncer leur dévalorisation par l'école",
     "neutral": "évoquer les langues régionales sans juger leur place à l'école"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Rémunération des enseignants",
@@ -19198,7 +19255,8 @@
     "positive": "juger la rémunération des enseignants suffisante",
     "negative": "juger les salaires des enseignants trop bas",
     "neutral": "évoquer le métier d'enseignant sans juger son salaire"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Sécurité des établissements",
@@ -19248,7 +19306,8 @@
     "positive": "juger les établissements et leurs abords sûrs",
     "negative": "dénoncer l'insécurité dans les établissements ou à leurs abords",
     "neutral": "évoquer la sécurité en général sans juger la situation"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Écoles de commerce",
@@ -19300,7 +19359,8 @@
     "positive": "apprécier la qualité ou l'accessibilité des écoles de commerce",
     "negative": "dénoncer leur coût, leurs pratiques ou leur inaccessibilité",
     "neutral": "décrire ces écoles sans juger leur fonctionnement"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Encadrement des stages",
@@ -19349,7 +19409,8 @@
     "positive": "apprécier le suivi des stages par l'établissement",
     "negative": "regretter des stages peu encadrés ou refusés par l'établissement",
     "neutral": "décrire un stage sans juger son encadrement"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Accueil des enfants étrangers",
@@ -19397,7 +19458,8 @@
     "positive": "saluer l'accueil et l'adaptation offerts aux enfants étrangers",
     "negative": "subir des obstacles à la scolarisation des enfants étrangers",
     "neutral": "décrire la situation de l'enfant sans juger son accueil"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Recherche de stages",
@@ -19444,7 +19506,8 @@
     "positive": "apprécier l'aide reçue pour trouver un stage",
     "negative": "peiner à trouver un stage ou manquer de soutien",
     "neutral": "évoquer les stages sans juger leur recherche"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Sorties scolaires",
@@ -19490,7 +19553,8 @@
     "positive": "apprécier les sorties organisées par l'école",
     "negative": "regretter des sorties rares, coûteuses ou difficiles à organiser",
     "neutral": "évoquer les activités sans juger les sorties"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Collectivités responsables des écoles",
@@ -19539,7 +19603,8 @@
     "positive": "approuver la répartition des écoles entre les collectivités",
     "negative": "critiquer un financement éclaté ou inégal entre collectivités",
     "neutral": "décrire le rôle des collectivités sans le juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Reconnaissance des diplômes",
@@ -19586,7 +19651,8 @@
     "positive": "apprécier la reconnaissance des diplômes et les équivalences",
     "negative": "subir l'absence de reconnaissance ou de passerelles entre diplômes",
     "neutral": "décrire un parcours de formation sans juger les diplômes"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Parité chez les enseignants",
@@ -19632,7 +19698,8 @@
     "positive": "apprécier un équilibre entre enseignants hommes et femmes",
     "negative": "regretter le manque d'enseignants de l'un des deux sexes",
     "neutral": "énoncer un principe général sur l'égalité entre les sexes"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Âge d'entrée à l'école",
@@ -19677,7 +19744,8 @@
     "positive": "défendre la règle d'âge pour entrer à l'école",
     "negative": "juger la règle d'âge trop rigide ou injuste",
     "neutral": "indiquer l'âge de l'enfant sans juger la règle"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Poids des cartables",
@@ -19722,7 +19790,8 @@
     "positive": "juger le poids des cartables raisonnable",
     "negative": "juger les cartables trop lourds pour les élèves",
     "neutral": "évoquer le matériel scolaire sans juger son poids"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Scolarisation des enfants malades",
@@ -19767,7 +19836,8 @@
     "positive": "saluer les solutions de scolarisation pour les enfants malades",
     "negative": "subir l'exclusion scolaire d'un enfant malade sans solution",
     "neutral": "constater la santé ou le parcours de l'enfant sans juger"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Laïcité à l'école",
@@ -19809,7 +19879,8 @@
     "positive": "défendre la laïcité ou regretter qu'elle ne soit pas respectée",
     "negative": "rejeter la laïcité à l'école ou en subir les contraintes",
     "neutral": "évoquer la laïcité sans juger sa place à l'école"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Mobilité des enseignants",
@@ -19853,7 +19924,8 @@
     "positive": "apprécier la stabilité des équipes enseignantes",
     "negative": "regretter les changements d'enseignants d'une année à l'autre",
     "neutral": "évoquer les enseignants sans juger leur mobilité"
-   }
+   },
+   "opposed": []
   },
   {
    "title": "Soutien scolaire privé",
@@ -19897,7 +19969,8 @@
     "positive": "apprécier le recours aux cours particuliers ou au soutien payant",
     "negative": "juger le soutien scolaire privé coûteux, inégalitaire ou indispensable",
     "neutral": "évoquer le soutien scolaire privé sans le juger"
-   }
+   },
+   "opposed": []
   }
  ],
  "themes": [],
@@ -19918,7 +19991,7 @@
   {
    "id": "summarize",
    "state": "running",
-   "done": 0,
+   "done": 6,
    "total": 73
   },
   {
@@ -19941,7 +20014,7 @@
   }
  ],
  "calls": {
-  "total": 421,
+  "total": 436,
   "cached": 421,
   "inputTokens": 0,
   "outputTokens": 0
@@ -20367,7 +20440,22 @@
   "8d621537f8c19efa139c07120a36af542d609c7ce258b988929ac7e62990f648",
   "45870f64719c5d5e3dc000f34dc972c10233d0ae0f433cb392a4135e3b64cdb7",
   "63b022e59507901db2ffb0cae7a1f51b1d07f0eee77673917350000e5819c49f",
-  "ff952328af393d8db3242a7e859dbad4714afbd447dd9bb1bd6e9997b31adc18"
+  "ff952328af393d8db3242a7e859dbad4714afbd447dd9bb1bd6e9997b31adc18",
+  "41dd9ee1970b7c7deae91a055b9037342cd252380919a1fdbd76abb39187e47f",
+  "5cef0fc66b86470103f034087fc984bfcca002712aaf9206e972cee8282e0baf",
+  "4df2fb6fa80fdef9e5353aeab9f3744aa197a7b1373e363d38fa447b31b41950",
+  "d2c0256f254f794fab952be168a45dedc3e701e41feb8aa36acabbc8303b53f6",
+  "b836b5201597824295ff50b26fcb752321da2f99e7329865c01df83e7daf2c0b",
+  "7d7e954dab438682e4dfed1a4ebc4366ae771086eaedcddc1cfc86a555289b0a",
+  "4d387872ec41818b4ecb225767b5e2576f0d1d328c05c805fe957515e9cdc93f",
+  "e0d89a1f7cd9127273f73ccd76df3e25eaebf5d86612ca0e268bdef8fa60cbfc",
+  "1aaa7ede1c7cf851df1f12ad50d2341c0522946b4023d77f7e78616cae216c81",
+  "d20209bf272a6da102269d4f10c23ddffadb57d327d853cc3d94b1a5f83d4795",
+  "9335db722c4ad1eb1b555bd5c335522e488ba61ab9404aaff21142078817b10a",
+  "061cfe9db8244d35b392d1fcd1607412d135dcb9d38669d8f9c38b2940bfbae6",
+  "1690ad1232f781551b1b0f3d04c5ca14bf56a94b9c3026f171bc87e12f5277e0",
+  "13211ac7fcf2a0087a173f5d2c744c3f9c2a99b2cc67b503ed71c07425bde436",
+  "466e78b87e7cd17d19077cc9134fd63c5460e82d0e7e2aa1a786c1fdb7f790db"
  ],
  "status": "running",
  "names": [
