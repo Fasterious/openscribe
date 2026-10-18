@@ -249,7 +249,7 @@ describe('regroupement', () => {
     ])
     const text = describeTheme({ metrics: theme }, [{ metrics: a }, { metrics: b }])
     expect(text).not.toMatch(/consensus|partagés|peu d'avis|positif|négatif|mitigé/)
-    expect(text).toContain('2 motifs')
+    expect(text).toContain('2 thèmes')
   })
 })
 
@@ -557,7 +557,7 @@ describe('étiquettes à vérifier', () => {
     const copies = ['P6', 'P7', 'P8'].map((p, k) => ({ ...idea(`I10${k}`, p, 'negative'), copyOf: `I90${k}` }))
     const all = [...own, ...copies]
     const doubt = labelDoubt(group(all), new Map(all.map((i) => [i.id, i])))
-    expect(doubt).toBe('à vérifier : 3 de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « unanime »')
+    expect(doubt).toBe('à vérifier : 3 de ces avis comptent aussi dans un autre thème ; sans eux, ce serait « unanime »')
     // Sans copie, rien à signaler.
     expect(labelDoubt(group(own), new Map(own.map((i) => [i.id, i])))).toBeUndefined()
   })

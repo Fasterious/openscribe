@@ -72,7 +72,7 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   // Dans le résumé, une pastille qui suit un nombre déroule tout le camp compté.
   await expect(page.locator('section[aria-labelledby="resume"]').getByRole('button', { name: /les verbatims de \d+ participants/ }).first()).toBeVisible()
   // Depuis une liste, on va lire le motif en détail, puis on revient à la ligne de départ.
-  const go = page.getByRole('button', { name: 'Lire le motif en détail →' }).first()
+  const go = page.getByRole('button', { name: 'Lire le thème en détail →' }).first()
   await tap(go)
   // Le motif est ouvert, à l'écran, et son titre a le focus (passe testeur du 18/10 : la page ne bougeait pas).
   const arrived = page.locator('details[data-fold="motif"][open] > summary').first()
@@ -91,7 +91,7 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await tap(theme.locator(':scope > summary'))
   const motif = theme.locator('details[data-fold="motif"]').first()
   await tap(motif.locator(':scope > summary'))
-  await expect(motif.getByText('Ce qui compte comme positif ou négatif dans ce motif')).toBeVisible()
+  await expect(motif.getByText('Ce qui compte comme positif ou négatif dans ce thème')).toBeVisible()
   await tap(motif.getByRole('button', { name: /^«/ }).first())
   await expect(motif.locator('mark').first()).toBeVisible()
   // Ce que l'article d'une page avait en plus est dans l'application : la méthode détaillée, et l'impression.
@@ -126,7 +126,7 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   await expect(page.getByText("Rapport d'exemple")).toBeVisible()
   await expect(page.getByText('À vérifier', { exact: true })).toHaveCount(0)
   // Le second niveau existe : des thèmes rapprochent les motifs, dans « Le détail, thème par thème ».
-  await expect(page.getByRole('heading', { name: 'Le détail, thème par thème' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Le détail, par grand thème' })).toBeVisible()
   expect(await page.locator('details[data-fold="theme"]').count()).toBeGreaterThan(1)
   await noHorizontalScroll(page)
   await shot(page, '3-rapport')
@@ -442,7 +442,7 @@ test('relancer une analyse ne fait jamais disparaître le rapport précédent', 
   await page.getByRole('button', { name: 'Relancer une analyse' }).click()
   await page.getByRole('tab', { name: /Rapport/ }).click()
   await expect(page.getByText('Une nouvelle analyse est en cours')).toBeVisible()
-  await expect(page.getByRole('heading', { name: /Le détail, (thème par thème|motif par motif)/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Le détail, (par grand thème|thème par thème)/ })).toBeVisible()
 })
 
 test('un double clic sur « Créer » ne crée qu’une étude, nommée par sa date', async ({ page }) => {

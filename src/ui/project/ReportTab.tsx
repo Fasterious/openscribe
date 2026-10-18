@@ -389,7 +389,7 @@ function ListItem({
           onClick={(e) => ctx.reveal(group.id, e.currentTarget, `Revenir à « ${heading} »`)}
           className="no-print mt-1 block min-h-6 cursor-pointer text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
         >
-          Lire le motif en détail →
+          Lire le thème en détail →
         </button>
       )}
       {why && group && (
@@ -410,7 +410,7 @@ function DoubtLinks({ sections, ctx }: { sections: HighlightSection[]; ctx: Ctx 
   if (!items.length) return null
   return (
     <p className="mt-2 text-sm text-muted-foreground">
-      À vérifier avant de citer : l'étiquette {items.length > 1 ? 'des motifs' : 'du motif'}{' '}
+      À vérifier avant de citer : l'étiquette {items.length > 1 ? 'des thèmes' : 'du thème'}{' '}
       {items.map(([id, title], k) => (
         <Fragment key={id}>
           {k > 0 && (k === items.length - 1 ? ' et ' : ', ')}
@@ -419,7 +419,7 @@ function DoubtLinks({ sections, ctx }: { sections: HighlightSection[]; ctx: Ctx 
           </button>
         </Fragment>
       ))}
-      . {items.length > 1 ? 'Leur étiquette dépend' : 'Son étiquette dépend'} d'avis comptés aussi dans un autre motif ; chaque motif, une fois ouvert, explique pourquoi.
+      . {items.length > 1 ? 'Leur étiquette dépend' : 'Son étiquette dépend'} d'avis comptés aussi dans un autre thème ; chaque thème, une fois ouvert, explique pourquoi.
     </p>
   )
 }
@@ -454,7 +454,7 @@ function MoreItems({
   const [open, setOpen] = useState(false)
   const top = useRef<HTMLButtonElement>(null)
   const n = items.length
-  const hide = n > 1 ? `Masquer les ${n} autres motifs` : "Masquer l'autre motif"
+  const hide = n > 1 ? `Masquer les ${n} autres thèmes` : "Masquer l'autre thème"
   const toggle = (
     <button
       ref={top}
@@ -463,7 +463,7 @@ function MoreItems({
       onClick={() => setOpen((o) => !o)}
       className="no-print inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md text-sm font-medium text-primary hover:underline"
     >
-      {open ? hide : `Voir ${n > 1 ? `les ${n} autres motifs` : "l'autre motif"} ${MORE_WORD[section]}`}
+      {open ? hide : `Voir ${n > 1 ? `les ${n} autres thèmes` : "l'autre thème"} ${MORE_WORD[section]}`}
       <span aria-hidden className={`transition-transform motion-reduce:transition-none ${open ? '-rotate-90' : 'rotate-90'}`}>
         ›
       </span>
@@ -736,7 +736,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
     <Fold
       level="motif"
       id={`motif-${group.id}`}
-      label={`le motif « ${group.title} »`}
+      label={`le thème « ${group.title} »`}
       className="border-b py-0.5"
       closed={
         <span className="flex flex-col gap-1.5 py-2 sm:flex-row sm:items-center sm:justify-between">
@@ -779,13 +779,13 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
         {/* La définition du motif : explication secondaire, pliée ; la synthèse se lit d'abord (remarque d'Arnaud, 17/10). */}
         {group.definition && (
           <details className="group/def text-sm" onKeyDown={closeOnEscape}>
-            <summary className="cursor-pointer py-1 text-muted-foreground">Ce qui compte comme positif ou négatif dans ce motif</summary>
+            <summary className="cursor-pointer py-1 text-muted-foreground">Ce qui compte comme positif ou négatif dans ce thème</summary>
             <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{definitionLine(group.definition)}</p>
           </details>
         )}
         {m.minority && <MinorityNote minority={m.minority} ctx={ctx} />}
         <Camps ideas={ideas} m={m} both={both} full={full} ctx={ctx} />
-        {both.size > 0 && <p className="text-sm text-muted-foreground">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>}
+        {both.size > 0 && <p className="text-sm text-muted-foreground">* Personne qui s'exprime aussi dans l'autre sens sur ce thème.</p>}
       </div>
     </Fold>
   )
@@ -1035,7 +1035,7 @@ function VerdictLine({ groups, suggestions }: { groups: Metrics[]; suggestions?:
   const verdicts = themeVerdicts(counted)
   return (
     <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-      <span className="font-medium text-foreground">{plural(groups.length, 'motif')} :</span>
+      <span className="font-medium text-foreground">{plural(groups.length, 'thème')} :</span>
       {verdicts.map(({ verdict, count }) => (
         <span key={verdict} className="inline-flex items-center gap-1.5">
           <span className={`inline-block size-2.5 rounded-full ${VERDICT_DOT[verdict]}`} aria-hidden />
@@ -1085,7 +1085,7 @@ function ExpandAll() {
       onClick={() => document.querySelectorAll<HTMLDetailsElement>('details[data-fold="theme"]').forEach((d) => (d.open = !all))}
       className="no-print inline-flex min-h-8 cursor-pointer items-center rounded-md border border-input bg-card px-3 text-sm font-medium hover:bg-accent"
     >
-      {all ? 'Replier tous les thèmes' : 'Déplier tous les thèmes'}
+      {all ? 'Replier tous les grands thèmes' : 'Déplier tous les grands thèmes'}
     </button>
   )
 }
@@ -1405,8 +1405,8 @@ export function ReportTab({
             })}
           </div>
           <p className="text-sm text-muted-foreground">
-            Listes établies par le code à partir des chiffres de chaque motif, sur {plural(all.participants, 'participant')} ; la phrase sous chaque
-            motif ouvre sa synthèse, et ❝ déroule les verbatims qu'elle compte.
+            Listes établies par le code à partir des chiffres de chaque thème, sur {plural(all.participants, 'participant')} ; la phrase sous chaque
+            thème ouvre sa synthèse, et ❝ déroule les verbatims qu'elle compte.
           </p>
         </section>
       )}
@@ -1416,10 +1416,10 @@ export function ReportTab({
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div className="space-y-1">
             <h2 id="detail" className="text-xl font-semibold">
-              {sections ? 'Le détail, thème par thème' : 'Le détail, motif par motif'}
+              {sections ? 'Le détail, par grand thème' : 'Le détail, thème par thème'}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {sections ? `${plural(sections.length, 'thème')}, ${plural(analysis.groups.length, 'motif')}. Ouvrez un thème, puis un motif, pour lire ce que disent les participants.` : 'Ouvrez un motif pour lire ce que disent les participants.'}
+              {sections ? `${plural(sections.length, 'grand thème', 'grands thèmes')}, ${plural(analysis.groups.length, 'thème')}. Ouvrez un grand thème, puis un thème, pour lire ce que disent les participants.` : 'Ouvrez un thème pour lire ce que disent les participants.'}
             </p>
           </div>
           {sections && <ExpandAll />}
@@ -1438,7 +1438,7 @@ export function ReportTab({
                   key={t.id}
                   id={`sec-${t.id}`}
                   level="theme"
-                  label={`le thème « ${t.title} »`}
+                  label={`le grand thème « ${t.title} »`}
                   className="border-b"
                   closed={<ThemeRow title={t.title} m={m} groups={groups.map((x) => x.m)} />}
                   opened={

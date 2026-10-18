@@ -39,7 +39,7 @@ describe('étiquettes expliquées au cas par cas', () => {
     const r = doubtReason(group(ideas), byId, () => 'Horaires')
     expect(r?.ideaIds).toEqual(['I0007', 'I0008'])
     expect(plain(r?.text)).toBe(
-      "1 des 7 personnes qui donnent un avis n'est comptée ici que par une idée rangée d'abord dans un autre motif : 1 avis négatif (« Horaires » : P7). Sans ces idées, il resterait 6 avis : « unanime » (6 sur 6), une étiquette plus nette. À vous de juger si ces 2 verbatims parlent bien du motif « Piscine ».",
+      "1 des 7 personnes qui donnent un avis n'est comptée ici que par une idée rangée d'abord dans un autre thème : 1 avis négatif (« Horaires » : P7). Sans ces idées, il resterait 6 avis : « unanime » (6 sur 6), une étiquette plus nette. À vous de juger si ces 2 verbatims parlent bien du thème « Piscine ».",
     )
     // Aucune ligne ne commence par « : » : espace insécable avant les deux-points.
     expect(r?.text).toContain('\u00a0:')
@@ -50,7 +50,7 @@ describe('étiquettes expliquées au cas par cas', () => {
     const ideas = [...many(1, 4, 'negative'), idea(9, 'positive', 'I0098', 1)]
     const r = doubtReason(group(ideas), new Map(ideas.map((i) => [i.id, i])), () => 'Horaires')
     expect(plain(r?.text)).toBe(
-      "Sans les idées rangées d'abord dans un autre motif, 1 personne passerait d'un avis mitigé à un avis négatif. Il resterait alors 4 avis : « unanime » (4 sur 4), une étiquette plus nette. À vous de juger si ce verbatim parle bien du motif « Piscine ».",
+      "Sans les idées rangées d'abord dans un autre thème, 1 personne passerait d'un avis mitigé à un avis négatif. Il resterait alors 4 avis : « unanime » (4 sur 4), une étiquette plus nette. À vous de juger si ce verbatim parle bien du thème « Piscine ».",
     )
   })
 

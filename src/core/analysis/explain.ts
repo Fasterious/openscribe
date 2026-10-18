@@ -69,7 +69,7 @@ const nbsp = (t: string) =>
     .replace(/ ([;?!])/g, '\u202f$1')
     .replace(/« /g, '«\u00a0')
 /** « du motif « Accès… » », « du motif « École… » » : l'élision se fait sur « motif », jamais sur le titre. */
-const motifName = (title: string) => `du motif « ${title} »`
+const motifName = (title: string) => `du thème « ${title} »`
 /** « 2 avis positifs contre 4 négatifs et 1 mitigé » : la répartition après la bascule, mitigés compris. */
 const split = (P: number, N: number, M: number) =>
   `${count(P, 'avis positif', 'avis positifs')} contre ${count(N, 'négatif', 'négatifs')}${M ? ` et ${count(M, 'mitigé', 'mitigés')}` : ''}`
@@ -147,7 +147,7 @@ export function doubtReason(
   // D'où vient chaque personne retirée : le motif où son idée a été rangée d'abord.
   const from = (p: string) => {
     const c = copies.find((i) => i.participantId === p && (i.category === 'positive' || i.category === 'negative'))
-    return (c && alsoIn(c)) ?? 'un autre motif'
+    return (c && alsoIn(c)) ?? 'un autre thème'
   }
   const describe = (side: 'positive' | 'negative' | 'mixed', one: string, many: string) => {
     const people = gone.filter(([, c]) => c === side).map(([p]) => p)
@@ -168,8 +168,8 @@ export function doubtReason(
       ? "« peu d'avis », trop peu pour conclure"
       : `« ${WORD[after.stance]} » (${D2} sur ${T2}), ${RANK[after.stance] > RANK[before.stance] ? 'une étiquette plus nette' : 'une étiquette moins nette'}`
   const head = gone.length
-    ? `${gone.length} des ${T} personnes qui donnent un avis ${gone.length > 1 ? 'ne sont comptées' : "n'est comptée"} ici que par une idée rangée d'abord dans un autre motif : ${list(parts)}${changed.length ? ` ; ${movedText(true)}` : ''}. Sans ces idées, il resterait`
-    : `Sans les idées rangées d'abord dans un autre motif, ${movedText(false)}. Il resterait alors`
+    ? `${gone.length} des ${T} personnes qui donnent un avis ${gone.length > 1 ? 'ne sont comptées' : "n'est comptée"} ici que par une idée rangée d'abord dans un autre thème : ${list(parts)}${changed.length ? ` ; ${movedText(true)}` : ''}. Sans ces idées, il resterait`
+    : `Sans les idées rangées d'abord dans un autre thème, ${movedText(false)}. Il resterait alors`
   const judge =
     copies.length > 1 ? `À\u00a0vous de juger si ces ${copies.length} verbatims parlent bien ${motifName(g.title)}.` : `À\u00a0vous de juger si ce verbatim parle bien ${motifName(g.title)}.`
   const text = nbsp(`${head} ${T2} avis : ${verdict}. ${judge}`)

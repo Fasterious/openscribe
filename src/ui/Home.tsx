@@ -74,7 +74,7 @@ export function Home() {
               Des verbatims au rapport, preuves à l'appui.
             </h1>
             <p className="max-w-xl text-lg text-muted-foreground">
-              Importez les réponses ouvertes de vos participants : OpenScribe en tire les motifs et les thèmes, compte qui dit quoi, et relie chaque chiffre au
+              Importez les réponses ouvertes de vos participants : OpenScribe en tire les thèmes et les grands thèmes, compte qui dit quoi, et relie chaque chiffre au
               verbatim exact.
             </p>
             <div className="flex flex-wrap gap-2">
@@ -112,7 +112,7 @@ export function Home() {
             </a>
           </Step>
           <Step n={3} icon={<ScanSearch />} title="Lisez le rapport, vérifiez tout">
-            Vous suivez chaque étape de l'analyse, puis vous remontez de chaque thème jusqu'au verbatim. Téléchargez le rapport en Markdown, en page HTML ou en
+            Vous suivez chaque étape de l'analyse, puis vous remontez de chaque grand thème jusqu'au verbatim. Téléchargez le rapport en Markdown, en page HTML ou en
             PDF.
           </Step>
         </ol>
@@ -142,7 +142,7 @@ export function Home() {
             <ul className="mt-4 space-y-2 text-sm">
               {[
                 'Un questionnaire et des entretiens analysés ensemble, avec la même méthode',
-                'Motifs et thèmes, avec le nombre de participants derrière chacun',
+                'Thèmes et grands thèmes, avec le nombre de participants derrière chacun',
                 'Les avis (positifs, négatifs, mitigés), les suggestions et les questions que se pose le groupe ; où en sont les participants : consensus, majorité, avis partagés',
                 "Chaque verbatim tel quel, à retrouver dans son texte d'origine",
                 'Filtrer par segment (par exemple les étudiants, puis les retraités)',

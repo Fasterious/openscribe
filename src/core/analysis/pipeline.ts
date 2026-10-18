@@ -715,7 +715,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       respondents,
     )
   ) {
-    s.message = 'Consolidation des motifs'
+    s.message = 'Consolidation des thèmes'
     await emit()
     const res = await runner.json(
       consolidationPrompt(
@@ -742,7 +742,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     const singles = groups.filter((g) => g.metrics.participants === 1)
     const targets = groups.filter((g) => g.metrics.participants > 1)
     if (singles.length && targets.length) {
-      s.message = 'Rattachement des motifs isolés'
+      s.message = 'Rattachement des thèmes isolés'
       await emit()
       const proposals: { single: string; group: string }[] = []
       for (let i = 0; i < singles.length; i += 40) {
@@ -792,7 +792,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
   // Relecture des motifs : une idée hors de l'objet de son motif est déplacée, un ton faux par rapport à cet objet est corrigé.
   // Les mitigés sont vérifiés en priorité : souvent leurs deux idées parlent de deux objets. Le modèle propose, le code applique et garde la trace.
   if (!grid.length && groups.length > 1) {
-    s.message = 'Relecture des motifs'
+    s.message = 'Relecture des thèmes'
     await emit()
     const before = (i: Idea) => {
       const text = contributionById.get(i.contributionId)?.text ?? ''
@@ -896,7 +896,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       const arrived = arrivals(reviewed.moved)
       const scope = groups.filter((g) => g.ideaIds.some((id) => arrived.has(id)))
       if (scope.length) {
-        s.message = 'Seconde relecture des motifs'
+        s.message = 'Seconde relecture des thèmes'
         await emit()
         const second = applyReview(state.ideas, groups, keepForward(await reviewRound(scope, arrived), reviewed.moved, groups), multi)
         learn(second.copied)
@@ -974,7 +974,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
     if (codebook && methodOf(state.settings).sweep && definitions.size && groups.length > 1) {
       const targets = sweepTargets(groups, ideaById, (g) => definitions.has(titleKey(g.title)))
       if (targets.length) {
-        s.message = 'Balayage des motifs du résumé'
+        s.message = 'Balayage des thèmes du résumé'
         await emit()
         const home = new Map(groups.flatMap((g) => g.ideaIds.map((id) => [id, g] as const)))
         const batches: Group[][] = []
@@ -1360,7 +1360,7 @@ export function applyAttachments(
     if (single.metrics.participants !== 1 || target.metrics.participants < 2) continue
     moved.add(single.id)
     into.set(target.id, [...(into.get(target.id) ?? []), ...single.ideaIds])
-    merges.push({ title: target.title, from: [target.title, single.title], reason: 'Motif isolé rattaché au motif qui traite le même objet.' })
+    merges.push({ title: target.title, from: [target.title, single.title], reason: 'Thème isolé rattaché au thème qui traite le même objet.' })
   }
   return {
     groups: groups.filter((g) => !moved.has(g.id)).map((g) => ({ title: g.title, ideaIds: [...g.ideaIds, ...(into.get(g.id) ?? [])] })),
@@ -1448,7 +1448,7 @@ export function describeMetrics(m: Metrics, lang: 'fr' | 'en' = 'fr', opts: { st
 export function describeTheme(theme: { metrics: Metrics }, groups: { metrics: Metrics }[], lang: 'fr' | 'en' = 'fr'): string {
   const n = (k: number, one: string, many = `${one}s`) => `${k} ${k > 1 ? many : one}`
   if (lang === 'en') return `${n(theme.metrics.participants, 'person', 'people')} · ${n(groups.length, 'pattern')}`
-  return `${n(theme.metrics.participants, 'participant')} · ${n(groups.length, 'motif')}`
+  return `${n(theme.metrics.participants, 'participant')} · ${n(groups.length, 'thème')}`
 }
 
 /** Ne garde que les références [I…] qui appartiennent bien au périmètre. */
@@ -1563,7 +1563,7 @@ async function buildThemes(state: AnalysisState, runner: LlmRunner, emit: () => 
   if (state.groups.length <= THEME_LEVEL_FROM) {
     state.themes = []
     s.state = 'done'
-    s.message = 'Peu de groupes : pas de niveau de thèmes.'
+    s.message = 'Peu de groupes : pas de niveau de grands thèmes.'
     await emit()
     return
   }

@@ -18,9 +18,9 @@ const STEP_LABEL: Record<StepId, { title: string; help: string }> = {
     title: 'Découper en idées',
     help: "Le moteur d'IA découpe chaque réponse en idées, chacune appuyée sur un verbatim ; le code vérifie que ce verbatim figure mot pour mot dans la réponse.",
   },
-  group: { title: 'Regrouper en motifs', help: "Le moteur d'IA rassemble les idées en motifs ; le code vérifie que chaque idée n'est rangée qu'une fois." },
-  summarize: { title: 'Synthétiser chaque motif', help: "Le code compte les participants et les avis ; le moteur d'IA rédige une synthèse qui cite ses verbatims." },
-  themes: { title: 'Dégager les grands thèmes', help: "S'il y a beaucoup de motifs, le moteur d'IA les réunit en quelques grands thèmes." },
+  group: { title: 'Regrouper en thèmes', help: "Le moteur d'IA rassemble les idées en thèmes ; le code vérifie que chaque idée n'est rangée qu'une fois." },
+  summarize: { title: 'Synthétiser chaque thème', help: "Le code compte les participants et les avis ; le moteur d'IA rédige une synthèse qui cite ses verbatims." },
+  themes: { title: 'Dégager les grands thèmes', help: "S'il y a beaucoup de thèmes, le moteur d'IA les réunit en quelques grands thèmes." },
   report: { title: 'Écrire le résumé', help: "Le moteur d'IA rédige un résumé de l'ensemble à partir des synthèses." },
   polish: {
     title: 'Relire la langue',
@@ -128,7 +128,7 @@ export function AnalysisTab({ project }: { project: Project }) {
               <label className="flex cursor-pointer items-start gap-2 text-sm">
                 <input type="radio" name="mode" className="mt-1 accent-[var(--primary)]" disabled={running} checked={settings.mode === 'free'} onChange={() => setSettings({ ...settings, mode: 'free' })} />
                 <span>
-                  <strong>Libre</strong> — les motifs émergent des réponses. Recommandé pour explorer.
+                  <strong>Libre</strong> — les thèmes émergent des réponses. Recommandé pour explorer.
                 </span>
               </label>
               <label className="flex cursor-pointer items-start gap-2 text-sm">
@@ -292,10 +292,10 @@ export function AnalysisTab({ project }: { project: Project }) {
                   onChange={(e) => setSettings({ ...settings, multiCoding: e.target.checked })}
                 />
                 <span>
-                  Une idée peut compter dans deux motifs
+                  Une idée peut compter dans deux thèmes
                   <span className="block text-xs text-muted-foreground">
-                    Codage en double : une idée qui répond à la définition de deux motifs (la cause chez l'un, l'effet chez l'autre) est
-                    copiée dans le second. Chaque motif compte des personnes, aucune deux fois. Par défaut, une idée n'a qu'un motif.
+                    Codage en double : une idée qui répond à la définition de deux thèmes (la cause chez l'un, l'effet chez l'autre) est
+                    copiée dans le second. Chaque thème compte des personnes, aucune deux fois. Par défaut, une idée n'a qu'un thème.
                   </span>
                 </span>
               </label>
@@ -401,8 +401,8 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
         <Alert tone="success" className="flex flex-wrap items-center justify-between gap-2">
           <span>
             <CheckCircle2 className="mr-1 inline size-4" /> Analyse terminée : {plural(analysis.ideas.length, 'idée')},{' '}
-            {plural(analysis.groups.length, 'motif')}
-            {analysis.themes.length ? `, ${plural(analysis.themes.length, 'thème')}` : ''}.
+            {plural(analysis.groups.length, 'thème')}
+            {analysis.themes.length ? `, ${plural(analysis.themes.length, 'grand thème', 'grands thèmes')}` : ''}.
           </span>
           <Button size="sm" onClick={() => navigate({ name: 'project', id: project.id, tab: 'report' })}>
             Voir le rapport
@@ -483,7 +483,7 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
               </Disclosure>
             )}
             {analysis.groups.length > 0 && (
-              <Disclosure summary={`Motifs (${analysis.groups.length})`}>
+              <Disclosure summary={`Thèmes (${analysis.groups.length})`}>
                 <ul className="space-y-1 text-sm">
                   {analysis.groups.map((g) => (
                     <li key={g.id}>

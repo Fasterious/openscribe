@@ -135,8 +135,8 @@ export function labelDoubt(g: Group, ideas: Map<string, Idea>): string | undefin
   // « École publique face au privé », 16 copies sur 34 avis, dont des positions opposées réunies).
   if (without === g.metrics.stance) return undefined
   return copies > 1
-    ? `à vérifier : ${copies} de ces avis comptent aussi dans un autre motif ; sans eux, ce serait « ${STANCE_WORD[without]} »`
-    : `à vérifier : 1 de ces avis compte aussi dans un autre motif ; sans lui, ce serait « ${STANCE_WORD[without]} »`
+    ? `à vérifier : ${copies} de ces avis comptent aussi dans un autre thème ; sans eux, ce serait « ${STANCE_WORD[without]} »`
+    : `à vérifier : 1 de ces avis compte aussi dans un autre thème ; sans lui, ce serait « ${STANCE_WORD[without]} »`
 }
 
 /** La conclusion d'une étiquette : un camp l'emporte (unanime, large majorité, majorité), pas de majorité, avis partagés. */

@@ -87,12 +87,12 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   const lines = [
     `Participants ayant répondu : ${respondents} ; participants dont au moins une idée a été retenue : ${withIdeas}.`,
     `Idées retenues : ${state.ideas.length} (verbatims vérifiés mot pour mot dans les réponses). Verbatims écartés car introuvables tels quels : ${state.rejected.length || 'aucun'}.`,
-    `Motifs : ${state.groups.length}${state.themes.length ? `, regroupés en ${state.themes.length} thèmes` : ''} ; ${single ? `${single} ${single > 1 ? 'reposent' : 'repose'} sur un seul participant (signaux isolés, pas des tendances)` : 'aucun ne repose sur un seul participant'}.${consolidated ? ` La passe de consolidation a fusionné ${consolidated} ensemble${consolidated > 1 ? 's' : ''} de motifs qui traitaient le même objet.` : ''}`,
+    `Thèmes : ${state.groups.length}${state.themes.length ? `, regroupés en ${state.themes.length} grands thèmes` : ''} ; ${single ? `${single} ${single > 1 ? 'reposent' : 'repose'} sur un seul participant (signaux isolés, pas des tendances)` : 'aucun ne repose sur un seul participant'}.${consolidated ? ` La passe de consolidation a fusionné ${consolidated} ensemble${consolidated > 1 ? 's' : ''} de thèmes qui traitaient le même objet.` : ''}`,
   ]
   const off = offTopicLines(state)
   if (off.ideas)
     lines.push(
-      `Hors question : ${off.ideas} idée${off.ideas > 1 ? 's' : ''} de ${off.people} participant${off.people > 1 ? 's' : ''} ne répond${off.ideas > 1 ? 'ent' : ''} pas à la question posée. Elles sont listées en fin de rapport, mais ne comptent dans aucun motif et ne sont pas résumées.`,
+      `Hors question : ${off.ideas} idée${off.ideas > 1 ? 's' : ''} de ${off.people} participant${off.people > 1 ? 's' : ''} ne répond${off.ideas > 1 ? 'ent' : ''} pas à la question posée. Elles sont listées en fin de rapport, mais ne comptent dans aucun thème et ne sont pas résumées.`,
     )
   if (state.ideas.length >= 30 && perPerson.length > 5)
     lines.push(
@@ -115,16 +115,16 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     const pl = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`
     if (moved || retoned)
       lines.push(
-        `Relecture des motifs par le moteur d'IA : ${[moved && pl(moved, 'idée déplacée vers le motif dont elle parle vraiment', 'idées déplacées vers le motif dont elles parlent vraiment'), retoned && pl(retoned, "idée qui a changé de ton une fois jugée par rapport à l'objet du motif", "idées qui ont changé de ton une fois jugées par rapport à l'objet du motif")].filter(Boolean).join(' ; ')}. Une personne n'est « mitigée » que si elle dit du bien et du mal du même objet.`,
+        `Relecture des thèmes par le moteur d'IA : ${[moved && pl(moved, 'idée déplacée vers le thème dont elle parle vraiment', 'idées déplacées vers le thème dont elles parlent vraiment'), retoned && pl(retoned, "idée qui a changé de ton une fois jugée par rapport à l'objet du thème", "idées qui ont changé de ton une fois jugées par rapport à l'objet du thème")].filter(Boolean).join(' ; ')}. Une personne n'est « mitigée » que si elle dit du bien et du mal du même objet.`,
       )
   }
   if (state.copied?.length)
     lines.push(
-      `Codage en double, à la demande du chercheur : ${state.copied.length} idée${state.copied.length > 1 ? 's' : ''} qui répond${state.copied.length > 1 ? 'ent' : ''} à la définition de deux motifs ${state.copied.length > 1 ? 'comptent' : 'compte'} dans les deux (la citation figure sous chacun, avec la mention « aussi dans » et le nom de l'autre motif). Chaque motif compte des personnes, aucune deux fois.`,
+      `Codage en double, à la demande du chercheur : ${state.copied.length} idée${state.copied.length > 1 ? 's' : ''} qui répond${state.copied.length > 1 ? 'ent' : ''} à la définition de deux thèmes ${state.copied.length > 1 ? 'comptent' : 'compte'} dans les deux (la citation figure sous chacun, avec la mention « aussi dans » et le nom de l'autre thème). Chaque thème compte des personnes, aucune deux fois.`,
     )
   if (state.groups.some((g) => g.definition))
     lines.push(
-      `Livre de codes : avant de juger les idées de chaque motif, le moteur d'IA a écrit ce qui y compte comme positif, comme négatif, et ce qui ne compte pas comme un avis. Cette définition figure sous le titre du motif ; le positif et le négatif y obéissent, et le lecteur peut la contester.${state.reconciled?.pairs || state.reconciled?.merges ? ` Le livre de codes a ensuite été relu d'un bloc : ${[state.reconciled.pairs && `${state.reconciled.pairs} paire${state.reconciled.pairs > 1 ? 's' : ''} de motifs voisins relue${state.reconciled.pairs > 1 ? 's' : ''} ensemble avec une règle de partage`, state.reconciled.merges && `${state.reconciled.merges} fusion${state.reconciled.merges > 1 ? 's' : ''} de motifs qui traitaient le même objet`].filter(Boolean).join(' ; ')}.` : ''}`,
+      `Livre de codes : avant de juger les idées de chaque thème, le moteur d'IA a écrit ce qui y compte comme positif, comme négatif, et ce qui ne compte pas comme un avis. Cette définition figure sous le titre du thème ; le positif et le négatif y obéissent, et le lecteur peut la contester.${state.reconciled?.pairs || state.reconciled?.merges ? ` Le livre de codes a ensuite été relu d'un bloc : ${[state.reconciled.pairs && `${state.reconciled.pairs} paire${state.reconciled.pairs > 1 ? 's' : ''} de thèmes voisins relue${state.reconciled.pairs > 1 ? 's' : ''} ensemble avec une règle de partage`, state.reconciled.merges && `${state.reconciled.merges} fusion${state.reconciled.merges > 1 ? 's' : ''} de thèmes qui traitaient le même objet`].filter(Boolean).join(' ; ')}.` : ''}`,
     )
   if (state.swept?.motifs) {
     const w = state.swept
@@ -135,18 +135,18 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
       w.retoned && `${w.retoned} ${w.retoned > 1 ? 'ont' : 'a'} changé de ton`,
     ].filter(Boolean)
     lines.push(
-      `Balayage par définition : les idées rangées dans les autres motifs ont été relues au regard de la définition de${w.motifs > 1 ? 's' : ''} ${w.motifs} motif${pl(w.motifs)} du résumé ; ${done.length ? done.join(', ') : 'aucune n’y manquait'}.`,
+      `Balayage par définition : les idées rangées dans les autres thèmes ont été relues au regard de la définition de${w.motifs > 1 ? 's' : ''} ${w.motifs} thème${pl(w.motifs)} du résumé ; ${done.length ? done.join(', ') : 'aucune n’y manquait'}.`,
     )
   }
   const doubtful = state.groups.filter((g) => labelDoubt(g, new Map(state.ideas.map((i) => [i.id, i]))))
   if (doubtful.length)
     lines.push(
-      `Étiquettes à vérifier : ${doubtful.length} motif${doubtful.length > 1 ? 's' : ''} ${doubtful.length > 1 ? 'portent' : 'porte'} la mention « à vérifier », parce que ${doubtful.length > 1 ? 'leur étiquette dépend' : 'son étiquette dépend'} d'avis comptés aussi dans un autre motif. Le code mesure cet écart ; c'est au lecteur de trancher, en relisant les citations.`,
+      `Étiquettes à vérifier : ${doubtful.length} thème${doubtful.length > 1 ? 's' : ''} ${doubtful.length > 1 ? 'portent' : 'porte'} la mention « à vérifier », parce que ${doubtful.length > 1 ? 'leur étiquette dépend' : 'son étiquette dépend'} d'avis comptés aussi dans un autre thème. Le code mesure cet écart ; c'est au lecteur de trancher, en relisant les citations.`,
     )
   if (state.groups.some((g) => g.metrics.minority)) lines.push(labelled('« Minorité constante »', MINORITY_HELP))
   if (state.support)
     lines.push(
-      `Renvois vérifiés : chaque phrase des synthèses a été confrontée par le moteur d'IA aux verbatims qu'elle cite (${state.support.checked} phrases) ; ${state.support.fixed || 'aucune'} corrigée${state.support.fixed > 1 ? 's' : ''}, ${state.support.dropped || 'aucune'} retirée${state.support.dropped > 1 ? 's' : ''} faute d'appui${state.support.added ? ` ; le moteur d'IA en a ajouté ${state.support.added} pour un sujet ou un camp d'avis qui manquait` : ''}.${state.campsAdded ? ` Le code en a écrit ${state.campsAdded} pour un camp d'avis encore absent de la synthèse de son motif.` : ''}`,
+      `Renvois vérifiés : chaque phrase des synthèses a été confrontée par le moteur d'IA aux verbatims qu'elle cite (${state.support.checked} phrases) ; ${state.support.fixed || 'aucune'} corrigée${state.support.fixed > 1 ? 's' : ''}, ${state.support.dropped || 'aucune'} retirée${state.support.dropped > 1 ? 's' : ''} faute d'appui${state.support.added ? ` ; le moteur d'IA en a ajouté ${state.support.added} pour un sujet ou un camp d'avis qui manquait` : ''}.${state.campsAdded ? ` Le code en a écrit ${state.campsAdded} pour un camp d'avis encore absent de la synthèse de son thème.` : ''}`,
     )
   if (state.polish?.changed)
     lines.push(
@@ -182,11 +182,11 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   const engine = engineName(state.engine.presetId, state.engine.model)
   lines.push(
     `Moteur d'IA : ${state.engine.presetId === 'bridge' || state.engine.presetId === 'simulation' ? engine : `${engine}, modèle ${state.engine.model}`} · température ${state.settings.temperature} · graine ${state.settings.seed}.`,
-    "Partage des rôles : le moteur d'IA découpe les réponses en idées (positif, négatif, suggestion, question ou constat), propose les motifs et les thèmes, et rédige les synthèses ; le code vérifie chaque verbatim, range chaque idée exactement une fois et calcule tous les chiffres, y compris les listes « Ce qui a marché », « Ce qui bloque », « Ce qui divise », « Ce que proposent les participants » et « Questions soulevées ». « Ce qui divise » réunit les motifs aux avis opposés et ceux où tous font la même critique mais proposent des remèdes opposés (repérés par le moteur d'IA ; le code vérifie qu'il s'agit de deux propositions de deux personnes différentes).",
-    `Indicateurs : on compte des participants. Dans « 4 avis négatifs sur 5 », le total (5) compte les participants qui disent du bien du motif, du mal, ou les deux (mitigés, comptés dans le total mais dans aucun camp ; dans les listes de verbatims, un mitigé figure dans les deux camps) ; suggestions, questions et constats ne sont pas des avis. Le chiffre vient toujours avec le mot de l'échelle : « unanime » quand toutes les personnes qui donnent un avis sont du même côté ; « large majorité » à partir de 80 % ; « majorité » au-dessus de la moitié ; « pas de majorité » quand le camp en tête reste sous la moitié ; « avis partagés » quand les deux camps sont proches (chacun au moins deux personnes, le plus petit au moins la moitié du plus grand) ou quand les mitigés sont au moins aussi nombreux que le camp le plus fort ; en dessous de 4 avis, « peu d'avis ». « Fragile » signale qu'une seule voix changeant de camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver : la base est celle des personnes qui ont donné un avis spontanément. Ces proportions décrivent les personnes interrogées, pas une population. Un thème réunit des motifs différents : on n'y additionne pas les avis.`,
+    "Partage des rôles : le moteur d'IA découpe les réponses en idées (positif, négatif, suggestion, question ou constat), propose les thèmes et les grands thèmes, et rédige les synthèses ; le code vérifie chaque verbatim, range chaque idée exactement une fois et calcule tous les chiffres, y compris les listes « Ce qui a marché », « Ce qui bloque », « Ce qui divise », « Ce que proposent les participants » et « Questions soulevées ». « Ce qui divise » réunit les thèmes aux avis opposés et ceux où tous font la même critique mais proposent des remèdes opposés (repérés par le moteur d'IA ; le code vérifie qu'il s'agit de deux propositions de deux personnes différentes).",
+    `Indicateurs : on compte des participants. Dans « 4 avis négatifs sur 5 », le total (5) compte les participants qui disent du bien du thème, du mal, ou les deux (mitigés, comptés dans le total mais dans aucun camp ; dans les listes de verbatims, un mitigé figure dans les deux camps) ; suggestions, questions et constats ne sont pas des avis. Le chiffre vient toujours avec le mot de l'échelle : « unanime » quand toutes les personnes qui donnent un avis sont du même côté ; « large majorité » à partir de 80 % ; « majorité » au-dessus de la moitié ; « pas de majorité » quand le camp en tête reste sous la moitié ; « avis partagés » quand les deux camps sont proches (chacun au moins deux personnes, le plus petit au moins la moitié du plus grand) ou quand les mitigés sont au moins aussi nombreux que le camp le plus fort ; en dessous de 4 avis, « peu d'avis ». « Fragile » signale qu'une seule voix changeant de camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver : la base est celle des personnes qui ont donné un avis spontanément. Ces proportions décrivent les personnes interrogées, pas une population. Un grand thème réunit des thèmes différents : on n'y additionne pas les avis.`,
     'Dans les synthèses, « (P2, P14) » renvoie aux participants dont un verbatim appuie la phrase ; « (notamment P2) » signale un exemple quand la phrase compte davantage de personnes.',
-    'Une réponse de quelques mots est suivie de sa question, qui en donne le sens (en entier la première fois dans un motif, puis par son code).',
-    "Les questions orientent les réponses (« qu'est-ce qui a bien marché ? ») : un motif où personne ne critique n'est pas pour autant un accord de tous, les autres participants n'en ont simplement pas parlé.",
+    'Une réponse de quelques mots est suivie de sa question, qui en donne le sens (en entier la première fois dans un thème, puis par son code).',
+    "Les questions orientent les réponses (« qu'est-ce qui a bien marché ? ») : un thème où personne ne critique n'est pas pour autant un accord de tous, les autres participants n'en ont simplement pas parlé.",
   )
   return lines
 }
@@ -199,7 +199,7 @@ export function offTopicLines(state: AnalysisState): { ideas: number; people: nu
   return { ideas: ideas.length, people: lines.length, lines }
 }
 
-export const OFF_TOPIC_INTRO = 'Ces idées ne répondent pas à la question posée : gardées pour la transparence, elles ne comptent dans aucun motif.'
+export const OFF_TOPIC_INTRO = 'Ces idées ne répondent pas à la question posée : gardées pour la transparence, elles ne comptent dans aucun thème.'
 
 function ideasOf(group: Group, byId: Map<string, Idea>): Idea[] {
   return group.ideaIds.map((id) => byId.get(id)!).filter(Boolean)
@@ -529,7 +529,7 @@ export function dominantVoice(ideas: Idea[]): string | null {
   const per = new Map<string, number>()
   for (const i of ideas) per.set(i.participantId, (per.get(i.participantId) ?? 0) + 1)
   const [who, n] = [...per].sort((a, b) => b[1] - a[1])[0]
-  return n * 2 > ideas.length && per.size > 1 ? `${n} des ${ideas.length} idées de ce motif viennent de ${who}.` : null
+  return n * 2 > ideas.length && per.size > 1 ? `${n} des ${ideas.length} idées de ce thème viennent de ${who}.` : null
 }
 
 export function bothSides(ideas: Idea[]): Set<string> {
@@ -614,8 +614,8 @@ export function summaryDoubts(sections: HighlightSection[]): string | undefined 
   const q = titles.map((t) => `« ${t} »`)
   const list = q.length > 1 ? `${q.slice(0, -1).join(', ')} et ${q[q.length - 1]}` : q[0]
   return q.length > 1
-    ? `À vérifier avant de citer ces étiquettes : ${list}. Elles dépendent d'avis comptés aussi dans un autre motif ; le détail est dans les listes ci-dessous.`
-    : `À vérifier avant de citer cette étiquette : ${list}. Elle dépend d'avis comptés aussi dans un autre motif ; le détail est dans les listes ci-dessous.`
+    ? `À vérifier avant de citer ces étiquettes : ${list}. Elles dépendent d'avis comptés aussi dans un autre thème ; le détail est dans les listes ci-dessous.`
+    : `À vérifier avant de citer cette étiquette : ${list}. Elle dépend d'avis comptés aussi dans un autre thème ; le détail est dans les listes ci-dessous.`
 }
 
 /**
@@ -668,7 +668,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
   const pl = (n: number) => (n > 1 ? 's' : '')
   // Le chiffre d'abord : aucun accord à faire avec le titre du motif (« Délais de livraison — 5 avis négatifs sur 6 »).
   const opinion = (x: Highlight, kind: string) => `${x.people} avis ${kind}${x.people > 1 ? 's' : ''} sur ${x.of}`
-  const INTRO = 'Chiffres : participants qui donnent un avis sur le motif.'
+  const INTRO = 'Chiffres : participants qui donnent un avis sur le thème.'
   const SHOWN = 6
   // Une liste n'est jamais coupée au milieu d'ex aequo : les motifs à égalité avec le dernier montré restent visibles.
   const cut = (list: Highlight[], n = SHOWN) => {
@@ -883,7 +883,7 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
       }
       out.push('')
     }
-    if (both.size) out.push(`\\* Personne qui s'exprime aussi dans l'autre sens sur ce motif.`, '')
+    if (both.size) out.push(`\\* Personne qui s'exprime aussi dans l'autre sens sur ce thème.`, '')
   }
 
   if (state.themes.length) {
@@ -998,11 +998,11 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
           .join('')}</ul></details>`
       })
       .join('')
-    const note = both.size ? `<p class="facts">* Personne qui s'exprime aussi dans l'autre sens sur ce motif.</p>` : ''
+    const note = both.size ? `<p class="facts">* Personne qui s'exprime aussi dans l'autre sens sur ce thème.</p>` : ''
     const dominant = dominantVoice(ideasOf(g, byId))
     // La synthèse se lit en premier ; la définition du motif, explication secondaire, reste pliée (remarque d'Arnaud, 17/10).
     const doubt = labelDoubt(g, byId)
-    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}${help(stanceTitle(g.metrics))}</p>${doubt ? `<p class="facts"><strong>${e(cap(doubt))}.</strong>${help(helpText({ ...DOUBT_HELP, what: '' }))}</p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="synth">${para(g.summary)}</div>` : ''}${g.definition ? `<details class="def"><summary>Ce qui compte comme positif ou négatif dans ce motif</summary><p>${e(definitionLine(g.definition))}</p></details>` : ''}${blocks}${note}</section>`
+    return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}${help(stanceTitle(g.metrics))}</p>${doubt ? `<p class="facts"><strong>${e(cap(doubt))}.</strong>${help(helpText({ ...DOUBT_HELP, what: '' }))}</p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="synth">${para(g.summary)}</div>` : ''}${g.definition ? `<details class="def"><summary>Ce qui compte comme positif ou négatif dans ce thème</summary><p>${e(definitionLine(g.definition))}</p></details>` : ''}${blocks}${note}</section>`
   }
 
   if (opts.stale) parts.push(`<p class="facts"><strong>${e(STALE_NOTE)}</strong></p>`)

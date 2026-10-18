@@ -156,7 +156,7 @@ export function SynthesisPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Tooltip
             side="bottom"
-            content="Importez des réponses de questionnaire, des transcriptions d'entretiens ou des notes : OpenScribe en tire les motifs récurrents, compte qui dit quoi et rédige un rapport où chaque constat renvoie aux verbatims."
+            content="Importez des réponses de questionnaire, des transcriptions d'entretiens ou des notes : OpenScribe en tire les thèmes récurrents, compte qui dit quoi et rédige un rapport où chaque constat renvoie aux verbatims."
           >
             <h1 tabIndex={0} className="flex cursor-help items-center gap-3 text-3xl font-bold tracking-tight">
               <span className="flex size-10 items-center justify-center rounded-xl bg-accent text-primary">
