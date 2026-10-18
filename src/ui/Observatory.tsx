@@ -1,8 +1,9 @@
-import { ArrowLeft, ArrowRight, Printer } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Info, Printer } from 'lucide-react'
 import { href } from '@/app/router'
 import { useEffect, useState } from 'react'
+import { activeParticipants } from '@/core/corpus'
 import type { PublishedStudy } from '@/core/observatoire'
-import { Disclosure } from './primitives'
+import { Disclosure, Explain } from './primitives'
 import { ReportTab } from './project/ReportTab'
 import { TAB_ACTIONS } from './project/slots'
 
@@ -63,6 +64,9 @@ export function ObservatoryPage({ slug }: { slug: string }) {
   const f = study.fiche
   // Les chiffres de l'en-tête : les personnes qui disent au moins une chose sur la question, les idées sans les copies du codage en double.
   const people = new Set(analysis.ideas.map((i) => i.participantId)).size
+  // Tirées au sort et comptées : l'écart se dit dès l'en-tête (remarque d'Arnaud, 18/10).
+  const drawn = activeParticipants(study.project.corpus).length
+  const silent = drawn - people
   const ideas = analysis.ideas.filter((i) => !i.copyOf).length
   return (
     <div className="space-y-6">
@@ -72,7 +76,20 @@ export function ObservatoryPage({ slug }: { slug: string }) {
           <h1 className="text-2xl font-bold sm:text-3xl">{study.title}</h1>
           <p className="text-sm text-muted-foreground">
             Publiée le {date(study.publishedAt)}
-            {study.news && ` · ${study.news.replace(/\.$/, '')}`} · {people.toLocaleString('fr-FR')} participants · {ideas.toLocaleString('fr-FR')} idées
+            {study.news && ` · ${study.news.replace(/\.$/, '')}`} ·{' '}
+            {silent > 0 ? (
+              <Explain
+                content={`${silent} des ${drawn} réponses tirées au sort, trop brèves ou sans avis sur la question, ne donnent aucune idée : le rapport porte sur les ${people} autres.`}
+              >
+                <span className="whitespace-nowrap underline decoration-dotted underline-offset-4">
+                  {drawn.toLocaleString('fr-FR')} tirés au sort, {people.toLocaleString('fr-FR')} comptés
+                  <Info className="ml-1 inline size-3.5 align-[-2px]" aria-hidden />
+                </span>
+              </Explain>
+            ) : (
+              `${people.toLocaleString('fr-FR')} participants`
+            )}{' '}
+            · {ideas.toLocaleString('fr-FR')} idées
           </p>
         </div>
         <div className="no-print flex flex-wrap items-center gap-2">

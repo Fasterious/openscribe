@@ -58,7 +58,11 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
   // Un seul résumé, et les chiffres dans la ligne grise de l'en-tête.
   await expect(page.getByRole('heading', { name: 'En bref' })).toHaveCount(0)
-  await expect(page.getByText(/Publiée le .* participants · .* idées/)).toBeVisible()
+  await expect(page.getByText(/Publiée le .* tirés au sort, .* comptés .* idées/)).toBeVisible()
+  // L'écart entre les réponses tirées au sort et les participants comptés s'explique au toucher comme au survol.
+  await page.getByRole('button', { name: /tirés au sort, .* comptés/ }).click()
+  await expect(page.getByRole('tooltip')).toContainText('ne donnent aucune idée')
+  await page.keyboard.press('Escape')
   await expect(page).toHaveTitle(/L'Observatoire OpenScribe/)
   await noHorizontalScroll(page)
   // Une ligne des listes : sa phrase, et ❝ N déroule les verbatims des N participants comptés.
