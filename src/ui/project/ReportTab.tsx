@@ -35,7 +35,7 @@ import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from '@/core/a
 import type { Contribution } from '@/core/corpus'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { isExample } from '../Synthesis'
-import { Fold, freezeHeadroom, revealMotif } from './fold'
+import { Fold, freezeHeadroom, glideTo, revealMotif } from './fold'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, download, formatDate, plural, slug } from '../format'
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
@@ -740,23 +740,39 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
       className="border-b py-0.5"
       closed={
         <span className="flex flex-col gap-1.5 py-2 sm:flex-row sm:items-center sm:justify-between">
-          <H className="text-base font-semibold">{group.title}</H>
+          <H data-vt="title" className="text-base font-semibold">
+            {group.title}
+          </H>
           <span className="flex flex-wrap items-center gap-2">
-            <span className="block w-14 sm:w-20">
+            <span data-vt="bar" className="block w-14 sm:w-20">
               <OpinionBar m={m} />
             </span>
-            <span className="text-sm text-muted-foreground">
-              <Users className="mr-0.5 inline size-3" aria-hidden />
-              {m.participants}
+            <span data-vt="meta" className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                <Users className="mr-0.5 inline size-3" aria-hidden />
+                {m.participants}
+              </span>
+              {marks}
             </span>
-            {marks}
           </span>
         </span>
       }
       opened={
+        // La barre reste dans l'en-tête ouvert : ce que contient le thème ne disparaît pas quand on l'ouvre (Arnaud, 18/10).
         <span className="flex min-w-0 items-center gap-2">
-          <H className="truncate text-base font-semibold">{group.title}</H>
-          <span className="hidden shrink-0 sm:inline-flex sm:gap-1.5">{stanceBadgeOnly(m)}</span>
+          <H data-vt="title" className="min-w-0 truncate text-base font-semibold">
+            {group.title}
+          </H>
+          <span data-vt="bar" className="block w-10 shrink-0 sm:w-20">
+            <OpinionBar m={m} />
+          </span>
+          <span data-vt="meta" className="hidden shrink-0 items-center gap-2 sm:inline-flex">
+            <span className="text-sm text-muted-foreground">
+              <Users className="mr-0.5 inline size-3" aria-hidden />
+              {m.participants}
+            </span>
+            <span className="hidden md:inline-flex md:gap-1.5">{stanceBadgeOnly(m)}</span>
+          </span>
         </span>
       }
       bodyClassName="pb-3"
@@ -1053,15 +1069,50 @@ function VerdictLine({ groups, suggestions }: { groups: Metrics[]; suggestions?:
   )
 }
 
+/**
+ * Le compte court des thèmes, dans l'en-tête collé d'un grand thème ouvert, sur un écran assez large : « 5 thèmes
+ * ● 1 ● 4 », les mots complets en infobulle et pour les lecteurs d'écran ; la ligne complète reste en tête du contenu.
+ */
+function VerdictDots({ groups }: { groups: Metrics[] }) {
+  const counted = groups.filter((m) => m.participants > 1)
+  const isolated = groups.length - counted.length
+  const verdicts = themeVerdicts(counted)
+  const words = [...verdicts.map(({ verdict, count }) => verdictLabel(verdict, count)), ...(isolated ? [`${isolated} d'une seule personne`] : [])].join(', ')
+  return (
+    <span className="hidden shrink-0 items-center gap-2 text-sm text-muted-foreground md:inline-flex" title={words}>
+      <span>{plural(groups.length, 'thème')}</span>
+      <span className="sr-only">: {words}</span>
+      {verdicts.map(({ verdict, count }) => (
+        <span key={verdict} className="inline-flex items-center gap-1" aria-hidden>
+          <span className={`inline-block size-2.5 rounded-full ${VERDICT_DOT[verdict]}`} />
+          {count}
+        </span>
+      ))}
+      {isolated > 0 && (
+        <span className="inline-flex items-center gap-1" aria-hidden>
+          <span className="inline-block size-2.5 rounded-full border border-muted-foreground/50" />
+          {isolated}
+        </span>
+      )}
+    </span>
+  )
+}
+
 /** La ligne d'un thème fermé : une seule cible, qui ouvre. */
 function ThemeRow({ title, m, groups }: { title: string; m: Metrics; groups: Metrics[] }) {
   return (
     <span className="block space-y-2 py-3">
       <span className="flex items-start justify-between gap-2">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        <span className="shrink-0 pt-1 text-sm text-muted-foreground">{plural(m.participants, 'participant')}</span>
+        <h3 data-vt="title" className="text-lg font-semibold">
+          {title}
+        </h3>
+        <span data-vt="meta" className="shrink-0 pt-1 text-sm text-muted-foreground">
+          {plural(m.participants, 'participant')}
+        </span>
       </span>
-      <VerdictBar groups={groups} />
+      <span data-vt="bar" className="block">
+        <VerdictBar groups={groups} />
+      </span>
       <VerdictLine groups={groups} />
     </span>
   )
@@ -1443,10 +1494,15 @@ export function ReportTab({
                   closed={<ThemeRow title={t.title} m={m} groups={groups.map((x) => x.m)} />}
                   opened={
                     <span className="flex min-w-0 items-center gap-3">
-                      <h3 className="truncate text-lg font-semibold">{t.title}</h3>
-                      <span className="shrink-0 text-sm text-muted-foreground">{plural(m.participants, 'participant')}</span>
-                      <span className="hidden w-28 shrink-0 sm:block">
+                      <h3 data-vt="title" className="min-w-0 truncate text-lg font-semibold">
+                        {t.title}
+                      </h3>
+                      <span data-vt="bar" className="block w-12 shrink-0 sm:w-28">
                         <VerdictBar groups={groups.map((x) => x.m)} />
+                      </span>
+                      <VerdictDots groups={groups.map((x) => x.m)} />
+                      <span data-vt="meta" className="hidden shrink-0 text-sm text-muted-foreground lg:inline">
+                        {plural(m.participants, 'participant')}
                       </span>
                     </span>
                   }
@@ -1510,9 +1566,7 @@ export function ReportTab({
           ref={backButton}
           type="button"
           onClick={() => {
-            freezeHeadroom(800)
-            back.from.scrollIntoView({ block: 'center' })
-            back.from.focus({ preventScroll: true })
+            glideTo(back.from, 'center')
             setBack(null)
             unwatch()
           }}

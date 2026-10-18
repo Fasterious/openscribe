@@ -77,9 +77,9 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   // Le motif est ouvert, à l'écran, et son titre a le focus (passe testeur du 18/10 : la page ne bougeait pas).
   const arrived = page.locator('details[data-fold="motif"][open] > summary').first()
   await expect(arrived).toBeFocused()
-  const box = (await arrived.boundingBox())!
-  expect(box.y).toBeGreaterThanOrEqual(0)
-  expect(box.y).toBeLessThan(page.viewportSize()!.height / 2)
+  // Un saut court défile en douceur : la position se vérifie une fois le défilement fini.
+  await expect.poll(async () => (await arrived.boundingBox())!.y).toBeGreaterThanOrEqual(0)
+  await expect.poll(async () => (await arrived.boundingBox())!.y).toBeLessThan(page.viewportSize()!.height / 2)
   const backTo = page.getByRole('button', { name: /← Revenir à « Ce qui a marché »/ })
   await tap(backTo)
   await expect(backTo).toHaveCount(0)
@@ -507,4 +507,45 @@ test('menu : sur un petit téléphone, aucun lien du menu n’en recouvre un aut
     await expect(page.getByRole('navigation', { name: 'Modules' }).getByRole('link', { name: 'Observatoire' })).toBeVisible()
     await noHorizontalScroll(page)
   }
+})
+
+test('lire un grand thème : il reste collé, s’efface quand on lit un thème ouvert, revient quand on remonte ; la barre suit l’en-tête', async ({ page }) => {
+  await page.goto('/#/observatoire/ecole-grand-debat-2019')
+  const theme = page.locator('details[data-fold="theme"]').nth(1)
+  const themeHead = theme.locator(':scope > summary')
+  await themeHead.scrollIntoViewIfNeeded()
+  await themeHead.click()
+  await expect(theme).toHaveAttribute('open', '')
+  // La barre du grand thème reste dans son en-tête ouvert (Arnaud, 18/10) ; sur un écran large, le compte des thèmes aussi.
+  await expect(themeHead.locator('[data-vt="bar"]')).toBeVisible()
+  if ((page.viewportSize()?.width ?? 0) >= 768) await expect(themeHead).toContainText(/\d+ thèmes/)
+  const top = (l: Locator) => l.evaluate((el) => Math.round(el.getBoundingClientRect().top))
+  const scroll = async (dy: number) => {
+    for (let i = 0; i < 4; i++) {
+      await page.evaluate((d) => window.scrollBy(0, d / 4), dy)
+      await page.waitForTimeout(60)
+    }
+  }
+  const barBottom = () => page.locator('body header').evaluate((el) => Math.max(0, Math.round(el.getBoundingClientRect().bottom)))
+  // Dans le grand thème, thèmes fermés : on descend, son en-tête reste collé sous la barre de l'application (cachée ou non).
+  await scroll(500)
+  await expect.poll(async () => Math.abs((await top(themeHead)) - (await barBottom()))).toBeLessThanOrEqual(2)
+  // Un thème ouvert, et on le lit en descendant : le grand thème s'efface, le thème prend le haut de l'écran.
+  const motif = theme.locator('details[data-fold="motif"]').first()
+  const motifHead = motif.locator(':scope > summary')
+  await motifHead.click()
+  await expect(motif).toHaveAttribute('open', '')
+  await expect(motifHead.locator('[data-vt="bar"]')).toBeVisible()
+  await scroll(600)
+  await expect.poll(() => top(themeHead)).toBeLessThan(0)
+  await expect.poll(() => top(motifHead)).toBeLessThanOrEqual(2)
+  // On remonte un peu : la barre et le grand thème reviennent, le thème se range dessous.
+  await scroll(-80)
+  await expect.poll(() => top(themeHead)).toBeGreaterThanOrEqual(50)
+  await expect.poll(async () => (await top(motifHead)) - (await top(themeHead))).toBe(48)
+  // Replier le thème rend la place au grand thème, et le titre replié reste sous lui.
+  await motifHead.click()
+  await expect(motif).not.toHaveAttribute('open', '')
+  await expect(motifHead).toBeFocused()
+  await expect.poll(async () => (await top(motifHead)) - (await top(themeHead))).toBeGreaterThanOrEqual(47)
 })
