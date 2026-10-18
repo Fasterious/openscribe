@@ -81,6 +81,15 @@
   * {
     border-color: var(--border);
   }
+  /*
+   * Tout se lit sur papier : les camps et « Et aussi » cachés à l'écran. Dans la même couche que la règle de Tailwind
+   * qui cache [hidden] (une règle « !important » d'une couche l'emporte sur une règle hors couche).
+   */
+  @media print {
+    [data-print-open][hidden] {
+      display: block !important;
+    }
+  }
   body {
     background: var(--background);
     color: var(--foreground);
@@ -149,7 +158,13 @@ html {
     color: black;
   }
   /* À l'impression, rien ne colle : un en-tête collant se répéterait sur chaque page. */
-  .sticky {
+  [class*='sticky'] {
     position: static !important;
+  }
+  .fold-in {
+    animation: none !important;
+  }
+  details.fold::details-content {
+    transition: none !important;
   }
 }

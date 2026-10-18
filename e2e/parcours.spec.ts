@@ -58,10 +58,10 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
   // Un seul résumé, et les chiffres dans la ligne grise de l'en-tête.
   await expect(page.getByRole('heading', { name: 'En bref' })).toHaveCount(0)
-  await expect(page.getByText(/Publiée le .* tirés au sort, .* comptés .* idées/)).toBeVisible()
+  await expect(page.getByText(/Publiée le .* participants sur .* tirés au sort .* idées/)).toBeVisible()
   // L'écart entre les réponses tirées au sort et les participants comptés s'explique au toucher comme au survol.
-  await page.getByRole('button', { name: /tirés au sort, .* comptés/ }).click()
-  await expect(page.getByRole('tooltip')).toContainText('ne donnent aucune idée')
+  await page.getByRole('button', { name: /participants sur .* tirés au sort/ }).click()
+  await expect(page.getByRole('tooltip')).toContainText('aucune idée sur la question')
   await page.keyboard.press('Escape')
   await expect(page).toHaveTitle(/L'Observatoire OpenScribe/)
   await noHorizontalScroll(page)
@@ -74,8 +74,13 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   // Depuis une liste, on va lire le motif en détail, puis on revient à la ligne de départ.
   const go = page.getByRole('button', { name: 'Lire le motif en détail →' }).first()
   await tap(go)
-  await expect(page.locator('details[data-fold="motif"][open]').first()).toBeVisible()
-  const backTo = page.getByRole('button', { name: /← Revenir à « .* »/ })
+  // Le motif est ouvert, à l'écran, et son titre a le focus (passe testeur du 18/10 : la page ne bougeait pas).
+  const arrived = page.locator('details[data-fold="motif"][open] > summary').first()
+  await expect(arrived).toBeFocused()
+  const box = (await arrived.boundingBox())!
+  expect(box.y).toBeGreaterThanOrEqual(0)
+  expect(box.y).toBeLessThan(page.viewportSize()!.height / 2)
+  const backTo = page.getByRole('button', { name: /← Revenir à « Ce qui a marché »/ })
   await tap(backTo)
   await expect(backTo).toHaveCount(0)
   expect(await go.evaluate((el) => el === document.activeElement)).toBe(true)
@@ -161,10 +166,12 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   expect(text).toContain('## Résumé')
   expect(text).toContain('Méthode')
 
-  // À l'impression, tous les groupes sont dépliés.
+  // À l'impression, tous les groupes sont dépliés, et chaque camp (même fermé à l'écran) montre ses verbatims.
   await page.emulateMedia({ media: 'print' })
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')))
   expect(await page.locator('article details:not([open])').count()).toBe(0)
+  const hiddenOnPaper = await page.locator('article [data-print-open]').evaluateAll((els) => els.filter((e) => getComputedStyle(e).display === 'none').length)
+  expect(hiddenOnPaper).toBe(0)
 })
 
 test('replier des verbatims ramène le lecteur là où il les avait dépliés', async ({ page }) => {
@@ -483,6 +490,8 @@ test('vos études : renommer, dupliquer et supprimer depuis le menu d’une étu
   await page.getByRole('button', { name: 'Actions sur Étude rangée (copie)' }).click()
   await page.getByRole('menuitem', { name: 'Supprimer' }).click()
   await page.getByRole('button', { name: 'Supprimer', exact: true }).click()
+  // La fenêtre fermée d'abord : tant qu'elle est ouverte, la liste derrière est cachée aux lecteurs d'écran (compte nul trompeur).
+  await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page.getByRole('link', { name: /Étude rangée \(copie\)/ })).toHaveCount(0)
   await expect(page.getByRole('link', { name: /Étude rangée/ })).toBeVisible()
 })

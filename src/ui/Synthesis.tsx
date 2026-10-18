@@ -144,7 +144,9 @@ export function SynthesisPage() {
     const { project } = importProject(exportProject(p, await getResponses(keys)))
     await createProject({ ...project, name: `${p.name} (copie)` })
   }
-  const mine = projects?.filter((p) => !isExample(p)) ?? null
+  // Une synthèse supprimée quitte la liste aussitôt, sans attendre la relecture de la base (elle réapparaissait un instant).
+  const [gone, setGone] = useState<Set<string>>(() => new Set())
+  const mine = projects?.filter((p) => !isExample(p) && !gone.has(p.id)) ?? null
   const example = projects?.find(isExample)
 
   return (
@@ -250,7 +252,10 @@ export function SynthesisPage() {
           <Button
             variant="destructive"
             onClick={async () => {
-              if (toDelete) await deleteProject(toDelete.id)
+              if (toDelete) {
+                await deleteProject(toDelete.id)
+                setGone((g) => new Set(g).add(toDelete.id))
+              }
               setToDelete(null)
               notifyProjectsChanged()
             }}

@@ -5,11 +5,16 @@ import { cn } from '../primitives'
  * Lire un rapport long sans s'y perdre (`docs/LECTURE-RAPPORT.md`) : un bloc ouvert (thème, motif) garde son en-tête
  * collé en haut de l'écran tant qu'on le lit, avec « Replier » ; replier replace le titre là où était l'en-tête et rend
  * le focus au bloc. La barre de l'application se cache quand on descend, revient dès qu'on remonte.
+ *
+ * Hauteurs fixes, pour que les en-têtes s'empilent sans se chevaucher : thème ouvert 3 rem, motif ouvert 2,75 rem.
+ * Sur un écran bas (moins de 600 px, téléphone couché) ou étroit, le thème ne colle pas : un seul niveau collé.
  */
 
 /** Hauteur de la barre de l'application quand elle est visible ; les en-têtes collants se placent dessous. */
 const APP_BAR = '3.5rem'
 let frozenUntil = 0
+/** Le dernier repli : le second clic d'un double clic sur « Replier » ne rouvre pas le bloc dont le titre arrive sous le pointeur. */
+let folded: { at: number; el: HTMLDetailsElement | null } = { at: 0, el: null }
 
 /** Un défilement provoqué par le code (un repli) ne fait pas réapparaître la barre de l'application. */
 export function freezeHeadroom(ms = 400) {
@@ -18,7 +23,7 @@ export function freezeHeadroom(ms = 400) {
 
 /**
  * La barre de l'application, partiellement persistante sur les pages de lecture : cachée quand on descend de plus de
- * 8 px au-delà des 200 premiers pixels, revenue dès qu'on remonte de 8 px, toujours visible si elle a le focus.
+ * 8 px au-delà des 200 premiers pixels, revenue dès qu'on remonte de 8 px, ou dès qu'elle reçoit le focus clavier.
  * Elle écrit sa hauteur visible dans `--app-bar`, que suivent les en-têtes collants.
  */
 export function useHeadroom(enabled: boolean, header: React.RefObject<HTMLElement | null>) {
@@ -50,8 +55,14 @@ export function useHeadroom(enabled: boolean, header: React.RefObject<HTMLElemen
       else if (dir < 0 && anchor - y > 8) setHidden(false)
       last = y
     }
+    const onFocus = () => setHidden(false)
+    const bar = header.current
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    bar?.addEventListener('focusin', onFocus)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      bar?.removeEventListener('focusin', onFocus)
+    }
   }, [enabled, header])
   useEffect(() => {
     document.documentElement.style.setProperty('--app-bar', hidden ? '0px' : APP_BAR)
@@ -60,6 +71,12 @@ export function useHeadroom(enabled: boolean, header: React.RefObject<HTMLElemen
 }
 
 const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+/** Ouvre ou ferme sans animation (les blocs ouverts par le code, les très grands blocs). */
+function instant(details: HTMLDetailsElement) {
+  details.classList.add('fold-instant')
+  window.setTimeout(() => details.classList.remove('fold-instant'), 300)
+}
 
 /**
  * Referme un bloc ouvert. Si le lecteur est descendu dans le bloc (son en-tête est collé), le titre refermé vient se
@@ -74,10 +91,8 @@ export function foldDetails(details: HTMLDetailsElement) {
     style?.position === 'sticky' ? parseFloat(style.top) || 0 : Math.max(0, document.querySelector('body header')?.getBoundingClientRect().bottom ?? 0)
   const r = details.getBoundingClientRect()
   freezeHeadroom()
-  if (r.height > window.innerHeight * 1.5 || reduced()) {
-    details.classList.add('fold-instant')
-    window.setTimeout(() => details.classList.remove('fold-instant'), 300)
-  }
+  folded = { at: Date.now(), el: details }
+  if (r.height > window.innerHeight * 1.5 || reduced()) instant(details)
   const inside = r.top < stick
   // L'ancrage du défilement du navigateur décalerait la page quand le bloc se referme : on le suspend le temps du repli.
   const root = document.documentElement
@@ -96,10 +111,19 @@ export function foldDetails(details: HTMLDetailsElement) {
   }, 260)
 }
 
+/** Les classes d'un en-tête ouvert qui colle : sous la barre de l'application et sous l'en-tête du niveau supérieur. */
+const STUCK = {
+  // Le thème ne colle que sur un écran assez large et assez haut : sur mobile, deux niveaux collés au plus.
+  theme:
+    'z-20 h-12 border-b bg-background/95 backdrop-blur transition-[top] duration-200 motion-reduce:transition-none [@media(min-width:40rem)_and_(min-height:600px)]:sticky [@media(min-width:40rem)_and_(min-height:600px)]:top-[var(--app-bar)]',
+  motif:
+    'sticky top-[calc(var(--app-bar)+var(--theme-stick,0px))] z-10 h-11 border-b bg-background/95 backdrop-blur transition-[top] duration-200 motion-reduce:transition-none',
+}
+
 /**
  * Un bloc repliable de lecture (thème, motif) : `<details>` natif (Ctrl+F l'ouvre, l'impression le déplie), dont
  * l'en-tête ouvert reste collé avec « Replier ». `closed` est la ligne fermée, une seule cible qui ouvre ; `opened`
- * l'en-tête compact du bloc ouvert. `level` place l'en-tête sous ceux des niveaux supérieurs.
+ * l'en-tête compact du bloc ouvert, sur une ligne. `level` place l'en-tête sous ceux des niveaux supérieurs.
  */
 export function Fold({
   closed,
@@ -111,6 +135,7 @@ export function Fold({
   bodyClassName,
   defaultOpen = false,
   label,
+  onToggle,
 }: {
   closed: ReactNode
   opened: ReactNode
@@ -122,6 +147,7 @@ export function Fold({
   defaultOpen?: boolean
   /** Nom du bloc pour les lecteurs d'écran (« le thème Public face au privé »). */
   label: string
+  onToggle?: (open: boolean) => void
 }) {
   const ref = useRef<HTMLDetailsElement>(null)
   const [open, setOpen] = useState(defaultOpen)
@@ -130,7 +156,7 @@ export function Fold({
     const d = ref.current
     if (!d) return
     if (d.open) foldDetails(d)
-    else d.open = true
+    else if (!(e.detail > 1 && folded.el === d && Date.now() - folded.at < 500)) d.open = true
   }, [])
   return (
     <details
@@ -138,7 +164,11 @@ export function Fold({
       id={id}
       open={defaultOpen}
       data-fold={level}
-      onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
+      onToggle={(e) => {
+        const isOpen = (e.currentTarget as HTMLDetailsElement).open
+        setOpen(isOpen)
+        onToggle?.(isOpen)
+      }}
       // Échap replie le bloc ouvert le plus intérieur (le plus proche du focus) et rend le focus à son titre.
       onKeyDown={(e) => {
         if (e.key !== 'Escape' || !ref.current?.open) return
@@ -150,14 +180,7 @@ export function Fold({
       <summary
         onClick={toggle}
         aria-label={open ? `Replier ${label}` : undefined}
-        className={cn(
-          'flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden',
-          // Ouvert, l'en-tête colle sous la barre de l'application et sous l'en-tête du niveau supérieur.
-          open &&
-            (level === 'theme'
-              ? 'z-20 border-b bg-background/95 backdrop-blur transition-[top] duration-200 sm:sticky sm:top-[var(--app-bar)]'
-              : 'sticky top-[calc(var(--app-bar)+var(--theme-stick,0px))] z-10 border-b bg-background/95 backdrop-blur transition-[top] duration-200'),
-        )}
+        className={cn('flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden', open && STUCK[level])}
       >
         <span className="min-w-0 flex-1">{open ? opened : closed}</span>
         {open ? (
@@ -172,9 +195,9 @@ export function Fold({
       </summary>
       <div
         className={cn(
-          // Les en-têtes des motifs collent sous celui du thème (sur grand écran : sur mobile, deux niveaux au plus).
-          level === 'theme' && '[--theme-stick:0px] sm:[--theme-stick:3rem]',
-          level === 'motif' && '[--motif-stick:3rem]',
+          // Les en-têtes des motifs collent sous celui du thème, quand celui-ci colle (même condition que STUCK.theme).
+          level === 'theme' && '[--theme-stick:0px] [@media(min-width:40rem)_and_(min-height:600px)]:[--theme-stick:3rem]',
+          level === 'motif' && '[--motif-stick:2.75rem]',
           bodyClassName,
         )}
       >
@@ -192,17 +215,26 @@ export function Fold({
 }
 
 /**
- * Ouvre un motif dans la partie détaillée (et son thème), l'amène sous les en-têtes collants et lui donne le focus :
- * depuis une liste ou le résumé, on va lire le motif en entier.
+ * Ouvre un motif dans la partie détaillée (et son thème), sans animation (le contenu doit être rendu pour qu'on y
+ * défile), l'amène sous les en-têtes collants et lui donne le focus : depuis une liste ou le résumé, on va lire le
+ * motif en entier. Renvoie le bloc ouvert.
  */
-export function revealMotif(groupId: string): boolean {
+export function revealMotif(groupId: string): HTMLDetailsElement | null {
   const d = document.getElementById(`motif-${groupId}`) as HTMLDetailsElement | null
-  if (!d) return false
-  for (let p: HTMLElement | null = d; p; p = p.parentElement) if (p instanceof HTMLDetailsElement) p.open = true
-  freezeHeadroom(800)
-  requestAnimationFrame(() => {
-    d.scrollIntoView({ block: 'start' })
-    ;(d.querySelector(':scope > summary') as HTMLElement | null)?.focus({ preventScroll: true })
-  })
-  return true
+  if (!d) return null
+  for (let p: HTMLElement | null = d; p; p = p.parentElement)
+    if (p instanceof HTMLDetailsElement && !p.open) {
+      instant(p)
+      p.open = true
+    }
+  freezeHeadroom(1200)
+  const summary = d.querySelector(':scope > summary') as HTMLElement | null
+  // Deux images : le temps que le contenu ouvert soit mis en page.
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      d.scrollIntoView({ block: 'start' })
+      summary?.focus({ preventScroll: true })
+    }),
+  )
+  return d
 }

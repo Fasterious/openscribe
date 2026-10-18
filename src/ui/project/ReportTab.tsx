@@ -344,6 +344,7 @@ function ListItem({
   ctx,
   groupById,
   lineClass,
+  heading,
   compact = false,
 }: {
   section: HighlightSection['key']
@@ -351,11 +352,13 @@ function ListItem({
   ctx: Ctx
   groupById: Map<string, Group>
   lineClass: string
+  /** Le titre de la liste, que nomme le bouton de retour. */
+  heading: string
   compact?: boolean
 }) {
   const [why, setWhy] = useState(false)
   const group = groupById.get(item.groupId)
-  const mark = 'cursor-pointer rounded underline decoration-dotted underline-offset-2 hover:text-foreground'
+  const mark = 'inline-flex min-h-6 cursor-pointer items-center rounded underline decoration-dotted underline-offset-2 hover:text-foreground'
   return (
     <li className={`border-l-[3px] pl-2.5 ${lineClass}`}>
       <HighlightLine section={section} item={item} ctx={ctx} groupById={groupById} compact={compact}>
@@ -383,7 +386,7 @@ function ListItem({
       {group && (
         <button
           type="button"
-          onClick={(e) => ctx.reveal(group.id, e.currentTarget, item.title)}
+          onClick={(e) => ctx.reveal(group.id, e.currentTarget, `Revenir à « ${heading} »`)}
           className="no-print mt-1 block min-h-6 cursor-pointer text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
         >
           Lire le motif en détail →
@@ -407,16 +410,16 @@ function DoubtLinks({ sections, ctx }: { sections: HighlightSection[]; ctx: Ctx 
   if (!items.length) return null
   return (
     <p className="mt-2 text-sm text-muted-foreground">
-      À vérifier avant de citer {items.length > 1 ? 'ces étiquettes' : 'cette étiquette'} :{' '}
+      À vérifier avant de citer : l'étiquette {items.length > 1 ? 'des motifs' : 'du motif'}{' '}
       {items.map(([id, title], k) => (
         <Fragment key={id}>
           {k > 0 && (k === items.length - 1 ? ' et ' : ', ')}
-          <button type="button" onClick={(e) => ctx.reveal(id, e.currentTarget, 'Résumé')} className="cursor-pointer text-primary underline-offset-4 hover:underline">
+          <button type="button" onClick={(e) => ctx.reveal(id, e.currentTarget, 'Revenir au résumé')} className="inline-flex min-h-6 cursor-pointer items-center text-primary underline-offset-4 hover:underline">
             {title}
           </button>
         </Fragment>
       ))}
-      . {items.length > 1 ? 'Elles dépendent' : 'Elle dépend'} d'avis comptés aussi dans un autre motif : chaque motif ouvert l'explique.
+      . Elle dépend d'avis comptés aussi dans un autre motif ; chaque motif, une fois ouvert, explique pourquoi.
     </p>
   )
 }
@@ -429,41 +432,66 @@ const MORE_WORD: Record<HighlightSection['key'], string> = {
   questions: 'avec des questions',
 }
 
-/** « Et aussi » se déplie sur place, en vue restreinte : titre, chiffres, marques, pastille (demande d'Arnaud, 18/10). */
+/**
+ * « Et aussi » se déplie sur place, en vue restreinte : titre, chiffres, marques, pastille (demande d'Arnaud, 18/10).
+ * Le contenu reste dans la page, caché : l'impression le montre, Ctrl+F le trouve.
+ */
 function MoreItems({
   section,
   items,
   ctx,
   groupById,
   lineClass,
+  heading,
 }: {
   section: HighlightSection['key']
   items: HighlightSection['items']
   ctx: Ctx
   groupById: Map<string, Group>
   lineClass: string
+  heading: string
 }) {
   const [open, setOpen] = useState(false)
+  const top = useRef<HTMLButtonElement>(null)
   const n = items.length
+  const hide = n > 1 ? `Masquer les ${n} autres motifs` : "Masquer l'autre motif"
+  const toggle = (
+    <button
+      ref={top}
+      type="button"
+      aria-expanded={open}
+      onClick={() => setOpen((o) => !o)}
+      className="no-print inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md text-sm font-medium text-primary hover:underline"
+    >
+      {open ? hide : `Voir ${n > 1 ? `les ${n} autres motifs` : "l'autre motif"} ${MORE_WORD[section]}`}
+      <span aria-hidden className={`transition-transform motion-reduce:transition-none ${open ? '-rotate-90' : 'rotate-90'}`}>
+        ›
+      </span>
+    </button>
+  )
   return (
     <div className="mt-3 space-y-2">
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-        className="inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md text-sm font-medium text-primary hover:underline"
-      >
-        {open ? `Masquer les ${n} autres motifs` : `Voir ${n > 1 ? `les ${n} autres motifs` : "l'autre motif"} ${MORE_WORD[section]}`}
-        <span aria-hidden className={`transition-transform motion-reduce:transition-none ${open ? '-rotate-90' : 'rotate-90'}`}>
-          ›
-        </span>
-      </button>
+      {toggle}
+      <ul hidden={!open} data-print-open className="fold-in space-y-2 text-base">
+        {items.map((x) => (
+          <ListItem key={x.title} section={section} item={x} ctx={ctx} groupById={groupById} lineClass={lineClass} heading={heading} compact />
+        ))}
+      </ul>
       {open && (
-        <ul className="fold-in space-y-2 text-base">
-          {items.map((x) => (
-            <ListItem key={x.title} section={section} item={x} ctx={ctx} groupById={groupById} lineClass={lineClass} compact />
-          ))}
-        </ul>
+        <button
+          type="button"
+          onClick={() => {
+            freezeHeadroom()
+            setOpen(false)
+            requestAnimationFrame(() => {
+              top.current?.scrollIntoView({ block: 'nearest' })
+              top.current?.focus({ preventScroll: true })
+            })
+          }}
+          className="no-print inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md text-sm font-medium text-primary hover:underline"
+        >
+          <span aria-hidden>⌃</span> {hide}
+        </button>
       )}
     </div>
   )
@@ -474,7 +502,7 @@ const SECTION_WORD: Record<HighlightSection['key'], [string, string]> = {
   strengths: ['avis positif', 'avis positifs'],
   blockers: ['avis négatif', 'avis négatifs'],
   divided: ['avis', 'avis'],
-  proposals: ['proposition', 'propositions'],
+  proposals: ['suggestion', 'suggestions'],
   questions: ['question', 'questions'],
 }
 
@@ -522,7 +550,7 @@ function useFoldBack() {
 const PANEL_WORD: Record<IdeaCategory, [string, string]> = {
   positive: ['avis positif', 'avis positifs'],
   negative: ['avis négatif', 'avis négatifs'],
-  suggestion: ['proposition', 'propositions'],
+  suggestion: ['suggestion', 'suggestions'],
   question: ['question', 'questions'],
   neutral: ['constat', 'constats'],
 }
@@ -567,7 +595,7 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
         close()
       }}
     >
-      <div className="sticky top-[calc(var(--app-bar)+var(--theme-stick,0px)+var(--motif-stick,0px))] z-[5] flex items-center justify-between gap-2 border-b bg-background/95 py-1 text-sm backdrop-blur transition-[top] duration-200">
+      <div className="sticky top-[calc(var(--app-bar)+var(--theme-stick,0px)+var(--motif-stick,0px))] z-[5] flex items-center justify-between gap-2 border-b bg-background/95 py-1 text-sm backdrop-blur transition-[top] duration-200 motion-reduce:transition-none">
         <span className="min-w-0 truncate font-medium">
           <Quote className="mr-1 inline size-3" aria-hidden />
           {panelTitle(ideas, ctx)}
@@ -582,7 +610,7 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
         )),
       )}
       <button type="button" onClick={close} className="no-print inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
-        <span aria-hidden>⌃</span> Replier {plural(ideas.length, 'verbatim')}
+        <span aria-hidden>⌃</span> Replier ces verbatims
       </button>
     </div>
   )
@@ -600,9 +628,9 @@ function ContextPanel({ idea, ctx, onClose }: { idea: Idea; ctx: Ctx; onClose: (
           back()
           onClose()
         }}
-        className="mt-1 cursor-pointer text-sm text-muted-foreground hover:text-foreground"
+        className="mt-1 inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
       >
-        Replier
+        <span aria-hidden>⌃</span> Replier
       </button>
     </div>
   )
@@ -724,7 +752,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
         </span>
       }
       opened={
-        <span className="flex min-w-0 items-center gap-2 py-2">
+        <span className="flex min-w-0 items-center gap-2">
           <H className="truncate text-base font-semibold">{group.title}</H>
           <span className="hidden shrink-0 sm:inline-flex sm:gap-1.5">{stanceBadgeOnly(m)}</span>
         </span>
@@ -734,8 +762,8 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
       <div className="space-y-3 text-base">
         <p className="text-sm text-muted-foreground">{metricsLine(m)}</p>
         {/* Ce que veut dire l'étiquette, plié : dans la ligne fermée, ce n'est plus une infobulle (une seule cible). */}
-        <details className="text-sm">
-          <summary className="cursor-pointer text-muted-foreground">Que veut dire cette étiquette ?</summary>
+        <details className="text-sm" onKeyDown={closeOnEscape}>
+          <summary className="cursor-pointer py-1 text-muted-foreground">Que veut dire cette étiquette ?</summary>
           <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{helpText(STANCE_HELP[m.stance])}</p>
         </details>
         {dominantVoice(ideas) && <p className="text-sm text-muted-foreground">{dominantVoice(ideas)}</p>}
@@ -748,8 +776,8 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
         )}
         {/* La définition du motif : explication secondaire, pliée ; la synthèse se lit d'abord (remarque d'Arnaud, 17/10). */}
         {group.definition && (
-          <details className="group/def text-sm">
-            <summary className="cursor-pointer text-muted-foreground">Ce qui compte comme positif ou négatif dans ce motif</summary>
+          <details className="group/def text-sm" onKeyDown={closeOnEscape}>
+            <summary className="cursor-pointer py-1 text-muted-foreground">Ce qui compte comme positif ou négatif dans ce motif</summary>
             <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{definitionLine(group.definition)}</p>
           </details>
         )}
@@ -759,6 +787,14 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
       </div>
     </Fold>
   )
+}
+
+/** Échap referme un `<details>` d'explication ouvert, sans refermer le motif qui le contient. */
+function closeOnEscape(e: React.KeyboardEvent<HTMLDetailsElement>) {
+  if (e.key !== 'Escape' || !e.currentTarget.open) return
+  e.stopPropagation()
+  e.currentTarget.open = false
+  ;(e.currentTarget.querySelector(':scope > summary') as HTMLElement | null)?.focus()
 }
 
 /** Au-delà de 8 lignes, un camp reste fermé : le lecteur choisit le sien au lieu de faire défiler 8 écrans (D6). */
@@ -809,13 +845,12 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
                 ›
               </span>
             </button>
-            {isOpen && (
-              <ul className="fold-in space-y-1.5">
-                {lines.map((l) => (
-                  <PersonLine key={l.participantId} line={l} cat={cat} other={polar && both.has(l.participantId)} full={full} ctx={ctx} />
-                ))}
-              </ul>
-            )}
+            {/* Toujours dans la page, caché quand le camp est fermé : l'impression le montre, Ctrl+F le trouve. */}
+            <ul hidden={!isOpen} data-print-open className="fold-in space-y-1.5">
+              {lines.map((l) => (
+                <PersonLine key={l.participantId} line={l} cat={cat} other={polar && both.has(l.participantId)} full={full} ctx={ctx} />
+              ))}
+            </ul>
           </div>
         )
       })}
@@ -845,8 +880,8 @@ function WhyLabel({ group, ctx }: { group: Group; ctx: Ctx }) {
           <p>
             <span className="font-semibold">À vérifier.</span> {ctx.mask(doubt.text)}
           </p>
-          <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="min-h-6 cursor-pointer font-medium text-primary underline-offset-4 hover:underline">
-            {open ? 'Masquer ces verbatims' : `Montrer ces ${doubt.ideaIds.length} verbatims`}
+          <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="no-print inline-flex min-h-8 cursor-pointer items-center font-medium text-primary underline-offset-4 hover:underline">
+            {open ? (doubt.ideaIds.length > 1 ? 'Masquer ces verbatims' : 'Masquer ce verbatim') : doubt.ideaIds.length > 1 ? `Voir ces ${doubt.ideaIds.length} verbatims` : 'Voir ce verbatim'}
           </button>
           {open && <QuotesPanel ids={doubt.ideaIds} ctx={ctx} onClose={() => setOpen(false)} />}
         </>
@@ -874,11 +909,21 @@ function PersonLine({
   ctx: Ctx
 }) {
   const [open, setOpen] = useState<string | null>(null)
+  const box = useRef<HTMLLIElement>(null)
+  const close = () => {
+    const id = open
+    setOpen(null)
+    requestAnimationFrame(() => box.current?.querySelector<HTMLElement>(`[data-idea="${id}"]`)?.focus({ preventScroll: true }))
+  }
   return (
     <li
+      ref={box}
       className={`flex gap-2 border-l-[3px] py-0.5 pl-2.5 ${BORDER[cat]}`}
       onKeyDown={(e) => {
-        if (e.key === 'Escape' && open) setOpen(null)
+        if (e.key !== 'Escape' || !open) return
+        // Échap referme la réponse entière seulement, pas le motif qui la contient ; le focus revient au verbatim.
+        e.stopPropagation()
+        close()
       }}
     >
       <span className="w-9 shrink-0 pt-px text-sm font-semibold text-muted-foreground">
@@ -904,6 +949,7 @@ function PersonLine({
                 <Tooltip wide side="top" content={<SourceContext idea={i} ctx={ctx} excerpt={180} />}>
                   <button
                     type="button"
+                    data-idea={i.id}
                     className="cursor-pointer text-left underline-offset-4 hover:underline"
                     aria-expanded={open === i.id}
                     onClick={() => setOpen(open === i.id ? null : i.id)}
@@ -916,7 +962,7 @@ function PersonLine({
             </Fragment>
           )
         })}
-        {open && <ContextPanel idea={line.ideas.find((i) => i.id === open)!} ctx={ctx} onClose={() => setOpen(null)} />}
+        {open && <ContextPanel idea={line.ideas.find((i) => i.id === open)!} ctx={ctx} onClose={close} />}
       </div>
     </li>
   )
@@ -927,7 +973,7 @@ function MinorityNote({ minority, ctx }: { minority: NonNullable<Metrics['minori
   return (
     <Alert tone="info" className="text-sm">
       Minorité constante ({minority.side === 'positive' ? 'avis positifs' : 'avis négatifs'}) : {minority.participantIds.join(', ')}.{' '}
-      <button className="cursor-pointer text-primary underline" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button className="inline-flex min-h-6 cursor-pointer items-center text-primary underline" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {open ? 'Masquer leurs verbatims' : 'Voir leurs verbatims'}
       </button>
       {open && <QuotesPanel ids={minority.ideaIds} ctx={ctx} onClose={() => setOpen(false)} />}
@@ -967,15 +1013,20 @@ function VerdictLine({ groups, suggestions }: { groups: Metrics[]; suggestions?:
   const verdicts = themeVerdicts(counted)
   return (
     <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-      {counted.length > 0 && <span className="font-medium text-foreground">{plural(counted.length, 'motif')} :</span>}
+      <span className="font-medium text-foreground">{plural(groups.length, 'motif')} :</span>
       {verdicts.map(({ verdict, count }) => (
         <span key={verdict} className="inline-flex items-center gap-1.5">
           <span className={`inline-block size-2.5 rounded-full ${VERDICT_DOT[verdict]}`} aria-hidden />
           {verdictLabel(verdict, count)}
         </span>
       ))}
-      {isolated > 0 && <span>· {isolated > 1 ? `${isolated} signaux isolés` : '1 signal isolé'}</span>}
-      {!!suggestions && <span>· {suggestions > 1 ? `${suggestions} personnes proposent` : '1 personne propose'}</span>}
+      {isolated > 0 && (
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block size-2.5 rounded-full border border-muted-foreground/50" aria-hidden />
+          {isolated} d'une seule personne
+        </span>
+      )}
+      {!!suggestions && <span>{suggestions > 1 ? `${suggestions} personnes font des suggestions` : '1 personne fait une suggestion'}</span>}
     </span>
   )
 }
@@ -994,19 +1045,25 @@ function ThemeRow({ title, m, groups }: { title: string; m: Metrics; groups: Met
   )
 }
 
-/** Tout déplier ou tout replier les thèmes (pas les motifs) : pour qui veut tout lire, ou chercher avec Ctrl+F. */
+/** Déplier ou replier tous les thèmes (pas les motifs) : pour qui veut tout parcourir, ou chercher avec Ctrl+F. */
 function ExpandAll() {
   const [all, setAll] = useState(false)
+  // Le libellé suit l'état réel : des thèmes ouverts un à un comptent aussi.
+  useEffect(() => {
+    const sync = () => {
+      const themes = [...document.querySelectorAll<HTMLDetailsElement>('details[data-fold="theme"]')]
+      setAll(themes.length > 0 && themes.every((d) => d.open))
+    }
+    document.addEventListener('toggle', sync, true)
+    return () => document.removeEventListener('toggle', sync, true)
+  }, [])
   return (
     <button
       type="button"
-      onClick={() => {
-        document.querySelectorAll<HTMLDetailsElement>('details[data-fold="theme"]').forEach((d) => (d.open = !all))
-        setAll(!all)
-      }}
+      onClick={() => document.querySelectorAll<HTMLDetailsElement>('details[data-fold="theme"]').forEach((d) => (d.open = !all))}
       className="no-print inline-flex min-h-8 cursor-pointer items-center rounded-md border border-input bg-card px-3 text-sm font-medium hover:bg-accent"
     >
-      {all ? 'Tout replier' : 'Tout déplier'}
+      {all ? 'Replier tous les thèmes' : 'Déplier tous les thèmes'}
     </button>
   )
 }
@@ -1072,7 +1129,16 @@ export function ReportTab({
   const [back, setBack] = useState<{ from: HTMLElement; label: string } | null>(null)
   const ctx: Ctx = {
     reveal: (groupId, from, label) => {
-      if (revealMotif(groupId)) setBack({ from, label })
+      const d = revealMotif(groupId)
+      if (!d) return
+      setBack({ from, label })
+      // Le retour s'efface quand on referme le motif où l'on est allé.
+      const onToggle = () => {
+        if (d.open) return
+        setBack(null)
+        d.removeEventListener('toggle', onToggle)
+      }
+      d.addEventListener('toggle', onToggle)
     },
     ideaById: new Map(analysis.ideas.map((i) => [i.id, i])),
     contributionById: new Map(corpus.contributions.map((c) => [c.id, c])),
@@ -1284,10 +1350,10 @@ export function ReportTab({
                     {sec.intro && <p className="mb-2 text-sm text-muted-foreground">{sec.intro}</p>}
                     <ul className="space-y-2 text-base">
                       {sec.items.map((x) => (
-                        <ListItem key={x.title} section={sec.key} item={x} ctx={ctx} groupById={groupById} lineClass={look.line} />
+                        <ListItem key={x.title} section={sec.key} item={x} ctx={ctx} groupById={groupById} lineClass={look.line} heading={sec.heading} />
                       ))}
                     </ul>
-                    {sec.moreItems.length > 0 && <MoreItems section={sec.key} items={sec.moreItems} ctx={ctx} groupById={groupById} lineClass={look.line} />}
+                    {sec.moreItems.length > 0 && <MoreItems section={sec.key} items={sec.moreItems} ctx={ctx} groupById={groupById} lineClass={look.line} heading={sec.heading} />}
                   </CardContent>
                 </Card>
               )
@@ -1331,7 +1397,7 @@ export function ReportTab({
                   className="border-b"
                   closed={<ThemeRow title={t.title} m={m} groups={groups.map((x) => x.m)} />}
                   opened={
-                    <span className="flex min-w-0 items-center gap-3 py-3">
+                    <span className="flex min-w-0 items-center gap-3">
                       <h3 className="truncate text-lg font-semibold">{t.title}</h3>
                       <span className="shrink-0 text-sm text-muted-foreground">{plural(m.participants, 'participant')}</span>
                       <span className="hidden w-28 shrink-0 sm:block">
@@ -1403,9 +1469,9 @@ export function ReportTab({
             back.from.focus({ preventScroll: true })
             setBack(null)
           }}
-          className="no-print fixed bottom-4 left-1/2 z-40 inline-flex min-h-10 -translate-x-1/2 cursor-pointer items-center gap-1 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground shadow-lg"
+          className="no-print fixed bottom-4 left-4 z-40 inline-flex min-h-10 max-w-[calc(100vw-2rem)] cursor-pointer items-center gap-1 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground shadow-lg"
         >
-          ← Revenir à « {back.label} »
+          <span className="truncate">← {back.label}</span>
         </button>
       )}
 

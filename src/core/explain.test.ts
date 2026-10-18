@@ -9,6 +9,8 @@ const idea = (n: number, category: IdeaCategory, copyOf?: string, participant = 
   ({ id: `I${String(n).padStart(4, '0')}`, participantId: `P${participant}`, category, verbatim: 'x', ...(copyOf ? { copyOf } : {}) }) as Idea
 const group = (ideas: Idea[]): Group => ({ id: 'G1', title: 'Piscine', summary: '', ideaIds: ideas.map((i) => i.id), metrics: computeMetrics(ideas) }) as Group
 const many = (from: number, n: number, cat: IdeaCategory) => Array.from({ length: n }, (_, k) => idea(from + k, cat))
+// Les espaces insécables de la typographie française, lues comme des espaces ordinaires.
+const plain = (t?: string) => t?.replace(/[\u00a0\u202f]/g, ' ')
 
 describe('étiquettes expliquées au cas par cas', () => {
   it('12 sur 14 n\'est pas fragile : une voix de moins laisserait le même camp en tête (règle « la conclusion change »)', () => {
@@ -21,8 +23,8 @@ describe('étiquettes expliquées au cas par cas', () => {
     // 5 négatifs, 1 positif : une voix de moins, 4 contre 2 : avis partagés.
     const g = group([...many(1, 5, 'negative'), idea(6, 'positive')])
     expect(fragileShown(g.metrics)).toBe(true)
-    expect(fragileReason(g)).toBe(
-      '5 des 6 personnes qui donnent un avis sont négatives. Si une seule de ces 5 personnes avait donné un avis positif, ce serait 2 avis positifs contre 4 négatifs : les avis seraient partagés, le plus petit camp valant au moins la moitié du plus grand. Sur 6 avis, la conclusion tient donc à une voix : citez le chiffre (5 sur 6) plutôt que l\'étiquette seule, et lisez les verbatims des deux camps.',
+    expect(plain(fragileReason(g))).toBe(
+      "Sur les 6 personnes qui donnent un avis, 5 sont d'avis négatif. Si une seule de ces 5 personnes avait donné un avis positif, ce serait 2 avis positifs contre 4 négatifs : les avis seraient partagés, le plus petit camp comptant au moins la moitié du plus grand. La conclusion tient donc à une voix : citez le chiffre (5 sur 6) plutôt que l'étiquette seule, et lisez les verbatims des deux camps.",
     )
   })
 
@@ -36,8 +38,19 @@ describe('étiquettes expliquées au cas par cas', () => {
     const byId = new Map(ideas.map((i) => [i.id, i]))
     const r = doubtReason(group(ideas), byId, () => 'Horaires')
     expect(r?.ideaIds).toEqual(['I0007', 'I0008'])
-    expect(r?.text).toBe(
-      "1 des 7 personnes qui donnent un avis n'est comptée ici que par une idée rangée d'abord dans un autre motif : 1 avis négatif (P7, d'abord dans « Horaires »). Sans ces idées, il resterait 6 avis : « unanime » (6 sur 6), une étiquette plus nette. À vous de juger si ces 2 verbatims, quel que soit leur camp, parlent bien de « Piscine ».",
+    expect(plain(r?.text)).toBe(
+      "1 des 7 personnes qui donnent un avis n'est comptée ici que par une idée rangée d'abord dans un autre motif : 1 avis négatif (« Horaires » : P7). Sans ces idées, il resterait 6 avis : « unanime » (6 sur 6), une étiquette plus nette. À vous de juger si ces 2 verbatims parlent bien du motif « Piscine ».",
+    )
+    // Aucune ligne ne commence par « : » : espace insécable avant les deux-points.
+    expect(r?.text).toContain('\u00a0:')
+  })
+
+  it('« à vérifier » sans personne retirée : une personne mitigée qui changerait de camp, au singulier', () => {
+    // P1 a un avis négatif à elle et un avis positif copié d'ailleurs : mitigée ici, négative sans la copie.
+    const ideas = [...many(1, 4, 'negative'), idea(9, 'positive', 'I0098', 1)]
+    const r = doubtReason(group(ideas), new Map(ideas.map((i) => [i.id, i])), () => 'Horaires')
+    expect(plain(r?.text)).toBe(
+      "Sans les idées rangées d'abord dans un autre motif, 1 personne passerait d'un avis mitigé à un avis négatif. Il resterait alors 4 avis : « unanime » (4 sur 4), une étiquette plus nette. À vous de juger si ce verbatim parle bien du motif « Piscine ».",
     )
   })
 

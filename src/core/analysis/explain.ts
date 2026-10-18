@@ -59,7 +59,17 @@ const WORD: Record<Metrics['stance'], string> = {
   none: "pas d'avis",
 }
 const count = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`
-const mixedPart = (M: number) => (M ? ` et ${count(M, 'mitigée', 'mitigées')}` : '')
+/**
+ * Espaces insécables de la typographie française (avant « : », « ; », « ? », dans les guillemets) : aucune ligne ne
+ * commence par un deux-points ni ne finit sur un guillemet ouvrant (plume, 18/10).
+ */
+const nbsp = (t: string) =>
+  t
+    .replace(/ ([:»])/g, '\u00a0$1')
+    .replace(/ ([;?!])/g, '\u202f$1')
+    .replace(/« /g, '«\u00a0')
+/** « du motif « Accès… » », « du motif « École… » » : l'élision se fait sur « motif », jamais sur le titre. */
+const motifName = (title: string) => `du motif « ${title} »`
 /** « 2 avis positifs contre 4 négatifs et 1 mitigé » : la répartition après la bascule, mitigés compris. */
 const split = (P: number, N: number, M: number) =>
   `${count(P, 'avis positif', 'avis positifs')} contre ${count(N, 'négatif', 'négatifs')}${M ? ` et ${count(M, 'mitigé', 'mitigés')}` : ''}`
@@ -81,7 +91,9 @@ export function fragileReason(g: Group): string | undefined {
     const [p, n] = bigPos ? [P + 1, N - 1] : [P - 1, N + 1]
     const after = stanceOf(p, n, M)
     if (after === 'divided') return undefined
-    return `${count(P, 'personne est positive', 'personnes sont positives')}, ${count(N, 'négative', 'négatives')}${mixedPart(M)} : le plus petit camp vaut au moins la moitié du plus grand, d'où « avis partagés ». Si une seule des ${bigPos ? N : P} personnes ${bigPos ? 'négatives' : 'positives'} avait donné un avis ${bigPos ? 'positif' : 'négatif'}, ce serait ${split(p, n, M)} : « ${WORD[after]} » (${Math.max(p, n)} sur ${T}). La conclusion tient donc à une voix.`
+    return nbsp(
+      `${P} ${P > 1 ? 'personnes donnent' : 'personne donne'} un avis positif, ${N} un avis négatif${M ? ` et ${M} un avis mitigé` : ''} : le plus petit camp compte au moins la moitié du plus grand, d'où « avis partagés ». Si une seule des ${bigPos ? N : P} personnes d'avis ${bigPos ? 'négatif' : 'positif'} avait donné un avis ${bigPos ? 'positif' : 'négatif'}, ce serait ${split(p, n, M)} : « ${WORD[after]} » (${Math.max(p, n)} sur ${T}). La conclusion tient donc à une voix.`,
+    )
   }
   const move = conclusionMove(m)
   if (!move) return undefined
@@ -89,12 +101,14 @@ export function fragileReason(g: Group): string | undefined {
   const D = pos ? P : N
   const consequence =
     move.stance === 'divided'
-      ? 'les avis seraient partagés, le plus petit camp valant au moins la moitié du plus grand'
+      ? 'les avis seraient partagés, le plus petit camp comptant au moins la moitié du plus grand'
       : move.stance === 'lean'
         ? 'aucun camp ne dépasserait la moitié des avis'
         : `« ${WORD[move.stance]} »`
   const as = move.as === 'mixed' ? 'mitigé' : move.as === 'positive' ? 'positif' : 'négatif'
-  return `${D} des ${T} personnes qui donnent un avis sont ${pos ? 'positives' : 'négatives'}${mixedPart(M)}. Si une seule de ces ${D} personnes avait donné un avis ${as}, ce serait ${split(move.P, move.N, move.M)} : ${consequence}. Sur ${T} avis, la conclusion tient donc à une voix : citez le chiffre (${D} sur ${T}) plutôt que l'étiquette seule, et lisez les verbatims des deux camps.`
+  return nbsp(
+    `Sur les ${T} personnes qui donnent un avis, ${D} ${D > 1 ? 'sont' : 'est'} d'avis ${pos ? 'positif' : 'négatif'}${M ? ` et ${M} d'avis mitigé` : ''}. Si une seule de ces ${D} personnes avait donné un avis ${as}, ce serait ${split(move.P, move.N, move.M)} : ${consequence}. La conclusion tient donc à une voix : citez le chiffre (${D} sur ${T}) plutôt que l'étiquette seule, et lisez les verbatims des deux camps.`,
+  )
 }
 
 const byNumber = (a: string, b: string) => a.localeCompare(b, 'fr', { numeric: true })
@@ -140,21 +154,24 @@ export function doubtReason(
     if (!people.length) return ''
     const where = new Map<string, string[]>()
     for (const p of people) where.set(from(p), [...(where.get(from(p)) ?? []), p])
-    return `${count(people.length, one, many)} (${list([...where].map(([other, who]) => `${list(who.sort(byNumber))}, d'abord dans « ${other} »`))})`
+    // Le motif d'abord, puis ses personnes : « (« Démarches d'inscription » : P109 et P227 ; « Carte scolaire » : P137) ».
+    return `${count(people.length, one, many)} (${[...where].map(([other, who]) => `« ${other} » : ${list(who.sort(byNumber))}`).join(' ; ')})`
   }
   const parts = [describe('positive', 'avis positif', 'avis positifs'), describe('negative', 'avis négatif', 'avis négatifs'), describe('mixed', 'avis mitigé', 'avis mitigés')].filter(Boolean)
-  const moved = changed.length
-    ? ` ; ${changed.length > 1 ? `${changed.length} autres passeraient` : '1 autre passerait'} de mitigée${changed.length > 1 ? 's' : ''} à ${now.get(changed[0][0]) === 'positive' ? 'positive' : 'négative'}${changed.length > 1 ? 's' : ''}`
-    : ''
+  const to = now.get(changed[0]?.[0] ?? '') === 'positive' ? 'positif' : 'négatif'
+  const movedText = (other: boolean) =>
+    `${changed.length} ${other ? (changed.length > 1 ? 'autres personnes passeraient' : 'autre personne passerait') : changed.length > 1 ? 'personnes passeraient' : 'personne passerait'} d'un avis mitigé à un avis ${to}`
   const T2 = now.size
   const D2 = Math.max(after.positiveOnly.length, after.negativeOnly.length)
   const verdict =
     after.stance === 'thin' || after.stance === 'none'
-      ? "trop peu d'avis pour une étiquette"
+      ? "« peu d'avis », trop peu pour conclure"
       : `« ${WORD[after.stance]} » (${D2} sur ${T2}), ${RANK[after.stance] > RANK[before.stance] ? 'une étiquette plus nette' : 'une étiquette moins nette'}`
   const head = gone.length
-    ? `${gone.length} des ${T} personnes qui donnent un avis ${gone.length > 1 ? 'ne sont comptées' : "n'est comptée"} ici que par une idée rangée d'abord dans un autre motif : ${list(parts)}${moved}.`
-    : `Sans les idées rangées d'abord dans un autre motif${moved.replace(' ;', ',')}.`
-  const text = `${head} Sans ces idées, il resterait ${T2} avis : ${verdict}. À vous de juger si ces ${copies.length} verbatims, quel que soit leur camp, parlent bien de « ${g.title} ».`
+    ? `${gone.length} des ${T} personnes qui donnent un avis ${gone.length > 1 ? 'ne sont comptées' : "n'est comptée"} ici que par une idée rangée d'abord dans un autre motif : ${list(parts)}${changed.length ? ` ; ${movedText(true)}` : ''}. Sans ces idées, il resterait`
+    : `Sans les idées rangées d'abord dans un autre motif, ${movedText(false)}. Il resterait alors`
+  const judge =
+    copies.length > 1 ? `À vous de juger si ces ${copies.length} verbatims parlent bien ${motifName(g.title)}.` : `À vous de juger si ce verbatim parle bien ${motifName(g.title)}.`
+  const text = nbsp(`${head} ${T2} avis : ${verdict}. ${judge}`)
   return { text, ideaIds: copies.map((i) => i.id) }
 }

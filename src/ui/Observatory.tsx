@@ -79,10 +79,10 @@ export function ObservatoryPage({ slug }: { slug: string }) {
             {study.news && ` · ${study.news.replace(/\.$/, '')}`} ·{' '}
             {silent > 0 ? (
               <Explain
-                content={`${silent} des ${drawn} réponses tirées au sort, trop brèves ou sans avis sur la question, ne donnent aucune idée : le rapport porte sur les ${people} autres.`}
+                content={`${silent.toLocaleString('fr-FR')} des ${drawn.toLocaleString('fr-FR')} réponses tirées au sort ${silent > 1 ? 'ne contiennent' : 'ne contient'} aucune idée sur la question (trop brèves ou hors sujet) : le rapport porte sur les ${people.toLocaleString('fr-FR')} autres.`}
               >
                 <span className="whitespace-nowrap underline decoration-dotted underline-offset-4">
-                  {drawn.toLocaleString('fr-FR')} tirés au sort, {people.toLocaleString('fr-FR')} comptés
+                  {people.toLocaleString('fr-FR')} participants sur {drawn.toLocaleString('fr-FR')} tirés au sort
                   <Info className="ml-1 inline size-3.5 align-[-2px]" aria-hidden />
                 </span>
               </Explain>
