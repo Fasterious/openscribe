@@ -402,7 +402,7 @@ function RunView({ project, analysis, running, outdated }: { project: Project; a
           <span>
             <CheckCircle2 className="mr-1 inline size-4" /> Analyse terminée : {plural(analysis.ideas.length, 'idée')},{' '}
             {plural(analysis.groups.length, 'thème')}
-            {analysis.themes.length ? `, ${plural(analysis.themes.length, 'grand thème', 'grands thèmes')}` : ''}.
+            {analysis.themes.length ? `, réunis en ${plural(analysis.themes.length, 'grand thème', 'grands thèmes')}` : ''}.
           </span>
           <Button size="sm" onClick={() => navigate({ name: 'project', id: project.id, tab: 'report' })}>
             Voir le rapport

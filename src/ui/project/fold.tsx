@@ -56,8 +56,11 @@ export function useHeadroom(enabled: boolean, header: React.RefObject<HTMLElemen
   const hiddenRef = useRef(false)
   useEffect(() => {
     const root = document.documentElement
+    // La hauteur de la barre s'écrit tout de suite, avant que le grand thème ne s'efface : jamais l'un sous l'autre.
     const hide = (h: boolean) => {
       hiddenRef.current = h
+      barPx = h ? 0 : APP_BAR_PX
+      root.style.setProperty('--app-bar', h ? '0px' : APP_BAR)
       setHidden(h)
     }
     if (!enabled) {
@@ -253,9 +256,14 @@ export function Fold({
       if (!(second && unfolded.el === d && Date.now() - unfolded.at < 500)) foldDetails(d)
     } else if (!(second && folded.el === d && Date.now() - folded.at < 500)) {
       unfolded = { at: Date.now(), el: d }
+      // Un titre qui devient collé n'est plus un repère pour l'ancrage du défilement : le navigateur prendrait le bloc
+      // suivant et sauterait de toute la hauteur du contenu ouvert (passe testeur du 18/10). On le suspend le temps d'ouvrir.
+      const root = document.documentElement
+      root.style.overflowAnchor = 'none'
       transition(d, 'open', () => {
         d.open = true
       })
+      window.setTimeout(() => (root.style.overflowAnchor = ''), 400)
     }
   }, [])
   return (
@@ -280,12 +288,12 @@ export function Fold({
       <summary
         onClick={toggle}
         aria-label={open ? `Replier ${label}` : undefined}
-        className={cn('flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden', open && STUCK[level])}
+        className={cn('flex cursor-pointer list-none items-center gap-2 select-none [&::-webkit-details-marker]:hidden', open && STUCK[level])}
       >
         <span className="min-w-0 flex-1">{open ? opened : closed}</span>
         {open ? (
           <span className="no-print flex min-h-8 shrink-0 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
-            <span aria-hidden>⌃</span> Replier
+            <span aria-hidden>⌃</span> <span className="max-sm:hidden">Replier</span>
           </span>
         ) : (
           <span aria-hidden className="shrink-0 text-muted-foreground">
@@ -340,11 +348,13 @@ export function revealMotif(groupId: string): HTMLDetailsElement | null {
  */
 export function glideTo(target: HTMLElement, block: 'start' | 'center', focus: HTMLElement | null = target) {
   const r = target.getBoundingClientRect()
-  const goal = block === 'start' ? barPx + THEME_PX : window.innerHeight / 2 - r.height / 2
+  // Un bloc arrive juste sous les en-têtes collés tels qu'ils seront (la barre de l'application ne bouge pas pendant le saut).
+  const goal = block === 'start' ? (target instanceof HTMLDetailsElement ? stickLine(target) : barPx) : window.innerHeight / 2 - r.height / 2
   const far = Math.abs(r.top - goal) > window.innerHeight * 1.5
   const smooth = !far && !reduced()
   freezeHeadroom(smooth ? 1500 : 600)
-  target.scrollIntoView({ block, behavior: smooth ? 'smooth' : 'instant' })
+  if (target instanceof HTMLDetailsElement) setThemeOff(false)
+  window.scrollTo({ top: window.scrollY + r.top - goal, behavior: smooth ? 'smooth' : 'instant' })
   focus?.focus({ preventScroll: true })
   if (far && !reduced() && focus) {
     focus.classList.remove('fold-landed')

@@ -760,7 +760,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
       opened={
         // La barre reste dans l'en-tête ouvert : ce que contient le thème ne disparaît pas quand on l'ouvre (Arnaud, 18/10).
         <span className="flex min-w-0 items-center gap-2">
-          <H data-vt="title" className="min-w-0 truncate text-base font-semibold">
+          <H data-vt="title" className="line-clamp-2 min-w-0 text-sm leading-tight font-semibold sm:line-clamp-1 sm:text-base">
             {group.title}
           </H>
           <span data-vt="bar" className="block w-10 shrink-0 sm:w-20">
@@ -1051,7 +1051,7 @@ function VerdictLine({ groups, suggestions }: { groups: Metrics[]; suggestions?:
   const verdicts = themeVerdicts(counted)
   return (
     <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-      <span className="font-medium text-foreground">{plural(groups.length, 'thème')} :</span>
+      <span className="font-medium text-foreground">{plural(groups.length, 'thème')} :</span>
       {verdicts.map(({ verdict, count }) => (
         <span key={verdict} className="inline-flex items-center gap-1.5">
           <span className={`inline-block size-2.5 rounded-full ${VERDICT_DOT[verdict]}`} aria-hidden />
@@ -1061,7 +1061,7 @@ function VerdictLine({ groups, suggestions }: { groups: Metrics[]; suggestions?:
       {isolated > 0 && (
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block size-2.5 rounded-full border border-muted-foreground/50" aria-hidden />
-          {isolated} d'une seule personne
+          {isolated} {isolated > 1 ? 'portés' : 'porté'} par une seule personne
         </span>
       )}
       {!!suggestions && <span>{suggestions > 1 ? `${suggestions} personnes font des suggestions` : '1 personne fait une suggestion'}</span>}
@@ -1077,7 +1077,7 @@ function VerdictDots({ groups }: { groups: Metrics[] }) {
   const counted = groups.filter((m) => m.participants > 1)
   const isolated = groups.length - counted.length
   const verdicts = themeVerdicts(counted)
-  const words = [...verdicts.map(({ verdict, count }) => verdictLabel(verdict, count)), ...(isolated ? [`${isolated} d'une seule personne`] : [])].join(', ')
+  const words = [...verdicts.map(({ verdict, count }) => verdictLabel(verdict, count)), ...(isolated ? [`${isolated} ${isolated > 1 ? 'portés' : 'porté'} par une seule personne`] : [])].join(', ')
   return (
     <span className="hidden shrink-0 items-center gap-2 text-sm text-muted-foreground md:inline-flex" title={words}>
       <span>{plural(groups.length, 'thème')}</span>
@@ -1470,7 +1470,7 @@ export function ReportTab({
               {sections ? 'Le détail, par grand thème' : 'Le détail, thème par thème'}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {sections ? `${plural(sections.length, 'grand thème', 'grands thèmes')}, ${plural(analysis.groups.length, 'thème')}. Ouvrez un grand thème, puis un thème, pour lire ce que disent les participants.` : 'Ouvrez un thème pour lire ce que disent les participants.'}
+              {sections ? `${plural(analysis.groups.length, 'thème')}, réunis en ${plural(sections.length, 'grand thème', 'grands thèmes')}. Ouvrez un grand thème, puis l'un de ses thèmes, pour lire ce que disent les participants.` : 'Ouvrez un thème pour lire ce que disent les participants.'}
             </p>
           </div>
           {sections && <ExpandAll />}
@@ -1494,7 +1494,7 @@ export function ReportTab({
                   closed={<ThemeRow title={t.title} m={m} groups={groups.map((x) => x.m)} />}
                   opened={
                     <span className="flex min-w-0 items-center gap-3">
-                      <h3 data-vt="title" className="min-w-0 truncate text-lg font-semibold">
+                      <h3 data-vt="title" className="line-clamp-2 min-w-0 text-base leading-tight font-semibold sm:line-clamp-1 sm:text-lg">
                         {t.title}
                       </h3>
                       <span data-vt="bar" className="block w-12 shrink-0 sm:w-28">

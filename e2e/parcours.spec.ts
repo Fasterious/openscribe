@@ -548,4 +548,30 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   await expect(motif).not.toHaveAttribute('open', '')
   await expect(motifHead).toBeFocused()
   await expect.poll(async () => (await top(motifHead)) - (await top(themeHead))).toBeGreaterThanOrEqual(47)
+  // Le rouvrir aussitôt le laisse sur place : la page ne saute pas au bloc suivant (passe testeur du 18/10, +1197 px).
+  // Un clic à l'endroit du titre, comme un lecteur (le clic de Playwright recentrerait la page d'abord).
+  const clickAt = async (l: Locator) => {
+    const b = (await l.boundingBox())!
+    await page.mouse.click(b.x + 40, b.y + b.height / 2)
+  }
+  const before = await top(motifHead)
+  await clickAt(motifHead)
+  await expect(motif).toHaveAttribute('open', '')
+  await page.waitForTimeout(500)
+  expect(Math.abs((await top(motifHead)) - before)).toBeLessThanOrEqual(2)
+  // Pareil pour le grand thème, replié d'en bas puis rouvert.
+  // (On remonte un peu pour que le grand thème, effacé pendant la lecture du thème, revienne.)
+  await scroll(400)
+  await scroll(-80)
+  await expect.poll(() => top(themeHead)).toBeGreaterThanOrEqual(0)
+  await clickAt(themeHead)
+  await expect(theme).not.toHaveAttribute('open', '')
+  await page.waitForTimeout(500)
+  const themeBefore = await top(themeHead)
+  // Au clavier : Entrée sur le titre replié (il a le focus) le rouvre sur place.
+  await expect(themeHead).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(theme).toHaveAttribute('open', '')
+  await page.waitForTimeout(500)
+  expect(Math.abs((await top(themeHead)) - themeBefore)).toBeLessThanOrEqual(2)
 })

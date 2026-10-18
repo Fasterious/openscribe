@@ -1563,7 +1563,7 @@ async function buildThemes(state: AnalysisState, runner: LlmRunner, emit: () => 
   if (state.groups.length <= THEME_LEVEL_FROM) {
     state.themes = []
     s.state = 'done'
-    s.message = 'Peu de groupes : pas de niveau de grands thèmes.'
+    s.message = 'Peu de thèmes : pas de grands thèmes.'
     await emit()
     return
   }
