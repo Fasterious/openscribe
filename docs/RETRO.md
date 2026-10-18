@@ -9,6 +9,11 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - **Coûté pour rien** : un renommage par script qui a juxtaposé les deux niveaux (« les thèmes et les grands thèmes »)
   là où la phrase devait dire leur lien ; un faux échec dû au `click()` de Playwright, qui recentre la page d'abord.
 - **On change** : un test de position clique à l'endroit mesuré (`page.mouse.click`), jamais par `locator.click()`.
+- **Second tour** : du code modifié pendant une passe `testeur` l'a faussée (règle du commit figé enfreinte : la
+  demande d'Arnaud arrivait, il fallait d'abord arrêter la passe) ; un formateur lancé sans la configuration du projet
+  a réécrit tout un fichier, annulé aussitôt (même leçon que le 14/10 : ne jamais lancer `prettier` à la main ici).
+  La passe de certification a trouvé un seuil trop large (« on lit le thème ») sur le chemin le plus fréquent, le saut
+  depuis les listes : un test de parcours le couvre désormais.
 
 ## 2026-10-18 — Lire le rapport : audit d'abord, passe testeur ensuite
 

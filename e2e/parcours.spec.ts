@@ -80,6 +80,13 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   // Un saut court défile en douceur : la position se vérifie une fois le défilement fini.
   await expect.poll(async () => (await arrived.boundingBox())!.y).toBeGreaterThanOrEqual(0)
   await expect.poll(async () => (await arrived.boundingBox())!.y).toBeLessThan(page.viewportSize()!.height / 2)
+  // Il arrive juste sous son grand thème, resté visible : on sait où l'on est (passe testeur du 18/10 : grand thème effacé, trou au-dessus).
+  const gap = () =>
+    arrived.evaluate((el) => {
+      const head = el.parentElement?.parentElement?.closest('details[data-fold="theme"]')?.querySelector(':scope > summary')
+      return head ? Math.round(el.getBoundingClientRect().top - head.getBoundingClientRect().bottom) : 0
+    })
+  await expect.poll(async () => Math.abs(await gap())).toBeLessThanOrEqual(2)
   const backTo = page.getByRole('button', { name: /← Revenir à « Ce qui a marché »/ })
   await tap(backTo)
   await expect(backTo).toHaveCount(0)

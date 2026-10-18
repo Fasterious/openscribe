@@ -228,7 +228,7 @@ function CampChip({
         if (e.key === 'Escape' && open) onToggle()
       }}
       aria-expanded={open}
-      aria-label={`${open ? 'Masquer' : 'Voir'} les verbatims de ${plural(people, 'participant')} : ${CAMP_WORD[cat][1]}`}
+      aria-label={`${open ? 'Masquer' : 'Voir'} les verbatims de ${plural(people, 'participant')} : ${CAMP_WORD[cat][people > 1 ? 1 : 0]}`}
       className={`inline-flex min-h-6 cursor-pointer items-center gap-1 rounded-full px-2 py-0 align-baseline text-sm font-medium tabular-nums sm:min-h-0 sm:px-1.5 ${
         open ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'
       }`}
@@ -259,6 +259,8 @@ function CitedText({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: Group
   return <CitedParagraph text={text} ctx={ctx} camps={camps} />
 }
 
+const PUNCT = /^\s*[.,;:!?…)»]+/
+
 function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: Group[] }) {
   const [opened, setOpened] = useState<{ i: number; cat: IdeaCategory } | null>(null)
   const open = opened?.i ?? null
@@ -286,16 +288,21 @@ function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: 
     parts.slice(from, to).map((part, k) => {
       const i = from + k
       const ids = refs[i]
-      if (!ids) return <Fragment key={i}>{ctx.mask(part)}</Fragment>
+      // La ponctuation qui suit une pastille reste avec elle : jamais un point seul en début de ligne.
+      if (!ids) return <Fragment key={i}>{ctx.mask(refs[i - 1]?.length ? part.replace(PUNCT, '') : part)}</Fragment>
       if (!ids.length) return null
+      const trailing = parts[i + 1]?.match(PUNCT)?.[0].trim() ?? ''
       // Une pastille par camp : « ● 46 ● 1 », chacune déroule les verbatims de son camp.
       return (
-        <span key={i} className="mx-0.5 inline-flex flex-wrap gap-0.5 align-baseline">
-          {campsOf(ids, ctx).map((c) => (
-            <Tooltip key={c.cat} wide side="top" content={<QuotesPreview ids={c.ids} ctx={ctx} />}>
-              <CampChip cat={c.cat} people={c.people} pill={`${i}-${c.cat}`} open={opened?.i === i && opened.cat === c.cat} onToggle={() => toggle(i, c.cat)} />
-            </Tooltip>
-          ))}
+        <span key={i} className="whitespace-nowrap">
+          <span className="mx-0.5 inline-flex flex-wrap gap-0.5 align-baseline">
+            {campsOf(ids, ctx).map((c) => (
+              <Tooltip key={c.cat} wide side="top" content={<QuotesPreview ids={c.ids} ctx={ctx} />}>
+                <CampChip cat={c.cat} people={c.people} pill={`${i}-${c.cat}`} open={opened?.i === i && opened.cat === c.cat} onToggle={() => toggle(i, c.cat)} />
+              </Tooltip>
+            ))}
+          </span>
+          {trailing}
         </span>
       )
     })
@@ -305,8 +312,8 @@ function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: 
         <p className="leading-relaxed">{piece(0, parts.length)}</p>
       </div>
     )
-  // La ponctuation qui suit la pastille reste dans la phrase, avant le volet : plus de point orphelin dessous.
-  const punct = parts[open + 1]?.match(/^\s*[.,;:!?…)»]+/)?.[0] ?? ''
+  // La ponctuation qui suit la pastille reste dans la phrase (avec la pastille), avant le volet : plus de point orphelin dessous.
+  const punct = parts[open + 1]?.match(PUNCT)?.[0] ?? ''
   const tail = [parts[open + 1]?.slice(punct.length) ?? '', ...parts.slice(open + 2)]
   const rest = tail.join('').trim()
   const restParts = [...parts.slice(0, open + 1), ...tail]
@@ -319,7 +326,6 @@ function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: 
     <div ref={box}>
       <p className="leading-relaxed">
         {piece(0, open + 1)}
-        {punct.trim()}
       </p>
       <QuotesPanel ids={campsOf(refs[open]!, ctx).find((c) => c.cat === opened!.cat)?.ids ?? refs[open]!} ctx={ctx} onClose={() => setOpened(null)} />
       {rest && <p className="mt-2 leading-relaxed">{pieceRest()}</p>}
@@ -353,8 +359,13 @@ function HighlightLine({
   const camp = SECTION_CAMP[section]
   const inGroup = (group?.ideaIds ?? []).map((id) => ctx.ideaById.get(id)!).filter((i) => i && (!ctx.segment || ctx.segment.has(i.participantId)))
   // « 46 avis positifs » compte les seuls positifs : une personne mitigée n'est pas déroulée sous « Ce qui a marché ».
+  // « Ce qui divise » annonce « 22 positifs, 23 négatifs, 6 mitigés » : les mitigés ne sont déroulés dans aucun des deux camps.
   const opposite = section === 'strengths' ? 'negative' : section === 'blockers' ? 'positive' : undefined
-  const mixed = new Set(opposite ? inGroup.filter((i) => i.category === opposite).map((i) => i.participantId) : [])
+  const pos = new Set(inGroup.filter((i) => i.category === 'positive').map((i) => i.participantId))
+  const mixed =
+    section === 'divided'
+      ? new Set(inGroup.filter((i) => i.category === 'negative' && pos.has(i.participantId)).map((i) => i.participantId))
+      : new Set(opposite ? inGroup.filter((i) => i.category === opposite).map((i) => i.participantId) : [])
   const ideas = inGroup.filter((i) => camp.includes(i.category) && !mixed.has(i.participantId))
   const people = new Set(ideas.map((i) => i.participantId)).size
   const lead = group?.summary && !ctx.segment && !compact ? leadSentence(group.summary) : ''

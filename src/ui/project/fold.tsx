@@ -49,9 +49,11 @@ function themeHead(el: Element): number {
 function readingMotif(): number {
   for (const d of document.querySelectorAll<HTMLDetailsElement>('details[data-fold="theme"][open] details[data-fold="motif"][open]')) {
     const head = themeHead(d)
-    const line = barPx + head + 4
+    // On lit le thème quand on est descendu dedans : un titre qui vient d'arriver juste sous le grand thème (un saut, une
+    // réouverture) ne l'efface pas (passe testeur du 18/10).
+    const line = barPx + head
     const r = d.getBoundingClientRect()
-    if (r.top < line && r.bottom > line + 120) return head
+    if (r.top < line - 24 && r.bottom > line + 120) return head
   }
   return 0
 }
@@ -72,6 +74,8 @@ export function useHeadroom(enabled: boolean, header: React.RefObject<HTMLElemen
       hiddenRef.current = h
       barPx = h ? 0 : APP_BAR_PX
       root.style.setProperty('--app-bar', h ? '0px' : APP_BAR)
+      // La barre bouge en même temps que les en-têtes collés, sans attendre le rendu de React.
+      header.current?.classList.toggle('-translate-y-full', h)
       setHidden(h)
     }
     if (!enabled) {

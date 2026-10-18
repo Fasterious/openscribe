@@ -24,6 +24,10 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
   empiler les en-têtes. Plus de « Replier » en bas des blocs (celui de l'en-tête suffit). Dans le résumé, les
   pastilles deviennent « ● 46 », une par camp, à la couleur du camp, cliquables ; « 22 positifs, 23 négatifs » déroule
   les deux camps entiers (le code étend chaque camp cité dont la phrase donne le nombre).
+- **Passe de certification (79617ec)** : après un saut depuis les listes, le grand thème s'effaçait et laissait un trou
+  (le seuil « on lit le thème » valait dès que le titre arrivait sous le grand thème : il faut maintenant être descendu
+  de 24 px dedans) ; dans « Ce qui divise », les pastilles comptaient les mitigés dans les deux camps (28 et 29 pour
+  « 22 positifs, 23 négatifs, 6 mitigés ») : les mitigés n'y sont plus déroulés. Point final collé à sa pastille.
 - **Passe testeur** : rouvrir un bloc qu'on venait de replier faisait sauter la page jusqu'à 1 200 px (l'ancrage du
   défilement prenait le bloc suivant pour repère, le titre devenu collé ne comptant plus) : ancrage suspendu à
   l'ouverture, test de parcours qui échoue sans le correctif.
