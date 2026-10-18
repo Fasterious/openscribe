@@ -2,6 +2,37 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-18 — Lire le rapport : replis collants, détail par thème, étiquettes expliquées (retours d'Arnaud)
+
+Audit et spécification du `ux-designer` : `docs/LECTURE-RAPPORT.md` (mesures, causes racines, bonnes pratiques
+sourcées). Livré :
+- **Replier sans chercher** : l'en-tête d'un thème, d'un motif ou d'un volet de verbatims reste collé avec
+  « Replier » tant qu'on le lit ; replier remet le titre sous l'en-tête et rend le focus ; Échap replie le bloc le
+  plus intérieur ; ouverture 220 ms, fermeture 180 ms, aucune animation pour un très grand bloc ni en mouvement
+  réduit. La barre de l'application se cache en lecture quand on descend, revient quand on remonte.
+- **« Le détail, thème par thème »** remplace « Vue d'ensemble » (cartes et sections fusionnées) : une barre par
+  motif, à la couleur de son verdict et à la largeur de ses participants ; « 10 motifs : ● 4 critiqués ● 1 qui
+  divise… » (verdicts relus par le `methodologue` : jamais plus forts que l'étiquette ; « sans avis » ;
+  les motifs d'une seule personne à part). Une ligne fermée est une seule cible (le toucher n'ouvre plus une
+  bulle à la place du motif). Les camps se déroulent en touchant leur en-tête ou leur segment de barre ; au-delà
+  de 8 personnes, fermés au départ.
+- **« Pourquoi cette étiquette ? »**, au cas par cas, calculé par le code (`explain.ts`) : quelle voix ferait changer
+  la conclusion, quelles personnes ne sont comptées que par une idée rangée d'abord ailleurs, et l'étiquette sans
+  elles, avec ces verbatims. Plus d'infobulle pour ces marques.
+- **« Fragile » seulement quand une voix change la conclusion** (`methodologue`, conforme à la règle de CLAUDE.md) :
+  « 12 sur 14 » ne l'est plus (Arnaud y voyait une erreur). Le mot est gardé. L'étude école passe de 18 à 11
+  marques ; son résumé a été régénéré (passe 17), ses 3 « (fragile) » de seuil ont disparu.
+- **Listes** : pastilles libellées (« ❝ 27 avis négatifs »), marques qui déplient leur explication, « Et aussi »
+  dépliable, « Lire le motif en détail → » avec un bouton de retour à la liste. En-tête des volets (« ❝ 46 avis
+  positifs · Expérience globale de scolarisation »), point orphelin corrigé. En-tête de l'étude : « 366 participants
+  sur 378 tirés au sort », l'écart expliqué.
+- **Impression** : tout se lit sur papier, camps fermés et « Et aussi » compris, rien de collant.
+- **Laissé pour plus tard** (« important » ou « agréable » dans la spécification) : sommaire qui suit la lecture sur
+  grand écran, adresse partageable d'un motif, camp en cours dans l'en-tête collant sur mobile, filtre par
+  verdict, allègement du rendu (premier dépliage d'un thème : ~350 ms en développement, à mesurer sur le build).
+- **À trancher par Arnaud** : le mot du lecteur pour « motif » (« sujet » proposé, ou « thème » / « grand thème ») ;
+  le chercheur qui tranche les doubles comptes dans Synthèse.
+
 ## 2026-10-18 — Codage en double : on garde (décision d'Arnaud)
 
 - « Le privé est bien meilleur que le public » dit deux choses : une critique du public et un éloge du privé. Elle

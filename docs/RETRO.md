@@ -2,6 +2,17 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-18 — Lire le rapport : audit d'abord, passe testeur ensuite
+
+- **Bien marché** : l'audit chiffré du `ux-designer` avant de coder (causes racines, pas une liste de souhaits) ; le
+  `methodologue` consulté en parallèle sur « fragile », qui a montré que le malaise d'Arnaud venait d'un écart à
+  notre propre règle ; des captures et des mesures à chaque étape (positions après repli, au pixel).
+- **Coûté pour rien** : deux défauts bloquants vus seulement par la passe `testeur` (saut vers un motif pendant
+  l'animation, PDF vide) : nos tests vérifiaient « visible », pas « à l'écran » ni « imprimé ». Une règle Tailwind
+  « !important » dans une couche l'emportait sur la nôtre hors couche : une heure de doute.
+- **On change** : un test de parcours vérifie la position à l'écran et le focus, pas seulement la visibilité ; un
+  test vérifie ce qui s'imprime ; chaque modèle de phrase se relit sur ses cas limites (1, 0, un seul camp).
+
 ## 2026-10-17 — Synthèses des motifs : trois passes, et ce qu'elles ont appris
 
 - **Bien marché** : rejouer depuis le cache (idées et motifs identiques, vérifiés par script) ; les deux lectures

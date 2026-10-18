@@ -110,7 +110,9 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Stratégie d'acquisition (une fois l'expérience validée)
 - ✅ L'Observatoire : étude école publiée et reliée depuis l'accueil (passe 13, finale, avec Opus 5.5 et la méthode « consultation » : **7/10** aux deux lectures `methodologue`, 2 erreurs du résumé signalées et corrigées dans la fiche, langue **6,5/10**), avec la section Méthode, ses limites, les mentions « à vérifier » et « fragile » du code et leurs explications au survol et au toucher (`public/observatoire/ecole-grand-debat-2019/`) ; méthode expliquée étape par étape dans `docs/METHODE.md`
 - ✅ L'Observatoire dans l'application seulement : l'article d'une page retiré après reprise de ce qu'il avait en plus (méthode détaillée, « Hors question », impression) ; son adresse ouvre l'étude ; étude école republiée (passe 16c : synthèses chiffrées camp par camp, 1 erreur au résumé, `methodologue` 7 et 7,5/10, `plume` 7/10)
-- ⏳ Trois décisions de méthode pour Arnaud : motif « A face à B », copies qui changent d'objet, rubrique des propositions opposées
+- ✅ Lire le rapport (`docs/LECTURE-RAPPORT.md`) : en-têtes collants avec « Replier », barre qui se cache en lecture, « Le détail, thème par thème » aux étiquettes par verdict, « Pourquoi cette étiquette ? » au cas par cas, « Et aussi » dépliable, saut vers un motif avec retour, impression complète ; « fragile » seulement quand une voix change la conclusion
+- ⏳ Décisions pour Arnaud : motif « A face à B » (option B recommandée), rubrique des propositions opposées, mot du lecteur pour « motif », le chercheur qui tranche les doubles comptes
+- ⏳ Lecture, suite : sommaire qui suit la lecture (grand écran), adresse d'un motif, camp en cours dans l'en-tête collant (mobile)
 
 ## Itération 7 — Offres gratuites et modèles locaux (13-14/10)
 
