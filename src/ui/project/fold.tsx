@@ -190,3 +190,19 @@ export function Fold({
     </details>
   )
 }
+
+/**
+ * Ouvre un motif dans la partie détaillée (et son thème), l'amène sous les en-têtes collants et lui donne le focus :
+ * depuis une liste ou le résumé, on va lire le motif en entier.
+ */
+export function revealMotif(groupId: string): boolean {
+  const d = document.getElementById(`motif-${groupId}`) as HTMLDetailsElement | null
+  if (!d) return false
+  for (let p: HTMLElement | null = d; p; p = p.parentElement) if (p instanceof HTMLDetailsElement) p.open = true
+  freezeHeadroom(800)
+  requestAnimationFrame(() => {
+    d.scrollIntoView({ block: 'start' })
+    ;(d.querySelector(':scope > summary') as HTMLElement | null)?.focus({ preventScroll: true })
+  })
+  return true
+}

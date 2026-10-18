@@ -71,6 +71,16 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await expect(page.locator('#saillants').locator('..').getByRole('button', { name: /^«/ }).first()).toBeVisible()
   // Dans le résumé, une pastille qui suit un nombre déroule tout le camp compté.
   await expect(page.locator('section[aria-labelledby="resume"]').getByRole('button', { name: /les verbatims de \d+ participants/ }).first()).toBeVisible()
+  // Depuis une liste, on va lire le motif en détail, puis on revient à la ligne de départ.
+  const go = page.getByRole('button', { name: 'Lire le motif en détail →' }).first()
+  await tap(go)
+  await expect(page.locator('details[data-fold="motif"][open]').first()).toBeVisible()
+  const backTo = page.getByRole('button', { name: /← Revenir à « .* »/ })
+  await tap(backTo)
+  await expect(backTo).toHaveCount(0)
+  expect(await go.evaluate((el) => el === document.activeElement)).toBe(true)
+  await page.locator('details[data-fold="motif"][open] > summary').first().click()
+  await page.locator('details[data-fold="theme"][open] > summary').first().click()
   // Un motif, dans son thème : sa définition pliée, un verbatim qui se replace dans sa réponse.
   const theme = page.locator('details[data-fold="theme"]').first()
   await tap(theme.locator(':scope > summary'))

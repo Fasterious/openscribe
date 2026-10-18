@@ -35,7 +35,7 @@ import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from '@/core/a
 import type { Contribution } from '@/core/corpus'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { isExample } from '../Synthesis'
-import { Fold, freezeHeadroom } from './fold'
+import { Fold, freezeHeadroom, revealMotif } from './fold'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, download, formatDate, plural, slug } from '../format'
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
@@ -68,6 +68,8 @@ interface Ctx {
   alsoIn: (idea: Idea) => string | undefined
   /** Le motif où une idée est rangée (l'en-tête d'un volet de verbatims le nomme). */
   groupTitle: (ideaId: string) => string | undefined
+  /** Va lire un motif dans la partie détaillée ; un bouton ramène ensuite à `from` (règle : tout départ offre son retour). */
+  reveal: (groupId: string, from: HTMLElement, label: string) => void
 }
 
 /** Chaque section calculée a sa couleur et son pictogramme : on s'y repère sans lire. */
@@ -378,12 +380,44 @@ function ListItem({
           )}
         </span>
       </HighlightLine>
+      {group && (
+        <button
+          type="button"
+          onClick={(e) => ctx.reveal(group.id, e.currentTarget, item.title)}
+          className="no-print mt-1 block min-h-6 cursor-pointer text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+        >
+          Lire le motif en détail →
+        </button>
+      )}
       {why && group && (
         <div className="fold-in mt-2">
           <WhyLabel group={group} ctx={ctx} />
         </div>
       )}
     </li>
+  )
+}
+
+/**
+ * « À vérifier avant de citer ces étiquettes » : chaque motif nommé est un lien qui ouvre le motif, avec l'explication
+ * de sa marque, et un bouton ramène au résumé.
+ */
+function DoubtLinks({ sections, ctx }: { sections: HighlightSection[]; ctx: Ctx }) {
+  const items = [...new Map(sections.flatMap((sec) => sec.items.filter((x) => x.doubt).map((x) => [x.groupId, x.title] as const))).entries()]
+  if (!items.length) return null
+  return (
+    <p className="mt-2 text-sm text-muted-foreground">
+      À vérifier avant de citer {items.length > 1 ? 'ces étiquettes' : 'cette étiquette'} :{' '}
+      {items.map(([id, title], k) => (
+        <Fragment key={id}>
+          {k > 0 && (k === items.length - 1 ? ' et ' : ', ')}
+          <button type="button" onClick={(e) => ctx.reveal(id, e.currentTarget, 'Résumé')} className="cursor-pointer text-primary underline-offset-4 hover:underline">
+            {title}
+          </button>
+        </Fragment>
+      ))}
+      . {items.length > 1 ? 'Elles dépendent' : 'Elle dépend'} d'avis comptés aussi dans un autre motif : chaque motif ouvert l'explique.
+    </p>
   )
 }
 
@@ -671,6 +705,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
   return (
     <Fold
       level="motif"
+      id={`motif-${group.id}`}
       label={`le motif « ${group.title} »`}
       className="border-b py-0.5"
       closed={
@@ -1034,7 +1069,11 @@ export function ReportTab({
     settings: { ...analysis.settings, maskNames: masked },
   }
   const offTopic = offTopicLines(analysis)
+  const [back, setBack] = useState<{ from: HTMLElement; label: string } | null>(null)
   const ctx: Ctx = {
+    reveal: (groupId, from, label) => {
+      if (revealMotif(groupId)) setBack({ from, label })
+    },
     ideaById: new Map(analysis.ideas.map((i) => [i.id, i])),
     contributionById: new Map(corpus.contributions.map((c) => [c.id, c])),
     segment,
@@ -1218,7 +1257,7 @@ export function ReportTab({
           <div className="max-w-3xl text-base">
             <CitedText text={analysis.globalSummary} ctx={ctx} camps={analysis.groups} />
             <Unverified items={analysis.globalUnverified} />
-            {summaryDoubts(sectionsHL) && <p className="mt-2 text-sm text-muted-foreground">{summaryDoubts(sectionsHL)}</p>}
+            {summaryDoubts(sectionsHL) && <DoubtLinks sections={sectionsHL} ctx={ctx} />}
           </div>
         </section>
       )}
@@ -1353,6 +1392,21 @@ export function ReportTab({
             ))}
           </ul>
         </section>
+      )}
+
+      {back && (
+        <button
+          type="button"
+          onClick={() => {
+            freezeHeadroom(800)
+            back.from.scrollIntoView({ block: 'center' })
+            back.from.focus({ preventScroll: true })
+            setBack(null)
+          }}
+          className="no-print fixed bottom-4 left-1/2 z-40 inline-flex min-h-10 -translate-x-1/2 cursor-pointer items-center gap-1 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground shadow-lg"
+        >
+          ← Revenir à « {back.label} »
+        </button>
       )}
 
       <Card className={`max-sm:border-t ${FLAT_CARD}`}>
