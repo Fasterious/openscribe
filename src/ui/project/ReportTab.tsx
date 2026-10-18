@@ -176,6 +176,70 @@ const BAR: Record<IdeaCategory, string> = {
   neutral: 'bg-neutral',
 }
 
+const CAMP_ORDER: IdeaCategory[] = ['positive', 'negative', 'suggestion', 'question', 'neutral']
+const CAMP_WORD: Record<IdeaCategory, [string, string]> = {
+  positive: ['avis positif', 'avis positifs'],
+  negative: ['avis négatif', 'avis négatifs'],
+  suggestion: ['suggestion', 'suggestions'],
+  question: ['question', 'questions'],
+  neutral: ['constat', 'constats'],
+}
+
+/** Des verbatims rangés par camp, chacun avec ses personnes : « ● 46 » positifs et « ● 1 » négatif. */
+function campsOf(ids: string[], ctx: Ctx): { cat: IdeaCategory; ids: string[]; people: number }[] {
+  const by = new Map<IdeaCategory, string[]>()
+  for (const id of ids) {
+    const i = ctx.ideaById.get(id)
+    if (i) by.set(i.category, [...(by.get(i.category) ?? []), id])
+  }
+  return CAMP_ORDER.filter((c) => by.has(c)).map((cat) => ({
+    cat,
+    ids: by.get(cat)!,
+    people: new Set(by.get(cat)!.map((id) => ctx.ideaById.get(id)!.participantId)).size,
+  }))
+}
+
+/**
+ * Une pastille de camp : un point à la couleur du camp (les mêmes que la barre et les listes du détail) et le nombre de
+ * personnes ; la toucher déroule leurs verbatims (Arnaud, 18/10 : le résumé parle comme le reste du rapport).
+ */
+function CampChip({
+  cat,
+  people,
+  open,
+  onToggle,
+  word = false,
+  pill,
+}: {
+  cat: IdeaCategory
+  people: number
+  open: boolean
+  onToggle: () => void
+  /** Le mot après le nombre (« 46 avis positifs »), dans les listes ; le point seul suffit dans une phrase. */
+  word?: boolean
+  pill?: string
+}) {
+  return (
+    <button
+      type="button"
+      data-pill={pill}
+      onClick={onToggle}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape' && open) onToggle()
+      }}
+      aria-expanded={open}
+      aria-label={`${open ? 'Masquer' : 'Voir'} les verbatims de ${plural(people, 'participant')} : ${CAMP_WORD[cat][1]}`}
+      className={`inline-flex min-h-6 cursor-pointer items-center gap-1 rounded-full px-2 py-0 align-baseline text-sm font-medium tabular-nums sm:min-h-0 sm:px-1.5 ${
+        open ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'
+      }`}
+    >
+      <span className={`inline-block size-2 shrink-0 rounded-full ${BAR[cat]} ${open ? 'ring-1 ring-primary-foreground' : ''}`} aria-hidden />
+      {people}
+      {word && ` ${CAMP_WORD[cat][people > 1 ? 1 : 0]}`}
+    </button>
+  )
+}
+
 /**
  * Affiche un texte en rendant cliquables les références [I0001, I0002] : un
  * clic déplie les verbatims juste en dessous, sans quitter la lecture.
@@ -196,17 +260,18 @@ function CitedText({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: Group
 }
 
 function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: Group[] }) {
-  const [open, setOpen] = useState<number | null>(null)
+  const [opened, setOpened] = useState<{ i: number; cat: IdeaCategory } | null>(null)
+  const open = opened?.i ?? null
   // Ouvrir ou fermer recompose le paragraphe : la pastille touchée garde le focus (clavier, lecteur d'écran, Échap).
   const box = useRef<HTMLDivElement>(null)
-  const last = useRef<number | null>(null)
+  const last = useRef<string | null>(null)
   useEffect(() => {
     if (last.current === null) return
     box.current?.querySelector<HTMLElement>(`[data-pill="${last.current}"]`)?.focus({ preventScroll: true })
-  }, [open])
-  const toggle = (i: number) => {
-    last.current = i
-    setOpen(open === i ? null : i)
+  }, [opened])
+  const toggle = (i: number, cat: IdeaCategory) => {
+    last.current = `${i}-${cat}`
+    setOpened(opened?.i === i && opened.cat === cat ? null : { i, cat })
   }
   const parts = text.split(/(\[I\d{4,}(?:\s*,\s*I\d{4,})*\])/g)
   const cited = parts.map((part) => {
@@ -223,26 +288,15 @@ function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: 
       const ids = refs[i]
       if (!ids) return <Fragment key={i}>{ctx.mask(part)}</Fragment>
       if (!ids.length) return null
-      const isOpen = open === i
+      // Une pastille par camp : « ● 46 ● 1 », chacune déroule les verbatims de son camp.
       return (
-            <Tooltip key={i} wide side="top" content={<QuotesPreview ids={ids} ctx={ctx} />}>
-              <button
-                type="button"
-                data-pill={i}
-                onClick={() => toggle(i)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape' && isOpen) toggle(i)
-                }}
-                aria-expanded={isOpen}
-                className={`mx-0.5 inline-flex min-h-6 cursor-pointer items-center gap-0.5 rounded-full px-2 py-0 align-baseline text-sm font-medium sm:min-h-0 sm:px-1.5 ${
-                  isOpen ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'
-                }`}
-                aria-label={`${isOpen ? 'Masquer' : 'Voir'} ${whole[i] ? `les verbatims de ${plural(whole[i]!.people, 'participant')}` : plural(ids.length, 'verbatim')}`}
-              >
-                <Quote className="size-3" />
-                {whole[i]?.people ?? ids.length}
-              </button>
+        <span key={i} className="mx-0.5 inline-flex flex-wrap gap-0.5 align-baseline">
+          {campsOf(ids, ctx).map((c) => (
+            <Tooltip key={c.cat} wide side="top" content={<QuotesPreview ids={c.ids} ctx={ctx} />}>
+              <CampChip cat={c.cat} people={c.people} pill={`${i}-${c.cat}`} open={opened?.i === i && opened.cat === c.cat} onToggle={() => toggle(i, c.cat)} />
             </Tooltip>
+          ))}
+        </span>
       )
     })
   if (open === null || !refs[open])
@@ -267,7 +321,7 @@ function CitedParagraph({ text, ctx, camps }: { text: string; ctx: Ctx; camps?: 
         {piece(0, open + 1)}
         {punct.trim()}
       </p>
-      <QuotesPanel ids={refs[open]!} ctx={ctx} onClose={() => setOpen(null)} />
+      <QuotesPanel ids={campsOf(refs[open]!, ctx).find((c) => c.cat === opened!.cat)?.ids ?? refs[open]!} ctx={ctx} onClose={() => setOpened(null)} />
       {rest && <p className="mt-2 leading-relaxed">{pieceRest()}</p>}
     </div>
   )
@@ -294,7 +348,7 @@ function HighlightLine({
   /** Vue restreinte (« Et aussi ») : sans la phrase d'ouverture de la synthèse. */
   compact?: boolean
 }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState<IdeaCategory | null>(null)
   const group = groupById.get(item.groupId)
   const camp = SECTION_CAMP[section]
   const inGroup = (group?.ideaIds ?? []).map((id) => ctx.ideaById.get(id)!).filter((i) => i && (!ctx.segment || ctx.segment.has(i.participantId)))
@@ -311,25 +365,18 @@ function HighlightLine({
         <span className="mt-1 block text-[15px] leading-relaxed">
           {lead && <span>{ctx.mask(lead)} </span>}
           {people > 0 && (
-            <button
-              type="button"
-              onClick={() => setOpen((o) => !o)}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape' && open) setOpen(false)
-              }}
-              aria-expanded={open}
-              aria-label={`${open ? 'Masquer' : 'Voir'} les verbatims de ${plural(people, 'participant')}`}
-              className={`inline-flex min-h-6 cursor-pointer items-center gap-0.5 rounded-full px-2 py-0 align-baseline text-sm font-medium sm:min-h-0 sm:px-1.5 ${
-                open ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'
-              }`}
-            >
-              <Quote className="size-3" />
-              {people} {SECTION_WORD[section][people > 1 ? 1 : 0]}
-            </button>
+            <span className="inline-flex flex-wrap gap-1 align-baseline">
+              {campsOf(
+                ideas.map((i) => i.id),
+                ctx,
+              ).map((c) => (
+                <CampChip key={c.cat} cat={c.cat} people={c.people} word open={open === c.cat} onToggle={() => setOpen((o) => (o === c.cat ? null : c.cat))} />
+              ))}
+            </span>
           )}
         </span>
       )}
-      {open && <QuotesPanel ids={ideas.map((i) => i.id)} ctx={ctx} onClose={() => setOpen(false)} />}
+      {open && <QuotesPanel ids={ideas.filter((i) => i.category === open).map((i) => i.id)} ctx={ctx} onClose={() => setOpen(null)} />}
     </>
   )
 }
@@ -495,15 +542,6 @@ function MoreItems({
       )}
     </div>
   )
-}
-
-/** Ce que déroule la pastille d'une ligne de liste : le lecteur lit « 27 avis négatifs », pas « 27 » à côté d'un « 6 ». */
-const SECTION_WORD: Record<HighlightSection['key'], [string, string]> = {
-  strengths: ['avis positif', 'avis positifs'],
-  blockers: ['avis négatif', 'avis négatifs'],
-  divided: ['avis', 'avis'],
-  proposals: ['suggestion', 'suggestions'],
-  questions: ['question', 'questions'],
 }
 
 /** Place ses enfants sur la barre des onglets de l'étude (à droite des onglets). */
@@ -738,7 +776,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
       id={`motif-${group.id}`}
       label={`le thème « ${group.title} »`}
       className="border-b py-0.5"
-      closed={
+      row={
         <span className="flex flex-col gap-1.5 py-2 sm:flex-row sm:items-center sm:justify-between">
           <H data-vt="title" className="text-base font-semibold">
             {group.title}
@@ -754,24 +792,6 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
               </span>
               {marks}
             </span>
-          </span>
-        </span>
-      }
-      opened={
-        // La barre reste dans l'en-tête ouvert : ce que contient le thème ne disparaît pas quand on l'ouvre (Arnaud, 18/10).
-        <span className="flex min-w-0 items-center gap-2">
-          <H data-vt="title" className="line-clamp-2 min-w-0 text-sm leading-tight font-semibold sm:line-clamp-1 sm:text-base">
-            {group.title}
-          </H>
-          <span data-vt="bar" className="block w-10 shrink-0 sm:w-20">
-            <OpinionBar m={m} />
-          </span>
-          <span data-vt="meta" className="hidden shrink-0 items-center gap-2 sm:inline-flex">
-            <span className="text-sm text-muted-foreground">
-              <Users className="mr-0.5 inline size-3" aria-hidden />
-              {m.participants}
-            </span>
-            <span className="hidden md:inline-flex md:gap-1.5">{stanceBadgeOnly(m)}</span>
           </span>
         </span>
       }
@@ -1069,39 +1089,10 @@ function VerdictLine({ groups, suggestions }: { groups: Metrics[]; suggestions?:
   )
 }
 
-/**
- * Le compte court des thèmes, dans l'en-tête collé d'un grand thème ouvert, sur un écran assez large : « 5 thèmes
- * ● 1 ● 4 », les mots complets en infobulle et pour les lecteurs d'écran ; la ligne complète reste en tête du contenu.
- */
-function VerdictDots({ groups }: { groups: Metrics[] }) {
-  const counted = groups.filter((m) => m.participants > 1)
-  const isolated = groups.length - counted.length
-  const verdicts = themeVerdicts(counted)
-  const words = [...verdicts.map(({ verdict, count }) => verdictLabel(verdict, count)), ...(isolated ? [`${isolated} ${isolated > 1 ? 'portés' : 'porté'} par une seule personne`] : [])].join(', ')
+/** La ligne d'un grand thème : fermée, une seule cible qui ouvre ; ouverte, l'en-tête collé, telle quelle. */
+function ThemeRow({ title, m, groups, suggestions }: { title: string; m: Metrics; groups: Metrics[]; suggestions?: number }) {
   return (
-    <span className="hidden shrink-0 items-center gap-2 text-sm text-muted-foreground md:inline-flex" title={words}>
-      <span>{plural(groups.length, 'thème')}</span>
-      <span className="sr-only">: {words}</span>
-      {verdicts.map(({ verdict, count }) => (
-        <span key={verdict} className="inline-flex items-center gap-1" aria-hidden>
-          <span className={`inline-block size-2.5 rounded-full ${VERDICT_DOT[verdict]}`} />
-          {count}
-        </span>
-      ))}
-      {isolated > 0 && (
-        <span className="inline-flex items-center gap-1" aria-hidden>
-          <span className="inline-block size-2.5 rounded-full border border-muted-foreground/50" />
-          {isolated}
-        </span>
-      )}
-    </span>
-  )
-}
-
-/** La ligne d'un thème fermé : une seule cible, qui ouvre. */
-function ThemeRow({ title, m, groups }: { title: string; m: Metrics; groups: Metrics[] }) {
-  return (
-    <span className="block space-y-2 py-3">
+    <span className="block space-y-2 py-3 group-open/fold:py-2">
       <span className="flex items-start justify-between gap-2">
         <h3 data-vt="title" className="text-lg font-semibold">
           {title}
@@ -1113,7 +1104,7 @@ function ThemeRow({ title, m, groups }: { title: string; m: Metrics; groups: Met
       <span data-vt="bar" className="block">
         <VerdictBar groups={groups} />
       </span>
-      <VerdictLine groups={groups} />
+      <VerdictLine groups={groups} suggestions={suggestions} />
     </span>
   )
 }
@@ -1491,24 +1482,9 @@ export function ReportTab({
                   level="theme"
                   label={`le grand thème « ${t.title} »`}
                   className="border-b"
-                  closed={<ThemeRow title={t.title} m={m} groups={groups.map((x) => x.m)} />}
-                  opened={
-                    <span className="flex min-w-0 items-center gap-3">
-                      <h3 data-vt="title" className="line-clamp-2 min-w-0 text-base leading-tight font-semibold sm:line-clamp-1 sm:text-lg">
-                        {t.title}
-                      </h3>
-                      <span data-vt="bar" className="block w-12 shrink-0 sm:w-28">
-                        <VerdictBar groups={groups.map((x) => x.m)} />
-                      </span>
-                      <VerdictDots groups={groups.map((x) => x.m)} />
-                      <span data-vt="meta" className="hidden shrink-0 text-sm text-muted-foreground lg:inline">
-                        {plural(m.participants, 'participant')}
-                      </span>
-                    </span>
-                  }
+                  row={<ThemeRow title={t.title} m={m} groups={groups.map((x) => x.m)} suggestions={m.participantsByCategory.suggestion} />}
                   bodyClassName="space-y-3 pb-4 pt-2"
                 >
-                  <VerdictLine groups={groups.map((x) => x.m)} suggestions={m.participantsByCategory.suggestion} />
                   {t.summary && !segment && (
                     <div className="max-w-3xl text-base">
                       <CitedText text={t.summary} ctx={ctx} />

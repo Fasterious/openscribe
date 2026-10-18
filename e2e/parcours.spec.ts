@@ -148,11 +148,13 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   expect(await motif.locator(':scope > summary').evaluate((el) => el === document.activeElement)).toBe(true)
 
   // Une référence de la synthèse déplie ses verbatims juste en dessous, sans fenêtre.
-  await page
-    .getByRole('button', { name: /Voir \d+ verbatims?/ })
+  // (Une pastille par camp : un point à la couleur du camp et le nombre de personnes.)
+  await motif.locator(':scope > summary').click()
+  await motif
+    .getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / })
     .first()
     .click()
-  await expect(page.getByRole('button', { name: /Masquer \d+ verbatims?/ })).toHaveAttribute('aria-expanded', 'true')
+  await expect(motif.getByRole('button', { name: /^Masquer les verbatims de \d+ participants? : / })).toHaveAttribute('aria-expanded', 'true')
   await expect(page.getByRole('dialog')).toHaveCount(0)
   // Une ligne par participant ; un verbatim se replace dans sa réponse, le passage cité en gras.
   await page.locator('article').getByRole('button', { name: /^«/ }).first().click()
@@ -177,11 +179,11 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
 test('replier des verbatims ramène le lecteur là où il les avait dépliés', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Voir un exemple de rapport' }).click()
-  const pill = page.getByRole('button', { name: /Voir \d+ verbatims?/ }).first()
+  const pill = page.getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / }).first()
   await pill.scrollIntoViewIfNeeded()
   const before = (await pill.boundingBox())!.y
   await pill.click()
-  const opened = page.getByRole('button', { name: /Masquer \d+ verbatims?/ }).first()
+  const opened = page.getByRole('button', { name: /^Masquer les verbatims de \d+ participants? : / }).first()
   // Le lecteur parcourt les verbatims plus bas, puis replie.
   await page.mouse.wheel(0, 400)
   await page.waitForTimeout(200)
@@ -518,7 +520,10 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   await expect(theme).toHaveAttribute('open', '')
   // La barre du grand thème reste dans son en-tête ouvert (Arnaud, 18/10) ; sur un écran large, le compte des thèmes aussi.
   await expect(themeHead.locator('[data-vt="bar"]')).toBeVisible()
-  if ((page.viewportSize()?.width ?? 0) >= 768) await expect(themeHead).toContainText(/\d+ thèmes/)
+  // L'en-tête collé est la ligne fermée elle-même : titre, barre, et la ligne des verdicts dessous (Arnaud, 18/10).
+  await expect(themeHead).toContainText(/\d+ thèmes\u00a0:/)
+  // Plus de « Replier » en bas du bloc : celui de l'en-tête collé suffit.
+  await expect(theme.getByRole('button', { name: /^⌃ Replier/ })).toHaveCount(0)
   const top = (l: Locator) => l.evaluate((el) => Math.round(el.getBoundingClientRect().top))
   const scroll = async (dy: number) => {
     for (let i = 0; i < 4; i++) {
@@ -542,12 +547,14 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   // On remonte un peu : la barre et le grand thème reviennent, le thème se range dessous.
   await scroll(-80)
   await expect.poll(() => top(themeHead)).toBeGreaterThanOrEqual(50)
-  await expect.poll(async () => (await top(motifHead)) - (await top(themeHead))).toBe(48)
+  // Le thème se range juste sous l'en-tête du grand thème, qui est sa ligne entière (titre, barre, verdicts).
+  const themeHeight = () => themeHead.evaluate((el) => Math.round(el.getBoundingClientRect().height))
+  await expect.poll(async () => (await top(motifHead)) - (await top(themeHead)) - (await themeHeight())).toBe(0)
   // Replier le thème rend la place au grand thème, et le titre replié reste sous lui.
   await motifHead.click()
   await expect(motif).not.toHaveAttribute('open', '')
   await expect(motifHead).toBeFocused()
-  await expect.poll(async () => (await top(motifHead)) - (await top(themeHead))).toBeGreaterThanOrEqual(47)
+  await expect.poll(async () => (await top(motifHead)) - (await top(themeHead)) - (await themeHeight())).toBeGreaterThanOrEqual(-1)
   // Le rouvrir aussitôt le laisse sur place : la page ne saute pas au bloc suivant (passe testeur du 18/10, +1197 px).
   // Un clic à l'endroit du titre, comme un lecteur (le clic de Playwright recentrerait la page d'abord).
   const clickAt = async (l: Locator) => {

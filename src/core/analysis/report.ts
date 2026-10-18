@@ -625,23 +625,31 @@ export function summaryDoubts(sections: HighlightSection[]): string | undefined 
  */
 export function wholeCamp(before: string, ids: string[], groups: Group[], byId: Map<string, Idea>): { ids: string[]; people: number } | undefined {
   const cited = ids.map((id) => byId.get(id)).filter((i): i is Idea => !!i)
-  if (!cited.length || cited.some((i) => i.category !== cited[0].category)) return undefined
+  if (!cited.length) return undefined
   const g = groups.find((x) => cited.every((i) => x.ideaIds.includes(i.id)))
   if (!g) return undefined
-  const cat = cited[0].category
   const all = g.ideaIds.map((id) => byId.get(id)).filter((i): i is Idea => !!i)
-  const camp = all.filter((i) => i.category === cat)
-  // Un avis : le camp se compte avec ou sans les mitigés (« 46 personnes » = les seuls positifs, « 48 » = avec eux).
-  const other = cat === 'positive' ? 'negative' : cat === 'negative' ? 'positive' : undefined
-  const mixed = new Set(other ? all.filter((i) => i.category === other).map((i) => i.participantId) : [])
   const sentence = before.split(/(?<=[.!?])\s+/).pop() ?? ''
   const numbers = [...sentence.matchAll(/(?<![\p{L}\d-])(\d+|\p{L}+(?:-\p{L}+)*)(?![\p{L}\d])/gu)].map((m) => (/^\d+$/.test(m[1]) ? Number(m[1]) : frenchNumber(m[1])))
-  const citedPeople = new Set(cited.map((i) => i.participantId)).size
-  for (const ideas of [camp, camp.filter((i) => !mixed.has(i.participantId))]) {
-    const people = new Set(ideas.map((i) => i.participantId)).size
-    if (people > citedPeople && numbers.includes(people)) return { ids: ideas.map((i) => i.id), people }
+  // Chaque camp cité séparément : « 22 positifs, 23 négatifs » déroule les deux camps entiers (Arnaud, 18/10).
+  const out: Idea[] = []
+  let grown = false
+  for (const cat of [...new Set(cited.map((i) => i.category))]) {
+    const citedCat = cited.filter((i) => i.category === cat)
+    const camp = all.filter((i) => i.category === cat)
+    // Un avis : le camp se compte avec ou sans les mitigés (« 46 personnes » = les seuls positifs, « 48 » = avec eux).
+    const other = cat === 'positive' ? 'negative' : cat === 'negative' ? 'positive' : undefined
+    const mixed = new Set(other ? all.filter((i) => i.category === other).map((i) => i.participantId) : [])
+    const citedPeople = new Set(citedCat.map((i) => i.participantId)).size
+    const whole = [camp, camp.filter((i) => !mixed.has(i.participantId))].find((ideas) => {
+      const people = new Set(ideas.map((i) => i.participantId)).size
+      return people > citedPeople && numbers.includes(people)
+    })
+    out.push(...(whole ?? citedCat))
+    grown ||= !!whole
   }
-  return undefined
+  if (!grown) return undefined
+  return { ids: out.map((i) => i.id), people: new Set(out.map((i) => i.participantId)).size }
 }
 
 /** Les idées qu'une ligne des listes déroule au clic : le camp que la liste compte (avis positifs pour « Ce qui a marché »…). */

@@ -11,13 +11,14 @@ import { cn } from '../primitives'
  * et qu'on descend, il s'efface avec la barre de l'application, le thème prend sa place ; il revient avec elle dès
  * qu'on remonte (remarque d'Arnaud, 18/10). Sur un écran bas, il s'efface dès qu'on lit un thème ouvert.
  *
- * Hauteurs fixes, pour que les en-têtes s'empilent sans se chevaucher : grand thème 3 rem, thème 2,75 rem.
+ * L'en-tête collé est la ligne fermée elle-même (titre, barre et indicateurs dessous, Arnaud, 18/10) : sa hauteur varie
+ * avec le titre et l'écran, elle se mesure (`--theme-stick`, `--motif-stick`) pour que les en-têtes s'empilent sans se
+ * chevaucher.
  */
 
 /** Hauteur de la barre de l'application quand elle est visible ; les en-têtes collants se placent dessous. */
 const APP_BAR = '3.5rem'
 const APP_BAR_PX = 56
-const THEME_PX = 48
 let barPx = APP_BAR_PX
 let frozenUntil = 0
 /** Le dernier repli : le second clic d'un double clic sur « Replier » ne rouvre pas le bloc dont le titre arrive sous le pointeur. */
@@ -30,19 +31,29 @@ export function freezeHeadroom(ms = 400) {
   frozenUntil = Date.now() + ms
 }
 
-/** Le grand thème s'efface (`--theme-off`) ; les en-têtes qui collent dessous remontent d'autant. */
-function setThemeOff(off: boolean) {
-  document.documentElement.style.setProperty('--theme-off', off ? `${THEME_PX}px` : '0px')
+/** Le grand thème s'efface de toute sa hauteur (`--theme-off`) ; les en-têtes qui collent dessous remontent d'autant. */
+function setThemeOff(px: number) {
+  document.documentElement.style.setProperty('--theme-off', `${px}px`)
 }
 
-/** Le lecteur est dans un thème ouvert d'un grand thème : l'en-tête du thème est collé, son contenu occupe l'écran. */
-function readingMotif(): boolean {
-  const line = barPx + THEME_PX + 4
+/** La hauteur de l'en-tête ouvert du grand thème qui contient ce bloc (0 hors d'un grand thème). */
+function themeHead(el: Element): number {
+  const theme = el.parentElement?.closest('details[data-fold="theme"][open]')
+  return (theme?.querySelector(':scope > summary') as HTMLElement | null)?.offsetHeight ?? 0
+}
+
+/**
+ * Le lecteur est dans un thème ouvert d'un grand thème : l'en-tête du thème est collé, son contenu occupe l'écran.
+ * Renvoie la hauteur de l'en-tête du grand thème à effacer, ou 0.
+ */
+function readingMotif(): number {
   for (const d of document.querySelectorAll<HTMLDetailsElement>('details[data-fold="theme"][open] details[data-fold="motif"][open]')) {
+    const head = themeHead(d)
+    const line = barPx + head + 4
     const r = d.getBoundingClientRect()
-    if (r.top < line && r.bottom > line + 120) return true
+    if (r.top < line && r.bottom > line + 120) return head
   }
-  return false
+  return 0
 }
 
 /**
@@ -66,14 +77,14 @@ export function useHeadroom(enabled: boolean, header: React.RefObject<HTMLElemen
     if (!enabled) {
       hide(false)
       root.style.setProperty('--app-bar', APP_BAR)
-      setThemeOff(false)
+      setThemeOff(0)
       return
     }
     // `anchor` : là où le sens du défilement a changé ; la barre bouge après 8 px dans le nouveau sens.
     let last = window.scrollY
     let anchor = last
     let dir = 0
-    const deep = () => setThemeOff(readingMotif() && (hiddenRef.current || window.innerHeight < 600))
+    const deep = () => setThemeOff(hiddenRef.current || window.innerHeight < 600 ? readingMotif() : 0)
     const onScroll = () => {
       const y = window.scrollY
       if (Date.now() < frozenUntil) {
@@ -102,13 +113,13 @@ export function useHeadroom(enabled: boolean, header: React.RefObject<HTMLElemen
       window.removeEventListener('scroll', onScroll)
       document.removeEventListener('toggle', deep, true)
       bar?.removeEventListener('focusin', onFocus)
-      setThemeOff(false)
+      setThemeOff(0)
     }
   }, [enabled, header])
   useEffect(() => {
     barPx = hidden ? 0 : APP_BAR_PX
     document.documentElement.style.setProperty('--app-bar', hidden ? '0px' : APP_BAR)
-    if (!hidden) setThemeOff(window.innerHeight < 600 && readingMotif())
+    if (!hidden) setThemeOff(window.innerHeight < 600 ? readingMotif() : 0)
   }, [hidden])
   return hidden
 }
@@ -156,7 +167,7 @@ function transition(details: HTMLDetailsElement, kind: 'open' | 'fold', update: 
 /** Où se place le titre d'un bloc collé : sous la barre de l'application, et sous le grand thème pour un thème. */
 function stickLine(details: HTMLDetailsElement): number {
   if (details.dataset.fold === 'theme') return barPx
-  return barPx + (details.parentElement?.closest('details[data-fold="theme"]') ? THEME_PX : 0)
+  return barPx + themeHead(details)
 }
 
 /**
@@ -166,7 +177,7 @@ function stickLine(details: HTMLDetailsElement): number {
  */
 export function foldDetails(details: HTMLDetailsElement) {
   const summary = details.querySelector(':scope > summary') as HTMLElement | null
-  setThemeOff(false)
+  setThemeOff(0)
   const stick = stickLine(details)
   const r = details.getBoundingClientRect()
   freezeHeadroom()
@@ -204,20 +215,18 @@ export function foldDetails(details: HTMLDetailsElement) {
 /** Les classes d'un en-tête ouvert qui colle : sous la barre de l'application et sous l'en-tête du niveau supérieur. */
 const STUCK = {
   theme:
-    'sticky top-[calc(var(--app-bar)-var(--theme-off,0px))] z-20 h-12 border-b bg-background/95 backdrop-blur transition-[top] duration-200 motion-reduce:transition-none',
+    'sticky top-[calc(var(--app-bar)-var(--theme-off,0px))] z-20 border-b bg-background/95 backdrop-blur transition-[top] duration-200 motion-reduce:transition-none',
   motif:
-    'sticky top-[calc(var(--app-bar)+var(--theme-stick,0px))] z-10 h-11 border-b bg-background/95 backdrop-blur transition-[top] duration-200 motion-reduce:transition-none',
+    'sticky top-[calc(var(--app-bar)+var(--theme-stick,0px))] z-10 border-b bg-background/95 backdrop-blur transition-[top] duration-200 motion-reduce:transition-none',
 }
 
 /**
  * Un bloc repliable de lecture (grand thème, thème) : `<details>` natif (Ctrl+F l'ouvre, l'impression le déplie), dont
- * l'en-tête ouvert reste collé avec « Replier ». `closed` est la ligne fermée, une seule cible qui ouvre ; `opened`
- * l'en-tête compact du bloc ouvert, sur une ligne. `level` place l'en-tête sous ceux des niveaux supérieurs.
- * Le titre et la barre portent `data-vt="title"` et `data-vt="bar"` dans les deux : ils glissent de l'un à l'autre.
+ * l'en-tête ouvert reste collé avec « Replier ». `row` est la ligne du bloc, une seule cible : fermée, elle ouvre ;
+ * ouverte, elle colle telle quelle et replie. `level` place l'en-tête sous ceux des niveaux supérieurs.
  */
 export function Fold({
-  closed,
-  opened,
+  row,
   children,
   level,
   id,
@@ -227,8 +236,7 @@ export function Fold({
   label,
   onToggle,
 }: {
-  closed: ReactNode
-  opened: ReactNode
+  row: ReactNode
   children: ReactNode
   level: 'theme' | 'motif'
   id?: string
@@ -240,7 +248,23 @@ export function Fold({
   onToggle?: (open: boolean) => void
 }) {
   const ref = useRef<HTMLDetailsElement>(null)
+  const head = useRef<HTMLElement>(null)
+  const body = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(defaultOpen)
+  // La hauteur de l'en-tête ouvert, pour que les en-têtes du niveau dessous collent juste sous lui.
+  useEffect(() => {
+    const h = head.current
+    const b = body.current
+    if (!open || !h || !b) return
+    const measure = () =>
+      level === 'theme'
+        ? b.style.setProperty('--theme-stick', `calc(${h.offsetHeight}px - var(--theme-off, 0px))`)
+        : b.style.setProperty('--motif-stick', `${h.offsetHeight}px`)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(h)
+    return () => ro.disconnect()
+  }, [open, level])
   useEffect(() => {
     const d = ref.current
     if (!d) return
@@ -286,11 +310,12 @@ export function Fold({
       className={cn('fold group/fold', className)}
     >
       <summary
+        ref={head}
         onClick={toggle}
         aria-label={open ? `Replier ${label}` : undefined}
         className={cn('flex cursor-pointer list-none items-center gap-2 select-none [&::-webkit-details-marker]:hidden', open && STUCK[level])}
       >
-        <span className="min-w-0 flex-1">{open ? opened : closed}</span>
+        <span className="min-w-0 flex-1">{row}</span>
         {open ? (
           <span className="no-print flex min-h-8 shrink-0 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
             <span aria-hidden>⌃</span> <span className="max-sm:hidden">Replier</span>
@@ -301,22 +326,8 @@ export function Fold({
           </span>
         )}
       </summary>
-      <div
-        className={cn(
-          // Les en-têtes des thèmes collent sous celui du grand thème, et remontent quand il s'efface.
-          level === 'theme' && '[--theme-stick:calc(3rem-var(--theme-off,0px))]',
-          level === 'motif' && '[--motif-stick:2.75rem]',
-          bodyClassName,
-        )}
-      >
+      <div ref={body} className={bodyClassName}>
         {children}
-        <button
-          type="button"
-          onClick={() => ref.current && foldDetails(ref.current)}
-          className="no-print mt-3 inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-        >
-          <span aria-hidden>⌃</span> Replier {label}
-        </button>
       </div>
     </details>
   )
@@ -353,7 +364,7 @@ export function glideTo(target: HTMLElement, block: 'start' | 'center', focus: H
   const far = Math.abs(r.top - goal) > window.innerHeight * 1.5
   const smooth = !far && !reduced()
   freezeHeadroom(smooth ? 1500 : 600)
-  if (target instanceof HTMLDetailsElement) setThemeOff(false)
+  if (target instanceof HTMLDetailsElement) setThemeOff(0)
   window.scrollTo({ top: window.scrollY + r.top - goal, behavior: smooth ? 'smooth' : 'instant' })
   focus?.focus({ preventScroll: true })
   if (far && !reduced() && focus) {

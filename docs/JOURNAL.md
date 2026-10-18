@@ -19,6 +19,11 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 - **Sauts** : court (moins d'un écran et demi), défilement doux ; long, arrivée directe et titre éclairé un instant.
 - **Compte des thèmes** (laissé à notre choix par Arnaud) : « 10 thèmes ● 4 ● 1 ● 3 » dans l'en-tête collé du grand
   thème sur écran large, les mots en infobulle ; la ligne complète reste en tête du contenu.
+- **Second retour d'Arnaud, le même soir** : l'en-tête collé est la ligne fermée elle-même (titre, barre et
+  indicateurs dessous), pas une version compacte : c'est ce qui donne son sens à la barre. Sa hauteur se mesure pour
+  empiler les en-têtes. Plus de « Replier » en bas des blocs (celui de l'en-tête suffit). Dans le résumé, les
+  pastilles deviennent « ● 46 », une par camp, à la couleur du camp, cliquables ; « 22 positifs, 23 négatifs » déroule
+  les deux camps entiers (le code étend chaque camp cité dont la phrase donne le nombre).
 - **Passe testeur** : rouvrir un bloc qu'on venait de replier faisait sauter la page jusqu'à 1 200 px (l'ancrage du
   défilement prenait le bloc suivant pour repère, le titre devenu collé ne comptant plus) : ancrage suspendu à
   l'ouverture, test de parcours qui échoue sans le correctif.

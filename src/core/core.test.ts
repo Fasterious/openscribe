@@ -574,9 +574,14 @@ describe('étiquettes à vérifier', () => {
     // « 5 personnes » : le camp positif compte 5 participants, la pastille les déroule tous.
     expect(wholeCamp('Bilan. 5 personnes saluent l’accueil ', ['I0000'], groups, byId)).toEqual({ ids: ['I0000', 'I0001', 'I0002', 'I0003', 'I0004'], people: 5 })
     expect(wholeCamp('Cinq personnes saluent l’accueil ', ['I0000'], groups, byId)?.people).toBe(5)
-    // Sans le nombre, ou avec un camp mêlé : les seules idées citées.
+    // Sans le nombre : les seules idées citées.
     expect(wholeCamp('Une personne salue l’accueil ', ['I0000'], groups, byId)).toBeUndefined()
-    expect(wholeCamp('5 personnes ', ['I0000', 'I0009'], groups, byId)).toBeUndefined()
+    // Deux camps cités : chacun s'étend à son camp entier si la phrase en donne le nombre, sinon il reste tel quel.
+    expect(wholeCamp('5 personnes ', ['I0000', 'I0009'], groups, byId)?.ids).toEqual(['I0000', 'I0001', 'I0002', 'I0003', 'I0004', 'I0009'])
+    const pairIdeas = [...ideas, idea('I0011', 'P11', 'negative')]
+    const byId3 = new Map(pairIdeas.map((i) => [i.id, i]))
+    const groups3 = [{ id: 'G1', title: 'Accueil', ideaIds: pairIdeas.map((i) => i.id) }] as unknown as Group[]
+    expect(wholeCamp('Avis partagés (5 positifs, 2 négatifs) ', ['I0000', 'I0009'], groups3, byId3)).toEqual({ ids: ['I0000', 'I0001', 'I0002', 'I0003', 'I0004', 'I0009', 'I0011'], people: 7 })
     // Le camp sans les mitigés : P9 critique aussi, « 4 personnes » compte les seuls positifs.
     const mixedIdeas = [...ideas, idea('I0010', 'P1', 'negative')]
     const byId2 = new Map(mixedIdeas.map((i) => [i.id, i]))
