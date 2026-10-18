@@ -228,7 +228,7 @@ export function Disclosure({
         )}
       >
         <span className="min-w-0 flex-1">{summary}</span>
-        <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-90">
+        <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-90 motion-reduce:transition-none">
           ›
         </span>
       </summary>

@@ -15,6 +15,8 @@ const APP_BAR = '3.5rem'
 let frozenUntil = 0
 /** Le dernier repli : le second clic d'un double clic sur « Replier » ne rouvre pas le bloc dont le titre arrive sous le pointeur. */
 let folded: { at: number; el: HTMLDetailsElement | null } = { at: 0, el: null }
+/** La dernière ouverture : le second clic d'un double clic sur une ligne fermée ne referme pas le bloc qu'il vient d'ouvrir. */
+let unfolded: { at: number; el: HTMLDetailsElement | null } = { at: 0, el: null }
 
 /** Un défilement provoqué par le code (un repli) ne fait pas réapparaître la barre de l'application. */
 export function freezeHeadroom(ms = 400) {
@@ -155,8 +157,13 @@ export function Fold({
     e.preventDefault()
     const d = ref.current
     if (!d) return
-    if (d.open) foldDetails(d)
-    else if (!(e.detail > 1 && folded.el === d && Date.now() - folded.at < 500)) d.open = true
+    const second = e.detail > 1
+    if (d.open) {
+      if (!(second && unfolded.el === d && Date.now() - unfolded.at < 500)) foldDetails(d)
+    } else if (!(second && folded.el === d && Date.now() - folded.at < 500)) {
+      unfolded = { at: Date.now(), el: d }
+      d.open = true
+    }
   }, [])
   return (
     <details
@@ -184,7 +191,7 @@ export function Fold({
       >
         <span className="min-w-0 flex-1">{open ? opened : closed}</span>
         {open ? (
-          <span className="flex min-h-8 shrink-0 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
+          <span className="no-print flex min-h-8 shrink-0 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
             <span aria-hidden>⌃</span> Replier
           </span>
         ) : (

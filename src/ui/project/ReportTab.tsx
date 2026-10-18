@@ -419,7 +419,7 @@ function DoubtLinks({ sections, ctx }: { sections: HighlightSection[]; ctx: Ctx 
           </button>
         </Fragment>
       ))}
-      . Elle dépend d'avis comptés aussi dans un autre motif ; chaque motif, une fois ouvert, explique pourquoi.
+      . {items.length > 1 ? 'Leur étiquette dépend' : 'Son étiquette dépend'} d'avis comptés aussi dans un autre motif ; chaque motif, une fois ouvert, explique pourquoi.
     </p>
   )
 }
@@ -428,7 +428,7 @@ const MORE_WORD: Record<HighlightSection['key'], string> = {
   strengths: 'appréciés',
   blockers: 'critiqués',
   divided: 'qui divisent',
-  proposals: 'avec des propositions',
+  proposals: 'avec des suggestions',
   questions: 'avec des questions',
 }
 
@@ -472,7 +472,7 @@ function MoreItems({
   return (
     <div className="mt-3 space-y-2">
       {toggle}
-      <ul hidden={!open} data-print-open className="fold-in space-y-2 text-base">
+      <ul ref={foundable(open, () => setOpen(true))} data-print-open className="fold-in space-y-2 text-base">
         {items.map((x) => (
           <ListItem key={x.title} section={section} item={x} ctx={ctx} groupById={groupById} lineClass={lineClass} heading={heading} compact />
         ))}
@@ -604,11 +604,13 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
           <span aria-hidden>⌃</span> Replier
         </button>
       </div>
-      {cats.map((cat) =>
-        personLines(ideas.filter((i) => i.category === cat)).map((l) => (
-          <PersonLine key={`${cat}-${l.participantId}`} line={l} cat={cat} other={false} full={new Set()} ctx={ctx} />
-        )),
-      )}
+      <ul className="space-y-1.5">
+        {cats.map((cat) =>
+          personLines(ideas.filter((i) => i.category === cat)).map((l) => (
+            <PersonLine key={`${cat}-${l.participantId}`} line={l} cat={cat} other={false} full={new Set()} ctx={ctx} />
+          )),
+        )}
+      </ul>
       <button type="button" onClick={close} className="no-print inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
         <span aria-hidden>⌃</span> Replier ces verbatims
       </button>
@@ -789,6 +791,22 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
   )
 }
 
+/**
+ * Un contenu caché « jusqu'à ce qu'on le trouve » : la recherche du navigateur (Ctrl+F) le trouve, le montre, et
+ * l'état de l'écran suit (`beforematch`, Chrome et Edge ; ailleurs, le contenu reste caché à la recherche).
+ */
+const foundHandlers = new WeakMap<HTMLElement, () => void>()
+/** L'attribut est posé à la main : React réduit `hidden` à un booléen et perdrait « until-found ». */
+function foundable(open: boolean, onOpen: () => void) {
+  return (el: HTMLElement | null) => {
+    if (!el) return
+    if (open) el.removeAttribute('hidden')
+    else el.setAttribute('hidden', 'until-found')
+    if (!foundHandlers.has(el)) el.addEventListener('beforematch', () => foundHandlers.get(el)?.())
+    foundHandlers.set(el, onOpen)
+  }
+}
+
 /** Échap referme un `<details>` d'explication ouvert, sans refermer le motif qui le contient. */
 function closeOnEscape(e: React.KeyboardEvent<HTMLDetailsElement>) {
   if (e.key !== 'Escape' || !e.currentTarget.open) return
@@ -845,8 +863,12 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
                 ›
               </span>
             </button>
-            {/* Toujours dans la page, caché quand le camp est fermé : l'impression le montre, Ctrl+F le trouve. */}
-            <ul hidden={!isOpen} data-print-open className="fold-in space-y-1.5">
+            {/* Toujours dans la page, caché quand le camp est fermé : l'impression le montre, Ctrl+F le trouve et l'ouvre. */}
+            <ul
+              ref={foundable(isOpen, () => setOpen((o) => new Set(o).add(cat)))}
+              data-print-open
+              className="fold-in space-y-1.5"
+            >
               {lines.map((l) => (
                 <PersonLine key={l.participantId} line={l} cat={cat} other={polar && both.has(l.participantId)} full={full} ctx={ctx} />
               ))}
@@ -973,7 +995,7 @@ function MinorityNote({ minority, ctx }: { minority: NonNullable<Metrics['minori
   return (
     <Alert tone="info" className="text-sm">
       Minorité constante ({minority.side === 'positive' ? 'avis positifs' : 'avis négatifs'}) : {minority.participantIds.join(', ')}.{' '}
-      <button className="inline-flex min-h-6 cursor-pointer items-center text-primary underline" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button className="no-print inline-flex min-h-6 cursor-pointer items-center text-primary underline" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {open ? 'Masquer leurs verbatims' : 'Voir leurs verbatims'}
       </button>
       {open && <QuotesPanel ids={minority.ideaIds} ctx={ctx} onClose={() => setOpen(false)} />}
@@ -1127,18 +1149,41 @@ export function ReportTab({
   }
   const offTopic = offTopicLines(analysis)
   const [back, setBack] = useState<{ from: HTMLElement; label: string } | null>(null)
+  // Le retour s'efface quand on referme le motif où l'on est allé, et seulement celui-là (un nouveau saut remplace l'écoute).
+  const watched = useRef<{ d: HTMLDetailsElement; off: () => void } | null>(null)
+  const unwatch = () => {
+    watched.current?.off()
+    watched.current = null
+  }
+  // Tant que le bouton de retour flotte en bas, le focus clavier ne s'arrête jamais dessous (WCAG 2.4.11) : un élément
+  // qui reçoit le focus sous le bouton remonte juste assez pour le dégager.
+  const backButton = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!back) return
+    const onFocus = (e: FocusEvent) => {
+      const el = e.target as HTMLElement
+      const b = backButton.current?.getBoundingClientRect()
+      if (!b || el === backButton.current) return
+      const r = el.getBoundingClientRect()
+      const overlap = r.bottom > b.top && r.top < b.bottom && r.right > b.left && r.left < b.right
+      if (overlap) window.scrollBy({ top: r.bottom - b.top + 8, behavior: 'instant' })
+    }
+    document.addEventListener('focusin', onFocus)
+    return () => document.removeEventListener('focusin', onFocus)
+  }, [back])
   const ctx: Ctx = {
     reveal: (groupId, from, label) => {
       const d = revealMotif(groupId)
       if (!d) return
+      unwatch()
       setBack({ from, label })
-      // Le retour s'efface quand on referme le motif où l'on est allé.
       const onToggle = () => {
         if (d.open) return
         setBack(null)
-        d.removeEventListener('toggle', onToggle)
+        unwatch()
       }
       d.addEventListener('toggle', onToggle)
+      watched.current = { d, off: () => d.removeEventListener('toggle', onToggle) }
     },
     ideaById: new Map(analysis.ideas.map((i) => [i.id, i])),
     contributionById: new Map(corpus.contributions.map((c) => [c.id, c])),
@@ -1334,7 +1379,7 @@ export function ReportTab({
             Faits saillants
           </h2>
           {/* Colonnes plutôt que grille : des cartes de hauteurs inégales ne laissent pas de trou. */}
-          <div className="gap-3 md:columns-2">
+          <div className="gap-3 md:columns-2 print:columns-1">
             {sectionsHL.map((sec) => {
               const look = SECTION_LOOK[sec.key]
               const Icon = look.icon
@@ -1462,12 +1507,14 @@ export function ReportTab({
 
       {back && (
         <button
+          ref={backButton}
           type="button"
           onClick={() => {
             freezeHeadroom(800)
             back.from.scrollIntoView({ block: 'center' })
             back.from.focus({ preventScroll: true })
             setBack(null)
+            unwatch()
           }}
           className="no-print fixed bottom-4 left-4 z-40 inline-flex min-h-10 max-w-[calc(100vw-2rem)] cursor-pointer items-center gap-1 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground shadow-lg"
         >

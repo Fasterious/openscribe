@@ -171,7 +171,7 @@ export function doubtReason(
     ? `${gone.length} des ${T} personnes qui donnent un avis ${gone.length > 1 ? 'ne sont comptées' : "n'est comptée"} ici que par une idée rangée d'abord dans un autre motif : ${list(parts)}${changed.length ? ` ; ${movedText(true)}` : ''}. Sans ces idées, il resterait`
     : `Sans les idées rangées d'abord dans un autre motif, ${movedText(false)}. Il resterait alors`
   const judge =
-    copies.length > 1 ? `À vous de juger si ces ${copies.length} verbatims parlent bien ${motifName(g.title)}.` : `À vous de juger si ce verbatim parle bien ${motifName(g.title)}.`
+    copies.length > 1 ? `À\u00a0vous de juger si ces ${copies.length} verbatims parlent bien ${motifName(g.title)}.` : `À\u00a0vous de juger si ce verbatim parle bien ${motifName(g.title)}.`
   const text = nbsp(`${head} ${T2} avis : ${verdict}. ${judge}`)
   return { text, ideaIds: copies.map((i) => i.id) }
 }
