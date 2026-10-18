@@ -2,6 +2,13 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-18 — Codage en double : on garde (décision d'Arnaud)
+
+- « Le privé est bien meilleur que le public » dit deux choses : une critique du public et un éloge du privé. Elle
+  compte dans les deux motifs. Ne pas la compter côté public effacerait une donnée, et si le motif « privé »
+  n'émergeait pas, elle ne serait comptée nulle part. Le code continue de signaler « à vérifier » quand une
+  étiquette dépend de ces copies.
+
 ## 2026-10-17 — Synthèses des motifs récrites, article d'une page retiré (retours d'Arnaud)
 
 - **Synthèses des motifs** (passes 15, 16, 16b, 16c, idées et motifs identiques à la 14b) : plus de « une large
