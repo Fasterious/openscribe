@@ -2,6 +2,27 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-18 (soir) — « Grand thème » et « thème » ; glisser plutôt que téléporter (retours d'Arnaud)
+
+- **Vocabulaire, décidé par Arnaud** : « grand thème » pour le niveau haut, « thème » pour l'ancien « motif ». Seuls les
+  textes lus changent ; le code et les consignes du moteur gardent leurs noms (changer une consigne invaliderait le
+  cache et le rapport publié). Les deux niveaux se nomment ensemble avec leur lien : « 73 thèmes, réunis en 10 grands
+  thèmes » (`plume`).
+- **La barre ne disparaît plus** : l'en-tête ouvert garde la barre de la ligne fermée (cause : l'en-tête compact
+  l'avait retirée). Titre, barre et compte glissent de la ligne à l'en-tête par une transition de vue du navigateur,
+  à l'ouverture comme au repli ; sans elle, ou si le lecteur a demandé moins de mouvement, rien ne change.
+- **Le repli range au lieu de remplacer** : l'ancienne image se retire vers le bas du titre, le bloc suivant est déjà dessous.
+- **Grand thème collé, prioritaire** : il reste collé (mobile compris) tant qu'on lit ses thèmes fermés ; dans un thème
+  ouvert, il s'efface avec la barre de l'application en descendant et revient avec elle en remontant ; sur un écran
+  bas, il s'efface dès qu'on lit un thème ouvert. Un seul niveau à l'écran pendant la lecture, le contexte au premier
+  geste vers le haut.
+- **Sauts** : court (moins d'un écran et demi), défilement doux ; long, arrivée directe et titre éclairé un instant.
+- **Compte des thèmes** (laissé à notre choix par Arnaud) : « 10 thèmes ● 4 ● 1 ● 3 » dans l'en-tête collé du grand
+  thème sur écran large, les mots en infobulle ; la ligne complète reste en tête du contenu.
+- **Passe testeur** : rouvrir un bloc qu'on venait de replier faisait sauter la page jusqu'à 1 200 px (l'ancrage du
+  défilement prenait le bloc suivant pour repère, le titre devenu collé ne comptant plus) : ancrage suspendu à
+  l'ouverture, test de parcours qui échoue sans le correctif.
+
 ## 2026-10-18 — Lire le rapport : replis collants, détail par thème, étiquettes expliquées (retours d'Arnaud)
 
 Audit et spécification du `ux-designer` : `docs/LECTURE-RAPPORT.md` (mesures, causes racines, bonnes pratiques

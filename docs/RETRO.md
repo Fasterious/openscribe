@@ -2,6 +2,14 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-18 (soir) — Grand thème collé, glissements
+
+- **Bien marché** : mesurer les animations par l'API du navigateur (`document.getAnimations()`) plutôt que par des
+  captures, que le rendu lent du conteneur rendait trompeuses ; vérifier qu'un nouveau test échoue sans le correctif.
+- **Coûté pour rien** : un renommage par script qui a juxtaposé les deux niveaux (« les thèmes et les grands thèmes »)
+  là où la phrase devait dire leur lien ; un faux échec dû au `click()` de Playwright, qui recentre la page d'abord.
+- **On change** : un test de position clique à l'endroit mesuré (`page.mouse.click`), jamais par `locator.click()`.
+
 ## 2026-10-18 — Lire le rapport : audit d'abord, passe testeur ensuite
 
 - **Bien marché** : l'audit chiffré du `ux-designer` avant de coder (causes racines, pas une liste de souhaits) ; le
