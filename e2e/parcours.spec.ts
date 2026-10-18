@@ -71,9 +71,11 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await expect(page.locator('#saillants').locator('..').getByRole('button', { name: /^«/ }).first()).toBeVisible()
   // Dans le résumé, une pastille qui suit un nombre déroule tout le camp compté.
   await expect(page.locator('section[aria-labelledby="resume"]').getByRole('button', { name: /les verbatims de \d+ participants/ }).first()).toBeVisible()
-  // Un motif : sa définition pliée, un verbatim qui se replace dans sa réponse.
-  const motif = page.locator('details').filter({ has: page.locator('h3, h4') }).nth(2)
-  await motif.locator('h3, h4').first().click()
+  // Un motif, dans son thème : sa définition pliée, un verbatim qui se replace dans sa réponse.
+  const theme = page.locator('details[data-fold="theme"]').first()
+  await tap(theme.locator(':scope > summary'))
+  const motif = theme.locator('details[data-fold="motif"]').first()
+  await tap(motif.locator(':scope > summary'))
   await expect(motif.getByText('Ce qui compte comme positif ou négatif dans ce motif')).toBeVisible()
   await tap(motif.getByRole('button', { name: /^«/ }).first())
   await expect(motif.locator('mark').first()).toBeVisible()
@@ -108,24 +110,27 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
   await expect(page.getByText("Rapport d'exemple")).toBeVisible()
   await expect(page.getByText('À vérifier', { exact: true })).toHaveCount(0)
-  // Le second niveau existe : des thèmes rapprochent les groupes.
-  expect(await page.locator('section h2').count()).toBeGreaterThan(3)
+  // Le second niveau existe : des thèmes rapprochent les motifs, dans « Le détail, thème par thème ».
+  await expect(page.getByRole('heading', { name: 'Le détail, thème par thème' })).toBeVisible()
+  expect(await page.locator('details[data-fold="theme"]').count()).toBeGreaterThan(1)
   await noHorizontalScroll(page)
   await shot(page, '3-rapport')
 
-  // Une étiquette d'avis s'explique au survol, au clavier et au toucher : ce qu'elle veut dire et pourquoi,
-  // sans déplier le motif qui la porte.
-  const label = page.locator('span[role="button"]').filter({ hasText: /unanime|majorité|Avis partagés|Peu d'avis/i }).first()
-  const motif = page.locator('details').filter({ has: label }).first()
-  const wasOpen = await motif.evaluate((d) => (d as HTMLDetailsElement).open)
-  if (testInfo.project.name === 'mobile') await label.tap()
-  else await label.hover()
-  await expect(page.getByRole('tooltip')).toContainText('donnent un avis')
-  if (testInfo.project.name === 'mobile') {
-    expect(await motif.evaluate((d) => (d as HTMLDetailsElement).open)).toBe(wasOpen)
-    await label.tap()
-    await expect(page.getByRole('tooltip')).toHaveCount(0)
-  } else await page.mouse.move(0, 0)
+  // La ligne fermée d'un thème, puis d'un motif, est une seule cible : la toucher l'ouvre (au doigt aussi, sur l'étiquette).
+  const tap = async (l: Locator) => (testInfo.project.name === 'mobile' ? l.tap() : l.click())
+  const theme = page.locator('details[data-fold="theme"]').first()
+  await tap(theme.locator(':scope > summary'))
+  await expect(theme).toHaveAttribute('open', '')
+  const motif = theme.locator('details[data-fold="motif"]').first()
+  await tap(motif.locator(':scope > summary').getByText(/unanime|majorité|Avis partagés|Peu d'avis/i).first())
+  await expect(motif).toHaveAttribute('open', '')
+  // L'étiquette s'explique dans le motif ouvert, plus dans une infobulle.
+  await motif.getByText('Que veut dire cette étiquette ?').click()
+  await expect(motif.getByText(/donnent un avis/).first()).toBeVisible()
+  // Replier depuis l'en-tête du motif rend le focus à son titre.
+  await motif.locator(':scope > summary').click()
+  await expect(motif).not.toHaveAttribute('open', '')
+  expect(await motif.locator(':scope > summary').evaluate((el) => el === document.activeElement)).toBe(true)
 
   // Une référence de la synthèse déplie ses verbatims juste en dessous, sans fenêtre.
   await page
@@ -420,7 +425,7 @@ test('relancer une analyse ne fait jamais disparaître le rapport précédent', 
   await page.getByRole('button', { name: 'Relancer une analyse' }).click()
   await page.getByRole('tab', { name: /Rapport/ }).click()
   await expect(page.getByText('Une nouvelle analyse est en cours')).toBeVisible()
-  await expect(page.getByRole('heading', { name: "Vue d'ensemble" })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Le détail, (thème par thème|motif par motif)/ })).toBeVisible()
 })
 
 test('un double clic sur « Créer » ne crée qu’une étude, nommée par sa date', async ({ page }) => {

@@ -1,9 +1,11 @@
 import { House, KeyRound, Layers, Mic, PenTool, Telescope, UserRound } from 'lucide-react'
+import { useRef } from 'react'
 import { useEngines } from '@/app/engines'
 import { href, useRoute } from '@/app/router'
 import { Home } from './Home'
 import { ObservatoryList, ObservatoryPage } from './Observatory'
 import { cn, Explain, Tooltip } from './primitives'
+import { useHeadroom } from './project/fold'
 import { ProjectPage } from './project/ProjectPage'
 import { SettingsPage } from './Settings'
 import { SynthesisPage } from './Synthesis'
@@ -14,10 +16,20 @@ export function App() {
   const engine = engines.find((e) => e.id === defaultId) ?? engines.find((e) => e.verified !== false)
   const engineOk = engine?.verified !== false
   const inSynthesis = route.name === 'synthesis' || route.name === 'project'
+  // Sur les pages de lecture (rapport, étude de l'Observatoire), la barre se cache quand on descend, revient quand on remonte.
+  const reading = route.name === 'observatory' || (route.name === 'project' && route.tab === 'report')
+  const header = useRef<HTMLElement>(null)
+  const hidden = useHeadroom(reading, header)
 
   return (
     <div className="min-h-dvh flex flex-col">
-      <header className="no-print sticky top-0 z-30 border-b bg-background/90 backdrop-blur">
+      <header
+        ref={header}
+        className={cn(
+          'no-print sticky top-0 z-30 border-b bg-background/90 backdrop-blur transition-transform duration-200 motion-reduce:transition-none',
+          hidden && '-translate-y-full',
+        )}
+      >
         {/* À gauche, les modules (où je suis, où je peux aller) ; à droite, les moteurs d'IA, communs à tous les modules. */}
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
           {/* Des icônes ; la page où l'on est dit son nom (demande d'Arnaud, 17/10). Les modules à venir restent visibles, grisés. */}

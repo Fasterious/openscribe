@@ -139,12 +139,36 @@ export function labelDoubt(g: Group, ideas: Map<string, Idea>): string | undefin
     : `à vérifier : 1 de ces avis compte aussi dans un autre motif ; sans lui, ce serait « ${STANCE_WORD[without]} »`
 }
 
+/** La conclusion d'une étiquette : un camp l'emporte (unanime, large majorité, majorité), pas de majorité, avis partagés. */
+const conclusionOf = (s: Metrics['stance']) => (s === 'unanimous' || s === 'consensus' || s === 'majority' ? 'wins' : s)
+
+/** La bascule d'une seule voix qui change la conclusion, s'il y en a une : la nouvelle répartition et son étiquette. */
+export function conclusionMove(m: Metrics): { P: number; N: number; M: number; stance: Metrics['stance']; as: 'positive' | 'negative' | 'mixed' } | undefined {
+  if (!m.fragile || m.stance === 'unanimous' || !m.majority) return undefined
+  const P = m.positiveOnly.length
+  const N = m.negativeOnly.length
+  const M = m.mixed.length
+  // Un avis contraire d'abord, puis un avis mitigé (`isFragile` teste les mêmes déplacements).
+  const moves =
+    P > N
+      ? [
+          { P: P - 1, N: N + 1, M, as: 'negative' as const },
+          { P: P - 1, N, M: M + 1, as: 'mixed' as const },
+        ]
+      : [
+          { P: P + 1, N: N - 1, M, as: 'positive' as const },
+          { P, N: N - 1, M: M + 1, as: 'mixed' as const },
+        ]
+  return moves.map((x) => ({ ...x, stance: stanceOf(x.P, x.N, x.M) })).find((x) => conclusionOf(x.stance) !== conclusionOf(m.stance))
+}
+
 /**
- * « Fragile », tel que le lecteur le voit : une voix ferait changer la conclusion. Un « unanime » qui deviendrait
- * « large majorité » garde la sienne ; la marque y serait du bruit (deux lectures `methodologue`, passe 13).
- * `metrics.fragile` reste le calcul brut, envoyé tel quel au moteur (le changer invaliderait les réponses en cache).
+ * « Fragile », tel que le lecteur le voit : une voix ferait changer la conclusion (un camp perdrait la majorité, ou
+ * l'absence de majorité deviendrait des avis partagés), règle de `CLAUDE.md`. Passer de « large majorité » à
+ * « majorité » ne change pas la conclusion : « 12 sur 14 » n'est pas fragile (remarque d'Arnaud, 18/10 ;
+ * `methodologue`, D2). `metrics.fragile` reste le calcul brut (une voix change l'étiquette).
  */
-export const fragileShown = (m: Metrics): boolean => !!m.fragile && m.stance !== 'unanimous'
+export const fragileShown = (m: Metrics): boolean => !!conclusionMove(m)
 
 /** Des avis partagés qu'une seule voix ferait basculer : « fragile », comme pour les autres étiquettes (`isFragile` ne les teste pas). */
 export function dividedFragile(g: Group): boolean {

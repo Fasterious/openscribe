@@ -597,6 +597,8 @@ export interface HighlightSection {
   /** Verbatims montrés sous une ligne, avec leur auteur ; `fragile` et `doubt` : les marques de méthode, que l'affichage explique. */
   /** `groupId` : le motif de la ligne (l'application déroule ses verbatims au clic). */
   items: { groupId: string; title: string; detail: string; quotes: { who: string; text: string }[]; fragile?: boolean; doubt?: string }[]
+  /** Les mêmes lignes pour les motifs au-delà des premiers : « Et aussi » se déplie sur place (demande d'Arnaud, 18/10). */
+  moreItems: HighlightSection['items']
   /** Motifs au-delà des premiers, nommés sans détail : une liste n'est jamais coupée en silence. */
   more: string[]
 }
@@ -672,7 +674,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
   const cut = (list: Highlight[], n = SHOWN) => {
     let k = Math.min(n, list.length)
     while (k > 0 && k < list.length && list[k].people === list[k - 1].people && list[k].of === list[k - 1].of) k++
-    return { shown: list.slice(0, k), more: list.slice(k).map((x) => x.title) }
+    return { shown: list.slice(0, k), rest: list.slice(k), more: list.slice(k).map((x) => x.title) }
   }
   // Une étiquette discutable le dit à côté de son chiffre : le lecteur sait où relire les citations.
   const groupOf = new Map(state.groups.map((g) => [g.id, g]))
@@ -688,83 +690,93 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
   const s3 = cut(h.divided, SHOWN + h.divided.filter((x) => x.opposed).length)
   const s4 = cut(h.proposals, 8)
   const s5 = cut(h.questions, 6)
+  const build1 = (x: Highlight): HighlightSection['items'][number] => ({
+    groupId: x.groupId,
+    title: x.title,
+    detail: opinion(x, 'positif'),
+    ...marks(x.groupId),
+    quotes: [],
+  })
+  const build2 = (x: Highlight): HighlightSection['items'][number] => ({
+    groupId: x.groupId,
+    title: x.title,
+    detail: opinion(x, 'négatif'),
+    ...marks(x.groupId),
+    quotes: [],
+  })
+  const build3 = (x: Highlight): HighlightSection['items'][number] => {
+    const g = state.groups.find((y) => y.id === x.groupId)!
+    // Constat partagé, pistes opposées : on montre les deux propositions, chacune avec son auteur.
+    if (x.opposed && g.metrics.stance !== 'divided') {
+      const quote = (id: string) => ({ who: byId.get(id)!.participantId, text: mask(byId.get(id)!.verbatim) })
+      const side = g.metrics.majority === 'positive' ? 'positif' : 'négatif'
+      const n = Math.max(g.metrics.positiveOnly.length, g.metrics.negativeOnly.length)
+      const total = g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
+      return {
+        groupId: x.groupId,
+        title: x.title,
+        detail: `${n} avis ${side}${n > 1 ? 's' : ''} sur ${total}, mais deux propositions s'opposent sur ${x.opposed.about}`,
+        quotes: [quote(x.opposed.a), quote(x.opposed.b)],
+      }
+    }
+    return { groupId: x.groupId, title: x.title, detail: describeOpinions(g) + (x.opposed ? ` ; pistes opposées : ${x.opposed.about}` : ''), quotes: [], ...marks(x.groupId) }
+  }
+  const build4 = (x: Highlight): HighlightSection['items'][number] => ({
+    groupId: x.groupId,
+    title: x.title,
+    detail: `${x.people} participant${pl(x.people)}`,
+    // Deux propositions au plus, de deux personnes différentes si possible, les plus parlantes (les plus longues).
+    quotes: pickQuotes(
+      x.ideaIds.map((id) => byId.get(id)!),
+      2,
+    ).map((i) => ({ who: i.participantId, text: mask(i.verbatim) })),
+  })
+  const build5 = (x: Highlight): HighlightSection['items'][number] => ({
+    groupId: x.groupId,
+    title: x.title,
+    detail: `${x.people} participant${pl(x.people)}`,
+    quotes: pickQuotes(
+      x.ideaIds.map((id) => byId.get(id)!),
+      2,
+    ).map((i) => ({ who: i.participantId, text: mask(i.verbatim) })),
+  })
   const sections: HighlightSection[] = [
     {
       key: 'strengths',
       heading: 'Ce qui a marché',
       intro: INTRO,
-      items: s1.shown.map((x) => ({
-        groupId: x.groupId,
-        title: x.title,
-        detail: opinion(x, 'positif'),
-        ...marks(x.groupId),
-        quotes: [],
-      })),
+      items: s1.shown.map(build1),
       more: s1.more,
+      moreItems: s1.rest.map(build1),
     },
     {
       key: 'blockers',
       heading: 'Ce qui bloque',
       intro: INTRO,
-      items: s2.shown.map((x) => ({
-        groupId: x.groupId,
-        title: x.title,
-        detail: opinion(x, 'négatif'),
-        ...marks(x.groupId),
-        quotes: [],
-      })),
+      items: s2.shown.map(build2),
       more: s2.more,
+      moreItems: s2.rest.map(build2),
     },
     {
       key: 'divided',
       heading: 'Ce qui divise',
-      items: s3.shown.map((x) => {
-        const g = state.groups.find((y) => y.id === x.groupId)!
-        // Constat partagé, pistes opposées : on montre les deux propositions, chacune avec son auteur.
-        if (x.opposed && g.metrics.stance !== 'divided') {
-          const quote = (id: string) => ({ who: byId.get(id)!.participantId, text: mask(byId.get(id)!.verbatim) })
-          const side = g.metrics.majority === 'positive' ? 'positif' : 'négatif'
-          const n = Math.max(g.metrics.positiveOnly.length, g.metrics.negativeOnly.length)
-          const total = g.metrics.positiveOnly.length + g.metrics.negativeOnly.length + g.metrics.mixed.length
-          return {
-            groupId: x.groupId,
-            title: x.title,
-            detail: `${n} avis ${side}${n > 1 ? 's' : ''} sur ${total}, mais deux propositions s'opposent sur ${x.opposed.about}`,
-            quotes: [quote(x.opposed.a), quote(x.opposed.b)],
-          }
-        }
-        return { groupId: x.groupId, title: x.title, detail: describeOpinions(g) + (x.opposed ? ` ; pistes opposées : ${x.opposed.about}` : ''), quotes: [], ...marks(x.groupId) }
-      }),
+      items: s3.shown.map(build3),
       more: s3.more,
+      moreItems: s3.rest.map(build3),
     },
     {
       key: 'proposals',
       heading: 'Ce que proposent les participants',
-      items: s4.shown.map((x) => ({
-        groupId: x.groupId,
-        title: x.title,
-        detail: `${x.people} participant${pl(x.people)}`,
-        // Deux propositions au plus, de deux personnes différentes si possible, les plus parlantes (les plus longues).
-        quotes: pickQuotes(
-          x.ideaIds.map((id) => byId.get(id)!),
-          2,
-        ).map((i) => ({ who: i.participantId, text: mask(i.verbatim) })),
-      })),
+      items: s4.shown.map(build4),
       more: s4.more,
+      moreItems: s4.rest.map(build4),
     },
     {
       key: 'questions',
       heading: 'Questions soulevées',
-      items: s5.shown.map((x) => ({
-        groupId: x.groupId,
-        title: x.title,
-        detail: `${x.people} participant${pl(x.people)}`,
-        quotes: pickQuotes(
-          x.ideaIds.map((id) => byId.get(id)!),
-          2,
-        ).map((i) => ({ who: i.participantId, text: mask(i.verbatim) })),
-      })),
+      items: s5.shown.map(build5),
       more: s5.more,
+      moreItems: s5.rest.map(build5),
     },
   ]
   return sections.filter((s) => s.items.length)

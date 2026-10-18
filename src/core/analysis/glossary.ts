@@ -48,8 +48,8 @@ export const STANCE_HELP: Record<Metrics['stance'], LabelHelp> = {
 }
 
 export const FRAGILE_HELP: LabelHelp = {
-  what: "Il suffirait qu'une personne change d'avis pour que l'étiquette bascule.",
-  why: 'Sur de petits effectifs, une seule voix pèse lourd ; le code fait le calcul pour chaque motif.',
+  what: "Il suffirait qu'une personne soit de l'autre avis pour que la conclusion change : un camp perdrait la majorité, ou des avis partagés pencheraient d'un côté.",
+  why: 'Une seule voix pèse lourd quand les camps sont proches ou les avis peu nombreux ; le code fait le calcul pour chaque motif.',
   action: "Citez le chiffre plutôt que l'étiquette, et relisez les citations.",
 }
 
