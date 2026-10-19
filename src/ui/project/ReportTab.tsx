@@ -1,5 +1,5 @@
-import { ChevronRight, CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, Users } from 'lucide-react'
-import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { ChevronDown, ChevronRight, CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, TriangleAlert, Users } from 'lucide-react'
+import { Fragment, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
 import { computeMetrics, METRICS_VERSION, withCurrentMetrics } from '@/core/analysis/metrics'
 import { maskNames } from '@/core/analysis/names'
@@ -35,10 +35,10 @@ import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from '@/core/a
 import type { Contribution } from '@/core/corpus'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { isExample } from '../Synthesis'
-import { Fold, freezeHeadroom, glideTo, markSeen, morphTo, revealMotif } from './fold'
+import { Fold, freezeHeadroom, glideTo, markSeen, morphTo, placeStuck, revealMotif } from './fold'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, download, formatDate, plural, slug } from '../format'
-import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
+import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, cn, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
 import { helpText, STANCE_HELP } from '@/core/analysis/glossary'
 import { fragileShown, labelDoubt } from '@/core/analysis/highlights'
 import { doubtReason, fragileReason, themeVerdicts, verdictLabel, verdictOf, type Verdict } from '@/core/analysis/explain'
@@ -400,6 +400,37 @@ function HighlightLine({
 }
 
 /**
+ * Une marque d'une ligne de liste (« fragile », « À vérifier ») : une petite étiquette cliquable, de la forme des
+ * étiquettes du thème ouvert, avec son icône et un chevron qui tourne ; bleue et enfoncée tant que son explication est
+ * ouverte, comme les pastilles « ● N » (designer-ui, 19/10).
+ */
+function MarkChip({ kind, open, onToggle, controls }: { kind: 'fragile' | 'doubt'; open: boolean; onToggle: () => void; controls: string }) {
+  const Icon = kind === 'fragile' ? Scale : TriangleAlert
+  return (
+    <button
+      type="button"
+      aria-expanded={open}
+      aria-controls={controls}
+      onClick={(e) => {
+        if (e.detail <= 1) onToggle()
+      }}
+      className={cn(
+        'inline-flex h-6 shrink-0 cursor-pointer items-center gap-1 rounded-full border pr-1 pl-1.5 text-xs font-medium transition-colors duration-100',
+        open
+          ? 'border-primary bg-primary text-primary-foreground'
+          : kind === 'fragile'
+            ? 'border-muted-foreground/40 bg-background text-muted-foreground hover:border-foreground/50 hover:text-foreground'
+            : 'border-warning/60 bg-warning/20 text-foreground hover:bg-warning/35',
+      )}
+    >
+      <Icon aria-hidden className="size-3.5" />
+      {kind === 'fragile' ? 'fragile' : 'À vérifier'}
+      <ChevronDown aria-hidden className={cn('size-3.5 transition-transform duration-200 ease-out motion-reduce:transition-none', open && 'rotate-180')} />
+    </button>
+  )
+}
+
+/**
  * Une ligne d'une liste du haut. Ses marques (« fragile », « à vérifier ») sont des boutons : ils déplient sous la ligne
  * l'explication propre à ce motif, la même que dans le motif ouvert (plus d'infobulle générale).
  */
@@ -422,37 +453,43 @@ function ListItem({
   compact?: boolean
 }) {
   const [why, setWhy] = useState<'fragile' | 'doubt' | null>(null)
+  // Le contenu reste affiché pendant que le volet se referme.
+  const [shown, setShown] = useState<'fragile' | 'doubt' | null>(null)
   const group = groupById.get(item.groupId)
-  // Une marque est un bouton : enfoncée tant que son explication est ouverte, juste dessous (Arnaud, 19/10).
-  const mark = (on: boolean) => `inline-flex min-h-6 cursor-pointer items-center gap-1 rounded px-1 hover:text-foreground ${on ? 'ring-2 ring-primary/60 text-foreground' : ''}`
-  const chevron = (on: boolean) => <span aria-hidden className="text-xs">{on ? '⌃' : '⌄'}</span>
-  const flip = (k: 'fragile' | 'doubt') => setWhy((w) => (w === k ? null : k))
+  const panel = useId()
+  const flip = (k: 'fragile' | 'doubt') => {
+    setShown(k)
+    setWhy((w) => (w === k ? null : k))
+  }
   return (
     <li className={`border-l-[3px] pl-2.5 ${lineClass}`}>
       <HighlightLine section={section} item={item} ctx={ctx} groupById={groupById} compact={compact}>
         <span className="font-medium">{item.title}</span>
-        <span className="block text-sm text-muted-foreground">
-          {item.detail}
-          {item.fragile && (
-            <>
-              {' · '}
-              <button type="button" className={`${mark(why === 'fragile')} underline decoration-dotted underline-offset-2`} aria-expanded={why === 'fragile'} onClick={() => flip('fragile')}>
-                fragile {chevron(why === 'fragile')}
-              </button>
-            </>
-          )}
-          {item.doubt && (
-            <>
-              {' · '}
-              <button type="button" className={`${mark(why === 'doubt')} bg-warning/30 font-medium text-foreground`} aria-expanded={why === 'doubt'} onClick={() => flip('doubt')}>
-                À vérifier {chevron(why === 'doubt')}
-              </button>
-            </>
-          )}
+        <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+          <span>{item.detail}</span>
+          {item.fragile && <MarkChip kind="fragile" open={why === 'fragile'} onToggle={() => flip('fragile')} controls={panel} />}
+          {item.doubt && <MarkChip kind="doubt" open={why === 'doubt'} onToggle={() => flip('doubt')} controls={panel} />}
         </span>
-        {why && group && (
-          <div className="fold-in mt-2">
-            <WhyLabel group={group} ctx={ctx} only={why} />
+        {group && (item.fragile || item.doubt) && (
+          // L'explication s'ouvre juste sous la marque, en poussant le contenu : 220 ms en décélérant, 180 ms en
+          // accélérant pour se refermer, comme les blocs repliables ; réversible en cours de route (designer-ui, 19/10).
+          <div
+            id={panel}
+            inert={!why}
+            className={cn(
+              'grid motion-reduce:transition-none',
+              why
+                ? 'grid-rows-[1fr] opacity-100 transition-[grid-template-rows,opacity] duration-220 ease-[cubic-bezier(0.2,0.7,0.2,1)]'
+                : 'grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-180 ease-[cubic-bezier(0.4,0,1,1)]',
+            )}
+          >
+            <div className="min-h-0 overflow-hidden">
+              {shown && (
+                <div key={shown} className="fold-in pt-2">
+                  <WhyLabel group={group} ctx={ctx} only={shown} />
+                </div>
+              )}
+            </div>
           </div>
         )}
       </HighlightLine>
@@ -637,6 +674,8 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
   const label = useRef<HTMLSpanElement>(null)
   useLayoutEffect(() => {
     opener.current = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null
+    // Son en-tête collé se place sous ceux du grand thème et du thème qui le contiennent.
+    placeStuck()
   }, [])
   // Replier : l'intitulé glisse jusqu'à la pastille, revenue là où on l'avait touchée, qui garde le focus et un contour.
   const close = () => {
@@ -666,7 +705,8 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
         close()
       }}
     >
-      <div className="sticky top-[calc(var(--app-bar)+var(--theme-stick,0px)+var(--motif-stick,0px))] z-[5] flex items-center justify-between gap-2 border-b bg-background py-1 text-sm">
+      {/* Collé sous les en-têtes ouverts : sa position est donnée par fold.tsx (placeStuck). */}
+      <div data-stick-panel className="sticky top-14 z-[5] flex items-center justify-between gap-2 border-b bg-background py-1 text-sm">
         <span ref={label} className="min-w-0 truncate font-medium">
           {cats.length === 1 ? (
             <span className={`mr-1.5 inline-block size-2 rounded-full align-middle ${BAR[cats[0]]}`} aria-hidden />

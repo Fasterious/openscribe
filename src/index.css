@@ -109,11 +109,9 @@
  * Lecture du rapport (docs/LECTURE-RAPPORT.md) : un bloc s'ouvre en 220 ms, se referme en 180 ms ; un grand bloc se
  * referme sans animation (fold-instant) ; aucun mouvement si le lecteur l'a demandé.
  */
-:root {
-  --app-bar: 3.5rem;
-}
+/* La marge de défilement suit la pile des en-têtes collés (fold.tsx, placeStuck). */
 html {
-  scroll-padding-top: calc(var(--app-bar) + 6.5rem);
+  scroll-padding-top: 10rem;
 }
 @supports (interpolate-size: allow-keywords) {
   :root {

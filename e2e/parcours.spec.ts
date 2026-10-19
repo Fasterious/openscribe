@@ -635,7 +635,11 @@ test('résumé : la pastille « ● N », le volet replié revient à elle ; « 
     // Les verbatims en cause, par camp : « ● N avis … ».
     await expect(li.getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / }).first()).toBeVisible()
     await doubt.click()
-    await expect(why).toHaveCount(0)
+    // Refermée : le volet se replie (sa hauteur tombe à 0) et sort du parcours clavier.
+    await expect(doubt).toHaveAttribute('aria-expanded', 'false')
+    const panel = li.locator(`[id="${await doubt.getAttribute('aria-controls')}"]`)
+    await expect(panel).toHaveAttribute('inert', '')
+    await expect.poll(() => panel.evaluate((el) => Math.round(el.getBoundingClientRect().height))).toBe(0)
   }
 
   // Défiler vite dans un grand thème ouvert : son en-tête reste collé contre la barre, sans interstice.

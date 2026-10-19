@@ -2,6 +2,24 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-19 (soir) — Les en-têtes se poussent comme des objets ; marques en étiquettes
+
+- **Chaîne physique** (Arnaud) : le grand thème qui arrive contre la barre la pousse pixel pour pixel ; le thème lu pousse
+  à son tour le grand thème ; en remontant, le grand thème revient d'abord, puis la barre. La poussée se calcule d'après
+  la position réelle des blocs (la somme des défilements laissait des trous de 10 à 20 px au contact) ; en descendant,
+  rien ne revient (le grand thème redescendait puis repartait à la fin d'un thème). Les en-têtes collés reçoivent leur
+  position directement : une variable sur la racine recalculait les styles des 12 000 nœuds à chaque image (8,8 ms ;
+  0,23 ms désormais). Mesuré à chaque image, sur ordinateur et mobile, à toutes les vitesses : aucun trou, aucun
+  mouvement à contre-sens, aucun saut. La marge de défilement suit la pile collée (focus jamais dessous).
+- **Marques « fragile » et « À vérifier »** (designer-ui) : petites étiquettes avec icône et chevron, bleues une fois
+  ouvertes ; l'explication s'ouvre dessous en 220 ms et se referme en 180 ms.
+- **Granularité** (Arnaud) : la ligne d'un grand thème ne parle que de thèmes (« 2 signaux isolés »), plus de comptes de
+  personnes ; le nombre de participants reste pour le volume.
+- **Avis mitigé à vérifier** : la pastille « 1 avis mitigé » déroule les deux avis de la personne (le sien et la copie
+  qui la rend mitigée). Enquête : 6 des 18 personnes mitigées de l'étude école ne le sont que par une copie du codage en
+  double qui contredit leur propre avis (P11 : la CAF lente, l'inscription scolaire rapide). Décision de méthode soumise
+  à Arnaud.
+
 ## 2026-10-19 — Lire le rapport : le regard suit (retours d'Arnaud sur la préversion)
 
 - **Une seule forme pour un camp** : l'intitulé d'un volet de verbatims reprend le point du camp (« ● 46 avis positifs »),
