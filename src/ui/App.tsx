@@ -19,16 +19,15 @@ export function App() {
   // Sur les pages de lecture (rapport, étude de l'Observatoire), la barre se cache quand on descend, revient quand on remonte.
   const reading = route.name === 'observatory' || (route.name === 'project' && route.tab === 'report')
   const header = useRef<HTMLElement>(null)
-  const hidden = useHeadroom(reading, header)
+  useHeadroom(reading, header)
 
   return (
     <div className="min-h-dvh flex flex-col">
       <header
         ref={header}
         className={cn(
-          'no-print sticky top-0 z-30 border-b bg-background motion-reduce:transition-none',
-          // Elle glisse en se cachant, revient d'un coup (fold.tsx, useHeadroom).
-          hidden && '-translate-y-full transition-transform duration-200',
+          // Sur les pages de lecture, les en-têtes collés la poussent hors de l'écran au rythme du défilement (fold.tsx, useHeadroom).
+          'no-print sticky top-0 z-30 border-b bg-background',
         )}
       >
         {/* À gauche, les modules (où je suis, où je peux aller) ; à droite, les moteurs d'IA, communs à tous les modules. */}

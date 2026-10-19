@@ -553,11 +553,15 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   await scroll(600)
   await expect.poll(() => top(themeHead)).toBeLessThan(0)
   await expect.poll(() => top(motifHead)).toBeLessThanOrEqual(2)
-  // On remonte un peu : la barre et le grand thème reviennent, le thème se range dessous.
-  await scroll(-80)
+  // On remonte : le grand thème redescend au rythme du défilement, pixel pour pixel (il ne réapparaît pas d'un coup),
+  // puis la barre de l'application (Arnaud, 19/10 : les en-têtes se poussent comme des objets).
+  const themeHeight = () => themeHead.evaluate((el) => Math.round(el.getBoundingClientRect().height))
+  const pushed = await top(themeHead)
+  await scroll(-40)
+  await expect.poll(async () => Math.abs((await top(themeHead)) - Math.min(0, pushed + 40))).toBeLessThanOrEqual(3)
+  await scroll(-(await themeHeight()) - 80)
   await expect.poll(() => top(themeHead)).toBeGreaterThanOrEqual(50)
   // Le thème se range juste sous l'en-tête du grand thème, qui est sa ligne entière (titre, barre, verdicts).
-  const themeHeight = () => themeHead.evaluate((el) => Math.round(el.getBoundingClientRect().height))
   await expect.poll(async () => (await top(motifHead)) - (await top(themeHead)) - (await themeHeight())).toBe(0)
   // Replier le thème rend la place au grand thème, et le titre replié reste sous lui.
   await motifHead.click()
@@ -578,7 +582,7 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   // Pareil pour le grand thème, replié d'en bas puis rouvert.
   // (On remonte un peu pour que le grand thème, effacé pendant la lecture du thème, revienne.)
   await scroll(400)
-  await scroll(-80)
+  await scroll(-(await themeHeight()) - 40)
   await expect.poll(() => top(themeHead)).toBeGreaterThanOrEqual(0)
   await clickAt(themeHead)
   await expect(theme).not.toHaveAttribute('open', '')

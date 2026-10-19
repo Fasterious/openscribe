@@ -54,8 +54,8 @@ describe('étiquettes expliquées au cas par cas', () => {
     expect(plain(r?.text)).toBe(
       "Sans les idées rangées d'abord dans un autre thème, 1 personne passerait d'un avis mitigé à un avis négatif. Il resterait alors 4 avis : « unanime » (4 sur 4), une étiquette plus nette. À vous de juger si ce verbatim parle bien du thème « Piscine ».",
     )
-    // La pastille suit la phrase : 1 avis mitigé (le texte), pas 1 avis positif (la copie).
-    expect(r?.groups).toEqual([{ tone: 'mixed', ids: ['I0009'], people: 1 }])
+    // La pastille suit la phrase : 1 avis mitigé (le texte), qui déroule ses deux avis : le sien (négatif) et la copie (positive).
+    expect(r?.groups).toEqual([{ tone: 'mixed', ids: ['I0001', 'I0009'], people: 1 }])
   })
 
   it('le verdict d\'un motif résume les étiquettes d\'un thème, jamais plus fort que l\'étiquette', () => {

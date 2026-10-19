@@ -1116,7 +1116,11 @@ function VerdictBar({ groups }: { groups: Metrics[] }) {
   )
 }
 
-function VerdictLine({ groups, suggestions }: { groups: Metrics[]; suggestions?: number }) {
+/**
+ * La ligne d'un grand thème parle de ses thèmes, et seulement d'eux : une granularité par ligne (Arnaud, 19/10) ; les
+ * personnes se lisent plus bas, dans chaque thème.
+ */
+function VerdictLine({ groups }: { groups: Metrics[] }) {
   const counted = groups.filter((m) => m.participants > 1)
   const isolated = groups.length - counted.length
   const verdicts = themeVerdicts(counted)
@@ -1132,16 +1136,15 @@ function VerdictLine({ groups, suggestions }: { groups: Metrics[]; suggestions?:
       {isolated > 0 && (
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block size-2.5 rounded-full border border-muted-foreground/50" aria-hidden />
-          {isolated} {isolated > 1 ? 'portés' : 'porté'} par une seule personne
+          {isolated > 1 ? `${isolated} signaux isolés` : '1 signal isolé'}
         </span>
       )}
-      {!!suggestions && <span>{suggestions > 1 ? `${suggestions} personnes font des suggestions` : '1 personne fait une suggestion'}</span>}
     </span>
   )
 }
 
 /** La ligne d'un grand thème : fermée, une seule cible qui ouvre ; ouverte, l'en-tête collé, telle quelle. */
-function ThemeRow({ title, m, groups, suggestions }: { title: string; m: Metrics; groups: Metrics[]; suggestions?: number }) {
+function ThemeRow({ title, m, groups }: { title: string; m: Metrics; groups: Metrics[] }) {
   return (
     <span className="block space-y-2 py-3 group-open/fold:py-2">
       <span className="flex items-start justify-between gap-2">
@@ -1155,7 +1158,7 @@ function ThemeRow({ title, m, groups, suggestions }: { title: string; m: Metrics
       <span data-vt="bar" className="block">
         <VerdictBar groups={groups} />
       </span>
-      <VerdictLine groups={groups} suggestions={suggestions} />
+      <VerdictLine groups={groups} />
     </span>
   )
 }
@@ -1533,7 +1536,7 @@ export function ReportTab({
                   level="theme"
                   label={`le grand thème « ${t.title} »`}
                   className="border-b"
-                  row={<ThemeRow title={t.title} m={m} groups={groups.map((x) => x.m)} suggestions={m.participantsByCategory.suggestion} />}
+                  row={<ThemeRow title={t.title} m={m} groups={groups.map((x) => x.m)} />}
                   bodyClassName="space-y-3 pb-4 pt-2"
                 >
                   {t.summary && !segment && (

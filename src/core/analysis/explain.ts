@@ -183,7 +183,12 @@ export function doubtReason(
     const people = gone.filter(([, c]) => c === side).map(([p]) => p)
     if (people.length) groups.push({ tone: side, ids: copiesOf(people).map((i) => i.id), people: people.length })
   }
-  if (changed.length) groups.push({ tone: 'mixed', ids: copiesOf(changed.map(([p]) => p)).map((i) => i.id), people: changed.length })
+  // Une personne mitigée se lit par ses deux avis : son idée à elle et la copie qui la rend mitigée (Arnaud, 19/10 :
+  // une pastille « mitigé » qui ne déroulait que l'avis positif copié ne montrait pas pourquoi).
+  if (changed.length) {
+    const who = changed.map(([p]) => p)
+    groups.push({ tone: 'mixed', ids: all.filter((i) => who.includes(i.participantId) && (i.category === 'positive' || i.category === 'negative')).map((i) => i.id), people: changed.length })
+  }
   const inCause = copies.filter((i) => groups.some((g) => g.ids.includes(i.id)))
   const judge =
     inCause.length > 1 ? `À\u00a0vous de juger si ces ${inCause.length} verbatims parlent bien ${motifName(g.title)}.` : `À\u00a0vous de juger si ce verbatim parle bien ${motifName(g.title)}.`

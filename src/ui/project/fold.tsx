@@ -5,11 +5,8 @@ import { cn } from '../primitives'
 /**
  * Lire un rapport long sans s'y perdre (`docs/LECTURE-RAPPORT.md`) : un bloc ouvert (grand thème, thème) garde son
  * en-tête collé en haut de l'écran tant qu'on le lit, avec « Replier » ; replier replace le titre là où était l'en-tête
- * et rend le focus au bloc. La barre de l'application se cache quand on descend, revient dès qu'on remonte.
- *
- * Le grand thème ouvert reste collé tant qu'on lit ses thèmes fermés : il est prioritaire. Quand on lit un thème ouvert
- * et qu'on descend, il s'efface avec la barre de l'application, le thème prend sa place ; il revient avec elle dès
- * qu'on remonte (remarque d'Arnaud, 18/10). Sur un écran bas, il s'efface dès qu'on lit un thème ouvert.
+ * et rend le focus au bloc. Les en-têtes se poussent comme des objets (`useHeadroom`) : le grand thème pousse la barre
+ * de l'application, le thème qu'on lit pousse le grand thème ; en remontant, tout revient au même rythme.
  *
  * L'en-tête collé est la ligne fermée elle-même (titre, barre et indicateurs dessous, Arnaud, 18/10) : sa hauteur varie
  * avec le titre et l'écran, elle se mesure (`--theme-stick`, `--motif-stick`) pour que les en-têtes s'empilent sans se
@@ -17,7 +14,6 @@ import { cn } from '../primitives'
  */
 
 /** Hauteur de la barre de l'application quand elle est visible ; les en-têtes collants se placent dessous. */
-const APP_BAR = '3.5rem'
 const APP_BAR_PX = 56
 let barPx = APP_BAR_PX
 let frozenUntil = 0
@@ -31,8 +27,13 @@ export function freezeHeadroom(ms = 400) {
   frozenUntil = Date.now() + ms
 }
 
-/** Le grand thème s'efface de toute sa hauteur (`--theme-off`) ; les en-têtes qui collent dessous remontent d'autant. */
+/** Ce qui est poussé hors de l'écran : la barre de l'application (`appOff`) et l'en-tête du grand thème (`themeOff`). */
+let appOff = 0
+let themeOff = 0
+
+/** Le grand thème s'efface de `px` (`--theme-off`) ; les en-têtes qui collent dessous remontent d'autant. */
 function setThemeOff(px: number) {
+  themeOff = px
   document.documentElement.style.setProperty('--theme-off', `${px}px`)
 }
 
@@ -43,91 +44,88 @@ function themeHead(el: Element): number {
 }
 
 /**
- * Le lecteur est dans un thème ouvert d'un grand thème : l'en-tête du thème est collé, son contenu occupe l'écran.
- * Renvoie la hauteur de l'en-tête du grand thème à effacer, ou 0.
+ * Le thème ouvert dont l'en-tête est arrivé contre celui du grand thème : en descendant, il le pousse. Renvoie la
+ * hauteur de l'en-tête du grand thème (ce qu'il peut pousser), ou 0.
  */
 function readingMotif(): number {
   for (const d of document.querySelectorAll<HTMLDetailsElement>('details[data-fold="theme"][open] details[data-fold="motif"][open]')) {
     const head = themeHead(d)
-    // On lit le thème quand on est descendu dedans : un titre qui vient d'arriver juste sous le grand thème (un saut, une
-    // réouverture) ne l'efface pas (passe testeur du 18/10).
-    const line = barPx + head
+    const line = barPx + head - themeOff
     const r = d.getBoundingClientRect()
-    if (r.top < line - 24 && r.bottom > line + 120) return head
+    if (r.top <= line + 1 && r.bottom > line + 120) return head
   }
   return 0
 }
 
+/** Un grand thème ouvert dont l'en-tête est arrivé contre la barre de l'application : en descendant, il la pousse. */
+function themeInContact(): boolean {
+  for (const d of document.querySelectorAll<HTMLDetailsElement>('details[data-fold="theme"][open]')) {
+    const r = d.getBoundingClientRect()
+    if (r.top <= barPx + 1 && r.bottom > barPx + 120) return true
+  }
+  return false
+}
+
 /**
- * La barre de l'application, partiellement persistante sur les pages de lecture : cachée quand on descend de plus de
- * 8 px au-delà des 200 premiers pixels, revenue dès qu'on remonte de 8 px, ou dès qu'elle reçoit le focus clavier.
- * Elle écrit sa hauteur visible dans `--app-bar`, que suivent les en-têtes collants ; le grand thème s'efface avec elle
- * quand on lit un thème ouvert.
+ * Les en-têtes se poussent comme des objets (Arnaud, 19/10) : un grand thème ouvert qui arrive contre la barre de
+ * l'application la pousse hors de l'écran au rythme du défilement, pixel pour pixel ; une fois la barre sortie, le thème
+ * qu'on lit pousse à son tour le grand thème. En remontant, tout revient au même rythme : le grand thème d'abord, puis la
+ * barre. Rien n'apparaît ni ne disparaît d'un coup, rien n'est animé hors du défilement lui-même. La barre revient
+ * entière dès qu'elle reçoit le focus clavier ; un défilement provoqué par le code (repli, saut) ne pousse rien.
  */
 export function useHeadroom(enabled: boolean, header: React.RefObject<HTMLElement | null>) {
-  const [hidden, setHidden] = useState(false)
-  const hiddenRef = useRef(false)
   useEffect(() => {
     const root = document.documentElement
-    // La hauteur de la barre s'écrit tout de suite, avant que le grand thème ne s'efface : jamais l'un sous l'autre.
-    const hide = (h: boolean) => {
-      hiddenRef.current = h
-      barPx = h ? 0 : APP_BAR_PX
-      root.style.setProperty('--app-bar', h ? '0px' : APP_BAR)
-      // La barre bouge en même temps que les en-têtes collés, sans attendre le rendu de React. Elle glisse en se cachant
-      // (elle passe au-dessus des en-têtes qui montent) et revient d'un coup (sinon un interstice laisserait voir le texte).
-      const el = header.current
-      if (el) for (const c of ['-translate-y-full', 'transition-transform', 'duration-200']) el.classList.toggle(c, h)
-      setHidden(h)
+    const bar = header.current
+    const apply = () => {
+      barPx = APP_BAR_PX - appOff
+      root.style.setProperty('--app-bar', `${barPx}px`)
+      if (bar) bar.style.transform = appOff ? `translateY(${-appOff}px)` : ''
     }
-    if (!enabled) {
-      hide(false)
-      root.style.setProperty('--app-bar', APP_BAR)
-      setThemeOff(0)
-      return
-    }
-    // `anchor` : là où le sens du défilement a changé ; la barre bouge après 8 px dans le nouveau sens.
+    appOff = 0
+    setThemeOff(0)
+    apply()
+    if (!enabled) return
     let last = window.scrollY
-    let anchor = last
-    let dir = 0
-    const deep = () => setThemeOff(hiddenRef.current || window.innerHeight < 600 ? readingMotif() : 0)
     const onScroll = () => {
       const y = window.scrollY
-      if (Date.now() < frozenUntil) {
-        last = anchor = y
-        deep()
-        return
-      }
-      const d = Math.sign(y - last)
-      if (d && d !== dir) {
-        anchor = last
-        dir = d
-      }
-      if (y < 200 || header.current?.contains(document.activeElement)) hide(false)
-      else if (dir > 0 && y - anchor > 8) hide(true)
-      else if (dir < 0 && anchor - y > 8) hide(false)
+      const dy = y - last
       last = y
-      deep()
+      if (!dy || Date.now() < frozenUntil) return
+      if (dy > 0) {
+        let rest = dy
+        if (themeInContact()) {
+          const push = Math.min(rest, APP_BAR_PX - appOff)
+          appOff += push
+          rest -= push
+        }
+        const head = rest > 0 && appOff >= APP_BAR_PX ? readingMotif() : 0
+        if (head) setThemeOff(Math.min(head, themeOff + rest))
+        // Le thème lu est fini (son en-tête est sorti) : le grand thème redescend avec le contenu.
+        else if (themeOff && !readingMotif()) setThemeOff(Math.max(0, themeOff - dy))
+      } else {
+        let rest = -dy
+        const back = Math.min(rest, themeOff)
+        if (back) setThemeOff(themeOff - back)
+        rest -= back
+        appOff = Math.max(0, appOff - rest)
+      }
+      apply()
     }
-    const onFocus = () => hide(false)
-    const bar = header.current
+    const onFocus = () => {
+      appOff = 0
+      apply()
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
-    // Un bloc ouvert ou fermé change ce qu'on lit : le grand thème revient quand on referme un thème.
-    document.addEventListener('toggle', deep, true)
     bar?.addEventListener('focusin', onFocus)
     return () => {
       window.removeEventListener('scroll', onScroll)
-      document.removeEventListener('toggle', deep, true)
       bar?.removeEventListener('focusin', onFocus)
+      appOff = 0
       setThemeOff(0)
+      apply()
     }
   }, [enabled, header])
-  useEffect(() => {
-    barPx = hidden ? 0 : APP_BAR_PX
-    document.documentElement.style.setProperty('--app-bar', hidden ? '0px' : APP_BAR)
-    if (!hidden) setThemeOff(window.innerHeight < 600 ? readingMotif() : 0)
-  }, [hidden])
-  return hidden
 }
 
 const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
