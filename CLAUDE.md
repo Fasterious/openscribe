@@ -22,6 +22,7 @@ d'Arnaud) et signaler tout écart ; le fil complet est dans `fixtures/private/co
 |---|---|
 | `methodologue` | Rigueur de la recherche qualitative : idées atomiques, citations exactes, indicateurs, biais. Garant de la méthode. |
 | `ux-designer` | Parcours, ergonomie, accessibilité, responsive. Juge chaque écran avec les yeux d'un chercheur pressé. |
+| `designer-ui` | Direction artistique et qualité visuelle : homogénéité, standards, états, responsive (mobile, tablette, ordinateur), visualisation de données. Critique par captures et mesures (`docs/UI.md`). |
 | `plume` | Langue et ton : textes de l'interface et rapports produits, dans chaque langue. Traque les tournures traduites de l'anglais, le flou, les incohérences de vocabulaire. |
 | `testeur` | Joue l'utilisateur dans un vrai navigateur (ordinateur et mobile), cherche ce qui casse, rédige des rapports de test reproductibles. |
 | `modele-simule` | Joue le rôle d'un fournisseur d'IA distant : répond aux demandes de l'application au format exact attendu, pour tester toute la boucle sans clé. |
@@ -37,12 +38,14 @@ Chaque livraison passe par :
 1. **Construire** avec des tests automatiques (`npm test`) sur chaque règle métier.
 2. **Essayer comme un utilisateur** (`npm run e2e`, plus une passe manuelle
    guidée par le `testeur`) sur ordinateur et mobile.
-3. **Relire les mots** (`plume`) : tout texte nouveau de l'interface, et un
+3. **Regarder l'interface** (`designer-ui`) : toute amélioration visible, avant de coder pour la disposition, après
+   pour la critique sur captures à plusieurs largeurs.
+4. **Relire les mots** (`plume`) : tout texte nouveau de l'interface, et un
    rapport réel produit par l'analyse, dans chaque langue proposée.
-4. **Corriger**, puis **certifier** par une deuxième passe complète.
+5. **Corriger**, puis **certifier** par une deuxième passe complète.
    Une troisième passe si des défauts subsistent. Pas plus : on livre et on
    note ce qui reste.
-5. **Consigner** : `docs/AVANCEMENT.md` (où on en est) et `docs/JOURNAL.md`
+6. **Consigner** : `docs/AVANCEMENT.md` (où on en est) et `docs/JOURNAL.md`
    (décisions et pourquoi).
 
 Rien n'est déclaré « fait » sans preuve : test vert, capture, ou rapport de test.
