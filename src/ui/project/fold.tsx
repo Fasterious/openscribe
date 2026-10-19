@@ -150,6 +150,26 @@ export function useHeadroom(enabled: boolean, ref: React.RefObject<HTMLElement |
       appOff = 0
       placeStuck()
     }
+    // Un élément qui reçoit le focus (Tab, Maj+Tab) ne reste jamais sous la pile collée (WCAG 2.4.11) : le navigateur a
+    // défilé d'après la pile d'avant, la remontée a pu la faire redescendre ; on le dégage alors, sans rien pousser.
+    const onFocusIn = (e: FocusEvent) => {
+      const el = e.target as HTMLElement
+      if (header?.contains(el)) return
+      requestAnimationFrame(() => {
+        let bottom = Math.max(0, header?.getBoundingClientRect().bottom ?? 0)
+        for (const s of document.querySelectorAll<HTMLElement>('details[data-fold][open] > summary, [data-stick-panel]')) {
+          if (s.contains(el)) continue
+          const r = s.getBoundingClientRect()
+          if (r.bottom > 0 && Math.abs(r.top - (parseFloat(s.style.top) || 0)) < 1) bottom = Math.max(bottom, r.bottom)
+        }
+        const top = el.getBoundingClientRect().top
+        if (top < bottom) {
+          freezeHeadroom()
+          window.scrollBy({ top: top - bottom - 8, behavior: 'instant' })
+        }
+      })
+    }
+    document.addEventListener('focusin', onFocusIn)
     // Un bloc ouvert ou fermé, un en-tête qui change de hauteur : les positions collées se recalculent.
     const onToggle = () => requestAnimationFrame(placeStuck)
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -159,6 +179,7 @@ export function useHeadroom(enabled: boolean, ref: React.RefObject<HTMLElement |
       window.removeEventListener('scroll', onScroll)
       document.removeEventListener('toggle', onToggle, true)
       header?.removeEventListener('focusin', onFocus)
+      document.removeEventListener('focusin', onFocusIn)
       appOff = 0
       themeOff = 0
       themeEl = null
@@ -195,6 +216,9 @@ function transition(details: HTMLDetailsElement, kind: 'open' | 'fold', update: 
   root.classList.add(`vt-${kind}`)
   root.style.setProperty('--fold-line', `${Math.max(0, Math.round(line))}px`)
   const t = start.call(document, () => {
+    // Le défilement du repli arrive ici, parfois longtemps après le clic : il ne doit pas être pris pour une remontée du
+    // lecteur (passe testeur du 19/10 : la barre revenait et recouvrait le titre replié).
+    freezeHeadroom()
     update()
     setters.get(details)?.(details.open)
   })
@@ -435,6 +459,7 @@ export function morphTo(from: HTMLElement | null, update: () => void, to: () => 
   let target: HTMLElement | null = null
   from.style.viewTransitionName = 'fold-chip'
   const t = start.call(document, () => {
+    freezeHeadroom()
     from.style.viewTransitionName = ''
     update()
     target = to()

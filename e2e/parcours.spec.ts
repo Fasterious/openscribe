@@ -666,3 +666,38 @@ test('résumé : la pastille « ● N », le volet replié revient à elle ; « 
     expect(gap).toBeLessThanOrEqual(1)
   }
 })
+
+test('replier un thème lu depuis son en-tête collé : sa ligne reste visible sous le grand thème, la barre ne revient pas la couvrir', async ({ page }) => {
+  await page.goto('/#/observatoire/ecole-grand-debat-2019')
+  const go = page.getByRole('button', { name: 'Lire le thème en détail →' }).first()
+  await go.scrollIntoViewIfNeeded()
+  const g = (await go.boundingBox())!
+  await page.mouse.click(g.x + 20, g.y + g.height / 2)
+  const opened = page.locator('details[data-fold="motif"][open]').first()
+  await expect(opened).toBeVisible()
+  const motif = page.locator(`[id="${await opened.getAttribute('id')}"]`)
+  const head = motif.locator(':scope > summary')
+  await expect(head).toBeFocused()
+  // On lit le thème : barre et grand thème sont poussés, le thème est en haut.
+  for (let i = 0; i < 8; i++) {
+    await page.mouse.wheel(0, 50)
+    await page.waitForTimeout(40)
+  }
+  await page.waitForTimeout(300)
+  // Un processeur lent (téléphone modeste) : la transition de repli dure plus longtemps que le gel du défilement.
+  const cdp = await page.context().newCDPSession(page)
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 })
+  const h = (await head.boundingBox())!
+  await page.mouse.click(h.x + 30, h.y + h.height / 2)
+  await expect(motif).not.toHaveAttribute('open', '')
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
+  // Longtemps après (la transition de repli peut tarder) : la ligne repliée est toujours dégagée, sous le grand thème.
+  await page.waitForTimeout(1500)
+  const gap = await head.evaluate((el) => {
+    const theme = el.parentElement!.parentElement!.closest('details[data-fold="theme"]')!.querySelector(':scope > summary')!
+    const bar = document.querySelector('body header')!.getBoundingClientRect().bottom
+    return Math.round(el.getBoundingClientRect().top - Math.max(theme.getBoundingClientRect().bottom, bar))
+  })
+  expect(gap).toBeGreaterThanOrEqual(-1)
+  await expect(head).toBeFocused()
+})

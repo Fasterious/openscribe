@@ -11,8 +11,12 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
   position directement : une variable sur la racine recalculait les styles des 12 000 nœuds à chaque image (8,8 ms ;
   0,23 ms désormais). Mesuré à chaque image, sur ordinateur et mobile, à toutes les vitesses : aucun trou, aucun
   mouvement à contre-sens, aucun saut. La marge de défilement suit la pile collée (focus jamais dessous).
-- **Marques « fragile » et « À vérifier »** (designer-ui) : petites étiquettes avec icône et chevron, bleues une fois
-  ouvertes ; l'explication s'ouvre dessous en 220 ms et se referme en 180 ms.
+- **Marques « fragile » et « À vérifier »** (designer-ui) : petites étiquettes avec chevron (sans icône, Arnaud), bleues
+  une fois ouvertes ; l'explication s'ouvre dessous en 220 ms et se referme en 180 ms ; Échap la referme.
+- **Certification** : après le repli d'un thème lu, la barre revenait et couvrait la ligne repliée (le défilement du
+  repli, dans une transition de vue, arrivait après la fin du gel et passait pour une remontée) : le gel s'arme dans la
+  transition elle-même ; test de parcours sous processeur ralenti (×6), qui échoue sans le correctif. En Maj+Tab,
+  l'élément focalisé est dégagé de la pile collée.
 - **Granularité** (Arnaud) : la ligne d'un grand thème ne parle que de thèmes (« 2 signaux isolés »), plus de comptes de
   personnes ; le nombre de participants reste pour le volume.
 - **Avis mitigé à vérifier** : la pastille « 1 avis mitigé » déroule les deux avis de la personne (le sien et la copie

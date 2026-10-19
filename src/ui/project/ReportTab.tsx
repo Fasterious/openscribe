@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, TriangleAlert, Users } from 'lucide-react'
+import { ChevronDown, ChevronRight, CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, Users } from 'lucide-react'
 import { Fragment, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
 import { computeMetrics, METRICS_VERSION, withCurrentMetrics } from '@/core/analysis/metrics'
@@ -401,11 +401,10 @@ function HighlightLine({
 
 /**
  * Une marque d'une ligne de liste (« fragile », « À vérifier ») : une petite étiquette cliquable, de la forme des
- * étiquettes du thème ouvert, avec son icône et un chevron qui tourne ; bleue et enfoncée tant que son explication est
+ * étiquettes du thème ouvert, avec un chevron qui tourne (sans icône, Arnaud, 19/10) ; bleue et enfoncée tant que son explication est
  * ouverte, comme les pastilles « ● N » (designer-ui, 19/10).
  */
 function MarkChip({ kind, open, onToggle, controls }: { kind: 'fragile' | 'doubt'; open: boolean; onToggle: () => void; controls: string }) {
-  const Icon = kind === 'fragile' ? Scale : TriangleAlert
   return (
     <button
       type="button"
@@ -414,8 +413,14 @@ function MarkChip({ kind, open, onToggle, controls }: { kind: 'fragile' | 'doubt
       onClick={(e) => {
         if (e.detail <= 1) onToggle()
       }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape' && open) {
+          e.stopPropagation()
+          onToggle()
+        }
+      }}
       className={cn(
-        'inline-flex h-6 shrink-0 cursor-pointer items-center gap-1 rounded-full border pr-1 pl-1.5 text-xs font-medium transition-colors duration-100',
+        'inline-flex h-6 shrink-0 cursor-pointer items-center gap-1 rounded-full border pr-1 pl-2 text-xs font-medium transition-colors duration-100',
         open
           ? 'border-primary bg-primary text-primary-foreground'
           : kind === 'fragile'
@@ -423,7 +428,6 @@ function MarkChip({ kind, open, onToggle, controls }: { kind: 'fragile' | 'doubt
             : 'border-warning/60 bg-warning/20 text-foreground hover:bg-warning/35',
       )}
     >
-      <Icon aria-hidden className="size-3.5" />
       {kind === 'fragile' ? 'fragile' : 'À vérifier'}
       <ChevronDown aria-hidden className={cn('size-3.5 transition-transform duration-200 ease-out motion-reduce:transition-none', open && 'rotate-180')} />
     </button>
@@ -476,6 +480,13 @@ function ListItem({
           <div
             id={panel}
             inert={!why}
+            // Échap referme l'explication et rend le focus à sa marque.
+            onKeyDown={(e) => {
+              if (e.key !== 'Escape' || !why) return
+              e.stopPropagation()
+              document.querySelector<HTMLElement>(`[aria-controls="${panel}"][aria-expanded="true"]`)?.focus()
+              setWhy(null)
+            }}
             className={cn(
               'grid motion-reduce:transition-none',
               why
