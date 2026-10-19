@@ -1,4 +1,4 @@
-import { CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, Users } from 'lucide-react'
+import { ChevronRight, CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, Users } from 'lucide-react'
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
 import { computeMetrics, METRICS_VERSION, withCurrentMetrics } from '@/core/analysis/metrics'
@@ -210,6 +210,7 @@ function CampChip({
   onToggle,
   word = false,
   pill,
+  mixed = false,
 }: {
   cat: IdeaCategory
   people: number
@@ -218,24 +219,30 @@ function CampChip({
   /** Le mot après le nombre (« 46 avis positifs »), dans les listes ; le point seul suffit dans une phrase. */
   word?: boolean
   pill?: string
+  /** Des personnes d'avis mitigé (l'explication « à vérifier ») : un point mi-vert mi-rouge. */
+  mixed?: boolean
 }) {
+  const words: [string, string] = mixed ? ['avis mitigé', 'avis mitigés'] : CAMP_WORD[cat]
   return (
     <button
       type="button"
       data-pill={pill}
-      onClick={onToggle}
+      // Un double clic n'ouvre pas puis ne referme pas aussitôt : seul le premier clic compte.
+      onClick={(e) => {
+        if (e.detail <= 1) onToggle()
+      }}
       onKeyDown={(e) => {
         if (e.key === 'Escape' && open) onToggle()
       }}
       aria-expanded={open}
-      aria-label={`${open ? 'Masquer' : 'Voir'} les verbatims de ${plural(people, 'participant')} : ${CAMP_WORD[cat][people > 1 ? 1 : 0]}`}
+      aria-label={`${open ? 'Masquer' : 'Voir'} les verbatims de ${plural(people, 'participant')} : ${words[people > 1 ? 1 : 0]}`}
       className={`inline-flex min-h-6 cursor-pointer items-center gap-1 rounded-full px-2 py-0 align-baseline text-sm font-medium tabular-nums sm:min-h-0 sm:px-1.5 ${
         open ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'
       }`}
     >
-      <span className={`inline-block size-2 shrink-0 rounded-full ${BAR[cat]} ${open ? 'ring-1 ring-primary-foreground' : ''}`} aria-hidden />
+      <span className={`inline-block size-2 shrink-0 rounded-full ${mixed ? 'bg-linear-to-r from-positive from-50% to-negative to-50%' : BAR[cat]} ${open ? 'ring-1 ring-primary-foreground' : ''}`} aria-hidden />
       {people}
-      {word && ` ${CAMP_WORD[cat][people > 1 ? 1 : 0]}`}
+      {word && ` ${words[people > 1 ? 1 : 0]}`}
     </button>
   )
 }
@@ -373,7 +380,7 @@ function HighlightLine({
     <>
       {children}
       {(lead || people > 0) && (
-        <span className="mt-1 block text-[15px] leading-relaxed">
+        <span className="mt-1 block text-base leading-relaxed">
           {lead && <span>{ctx.mask(lead)} </span>}
           {people > 0 && (
             <span className="inline-flex flex-wrap gap-1 align-baseline">
@@ -414,11 +421,12 @@ function ListItem({
   heading: string
   compact?: boolean
 }) {
-  const [why, setWhy] = useState(false)
+  const [why, setWhy] = useState<'fragile' | 'doubt' | null>(null)
   const group = groupById.get(item.groupId)
   // Une marque est un bouton : enfoncée tant que son explication est ouverte, juste dessous (Arnaud, 19/10).
-  const mark = `inline-flex min-h-6 cursor-pointer items-center gap-1 rounded px-1 hover:text-foreground ${why ? 'ring-2 ring-primary/60 text-foreground' : ''}`
-  const chevron = <span aria-hidden className="text-xs">{why ? '⌃' : '⌄'}</span>
+  const mark = (on: boolean) => `inline-flex min-h-6 cursor-pointer items-center gap-1 rounded px-1 hover:text-foreground ${on ? 'ring-2 ring-primary/60 text-foreground' : ''}`
+  const chevron = (on: boolean) => <span aria-hidden className="text-xs">{on ? '⌃' : '⌄'}</span>
+  const flip = (k: 'fragile' | 'doubt') => setWhy((w) => (w === k ? null : k))
   return (
     <li className={`border-l-[3px] pl-2.5 ${lineClass}`}>
       <HighlightLine section={section} item={item} ctx={ctx} groupById={groupById} compact={compact}>
@@ -428,23 +436,23 @@ function ListItem({
           {item.fragile && (
             <>
               {' · '}
-              <button type="button" className={`${mark} underline decoration-dotted underline-offset-2`} aria-expanded={why} onClick={() => setWhy((w) => !w)}>
-                fragile {chevron}
+              <button type="button" className={`${mark(why === 'fragile')} underline decoration-dotted underline-offset-2`} aria-expanded={why === 'fragile'} onClick={() => flip('fragile')}>
+                fragile {chevron(why === 'fragile')}
               </button>
             </>
           )}
           {item.doubt && (
             <>
               {' · '}
-              <button type="button" className={`${mark} bg-warning/30 font-medium text-foreground`} aria-expanded={why} onClick={() => setWhy((w) => !w)}>
-                À vérifier {chevron}
+              <button type="button" className={`${mark(why === 'doubt')} bg-warning/30 font-medium text-foreground`} aria-expanded={why === 'doubt'} onClick={() => flip('doubt')}>
+                À vérifier {chevron(why === 'doubt')}
               </button>
             </>
           )}
         </span>
         {why && group && (
           <div className="fold-in mt-2">
-            <WhyLabel group={group} ctx={ctx} />
+            <WhyLabel group={group} ctx={ctx} only={why} />
           </div>
         )}
       </HighlightLine>
@@ -741,7 +749,7 @@ function SourceContext({ idea, ctx, excerpt, card = false }: { idea: Idea; ctx: 
   }
   const where = c ? [ctx.sourceName(c.id), ctx.origin(c.id)].filter((x, i, a) => x && a.indexOf(x) === i) : []
   return (
-    <div className={`space-y-2 border-l-[3px] pl-3 ${BORDER[idea.category]} ${card ? 'rounded-r-lg border-y border-r bg-card py-3 pr-3 shadow-sm' : ''}`}>
+    <div className={`space-y-2 border-l-[3px] pl-3 ${BORDER[idea.category]} ${card ? 'rounded-r-lg border-y border-r border-y-border border-r-border bg-card py-3 pr-3' : ''}`}>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
         <span className="font-semibold text-foreground">{idea.participantId}</span>
         <Badge tone={CATEGORY[idea.category].tone}>{CATEGORY[idea.category].label}</Badge>
@@ -810,27 +818,28 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
           <H data-vt="title" className="text-base font-semibold">
             {group.title}
           </H>
-          <span className="flex flex-wrap items-center gap-2">
-            <span data-vt="bar" className="block w-14 sm:w-20">
+          {/* Sur ordinateur, comptes et barres alignés sur le bord droit d'une ligne à l'autre : on compare d'un coup d'œil. */}
+          <span className="flex flex-wrap items-center gap-2 sm:justify-end">
+            <span data-vt="bar" className="block w-14 sm:order-last sm:w-20">
               <OpinionBar m={m} />
             </span>
             <span data-vt="meta" className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-muted-foreground">
+              {marks}
+              <span className="text-sm text-muted-foreground tabular-nums sm:w-10 sm:text-right">
                 <Users className="mr-0.5 inline size-3" aria-hidden />
                 {m.participants}
               </span>
-              {marks}
             </span>
           </span>
         </span>
       }
       bodyClassName="pb-3"
     >
-      <div className="space-y-3 text-base">
+      <div className="max-w-lecture space-y-3 text-base">
         <p className="text-sm text-muted-foreground">{metricsLine(m)}</p>
         {/* Ce que veut dire l'étiquette, plié : dans la ligne fermée, ce n'est plus une infobulle (une seule cible). */}
-        <details className="text-sm" onKeyDown={closeOnEscape}>
-          <summary className="cursor-pointer py-1 text-muted-foreground">Que veut dire cette étiquette ?</summary>
+        <details className="group/inner text-sm" onKeyDown={closeOnEscape}>
+          <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden"><ChevronRight className="size-4 transition-transform group-open/inner:rotate-90 motion-reduce:transition-none" aria-hidden />Que veut dire cette étiquette ?</summary>
           <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{helpText(STANCE_HELP[m.stance])}</p>
         </details>
         {dominantVoice(ideas) && <p className="text-sm text-muted-foreground">{dominantVoice(ideas)}</p>}
@@ -843,8 +852,8 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
         )}
         {/* La définition du motif : explication secondaire, pliée ; la synthèse se lit d'abord (remarque d'Arnaud, 17/10). */}
         {group.definition && (
-          <details className="group/def text-sm" onKeyDown={closeOnEscape}>
-            <summary className="cursor-pointer py-1 text-muted-foreground">Ce qui compte comme positif ou négatif dans ce thème</summary>
+          <details className="group/inner text-sm" onKeyDown={closeOnEscape}>
+            <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden"><ChevronRight className="size-4 transition-transform group-open/inner:rotate-90 motion-reduce:transition-none" aria-hidden />Ce qui compte comme positif ou négatif dans ce thème</summary>
             <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{definitionLine(group.definition)}</p>
           </details>
         )}
@@ -949,10 +958,10 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
  * « Pourquoi cette étiquette ? » : ce qui rend ce motif fragile, ce qui est à vérifier, dans ce cas précis, calculé
  * par le code (`explain.ts`). Remplace les infobulles générales, qu'Arnaud jugeait incompréhensibles (18/10).
  */
-function WhyLabel({ group, ctx }: { group: Group; ctx: Ctx }) {
-  const fragile = fragileReason(group)
-  const doubt = doubtReason(group, ctx.ideaById, ctx.alsoIn)
-  const [open, setOpen] = useState<IdeaCategory | null>(null)
+function WhyLabel({ group, ctx, only }: { group: Group; ctx: Ctx; only?: 'fragile' | 'doubt' }) {
+  const fragile = only === 'doubt' ? undefined : fragileReason(group)
+  const doubt = only === 'fragile' ? undefined : doubtReason(group, ctx.ideaById, ctx.alsoIn)
+  const [open, setOpen] = useState<number | null>(null)
   if (!fragile && !doubt) return null
   return (
     <div className="space-y-2 rounded-md bg-muted px-3 py-2 text-sm">
@@ -969,11 +978,20 @@ function WhyLabel({ group, ctx }: { group: Group; ctx: Ctx }) {
           </p>
           {/* Les verbatims en cause, par camp, sous la même forme que partout : « ● 4 avis positifs ● 2 avis négatifs ». */}
           <span className="no-print flex flex-wrap items-center gap-1">
-            {campsOf(doubt.ideaIds, ctx).map((c) => (
-              <CampChip key={c.cat} cat={c.cat} people={c.people} word open={open === c.cat} onToggle={() => setOpen((o) => (o === c.cat ? null : c.cat))} />
+            {/* Groupés comme la phrase les compte : « 6 avis positifs », « 1 avis mitigé »… (passe testeur du 19/10). */}
+            {doubt.groups.map((g, k) => (
+              <CampChip
+                key={k}
+                cat={g.tone === 'mixed' ? 'positive' : g.tone}
+                mixed={g.tone === 'mixed'}
+                people={g.people}
+                word
+                open={open === k}
+                onToggle={() => setOpen((o) => (o === k ? null : k))}
+              />
             ))}
           </span>
-          {open && <QuotesPanel ids={campsOf(doubt.ideaIds, ctx).find((c) => c.cat === open)?.ids ?? []} ctx={ctx} onClose={() => setOpen(null)} />}
+          {open !== null && doubt.groups[open] && <QuotesPanel ids={doubt.groups[open].ids} ctx={ctx} onClose={() => setOpen(null)} />}
         </>
       )}
     </div>
@@ -1439,7 +1457,7 @@ export function ReportTab({
           <h2 id="resume" className="text-xl font-semibold">
             Résumé
           </h2>
-          <div className="max-w-3xl text-base">
+          <div className="max-w-lecture text-base">
             <CitedText text={analysis.globalSummary} ctx={ctx} camps={analysis.groups} />
             <Unverified items={analysis.globalUnverified} />
             {summaryDoubts(sectionsHL) && <DoubtLinks sections={sectionsHL} ctx={ctx} />}
@@ -1453,12 +1471,12 @@ export function ReportTab({
             Faits saillants
           </h2>
           {/* Colonnes plutôt que grille : des cartes de hauteurs inégales ne laissent pas de trou. */}
-          <div className="gap-3 md:columns-2 print:columns-1">
+          <div className="max-w-lecture">
             {sectionsHL.map((sec) => {
               const look = SECTION_LOOK[sec.key]
               const Icon = look.icon
               return (
-                <Card key={sec.key} className={`mb-3 break-inside-avoid border-t-4 ${look.top} ${FLAT_CARD}`}>
+                <Card key={sec.key} className={`mb-3 border-t-4 ${look.top} ${FLAT_CARD}`}>
                   <CardHeader className="pb-2 max-sm:px-0">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <Icon className={`size-4 ${look.text}`} aria-hidden />
@@ -1518,7 +1536,7 @@ export function ReportTab({
                   bodyClassName="space-y-3 pb-4 pt-2"
                 >
                   {t.summary && !segment && (
-                    <div className="max-w-3xl text-base">
+                    <div className="max-w-lecture text-base">
                       <CitedText text={t.summary} ctx={ctx} />
                       <Unverified items={t.unverified} />
                     </div>
@@ -1584,7 +1602,7 @@ export function ReportTab({
         </button>
       )}
 
-      <Card className={`max-sm:border-t ${FLAT_CARD}`}>
+      <Card className={`max-w-lecture max-sm:border-t ${FLAT_CARD}`}>
         <CardHeader className="max-sm:px-0">
           <CardTitle>Méthode</CardTitle>
         </CardHeader>

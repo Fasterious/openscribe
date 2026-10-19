@@ -52,6 +52,8 @@
 
 @theme inline {
   --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  /* La mesure de lecture (`max-w-lecture`) : 75 caractères au plus en Geist 16 px (designer-ui, 19/10 ; docs/UI.md). */
+  --container-lecture: 38rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -235,3 +237,4 @@ html {
     transition: none !important;
   }
 }
+

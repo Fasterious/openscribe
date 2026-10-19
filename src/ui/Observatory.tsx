@@ -37,7 +37,7 @@ export function ObservatoryPage({ slug }: { slug: string }) {
   }, [study])
 
   const back = (
-    <a href={href({ name: 'observatories' })} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+    <a href={href({ name: 'observatories' })} className="inline-flex min-h-6 items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
       <ArrowLeft className="size-4" /> Toutes les études de l'Observatoire
     </a>
   )
@@ -72,7 +72,7 @@ export function ObservatoryPage({ slug }: { slug: string }) {
     <div className="space-y-6">
       <div className="space-y-3">
         <div className="no-print">{back}</div>
-        <div className="space-y-1">
+        <div className="max-w-4xl space-y-1">
           <h1 className="text-2xl font-bold sm:text-3xl">{study.title}</h1>
           <p className="text-sm text-muted-foreground">
             Publiée le {date(study.publishedAt)}
@@ -105,8 +105,9 @@ export function ObservatoryPage({ slug }: { slug: string }) {
       </div>
 
 
-      <Disclosure flat summary={<span className="text-base font-semibold">Avant de lire : la question, les données, les limites</span>}>
-        <div className="max-w-3xl space-y-3 text-base">
+      {/* À la largeur du texte qu'il ouvre : plus de grand vide à droite sur ordinateur (Arnaud, 19/10). */}
+      <Disclosure flat className="max-w-lecture" summary={<span className="text-base font-semibold">Avant de lire : la question, les données, les limites</span>}>
+        <div className="space-y-3 text-base">
           <blockquote className="border-l-[3px] border-primary pl-3 italic">{f.question}</blockquote>
           <p>
             <a className="text-primary underline" href={f.source.url}>

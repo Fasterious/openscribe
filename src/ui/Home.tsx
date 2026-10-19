@@ -319,16 +319,17 @@ function ProofDemo() {
         <div className="w-full bg-negative" />
       </div>
       <p className="mt-3 text-sm leading-relaxed">
-        Trois personnes trouvent l'application lente. L'une attend parfois dix secondes au démarrage, une autre précise que c'est surtout vrai sur son vieux
+        3 personnes trouvent l'application lente. L'une attend parfois dix secondes au démarrage, une autre précise que c'est surtout vrai sur son vieux
         téléphone.
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          aria-label={open ? 'Masquer les 3 verbatims' : 'Voir les 3 verbatims'}
-          className="mx-1 inline-flex cursor-pointer items-center gap-0.5 rounded-full bg-accent px-1.5 align-baseline text-xs font-medium text-accent-foreground hover:bg-primary hover:text-primary-foreground"
+          aria-label={open ? 'Masquer les verbatims de 3 participants : avis négatifs' : 'Voir les verbatims de 3 participants : avis négatifs'}
+          className={`mx-1 inline-flex cursor-pointer items-center gap-1 rounded-full px-1.5 align-baseline text-sm font-medium tabular-nums ${open ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'}`}
         >
-          <Quote className="size-3" />3
+          {/* La même pastille que dans le rapport : le point du camp et le nombre de personnes. */}
+          <span className="inline-block size-2 rounded-full bg-negative" aria-hidden />3
         </button>
       </p>
       {open ? (

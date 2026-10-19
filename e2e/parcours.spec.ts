@@ -42,7 +42,8 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Des verbatims au rapport')
   // La preuve : un constat de l'exemple dont on déplie les verbatims.
-  await page.getByRole('button', { name: 'Voir les 3 verbatims' }).click()
+  // (La même pastille que dans le rapport : « ● 3 », les verbatims de 3 participants.)
+  await page.getByRole('button', { name: 'Voir les verbatims de 3 participants : avis négatifs' }).click()
   await expect(page.getByText('surtout sur mon vieux téléphone.').first()).toBeVisible()
   for (const h of ['Comment ça marche', 'Un outil par étape de votre recherche', 'Vos données, vos règles', 'Questions fréquentes', 'Ce qui arrive'])
     await expect(page.getByRole('heading', { name: h })).toBeVisible()
@@ -186,7 +187,8 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
 test('replier des verbatims ramène le lecteur là où il les avait dépliés', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Voir un exemple de rapport' }).click()
-  const pill = page.getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / }).first()
+  // Une pastille du rapport (l'accueil en a une aussi : on attend d'être dans le résumé).
+  const pill = page.locator('section[aria-labelledby="resume"]').getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / }).first()
   await pill.scrollIntoViewIfNeeded()
   const before = (await pill.boundingBox())!.y
   await pill.click()

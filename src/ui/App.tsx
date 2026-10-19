@@ -107,7 +107,8 @@ export function App() {
 function SoonItem({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <Explain content={`${label} : ce module n'est pas encore disponible.`}>
-      <span aria-label={`${label}, bientôt`} className="flex h-9 cursor-not-allowed items-center rounded-md px-1.5 text-muted-foreground/50 min-[400px]:px-2 sm:px-2.5 [&_svg]:size-4">
+      {/* Sous 352 px, les modules à venir se masquent : sinon ils passent sous « Moteurs d'IA » (designer-ui, 19/10). */}
+      <span aria-label={`${label}, bientôt`} className="flex h-9 cursor-not-allowed items-center rounded-md px-1.5 text-muted-foreground/50 max-[22rem]:hidden min-[400px]:px-2 sm:px-2.5 [&_svg]:size-4">
         {icon}
       </span>
     </Explain>

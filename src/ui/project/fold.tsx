@@ -326,15 +326,18 @@ export function Fold({
         className={cn('flex cursor-pointer list-none items-center gap-2 select-none [&::-webkit-details-marker]:hidden', open && STUCK[level])}
       >
         <span className="min-w-0 flex-1">{row}</span>
-        {open ? (
-          <span className="no-print flex min-h-8 shrink-0 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
-            <span aria-hidden>⌃</span> <span className="max-sm:hidden">Replier</span>
-          </span>
-        ) : (
-          <span aria-hidden className="shrink-0 text-muted-foreground">
-            ›
-          </span>
-        )}
+        {/* « › » et « Replier » occupent la même place : rien ne glisse quand le bloc s'ouvre (designer-ui, 19/10). */}
+        <span className="no-print flex w-24 shrink-0 justify-end max-sm:w-8">
+          {open ? (
+            <span className="flex min-h-8 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
+              <span aria-hidden>⌃</span> <span className="max-sm:hidden">Replier</span>
+            </span>
+          ) : (
+            <span aria-hidden className="flex min-h-8 items-center px-2 text-muted-foreground">
+              ›
+            </span>
+          )}
+        </span>
       </summary>
       <div ref={body} className={bodyClassName}>
         {children}

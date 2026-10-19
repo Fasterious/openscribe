@@ -111,6 +111,13 @@ export function fragileReason(g: Group): string | undefined {
   )
 }
 
+/**
+ * Les verbatims en cause, groupés comme la phrase les compte (pastilles « ● 6 avis positifs ● 5 avis négatifs
+ * ● 1 avis mitigé ») : les personnes qui ne sont comptées ici que par une copie, par camp, puis celles qui changeraient
+ * de camp. Les copies d'une personne déjà comptée par une idée à elle ne changent pas l'étiquette : elles n'y sont pas.
+ */
+export type DoubtGroup = { tone: 'positive' | 'negative' | 'mixed'; ids: string[]; people: number }
+
 const byNumber = (a: string, b: string) => a.localeCompare(b, 'fr', { numeric: true })
 const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} et ${xs[xs.length - 1]}` : (xs[0] ?? ''))
 const RANK: Record<Metrics['stance'], number> = { unanimous: 5, consensus: 4, majority: 3, lean: 2, divided: 1, thin: 0, none: 0 }
@@ -125,7 +132,7 @@ export function doubtReason(
   g: Group,
   ideas: Map<string, Idea>,
   alsoIn: (idea: Idea) => string | undefined,
-): { text: string; ideaIds: string[] } | undefined {
+): { text: string; ideaIds: string[]; groups: DoubtGroup[] } | undefined {
   const all = g.ideaIds.map((id) => ideas.get(id)).filter((i): i is Idea => !!i)
   const copies = all.filter((i) => i.copyOf)
   if (!copies.length) return undefined
@@ -170,8 +177,16 @@ export function doubtReason(
   const head = gone.length
     ? `${gone.length} des ${T} personnes qui donnent un avis ${gone.length > 1 ? 'ne sont comptées' : "n'est comptée"} ici que par une idée rangée d'abord dans un autre thème : ${list(parts)}${changed.length ? ` ; ${movedText(true)}` : ''}. Sans ces idées, il resterait`
     : `Sans les idées rangées d'abord dans un autre thème, ${movedText(false)}. Il resterait alors`
+  const copiesOf = (people: string[]) => copies.filter((i) => people.includes(i.participantId))
+  const groups: DoubtGroup[] = []
+  for (const side of ['positive', 'negative', 'mixed'] as const) {
+    const people = gone.filter(([, c]) => c === side).map(([p]) => p)
+    if (people.length) groups.push({ tone: side, ids: copiesOf(people).map((i) => i.id), people: people.length })
+  }
+  if (changed.length) groups.push({ tone: 'mixed', ids: copiesOf(changed.map(([p]) => p)).map((i) => i.id), people: changed.length })
+  const inCause = copies.filter((i) => groups.some((g) => g.ids.includes(i.id)))
   const judge =
-    copies.length > 1 ? `À\u00a0vous de juger si ces ${copies.length} verbatims parlent bien ${motifName(g.title)}.` : `À\u00a0vous de juger si ce verbatim parle bien ${motifName(g.title)}.`
+    inCause.length > 1 ? `À\u00a0vous de juger si ces ${inCause.length} verbatims parlent bien ${motifName(g.title)}.` : `À\u00a0vous de juger si ce verbatim parle bien ${motifName(g.title)}.`
   const text = nbsp(`${head} ${T2} avis : ${verdict}. ${judge}`)
-  return { text, ideaIds: copies.map((i) => i.id) }
+  return { text, ideaIds: inCause.map((i) => i.id), groups }
 }

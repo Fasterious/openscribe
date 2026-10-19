@@ -10,6 +10,13 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
   l'avait touchée (transition de vue) ; la dernière pastille repliée garde un contour bleu léger.
 - **« À vérifier » s'explique juste dessous** : l'explication s'ouvre sous la marque et pousse le contenu, au lieu de
   venir après « Lire le thème en détail » ; la marque reste enfoncée tant que l'explication est ouverte.
+- **Premier audit du `designer-ui`** (agent créé à la demande d'Arnaud) : une mesure de lecture unique, `max-w-lecture`
+  (38 rem, 75 caractères en Geist) pour tout texte courant, « Avant de lire » et la méthode compris (fini le vide à
+  droite et les lignes de 146 caractères) ; listes du haut sur une colonne (la seconde colonne s'arrêtait un écran plus
+  tôt) ; comptes et barres des thèmes alignés à droite, « › » et « Replier » à la même place (plus de glissement de
+  72 px à l'ouverture) ; un seul chevron ; pastille de l'accueil identique à celle du rapport.
+- **Explication « à vérifier »** : les pastilles suivent les groupes de la phrase (« 6 avis positifs », « 1 avis
+  mitigé »), « fragile » et « À vérifier » s'ouvrent séparément, un double clic sur une pastille ne l'annule plus.
 - **Défiler vite ne décroche plus les en-têtes** : leur position n'est plus animée (une position animée se recalcule à
   chaque image et prend du retard sur un défilement rapide) ; fonds opaques ; la barre de l'application glisse en se
   cachant, au-dessus des en-têtes, et revient d'un coup (sinon un interstice laisse voir le texte).

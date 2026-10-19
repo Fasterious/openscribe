@@ -37,9 +37,11 @@ describe('étiquettes expliquées au cas par cas', () => {
     const ideas = [...many(1, 6, 'positive'), idea(7, 'negative', 'I0099'), idea(8, 'positive', 'I0098', 1)]
     const byId = new Map(ideas.map((i) => [i.id, i]))
     const r = doubtReason(group(ideas), byId, () => 'Horaires')
-    expect(r?.ideaIds).toEqual(['I0007', 'I0008'])
+    // Les verbatims en cause sont ceux que la phrase compte : la copie de P1, déjà comptée par son idée, n'y est pas.
+    expect(r?.ideaIds).toEqual(['I0007'])
+    expect(r?.groups).toEqual([{ tone: 'negative', ids: ['I0007'], people: 1 }])
     expect(plain(r?.text)).toBe(
-      "1 des 7 personnes qui donnent un avis n'est comptée ici que par une idée rangée d'abord dans un autre thème : 1 avis négatif (« Horaires » : P7). Sans ces idées, il resterait 6 avis : « unanime » (6 sur 6), une étiquette plus nette. À vous de juger si ces 2 verbatims parlent bien du thème « Piscine ».",
+      "1 des 7 personnes qui donnent un avis n'est comptée ici que par une idée rangée d'abord dans un autre thème : 1 avis négatif (« Horaires » : P7). Sans ces idées, il resterait 6 avis : « unanime » (6 sur 6), une étiquette plus nette. À vous de juger si ce verbatim parle bien du thème « Piscine ».",
     )
     // Aucune ligne ne commence par « : » : espace insécable avant les deux-points.
     expect(r?.text).toContain('\u00a0:')
@@ -52,6 +54,8 @@ describe('étiquettes expliquées au cas par cas', () => {
     expect(plain(r?.text)).toBe(
       "Sans les idées rangées d'abord dans un autre thème, 1 personne passerait d'un avis mitigé à un avis négatif. Il resterait alors 4 avis : « unanime » (4 sur 4), une étiquette plus nette. À vous de juger si ce verbatim parle bien du thème « Piscine ».",
     )
+    // La pastille suit la phrase : 1 avis mitigé (le texte), pas 1 avis positif (la copie).
+    expect(r?.groups).toEqual([{ tone: 'mixed', ids: ['I0009'], people: 1 }])
   })
 
   it('le verdict d\'un motif résume les étiquettes d\'un thème, jamais plus fort que l\'étiquette', () => {
