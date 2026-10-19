@@ -27,7 +27,8 @@ export function App() {
         ref={header}
         className={cn(
           // Sur les pages de lecture, les en-têtes collés la poussent hors de l'écran au rythme du défilement (fold.tsx, useHeadroom).
-          'no-print sticky top-0 z-30 border-b bg-background',
+          // Ses liens au focus ne font pas défiler la page (la marge de défilement ne vaut pas pour elle, toujours en haut).
+          'no-print sticky top-0 z-30 border-b bg-background [view-transition-name:app-bar] [&_*]:-scroll-mt-96',
         )}
       >
         {/* À gauche, les modules (où je suis, où je peux aller) ; à droite, les moteurs d'IA, communs à tous les modules. */}

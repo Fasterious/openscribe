@@ -17,6 +17,12 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
   repli, dans une transition de vue, arrivait après la fin du gel et passait pour une remontée) : le gel s'arme dans la
   transition elle-même ; test de parcours sous processeur ralenti (×6), qui échoue sans le correctif. En Maj+Tab,
   l'élément focalisé est dégagé de la pile collée.
+- **Seconde contre-vérification** : le gel à délai fixe ne suffisait pas (11 échecs sur 15 quand la transition rend la
+  main après 1,1 à 1,5 s) : le défilement du code est ignoré jusqu'à la fin réelle de la transition (15 sur 15 ensuite).
+  Tab dans la barre ne fait plus remonter la page.
+- **Ouvrir un grand thème** (Arnaud) : plus de transition de vue à l'ouverture (la ligne ouverte est la ligne fermée,
+  rien ne glisse ; la page remplacée par une image faisait disparaître la barre) ; la barre a sa propre couche pendant
+  les replis ; la ligne garde exactement sa taille ouverte (marge constante, trait sans épaisseur au lieu d'une bordure).
 - **Granularité** (Arnaud) : la ligne d'un grand thème ne parle que de thèmes (« 2 signaux isolés »), plus de comptes de
   personnes ; le nombre de participants reste pour le volume.
 - **Avis mitigé à vérifier** : la pastille « 1 avis mitigé » déroule les deux avis de la personne (le sien et la copie

@@ -1197,7 +1197,7 @@ function VerdictLine({ groups }: { groups: Metrics[] }) {
 /** La ligne d'un grand thème : fermée, une seule cible qui ouvre ; ouverte, l'en-tête collé, telle quelle. */
 function ThemeRow({ title, m, groups }: { title: string; m: Metrics; groups: Metrics[] }) {
   return (
-    <span className="block space-y-2 py-3 group-open/fold:py-2">
+    <span className="block space-y-2 py-3">
       <span className="flex items-start justify-between gap-2">
         <h3 data-vt="title" className="text-lg font-semibold">
           {title}

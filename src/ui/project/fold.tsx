@@ -23,8 +23,22 @@ let unfolded: { at: number; el: HTMLDetailsElement | null } = { at: 0, el: null 
 
 /** Un défilement provoqué par le code (un repli) ne fait pas réapparaître la barre de l'application. */
 export function freezeHeadroom(ms = 400) {
-  frozenUntil = Date.now() + ms
+  frozenUntil = Math.max(frozenUntil, Date.now() + ms)
 }
+
+/**
+ * Pendant une transition de vue, le défilement du code peut arriver bien après le clic (jusqu'à 1,5 s mesurées) : on
+ * gèle jusqu'à la fin réelle de la transition, plus une marge, plutôt qu'un délai fixe (passe testeur du 19/10).
+ */
+let holds = 0
+function holdUntil(done: Promise<unknown>) {
+  holds++
+  done.finally(() => {
+    holds--
+    freezeHeadroom(200)
+  })
+}
+const frozen = () => holds > 0 || Date.now() < frozenUntil
 
 /**
  * Ce qui est poussé hors de l'écran : la barre de l'application (`appOff`) et l'en-tête du grand thème `themeEl`
@@ -126,7 +140,7 @@ export function useHeadroom(enabled: boolean, ref: React.RefObject<HTMLElement |
       const y = window.scrollY
       const dy = y - last
       last = y
-      if (!dy || Date.now() < frozenUntil) return placeStuck()
+      if (!dy || frozen()) return placeStuck()
       const n = needed()
       if (n.theme !== themeEl) {
         // Un autre grand thème (ou aucun) : le précédent n'est plus à l'écran, il n'a plus rien de poussé.
@@ -224,6 +238,7 @@ function transition(details: HTMLDetailsElement, kind: 'open' | 'fold', update: 
   })
   // Une transition sautée (bloc hors de l'écran, onglet caché) rejette `ready` : le bloc est ouvert quand même.
   ;(t as unknown as { ready: Promise<void> }).ready.catch(() => {})
+  holdUntil(t.finished)
   t.finished.finally(() => {
     details.classList.remove('vt-active')
     root.classList.remove(`vt-${kind}`)
@@ -286,9 +301,9 @@ export function foldDetails(details: HTMLDetailsElement) {
  */
 const STUCK = {
   theme:
-    'sticky z-20 border-b bg-background',
+    'sticky z-20 bg-background shadow-[0_1px_0_var(--border)]',
   motif:
-    'sticky z-10 border-b bg-background',
+    'sticky z-10 bg-background shadow-[0_1px_0_var(--border)]',
 }
 
 /**
@@ -349,9 +364,10 @@ export function Fold({
       // suivant et sauterait de toute la hauteur du contenu ouvert (passe testeur du 18/10). On le suspend le temps d'ouvrir.
       const root = document.documentElement
       root.style.overflowAnchor = 'none'
-      transition(d, 'open', () => {
-        d.open = true
-      })
+      // Pas de transition de vue à l'ouverture : la ligne ouverte est la ligne fermée, rien ne glisse ; la transition ne
+      // faisait que remplacer la page par une image le temps de l'ouvrir (la barre disparaissait, Arnaud, 19/10).
+      // Le contenu s'ouvre par sa hauteur (index.css).
+      d.open = true
       window.setTimeout(() => (root.style.overflowAnchor = ''), 400)
     }
   }, [])
@@ -465,6 +481,7 @@ export function morphTo(from: HTMLElement | null, update: () => void, to: () => 
     target = to()
     if (target) target.style.viewTransitionName = 'fold-chip'
   })
+  holdUntil(t.finished)
   t.ready.catch(() => {})
   t.finished.finally(() => {
     if (target) target.style.viewTransitionName = ''
