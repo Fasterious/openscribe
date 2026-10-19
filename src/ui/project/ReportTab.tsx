@@ -907,7 +907,7 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
     requestAnimationFrame(() => refs.current.get(cat)?.scrollIntoView({ block: 'nearest' }))
   }
   return (
-    <div className="space-y-3">
+    <div className="space-y-1">
       <div className="max-w-sm">
         <OpinionBar m={m} onPick={show} />
       </div>
@@ -915,7 +915,7 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
         const isOpen = open.has(cat)
         const polar = cat === 'positive' || cat === 'negative'
         return (
-          <div key={cat} ref={(el) => void (el ? refs.current.set(cat, el) : refs.current.delete(cat))} className="scroll-mt-32 space-y-1.5">
+          <div key={cat} ref={(el) => void (el ? refs.current.set(cat, el) : refs.current.delete(cat))} className="scroll-mt-32">
             <button
               type="button"
               aria-expanded={isOpen}
@@ -941,7 +941,8 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
             <ul
               ref={foundable(isOpen, () => setOpen((o) => new Set(o).add(cat)))}
               data-print-open
-              className="fold-in space-y-1.5"
+              // Fermé, le camp reste dans la page (impression, Ctrl+F) mais sans espace : les camps fermés se suivent de près.
+              className={`fold-in space-y-1.5 print:pt-1.5 print:pb-3 ${isOpen ? 'pt-1.5 pb-3' : ''}`}
             >
               {lines.map((l) => (
                 <PersonLine key={l.participantId} line={l} cat={cat} other={polar && both.has(l.participantId)} full={full} ctx={ctx} />
@@ -1504,7 +1505,7 @@ export function ReportTab({
       )}
 
       {/* La partie détaillée, séparée de « la température » du haut : on y explore, thème par thème, motif par motif. */}
-      <section aria-labelledby="detail" className="space-y-3 border-t-4 border-foreground/10 pt-8">
+      <section aria-labelledby="detail" className="max-w-4xl space-y-3 border-t-4 border-foreground/10 pt-8">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div className="space-y-1">
             <h2 id="detail" className="text-xl font-semibold">

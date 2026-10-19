@@ -94,7 +94,7 @@ export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLab
   return <label className={cn('text-sm font-medium leading-none', className)} {...props} />
 }
 
-const badgeVariants = cva('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[13px] font-medium', {
+const badgeVariants = cva('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium', {
   variants: {
     tone: {
       default: 'border-transparent bg-accent text-accent-foreground',
