@@ -2,6 +2,16 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-19 — Premier tour du `designer-ui`
+
+- **Bien marché** : un audit par mesures (caractères par ligne, positions des barres, espaces vides) a trouvé en une
+  passe une famille entière de défauts qu'on corrigeait un par un au fil des retours d'Arnaud ; la contre-vérification
+  par le même agent sur un commit figé a donné un verdict net.
+- **Coûté pour rien** : une correction (clics pendant une transition de vue) annoncée avant d'être mesurée, puis retirée ;
+  un espace « invisible » (liste cachée qui gardait ses marges) vu seulement à la capture.
+- **On change** : toute amélioration visible passe par le `designer-ui` (boucle de qualité) ; un nouvel agent n'est
+  appelable qu'à la session suivante : d'ici là, un agent généraliste lit sa définition.
+
 ## 2026-10-18 (soir) — Grand thème collé, glissements
 
 - **Bien marché** : mesurer les animations par l'API du navigateur (`document.getAnimations()`) plutôt que par des
