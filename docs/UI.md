@@ -55,10 +55,20 @@ concordantes. Une règle sert à expliquer un défaut observé sur une capture, 
   [https://carbondesignsystem.com/data-visualization/color-palettes/ ; https://nightingaledvs.com/data-journalism-colour-accessibility/]
 - Mode sombre : redéfinir les jetons et revérifier chaque contraste (#2F40C2 sur fond sombre est à contrôler).
 
-## 6. Mouvement
+## 6. Mouvement (motion design)
 
 - 100 ms pour un retour simple, 200 à 300 ms pour un changement de disposition, 500 ms au plus. [à vérifier]
 - Le mouvement sert la continuité spatiale (d'où vient l'élément, où il va), jamais la décoration.
+- Chorégraphie : un repère reste fixe pendant que le reste bouge ; ce qui sort part avant ce qui entre ; plusieurs
+  éléments se décalent légèrement (quelques dizaines de ms) plutôt que de bouger en bloc ; un élément partagé glisse
+  d'un état à l'autre au lieu de disparaître puis réapparaître.
+- Courbes : décélération pour entrer, accélération pour sortir, standard pour un déplacement à l'écran ; jamais
+  linéaire pour un mouvement dans l'espace. Durée proportionnée au trajet et à la taille de l'élément.
+- Performance : n'animer que `transform` et `opacity` (composées hors du fil principal) ; une position (`top`), une
+  hauteur ou une ombre animées se recalculent à chaque image et saccadent ou décrochent au défilement.
+- Interruption : une animation se reprend ou s'inverse depuis son état courant ; elle ne bloque jamais un clic.
+- Vérification : image par image (`document.getAnimations()`, mesures à chaque `requestAnimationFrame`), pas sur une
+  capture fixe.
 - Transitions de vue : tester `document.startViewTransition` ; couper leurs animations sous `prefers-reduced-motion`.
 - Ne jamais animer une position (`top`) sur un élément collant pendant le défilement : il décroche (constaté le 19/10).
 
