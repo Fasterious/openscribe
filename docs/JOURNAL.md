@@ -2,6 +2,18 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-19 — Lire le rapport : le regard suit (retours d'Arnaud sur la préversion)
+
+- **Une seule forme pour un camp** : l'intitulé d'un volet de verbatims reprend le point du camp (« ● 46 avis positifs »),
+  comme la pastille qui l'a ouvert ; l'explication « à vérifier » déroule ses verbatims par camp (« ● 4 avis positifs ● 2 avis négatifs »).
+- **Replier ramène à la pastille** : l'intitulé du volet glisse jusqu'à la pastille, revenue à l'endroit exact où on
+  l'avait touchée (transition de vue) ; la dernière pastille repliée garde un contour bleu léger.
+- **« À vérifier » s'explique juste dessous** : l'explication s'ouvre sous la marque et pousse le contenu, au lieu de
+  venir après « Lire le thème en détail » ; la marque reste enfoncée tant que l'explication est ouverte.
+- **Défiler vite ne décroche plus les en-têtes** : leur position n'est plus animée (une position animée se recalcule à
+  chaque image et prend du retard sur un défilement rapide) ; fonds opaques ; la barre de l'application glisse en se
+  cachant, au-dessus des en-têtes, et revient d'un coup (sinon un interstice laisse voir le texte).
+
 ## 2026-10-18 (soir) — « Grand thème » et « thème » ; glisser plutôt que téléporter (retours d'Arnaud)
 
 - **Vocabulaire, décidé par Arnaud** : « grand thème » pour le niveau haut, « thème » pour l'ancien « motif ». Seuls les

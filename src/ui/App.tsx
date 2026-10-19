@@ -26,8 +26,9 @@ export function App() {
       <header
         ref={header}
         className={cn(
-          'no-print sticky top-0 z-30 border-b bg-background/90 backdrop-blur transition-transform duration-200 motion-reduce:transition-none',
-          hidden && '-translate-y-full',
+          'no-print sticky top-0 z-30 border-b bg-background motion-reduce:transition-none',
+          // Elle glisse en se cachant, revient d'un coup (fold.tsx, useHeadroom).
+          hidden && '-translate-y-full transition-transform duration-200',
         )}
       >
         {/* À gauche, les modules (où je suis, où je peux aller) ; à droite, les moteurs d'IA, communs à tous les modules. */}

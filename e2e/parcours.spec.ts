@@ -589,3 +589,70 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   await page.waitForTimeout(500)
   expect(Math.abs((await top(themeHead)) - themeBefore)).toBeLessThanOrEqual(2)
 })
+
+test('résumé : la pastille « ● N », le volet replié revient à elle ; « À vérifier » s’explique juste dessous ; défiler vite ne décroche rien', async ({ page }) => {
+  await page.goto('/#/observatoire/ecole-grand-debat-2019')
+  const resume = page.locator('section[aria-labelledby="resume"]')
+  const chip = resume.getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / }).first()
+  await chip.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(300)
+  const at = () => chip.evaluate((el) => Math.round(el.getBoundingClientRect().top))
+  const before = await at()
+  const b = (await chip.boundingBox())!
+  await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2)
+  // L'intitulé du volet reprend le point du camp, pas un guillemet.
+  const head = resume.getByRole('button', { name: 'Replier', exact: true }).first()
+  await expect(head).toBeVisible()
+  await expect(head.locator('xpath=..').locator('span.rounded-full').first()).toBeVisible()
+  // On lit plus bas, puis on replie depuis l'en-tête collé : la pastille revient où elle était, avec le focus et un contour.
+  await page.evaluate(() => window.scrollBy(0, 700))
+  await page.waitForTimeout(300)
+  const hb = (await head.boundingBox())!
+  await page.mouse.click(hb.x + hb.width / 2, hb.y + hb.height / 2)
+  await expect(resume.getByRole('button', { name: /^Masquer les verbatims/ })).toHaveCount(0)
+  await expect.poll(async () => Math.abs((await at()) - before)).toBeLessThanOrEqual(4)
+  await expect(chip).toBeFocused()
+  await expect(chip).toHaveClass(/chip-seen/)
+
+  // « À vérifier » dans une liste : enfoncé une fois ouvert, son explication juste dessous, avant « Lire le thème en détail ».
+  const doubt = page.locator('li').getByRole('button', { name: /^À vérifier/ }).first()
+  if (await doubt.count()) {
+    await doubt.scrollIntoViewIfNeeded()
+    await doubt.click()
+    await expect(doubt).toHaveAttribute('aria-expanded', 'true')
+    const li = doubt.locator('xpath=ancestor::li[1]')
+    const why = li.getByText('Pourquoi cette étiquette ?')
+    await expect(why).toBeVisible()
+    const gap = (await why.boundingBox())!.y - ((await doubt.boundingBox())!.y + (await doubt.boundingBox())!.height)
+    expect(gap).toBeLessThan(40)
+    expect((await why.boundingBox())!.y).toBeLessThan((await li.getByRole('button', { name: 'Lire le thème en détail →' }).boundingBox())!.y)
+    // Les verbatims en cause, par camp : « ● N avis … ».
+    await expect(li.getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / }).first()).toBeVisible()
+    await doubt.click()
+    await expect(why).toHaveCount(0)
+  }
+
+  // Défiler vite dans un grand thème ouvert : son en-tête reste collé contre la barre, sans interstice.
+  const theme = page.locator('details[data-fold="theme"]').nth(1)
+  const th = theme.locator(':scope > summary')
+  await th.scrollIntoViewIfNeeded()
+  const tb = (await th.boundingBox())!
+  await page.mouse.click(tb.x + 30, tb.y + 12)
+  await expect(theme).toHaveAttribute('open', '')
+  await page.evaluate(() => window.scrollBy(0, 300))
+  for (const dy of [400, -250, 500, -300, 350, -120]) {
+    await page.evaluate((d) => window.scrollBy(0, d), dy)
+    const gap = await page.evaluate(
+      () =>
+        new Promise<number>((res) =>
+          requestAnimationFrame(() => {
+            const bar = Math.max(0, document.querySelector('body header')!.getBoundingClientRect().bottom)
+            const t = document.querySelector('details[data-fold="theme"][open] > summary')!.getBoundingClientRect().top
+            res(Math.round(t - bar))
+          }),
+        ),
+    )
+    // Le grand thème touche la barre (ou passe dessous pendant qu'elle se cache), jamais plus bas : aucun texte visible entre les deux.
+    expect(gap).toBeLessThanOrEqual(1)
+  }
+})

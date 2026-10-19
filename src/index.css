@@ -159,6 +159,8 @@ html {
   animation-duration: 240ms;
   animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
+::view-transition-old(fold-chip),
+::view-transition-new(fold-chip),
 ::view-transition-old(fold-title),
 ::view-transition-new(fold-title),
 ::view-transition-old(fold-meta),
@@ -188,6 +190,10 @@ html {
   to {
     clip-path: inset(0 0 calc(100% - var(--fold-line, 0px)) 0);
   }
+}
+/* La dernière pastille repliée : un contour bleu léger (fold.tsx, markSeen). */
+.chip-seen {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 45%, transparent);
 }
 /* Après un saut long, le titre d'arrivée s'éclaire un instant (fold.tsx, glideTo). */
 @keyframes fold-landed {

@@ -1,6 +1,6 @@
 import { CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, Users } from 'lucide-react'
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { createPortal, flushSync } from 'react-dom'
 import { computeMetrics, METRICS_VERSION, withCurrentMetrics } from '@/core/analysis/metrics'
 import { maskNames } from '@/core/analysis/names'
 import {
@@ -35,7 +35,7 @@ import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from '@/core/a
 import type { Contribution } from '@/core/corpus'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { isExample } from '../Synthesis'
-import { Fold, freezeHeadroom, glideTo, revealMotif } from './fold'
+import { Fold, freezeHeadroom, glideTo, markSeen, morphTo, revealMotif } from './fold'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, download, formatDate, plural, slug } from '../format'
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
@@ -416,7 +416,9 @@ function ListItem({
 }) {
   const [why, setWhy] = useState(false)
   const group = groupById.get(item.groupId)
-  const mark = 'inline-flex min-h-6 cursor-pointer items-center rounded underline decoration-dotted underline-offset-2 hover:text-foreground'
+  // Une marque est un bouton : enfoncée tant que son explication est ouverte, juste dessous (Arnaud, 19/10).
+  const mark = `inline-flex min-h-6 cursor-pointer items-center gap-1 rounded px-1 hover:text-foreground ${why ? 'ring-2 ring-primary/60 text-foreground' : ''}`
+  const chevron = <span aria-hidden className="text-xs">{why ? '⌃' : '⌄'}</span>
   return (
     <li className={`border-l-[3px] pl-2.5 ${lineClass}`}>
       <HighlightLine section={section} item={item} ctx={ctx} groupById={groupById} compact={compact}>
@@ -426,20 +428,25 @@ function ListItem({
           {item.fragile && (
             <>
               {' · '}
-              <button type="button" className={mark} aria-expanded={why} onClick={() => setWhy((w) => !w)}>
-                fragile
+              <button type="button" className={`${mark} underline decoration-dotted underline-offset-2`} aria-expanded={why} onClick={() => setWhy((w) => !w)}>
+                fragile {chevron}
               </button>
             </>
           )}
           {item.doubt && (
             <>
               {' · '}
-              <button type="button" className={`${mark} bg-warning/30 px-1 font-medium text-foreground no-underline`} aria-expanded={why} onClick={() => setWhy((w) => !w)}>
-                À vérifier
+              <button type="button" className={`${mark} bg-warning/30 font-medium text-foreground`} aria-expanded={why} onClick={() => setWhy((w) => !w)}>
+                À vérifier {chevron}
               </button>
             </>
           )}
         </span>
+        {why && group && (
+          <div className="fold-in mt-2">
+            <WhyLabel group={group} ctx={ctx} />
+          </div>
+        )}
       </HighlightLine>
       {group && (
         <button
@@ -449,11 +456,6 @@ function ListItem({
         >
           Lire le thème en détail →
         </button>
-      )}
-      {why && group && (
-        <div className="fold-in mt-2">
-          <WhyLabel group={group} ctx={ctx} />
-        </div>
       )}
     </li>
   )
@@ -604,7 +606,7 @@ const PANEL_WORD: Record<IdeaCategory, [string, string]> = {
   neutral: ['constat', 'constats'],
 }
 
-/** Ce que déroule un volet, dit dans son en-tête : « ❝ 46 avis positifs · Expérience globale de scolarisation ». */
+/** Ce que déroule un volet, dit dans son en-tête : « ● 46 avis positifs · Expérience globale de scolarisation ». */
 function panelTitle(ideas: Idea[], ctx: Ctx): string {
   const people = new Set(ideas.map((i) => i.participantId)).size
   const cats = [...new Set(ideas.map((i) => i.category))]
@@ -624,15 +626,27 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
   const cats = [...new Set(ideas.map((i) => i.category))]
   const [ref, back] = useFoldBack()
   const opener = useRef<HTMLElement | null>(null)
+  const label = useRef<HTMLSpanElement>(null)
   useLayoutEffect(() => {
     opener.current = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null
   }, [])
+  // Replier : l'intitulé glisse jusqu'à la pastille, revenue là où on l'avait touchée, qui garde le focus et un contour.
   const close = () => {
     freezeHeadroom()
-    back()
-    onClose()
     const o = opener.current
-    if (o) requestAnimationFrame(() => o.isConnected && o.focus({ preventScroll: true }))
+    morphTo(
+      label.current,
+      () => {
+        back()
+        flushSync(onClose)
+      },
+      () => {
+        if (!o?.isConnected) return null
+        o.focus({ preventScroll: true })
+        markSeen(o)
+        return o
+      },
+    )
   }
   return (
     <div
@@ -644,9 +658,13 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
         close()
       }}
     >
-      <div className="sticky top-[calc(var(--app-bar)+var(--theme-stick,0px)+var(--motif-stick,0px))] z-[5] flex items-center justify-between gap-2 border-b bg-background/95 py-1 text-sm backdrop-blur transition-[top] duration-200 motion-reduce:transition-none">
-        <span className="min-w-0 truncate font-medium">
-          <Quote className="mr-1 inline size-3" aria-hidden />
+      <div className="sticky top-[calc(var(--app-bar)+var(--theme-stick,0px)+var(--motif-stick,0px))] z-[5] flex items-center justify-between gap-2 border-b bg-background py-1 text-sm">
+        <span ref={label} className="min-w-0 truncate font-medium">
+          {cats.length === 1 ? (
+            <span className={`mr-1.5 inline-block size-2 rounded-full align-middle ${BAR[cats[0]]}`} aria-hidden />
+          ) : (
+            <Quote className="mr-1 inline size-3" aria-hidden />
+          )}
           {panelTitle(ideas, ctx)}
         </span>
         <button type="button" onClick={close} className="no-print inline-flex min-h-8 shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
@@ -934,7 +952,7 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
 function WhyLabel({ group, ctx }: { group: Group; ctx: Ctx }) {
   const fragile = fragileReason(group)
   const doubt = doubtReason(group, ctx.ideaById, ctx.alsoIn)
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState<IdeaCategory | null>(null)
   if (!fragile && !doubt) return null
   return (
     <div className="space-y-2 rounded-md bg-muted px-3 py-2 text-sm">
@@ -949,10 +967,13 @@ function WhyLabel({ group, ctx }: { group: Group; ctx: Ctx }) {
           <p>
             <span className="font-semibold">À vérifier.</span> {ctx.mask(doubt.text)}
           </p>
-          <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="no-print inline-flex min-h-8 cursor-pointer items-center font-medium text-primary underline-offset-4 hover:underline">
-            {open ? (doubt.ideaIds.length > 1 ? 'Masquer ces verbatims' : 'Masquer ce verbatim') : doubt.ideaIds.length > 1 ? `Voir ces ${doubt.ideaIds.length} verbatims` : 'Voir ce verbatim'}
-          </button>
-          {open && <QuotesPanel ids={doubt.ideaIds} ctx={ctx} onClose={() => setOpen(false)} />}
+          {/* Les verbatims en cause, par camp, sous la même forme que partout : « ● 4 avis positifs ● 2 avis négatifs ». */}
+          <span className="no-print flex flex-wrap items-center gap-1">
+            {campsOf(doubt.ideaIds, ctx).map((c) => (
+              <CampChip key={c.cat} cat={c.cat} people={c.people} word open={open === c.cat} onToggle={() => setOpen((o) => (o === c.cat ? null : c.cat))} />
+            ))}
+          </span>
+          {open && <QuotesPanel ids={campsOf(doubt.ideaIds, ctx).find((c) => c.cat === open)?.ids ?? []} ctx={ctx} onClose={() => setOpen(null)} />}
         </>
       )}
     </div>

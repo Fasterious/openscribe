@@ -74,8 +74,10 @@ export function useHeadroom(enabled: boolean, header: React.RefObject<HTMLElemen
       hiddenRef.current = h
       barPx = h ? 0 : APP_BAR_PX
       root.style.setProperty('--app-bar', h ? '0px' : APP_BAR)
-      // La barre bouge en même temps que les en-têtes collés, sans attendre le rendu de React.
-      header.current?.classList.toggle('-translate-y-full', h)
+      // La barre bouge en même temps que les en-têtes collés, sans attendre le rendu de React. Elle glisse en se cachant
+      // (elle passe au-dessus des en-têtes qui montent) et revient d'un coup (sinon un interstice laisserait voir le texte).
+      const el = header.current
+      if (el) for (const c of ['-translate-y-full', 'transition-transform', 'duration-200']) el.classList.toggle(c, h)
       setHidden(h)
     }
     if (!enabled) {
@@ -216,12 +218,16 @@ export function foldDetails(details: HTMLDetailsElement) {
   }, 300)
 }
 
-/** Les classes d'un en-tête ouvert qui colle : sous la barre de l'application et sous l'en-tête du niveau supérieur. */
+/**
+ * Les classes d'un en-tête ouvert qui colle : sous la barre de l'application et sous l'en-tête du niveau supérieur.
+ * Fond opaque, et aucune animation de position : une position animée se recalcule à chaque image et décroche l'en-tête
+ * quand on défile vite (Arnaud, 19/10) ; seule la barre de l'application glisse, au-dessus d'eux, quand elle se cache.
+ */
 const STUCK = {
   theme:
-    'sticky top-[calc(var(--app-bar)-var(--theme-off,0px))] z-20 border-b bg-background/95 backdrop-blur transition-[top] duration-200 motion-reduce:transition-none',
+    'sticky top-[calc(var(--app-bar)-var(--theme-off,0px))] z-20 border-b bg-background',
   motif:
-    'sticky top-[calc(var(--app-bar)+var(--theme-stick,0px))] z-10 border-b bg-background/95 backdrop-blur transition-[top] duration-200 motion-reduce:transition-none',
+    'sticky top-[calc(var(--app-bar)+var(--theme-stick,0px))] z-10 border-b bg-background',
 }
 
 /**
@@ -377,4 +383,39 @@ export function glideTo(target: HTMLElement, block: 'start' | 'center', focus: H
     focus.classList.add('fold-landed')
     window.setTimeout(() => focus.classList.remove('fold-landed'), 1200)
   }
+}
+
+/**
+ * Replier un volet de verbatims : son intitulé (« ● 46 avis positifs ») glisse jusqu'à la pastille qui l'avait ouvert,
+ * à l'endroit exact où elle était (Arnaud, 19/10 : le regard suit, même après un long défilement). `update` replie (et
+ * doit rendre React d'un coup, `flushSync`) ; `to` renvoie la pastille d'arrivée. Sans transition de vue, ou si le
+ * lecteur a demandé moins de mouvement, le volet se replie simplement.
+ */
+export function morphTo(from: HTMLElement | null, update: () => void, to: () => HTMLElement | null) {
+  const start = (document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void>; finished: Promise<void> } }).startViewTransition
+  if (!start || reduced() || !from) {
+    update()
+    to()
+    return
+  }
+  let target: HTMLElement | null = null
+  from.style.viewTransitionName = 'fold-chip'
+  const t = start.call(document, () => {
+    from.style.viewTransitionName = ''
+    update()
+    target = to()
+    if (target) target.style.viewTransitionName = 'fold-chip'
+  })
+  t.ready.catch(() => {})
+  t.finished.finally(() => {
+    if (target) target.style.viewTransitionName = ''
+  })
+}
+
+let seen: HTMLElement | null = null
+/** La dernière pastille repliée garde un contour bleu léger : on sait ce qu'on vient de lire et de refermer. */
+export function markSeen(el: HTMLElement) {
+  if (seen && seen !== el) seen.classList.remove('chip-seen')
+  seen = el
+  el.classList.add('chip-seen')
 }
