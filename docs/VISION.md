@@ -105,11 +105,14 @@ bloqué sur ça. » Concrètement :
 - **Transcription** : un fournisseur en ligne asynchrone pour commencer ;
   transcription locale ensuite. La vidéo ne bouge jamais : on n'envoie que
   l'audio et des images clés.
-  Candidat en ligne signalé par Arnaud (20/10/2026) : **Voxtral 3** (Mistral), modèles de
-  parole en plus de 50 langues et kit pour agents vocaux, « très prometteur » :
-  https://share.google/hJsy6udtuj25Ng8ta (lien partagé, page non consultée d'ici). À éprouver
-  le moment venu comme tout moteur : qualité sur un vrai enregistrement, coût, conditions
-  d'usage des données, parcours réel dans la console (`docs/PARCOURS-FOURNISSEURS.md`).
+  Candidat en ligne signalé par Arnaud (20/10/2026) : **Voxtral 3** (Mistral, sorti le 20/10/2026),
+  annonce officielle : https://mistral.ai/news/voxtral-3/. D'après l'annonce et la presse du jour
+  (non vérifié par nous) : Voxtral Small Transcribe 3 avec diarisation (qui parle) et
+  vocabulaire imposé (noms propres, termes du métier), plus de 50 langues ; Mini Transcribe 3
+  (4 milliards de paramètres, en lot) ; Mini Transcribe Realtime 3 (en direct) ; synthèse vocale ;
+  hébergé dans l'UE ; environ 0,004 $ la minute en lot. À éprouver le moment venu comme tout
+  moteur : qualité sur un vrai entretien (diarisation comprise), coût, conditions d'usage des
+  données, auto-hébergement réel ou non, parcours réel dans la console (`docs/PARCOURS-FOURNISSEURS.md`).
 - Site statique gratuit ; mesure d'audience anonyme et désactivable.
 - **Modèle économique : non tranché.** Pistes : rien de payant, prestation à la
   demande (l'expertise, pas l'outil), offre hébergée seulement si la demande
