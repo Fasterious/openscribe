@@ -9,9 +9,10 @@ Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
   clavier. La lecture n'est pas encombrée.
 - **« Avant de lire » en quatre parties titrées** : la question posée (avec sa place dans le questionnaire), comment
   les données ont été recueillies (questionnaires en ligne du Grand débat, réponses publiées en données ouvertes),
-  notre échantillon, les limites. Nouveaux champs facultatifs de la fiche : `questionContext`, `collection`. La liste
-  complète des questions du questionnaire n'est pas donnée : data.gouv.fr n'est pas joignable depuis cette session, et
-  rien n'est écrit qu'on ne puisse établir (pas de numéro de question).
+  notre échantillon, les limites. Nouveaux champs facultatifs de la fiche : `questionContext`, `collection`,
+  `questionnaire`, `questionIndex`. Les 33 questions du questionnaire, lues dans l'en-tête du fichier source depuis un
+  bac à sable Vercel (le réseau de la session ne joint pas data.gouv.fr ; 86 s, 216 Ko lus) : notre question est la
+  22e (le « Q32 » de nos colonnes était un numéro de colonne, pas de question). Liste dépliable, notre question en gras.
 - **« Minorité constante » retirée de l'écran** (étiquette, bandeau, ligne de chiffres, note de méthode) : le camp
   minoritaire est déjà dans les chiffres et dans la liste des camps, avec ses verbatims ; le mot était du jargon. Le code
   la calcule toujours (elle informe les consignes du moteur).

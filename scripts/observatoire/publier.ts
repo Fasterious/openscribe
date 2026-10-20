@@ -25,6 +25,8 @@ interface Fiche {
   news: string
   question: string
   questionContext?: string
+  questionnaire?: string[]
+  questionIndex?: number
   collection?: string
   source: { name: string; url: string; license: string; period: string }
   population: number
@@ -67,7 +69,7 @@ const study = publishedStudy(project, analysis, {
   title: fiche.title,
   publishedAt: fiche.publishedAt,
   news: fiche.news,
-  fiche: { summary: fiche.summary, question: fiche.question, questionContext: fiche.questionContext, collection: fiche.collection, source: fiche.source, sample: sampleLine, sampling: fiche.sampling, warnings: fiche.warnings },
+  fiche: { summary: fiche.summary, question: fiche.question, questionContext: fiche.questionContext, questionnaire: fiche.questionnaire, questionIndex: fiche.questionIndex, collection: fiche.collection, source: fiche.source, sample: sampleLine, sampling: fiche.sampling, warnings: fiche.warnings },
 })
 const root = join('public', 'observatoire')
 mkdirSync(join(root, fiche.slug), { recursive: true })

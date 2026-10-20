@@ -19,6 +19,9 @@ export interface PublishedStudy {
     question: string
     /** Où se trouvait la question dans le questionnaire (facultatif). */
     questionContext?: string
+    /** Toutes les questions du questionnaire, dans l'ordre, et la place de celle qu'on analyse (facultatif). */
+    questionnaire?: string[]
+    questionIndex?: number
     /** Comment les données ont été recueillies, puis publiées (facultatif). */
     collection?: string
     source: { name: string; url: string; period: string; license: string }

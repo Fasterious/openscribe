@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Info, Printer } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronRight, Info, Printer } from 'lucide-react'
 import { href } from '@/app/router'
 import { useEffect, useState } from 'react'
 import { activeParticipants } from '@/core/corpus'
@@ -114,6 +114,22 @@ export function ObservatoryPage({ slug }: { slug: string }) {
             <h3 className="font-semibold">La question posée</h3>
             <blockquote className="border-l-[3px] border-primary pl-3 italic">{f.question}</blockquote>
             {f.questionContext && <p className="text-sm text-muted-foreground">{f.questionContext}</p>}
+            {!!f.questionnaire?.length && (
+              <details className="group/q text-sm">
+                <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden">
+                  <ChevronRight className="size-4 transition-transform group-open/q:rotate-90 motion-reduce:transition-none" aria-hidden />
+                  Voir les {f.questionnaire.length} questions du questionnaire
+                </summary>
+                <ol className="mt-1 list-decimal space-y-1 pl-8">
+                  {f.questionnaire.map((q, i) => (
+                    <li key={i} className={i === f.questionIndex ? 'font-semibold text-foreground' : 'text-muted-foreground'}>
+                      {q}
+                      {i === f.questionIndex && <span className="font-normal"> (celle qu'analyse ce rapport)</span>}
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            )}
           </section>
           <section className="space-y-2">
             <h3 className="font-semibold">Comment les données ont été recueillies</h3>
