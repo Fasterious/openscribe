@@ -639,12 +639,13 @@ describe('explications des marques de méthode', () => {
     for (const [, [c, spans]] of Object.entries(data.i) as [string, [string, [number, number][]]][])
       for (const [, b] of spans) expect(b).toBeLessThanOrEqual(data.c[c][1].length)
   })
-  it('l’explication d’une ligne de chiffres dit aussi ce qu’est une minorité constante', async () => {
-    const { MINORITY_HELP } = await import('./analysis/glossary')
+  it('le lecteur ne voit plus « minorité constante » : le camp minoritaire est déjà dans les chiffres (Arnaud, 20/10)', () => {
     const ideas = [...['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10'].map((p, k) => idea(`I0${k}`, p, 'negative')), ...['P11', 'P12'].map((p, k) => idea(`I1${k}`, p, 'positive'))]
     const m = computeMetrics(ideas)
     expect(m.minority).toBeTruthy()
-    expect(stanceTitle(m)).toContain(`Minorité constante : ${MINORITY_HELP.what.charAt(0).toLowerCase()}`)
+    expect(stanceTitle(m)).not.toContain('inorité constante')
+    expect(metricsLine(m)).not.toContain('inorité constante')
+    expect(metricsLine(m)).toContain('2 positifs')
   })
 })
 

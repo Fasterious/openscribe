@@ -1,7 +1,7 @@
 import type { Corpus } from '../corpus'
 import { activeParticipants, duplicateContributions, promptsOf } from '../corpus'
 import { presetById } from '../providers/presets'
-import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, MINORITY_HELP, STANCE_HELP } from './glossary'
+import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, STANCE_HELP } from './glossary'
 import { dividedFragile, fragileShown, highlights, labelDoubt, type Highlight, type Highlights } from './highlights'
 import { withCurrentMetrics } from './metrics'
 import { maskNames, maskWithOffsets } from './names'
@@ -55,7 +55,6 @@ export const stanceTitle = (m: Metrics): string =>
   [
     helpText(STANCE_HELP[m.stance]),
     fragileShown(m) && labelled('Fragile', FRAGILE_HELP),
-    m.minority && m.stance !== 'divided' && labelled('Minorité constante', MINORITY_HELP),
   ]
     .filter(Boolean)
     .join(' ')
@@ -143,7 +142,6 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     lines.push(
       `Étiquettes à vérifier : ${doubtful.length} thème${doubtful.length > 1 ? 's' : ''} ${doubtful.length > 1 ? 'portent' : 'porte'} la mention « à vérifier », parce que ${doubtful.length > 1 ? 'leur étiquette dépend' : 'son étiquette dépend'} d'avis comptés aussi dans un autre thème. Le code mesure cet écart ; c'est au lecteur de trancher, en relisant les citations.`,
     )
-  if (state.groups.some((g) => g.metrics.minority)) lines.push(labelled('« Minorité constante »', MINORITY_HELP))
   if (state.support)
     lines.push(
       `Renvois vérifiés : chaque phrase des synthèses a été confrontée par le moteur d'IA aux verbatims qu'elle cite (${state.support.checked} phrases) ; ${state.support.fixed || 'aucune'} corrigée${state.support.fixed > 1 ? 's' : ''}, ${state.support.dropped || 'aucune'} retirée${state.support.dropped > 1 ? 's' : ''} faute d'appui${state.support.added ? ` ; le moteur d'IA en a ajouté ${state.support.added} pour un sujet ou un camp d'avis qui manquait` : ''}.${state.campsAdded ? ` Le code en a écrit ${state.campsAdded} pour un camp d'avis encore absent de la synthèse de son thème.` : ''}`,
@@ -243,14 +241,8 @@ export function metricsLine(m: Metrics): string {
   const ratio = `(${Math.max(pos, neg)} sur ${pos + neg + mix} qui donnent un avis)`
   parts.push(...scaleWords(m, ratio))
   if (m.stance === 'thin' && m.participants > 1) parts.push("peu d'avis")
-  // Quand les avis sont partagés, il n'y a pas de courant dominant : pas de « contre-courant ».
-  if (m.minority && m.stance !== 'divided') {
-    const k = m.minority.participantIds.length
-    parts.push(
-      // « l'apprécient » se lisait à contresens quand l'objet du motif est déjà négatif (« Fermetures de classes ») : on dit le camp.
-      `minorité constante : ${n(k, m.minority.side === 'positive' ? 'avis positif' : 'avis négatif')}`,
-    )
-  }
+  // Plus de « minorité constante » à l'écran (Arnaud, 20/10) : le camp minoritaire est déjà dans les chiffres et dans
+  // la liste des camps, avec ses verbatims ; le mot était du jargon. Le code la calcule toujours (consignes du moteur).
   return parts.join(' · ')
 }
 

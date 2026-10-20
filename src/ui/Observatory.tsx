@@ -107,23 +107,40 @@ export function ObservatoryPage({ slug }: { slug: string }) {
 
       {/* À la largeur du texte qu'il ouvre : plus de grand vide à droite sur ordinateur (Arnaud, 19/10). */}
       <Disclosure flat className="max-w-lecture" summary={<span className="text-base font-semibold">Avant de lire : la question, les données, les limites</span>}>
-        <div className="space-y-3 text-base">
-          <blockquote className="border-l-[3px] border-primary pl-3 italic">{f.question}</blockquote>
-          <p>
-            <a className="text-primary underline" href={f.source.url}>
-              {f.source.name}
-            </a>
-            , {f.source.period}. {f.source.license}.
-          </p>
-          <p>{f.sample}</p>
-          {paras(f.sampling).map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
-          <ul className="list-disc space-y-2 pl-5">
-            {f.warnings.map((w, i) => (
-              <li key={i}>{w}</li>
+        {/* Quatre parties titrées : la question, la collecte, notre échantillon, les limites (Arnaud, 20/10 : on ne savait
+            pas ce qu'était la citation, ni comment les données avaient été recueillies). */}
+        <div className="space-y-5 text-base">
+          <section className="space-y-2">
+            <h3 className="font-semibold">La question posée</h3>
+            <blockquote className="border-l-[3px] border-primary pl-3 italic">{f.question}</blockquote>
+            {f.questionContext && <p className="text-sm text-muted-foreground">{f.questionContext}</p>}
+          </section>
+          <section className="space-y-2">
+            <h3 className="font-semibold">Comment les données ont été recueillies</h3>
+            {f.collection && paras(f.collection).map((p, i) => <p key={i}>{p}</p>)}
+            <p>
+              Source :{' '}
+              <a className="text-primary underline" href={f.source.url}>
+                {f.source.name}
+              </a>
+              , {f.source.period}. {f.source.license}.
+            </p>
+          </section>
+          <section className="space-y-2">
+            <h3 className="font-semibold">Notre échantillon</h3>
+            <p>{f.sample}</p>
+            {paras(f.sampling).map((p, i) => (
+              <p key={i}>{p}</p>
             ))}
-          </ul>
+          </section>
+          <section className="space-y-2">
+            <h3 className="font-semibold">Les limites</h3>
+            <ul className="list-disc space-y-2 pl-5">
+              {f.warnings.map((w, i) => (
+                <li key={i}>{w}</li>
+              ))}
+            </ul>
+          </section>
         </div>
       </Disclosure>
 

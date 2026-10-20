@@ -855,7 +855,6 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
   const marks = (
     <>
       {stanceBadgeOnly(m)}
-      {m.minority && <Badge tone="suggestion">Minorité constante</Badge>}
       {doubt && <Badge tone="warning">À vérifier</Badge>}
     </>
   )
@@ -909,7 +908,6 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
             <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{definitionLine(group.definition)}</p>
           </details>
         )}
-        {m.minority && <MinorityNote minority={m.minority} ctx={ctx} />}
         <Camps ideas={ideas} m={m} both={both} full={full} ctx={ctx} />
         {both.size > 0 && <p className="text-sm text-muted-foreground">* Personne qui s'exprime aussi dans l'autre sens sur ce thème.</p>}
       </div>
@@ -1126,19 +1124,6 @@ function PersonLine({
         {open && <ContextPanel idea={line.ideas.find((i) => i.id === open)!} ctx={ctx} onClose={close} />}
       </div>
     </li>
-  )
-}
-
-function MinorityNote({ minority, ctx }: { minority: NonNullable<Metrics['minority']>; ctx: Ctx }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <Alert tone="info" className="text-sm">
-      Minorité constante ({minority.side === 'positive' ? 'avis positifs' : 'avis négatifs'}) : {minority.participantIds.join(', ')}.{' '}
-      <button className="no-print inline-flex min-h-6 cursor-pointer items-center text-primary underline" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        {open ? 'Masquer leurs verbatims' : 'Voir leurs verbatims'}
-      </button>
-      {open && <QuotesPanel ids={minority.ideaIds} ctx={ctx} onClose={() => setOpen(false)} />}
-    </Alert>
   )
 }
 

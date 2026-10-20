@@ -119,8 +119,8 @@ function needed(): { theme: HTMLDetailsElement | null; app: number; motif: numbe
 }
 
 /**
- * Les en-têtes se poussent comme des objets (Arnaud, 19/10) : un grand thème ouvert qui arrive contre la barre de
- * l'application la pousse hors de l'écran, pixel pour pixel ; le thème qu'on lit pousse à son tour le grand thème (et la
+ * Les en-têtes se poussent comme des objets (Arnaud, 19/10) : en descendant, la barre de l'application sort de l'écran
+ * au rythme du défilement (et un grand thème ouvert collé la suit) ; le thème qu'on lit pousse à son tour le grand thème (et la
  * barre, si elle est encore là). En descendant, rien ne revient ; en remontant, tout revient au même rythme : le grand
  * thème d'abord, puis la barre. Rien n'est animé hors du défilement lui-même. La barre revient entière dès qu'elle reçoit
  * le focus clavier ; un défilement provoqué par le code (repli, saut) ne pousse rien.
@@ -150,7 +150,9 @@ export function useHeadroom(enabled: boolean, ref: React.RefObject<HTMLElement |
         // On repousse au rythme du défilement, jamais d'un coup : après une remontée, la barre (puis le grand thème) se
         // recache pixel pour pixel (Arnaud, 20/10), sans dépasser ce que la position réelle des blocs demande.
         let rest = dy
-        const wantApp = Math.min(barFull, Math.max(n.app, n.motif))
+        // Pendant la lecture, la barre sort de l'écran au rythme du défilement, partout (Arnaud, 20/10 : la lecture n'est
+        // pas encombrée) ; elle revient en remontant. Tout en haut de la page, elle reste entière.
+        const wantApp = Math.min(barFull, Math.max(y, n.app, n.motif))
         const pushApp = Math.min(rest, Math.max(0, wantApp - appOff))
         appOff += pushApp
         rest -= pushApp
@@ -164,6 +166,7 @@ export function useHeadroom(enabled: boolean, ref: React.RefObject<HTMLElement |
         appOff = Math.max(0, appOff - rest)
       }
       themeOff = Math.max(0, themeOff)
+      appOff = Math.min(appOff, Math.max(0, y))
       placeStuck()
     }
     const onFocus = () => {

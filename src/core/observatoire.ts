@@ -17,6 +17,10 @@ export interface PublishedStudy {
   fiche: {
     summary: string
     question: string
+    /** Où se trouvait la question dans le questionnaire (facultatif). */
+    questionContext?: string
+    /** Comment les données ont été recueillies, puis publiées (facultatif). */
+    collection?: string
     source: { name: string; url: string; period: string; license: string }
     /** L'échantillon et sa marge, en une phrase. */
     sample: string

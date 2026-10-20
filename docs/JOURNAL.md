@@ -2,6 +2,20 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-20 (suite) — Trois retours d'Arnaud appliqués
+
+- **La barre de l'application se cache pendant la lecture**, partout dans le rapport : elle sort de l'écran au rythme
+  du défilement vers le bas et revient au même rythme en remontant ; entière tout en haut de la page et au focus
+  clavier. La lecture n'est pas encombrée.
+- **« Avant de lire » en quatre parties titrées** : la question posée (avec sa place dans le questionnaire), comment
+  les données ont été recueillies (questionnaires en ligne du Grand débat, réponses publiées en données ouvertes),
+  notre échantillon, les limites. Nouveaux champs facultatifs de la fiche : `questionContext`, `collection`. La liste
+  complète des questions du questionnaire n'est pas donnée : data.gouv.fr n'est pas joignable depuis cette session, et
+  rien n'est écrit qu'on ne puisse établir (pas de numéro de question).
+- **« Minorité constante » retirée de l'écran** (étiquette, bandeau, ligne de chiffres, note de méthode) : le camp
+  minoritaire est déjà dans les chiffres et dans la liste des camps, avec ses verbatims ; le mot était du jargon. Le code
+  la calcule toujours (elle informe les consignes du moteur).
+
 ## 2026-10-20 — Décisions d'Arnaud ; plus de transition de vue sur les blocs
 
 - **Mitigé (décision d'Arnaud)** : on garde la règle. Une personne qui dit du bien et du mal d'un même thème est
