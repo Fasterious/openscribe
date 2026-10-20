@@ -897,7 +897,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
     >
       <div className="max-w-lecture space-y-3 text-base">
         {/*
-          La légende des indicateurs, pliée en un seul volet : la ligne de chiffres, l'étiquette, ce qui la rend fragile ou à vérifier,
+          La légende des indicateurs, pliée en un seul volet : la barre, la ligne de chiffres, l'étiquette, ce qui la rend fragile ou à vérifier,
           ce qui compte comme positif ou négatif. La synthèse et les verbatims remontent (Arnaud, 20/10). « Fragile » et
           « À vérifier » s'expliquent aussi depuis leur marque, dans la ligne du thème.
         */}
@@ -907,6 +907,22 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
             <Chevron className="group-open/inner:rotate-180" />
           </summary>
           <div className="mt-1 space-y-2 rounded-md bg-muted px-3 py-2">
+            {/* La barre de la ligne, lue en clair : étiquettes directes plutôt qu'une couleur seule (docs/UI.md, §5 et §8). */}
+            <p>
+              <span className="font-semibold">La barre.</span>{' '}
+              <span className="text-muted-foreground">
+                Une couleur par catégorie, chaque segment à la mesure du nombre de personnes ; une personne mitigée compte dans
+                les deux couleurs. À côté, <Users className="inline size-3" aria-hidden /> le nombre de personnes qui s'expriment sur ce thème.
+              </span>
+            </p>
+            <p className="flex flex-wrap gap-x-3 gap-y-1">
+              {categoryBar(m).map(({ cat, people }) => (
+                <span key={cat} className="inline-flex items-center gap-1 tabular-nums">
+                  <span aria-hidden className={cn('size-2 rounded-full', BAR[cat])} />
+                  {people} {CAMP_WORD[cat][people > 1 ? 1 : 0]}
+                </span>
+              ))}
+            </p>
             <p>{metricsLine(m)}</p>
             <p>
               <span className="font-semibold">{STANCE_NAME[m.stance]}.</span> <span className="text-muted-foreground">{helpText(STANCE_HELP[m.stance])}</span>
