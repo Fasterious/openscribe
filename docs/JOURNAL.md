@@ -502,3 +502,14 @@ sourcées). Livré :
 - **Évaluateurs** : `methodologue` et `plume` fixés sur Opus ; grille explicite (`docs/NOTATION.md`) ; trois lectures de Sonnet B10 concordantes (3/5), la réflexion élevée n'apporte rien. Nouvelle échelle plus sévère : Gemini 2,5, Sonnet 3.
 - **Résultats** : Opus avec la référence 3 et 3,5 (langue 3,5) ; Opus avec découpage par lots de 10 personnes 3 et 3 (deux fois moins de demandes) ; Opus avec le grand prompt 3,5 et 3,5 (langue 4). Les défauts qui plafonnent la référence (regroupement qui disperse un même objet, fourre-tout d'éloges) viennent de la méthode, pas du modèle.
 - **Décisions** : Opus validé ; seuil ramené à la nouvelle échelle (le niveau de Gemini) ; badge « Qualité vérifiée » sans chiffre ; renvois « (P2, P14) » et « (notamment P2) » ; opposition au format `ids` lue. Prochaine expérience : un regroupement qui voit plus de contexte, sur la référence.
+
+## 2026-10-20 — Chevrons uniformes ; une seule légende pliée par thème
+
+- **Chevrons** (demande d'Arnaud, règle `designer-ui`) : un seul indicateur d'ouverture, le composant `Chevron`
+  (primitives). C'est un chevron vers le bas, placé après le libellé, qui tourne de 180° en 200 ms. Il remplace les
+  « › », « ⌃ », les chevrons à droite ou à gauche et le triangle natif des « Réglages avancés ». Les commandes de
+  repli gardent le mot « Replier » devant le chevron.
+- **Une seule légende** (Arnaud) : « Que veut dire cette étiquette ? », l'encadré « Pourquoi cette étiquette ? » et
+  « Ce qui compte comme positif ou négatif » sont réunis dans un seul volet plié, « Comment lire ces chiffres ».
+  Pourquoi : la synthèse et les verbatims, qui portent le contenu, remontent. Fragile et à vérifier restent aussi
+  expliqués depuis leur marque dans la ligne du thème.

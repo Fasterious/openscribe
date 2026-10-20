@@ -106,6 +106,17 @@ const SECTION_LOOK = {
   },
 } as const
 
+/** Le nom de l'étiquette, tel que l'affiche sa marque (échelle d'avis, CLAUDE.md). */
+const STANCE_NAME: Record<Metrics['stance'], string> = {
+  unanimous: 'Unanime',
+  consensus: 'Large majorité',
+  majority: 'Majorité',
+  lean: 'Pas de majorité',
+  divided: 'Avis partagés',
+  thin: "Peu d'avis",
+  none: 'Aucun avis',
+}
+
 function stanceBadgeOnly(m: Metrics) {
   const tone = m.majority === 'positive' ? 'positive' : 'negative'
   const pol = m.majority === 'positive' ? 'positif' : 'négatif'
@@ -886,25 +897,35 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
     >
       <div className="max-w-lecture space-y-3 text-base">
         <p className="text-sm text-muted-foreground">{metricsLine(m)}</p>
-        {/* Ce que veut dire l'étiquette, plié : dans la ligne fermée, ce n'est plus une infobulle (une seule cible). */}
+        {/*
+          La légende de la ligne de chiffres, pliée en un seul volet : l'étiquette, ce qui la rend fragile ou à vérifier,
+          ce qui compte comme positif ou négatif. La synthèse et les verbatims remontent (Arnaud, 20/10). « Fragile » et
+          « À vérifier » s'expliquent aussi depuis leur marque, dans la ligne du thème.
+        */}
         <details className="group/inner text-sm" onKeyDown={closeOnEscape}>
-          <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden">Que veut dire cette étiquette ?<Chevron className="group-open/inner:rotate-180" /></summary>
-          <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{helpText(STANCE_HELP[m.stance])}</p>
+          <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden">
+            Comment lire ces chiffres
+            <Chevron className="group-open/inner:rotate-180" />
+          </summary>
+          <div className="mt-1 space-y-2 rounded-md bg-muted px-3 py-2">
+            <p>
+              <span className="font-semibold">{STANCE_NAME[m.stance]}.</span> <span className="text-muted-foreground">{helpText(STANCE_HELP[m.stance])}</span>
+            </p>
+            {!ctx.segment && <WhyLabel group={group} ctx={ctx} bare />}
+            {group.definition && (
+              <p>
+                <span className="font-semibold">Ce qui compte comme positif ou négatif.</span>{' '}
+                <span className="text-muted-foreground">{definitionLine(group.definition)}</span>
+              </p>
+            )}
+          </div>
         </details>
         {dominantVoice(ideas) && <p className="text-sm text-muted-foreground">{dominantVoice(ideas)}</p>}
-        {!ctx.segment && <WhyLabel group={group} ctx={ctx} />}
         {group.summary && !ctx.segment && (
           <>
             <CitedText text={group.summary} ctx={ctx} />
             <Unverified items={group.unverified} />
           </>
-        )}
-        {/* La définition du motif : explication secondaire, pliée ; la synthèse se lit d'abord (remarque d'Arnaud, 17/10). */}
-        {group.definition && (
-          <details className="group/inner text-sm" onKeyDown={closeOnEscape}>
-            <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden">Ce qui compte comme positif ou négatif dans ce thème<Chevron className="group-open/inner:rotate-180" /></summary>
-            <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{definitionLine(group.definition)}</p>
-          </details>
         )}
         <Camps ideas={ideas} m={m} both={both} full={full} ctx={ctx} />
         {both.size > 0 && <p className="text-sm text-muted-foreground">* Personne qui s'exprime aussi dans l'autre sens sur ce thème.</p>}
@@ -1005,14 +1026,14 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
  * « Pourquoi cette étiquette ? » : ce qui rend ce motif fragile, ce qui est à vérifier, dans ce cas précis, calculé
  * par le code (`explain.ts`). Remplace les infobulles générales, qu'Arnaud jugeait incompréhensibles (18/10).
  */
-function WhyLabel({ group, ctx, only }: { group: Group; ctx: Ctx; only?: 'fragile' | 'doubt' }) {
+function WhyLabel({ group, ctx, only, bare }: { group: Group; ctx: Ctx; only?: 'fragile' | 'doubt'; /** Dans la légende pliée : ni fond ni titre. */ bare?: boolean }) {
   const fragile = only === 'doubt' ? undefined : fragileReason(group)
   const doubt = only === 'fragile' ? undefined : doubtReason(group, ctx.ideaById, ctx.alsoIn)
   const [open, setOpen] = useState<number | null>(null)
   if (!fragile && !doubt) return null
   return (
-    <div className="space-y-2 rounded-md bg-muted px-3 py-2 text-sm">
-      <p className="font-semibold">Pourquoi cette étiquette ?</p>
+    <div className={cn('space-y-2 text-sm', !bare && 'rounded-md bg-muted px-3 py-2')}>
+      {!bare && <p className="font-semibold">Pourquoi cette étiquette ?</p>}
       {fragile && (
         <p>
           <span className="font-semibold">Fragile.</span> {fragile}
