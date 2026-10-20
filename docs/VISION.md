@@ -105,6 +105,11 @@ bloqué sur ça. » Concrètement :
 - **Transcription** : un fournisseur en ligne asynchrone pour commencer ;
   transcription locale ensuite. La vidéo ne bouge jamais : on n'envoie que
   l'audio et des images clés.
+  Candidat en ligne signalé par Arnaud (20/10/2026) : **Voxtral 3** (Mistral), modèles de
+  parole en plus de 50 langues et kit pour agents vocaux, « très prometteur » :
+  https://share.google/hJsy6udtuj25Ng8ta (lien partagé, page non consultée d'ici). À éprouver
+  le moment venu comme tout moteur : qualité sur un vrai enregistrement, coût, conditions
+  d'usage des données, parcours réel dans la console (`docs/PARCOURS-FOURNISSEURS.md`).
 - Site statique gratuit ; mesure d'audience anonyme et désactivable.
 - **Modèle économique : non tranché.** Pistes : rien de payant, prestation à la
   demande (l'expertise, pas l'outil), offre hébergée seulement si la demande
