@@ -510,6 +510,6 @@ sourcées). Livré :
   « › », « ⌃ », les chevrons à droite ou à gauche et le triangle natif des « Réglages avancés ». Les commandes de
   repli gardent le mot « Replier » devant le chevron.
 - **Une seule légende** (Arnaud) : « Que veut dire cette étiquette ? », l'encadré « Pourquoi cette étiquette ? » et
-  « Ce qui compte comme positif ou négatif » sont réunis dans un seul volet plié, « Comment lire ces chiffres ».
+  « Ce qui compte comme positif ou négatif » sont réunis dans un seul volet plié, « Comment lire ces indicateurs ». La ligne de chiffres (participants, avis, échelle) y entre aussi (Arnaud) : la barre, l'étiquette et le compte de personnes restent dans la ligne du thème.
   Pourquoi : la synthèse et les verbatims, qui portent le contenu, remontent. Fragile et à vérifier restent aussi
   expliqués depuis leur marque dans la ligne du thème.

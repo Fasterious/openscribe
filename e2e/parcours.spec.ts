@@ -99,7 +99,7 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
   await tap(theme.locator(':scope > summary'))
   const motif = theme.locator('details[data-fold="motif"]').first()
   await tap(motif.locator(':scope > summary'))
-  await motif.getByText('Comment lire ces chiffres').click()
+  await motif.getByText('Comment lire ces indicateurs').click()
   await expect(motif.getByText('Ce qui compte comme positif ou négatif.')).toBeVisible()
   await tap(motif.getByRole('button', { name: /^«/ }).first())
   await expect(motif.locator('mark').first()).toBeVisible()
@@ -149,7 +149,7 @@ test('exemple : de l’accueil au rapport, verbatims dépliés sur place et expo
   await tap(motif.locator(':scope > summary').getByText(/unanime|majorité|Avis partagés|Peu d'avis/i).first())
   await expect(motif).toHaveAttribute('open', '')
   // L'étiquette s'explique dans le motif ouvert, plus dans une infobulle.
-  await motif.getByText('Comment lire ces chiffres').click()
+  await motif.getByText('Comment lire ces indicateurs').click()
   await expect(motif.getByText(/donnent un avis/).first()).toBeVisible()
   // Replier depuis l'en-tête du motif rend le focus à son titre.
   await motif.locator(':scope > summary').click()

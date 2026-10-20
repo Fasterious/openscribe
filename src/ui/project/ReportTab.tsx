@@ -896,18 +896,18 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
       bodyClassName="pb-3"
     >
       <div className="max-w-lecture space-y-3 text-base">
-        <p className="text-sm text-muted-foreground">{metricsLine(m)}</p>
         {/*
-          La légende de la ligne de chiffres, pliée en un seul volet : l'étiquette, ce qui la rend fragile ou à vérifier,
+          La légende des indicateurs, pliée en un seul volet : la ligne de chiffres, l'étiquette, ce qui la rend fragile ou à vérifier,
           ce qui compte comme positif ou négatif. La synthèse et les verbatims remontent (Arnaud, 20/10). « Fragile » et
           « À vérifier » s'expliquent aussi depuis leur marque, dans la ligne du thème.
         */}
         <details className="group/inner text-sm" onKeyDown={closeOnEscape}>
           <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden">
-            Comment lire ces chiffres
+            Comment lire ces indicateurs
             <Chevron className="group-open/inner:rotate-180" />
           </summary>
           <div className="mt-1 space-y-2 rounded-md bg-muted px-3 py-2">
+            <p>{metricsLine(m)}</p>
             <p>
               <span className="font-semibold">{STANCE_NAME[m.stance]}.</span> <span className="text-muted-foreground">{helpText(STANCE_HELP[m.stance])}</span>
             </p>
