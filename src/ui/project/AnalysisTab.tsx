@@ -11,7 +11,7 @@ import { runsLocally } from '@/core/providers/location'
 import { modelStudy, presetById, typicalSecondsPerCall } from '@/core/providers/presets'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { CATEGORY, formatDuration, plural } from '../format'
-import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Disclosure, Input, Label, Progress, Select, Textarea } from '../primitives'
+import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Chevron, Disclosure, Input, Label, Progress, Select, Textarea } from '../primitives'
 
 const STEP_LABEL: Record<StepId, { title: string; help: string }> = {
   extract: {
@@ -252,8 +252,10 @@ export function AnalysisTab({ project }: { project: Project }) {
               )}
             </div>
 
-            <details className="text-sm">
-              <summary className="cursor-pointer text-muted-foreground">Réglages avancés</summary>
+            <details className="group/adv text-sm">
+              <summary className="flex cursor-pointer list-none items-center gap-1 text-muted-foreground [&::-webkit-details-marker]:hidden">
+              Réglages avancés <Chevron className="group-open/adv:rotate-180" />
+            </summary>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label htmlFor="langue">Langue du rapport</Label>

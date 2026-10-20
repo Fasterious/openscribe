@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import { cn } from '../primitives'
+import { Chevron, cn } from '../primitives'
 
 /**
  * Lire un rapport long sans s'y perdre (`docs/LECTURE-RAPPORT.md`) : un bloc ouvert (grand thème, thème) garde son
@@ -363,17 +363,13 @@ export function Fold({
         className={cn('flex cursor-pointer list-none items-center gap-2 select-none [&::-webkit-details-marker]:hidden', open && STUCK[level])}
       >
         <span className="min-w-0 flex-1">{row}</span>
-        {/* « › » et « Replier » occupent la même place : rien ne glisse quand le bloc s'ouvre (designer-ui, 19/10). */}
+        {/* Un seul chevron, toujours là, qui tourne à l'ouverture ; « Replier » s'écrit devant quand le bloc est ouvert.
+            Place de largeur fixe : rien ne glisse quand le bloc s'ouvre (designer-ui, 19 et 20/10). */}
         <span className="no-print flex w-24 shrink-0 justify-end max-sm:w-8">
-          {open ? (
-            <span className="flex min-h-8 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
-              <span aria-hidden>⌃</span> <span className="max-sm:hidden">Replier</span>
-            </span>
-          ) : (
-            <span aria-hidden className="flex min-h-8 items-center px-2 text-muted-foreground">
-              ›
-            </span>
-          )}
+          <span className={cn('flex min-h-8 items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground', open && 'hover:bg-accent hover:text-foreground')}>
+            {open && <span className="max-sm:hidden">Replier</span>}
+            <Chevron open={open} className="text-current" />
+          </span>
         </span>
       </summary>
       <div className={bodyClassName}>

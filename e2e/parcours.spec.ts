@@ -532,7 +532,7 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   // L'en-tête collé est la ligne fermée elle-même : titre, barre, et la ligne des verdicts dessous (Arnaud, 18/10).
   await expect(themeHead).toContainText(/\d+ thèmes\u00a0:/)
   // Plus de « Replier » en bas du bloc : celui de l'en-tête collé suffit.
-  await expect(theme.getByRole('button', { name: /^⌃ Replier/ })).toHaveCount(0)
+  await expect(theme.getByRole('button', { name: /^Replier/ })).toHaveCount(0)
   const top = (l: Locator) => l.evaluate((el) => Math.round(el.getBoundingClientRect().top))
   const scroll = async (dy: number) => {
     for (let i = 0; i < 4; i++) {

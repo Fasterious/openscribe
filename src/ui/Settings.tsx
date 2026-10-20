@@ -15,7 +15,7 @@ import {
 import { href } from '@/app/router'
 import { runsLocally } from '@/core/providers/location'
 import { PROVIDER_PRESETS, presetById, presetStudy, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
-import { Alert, Badge, Button, Card, CardContent, Dialog, DropMenu, Input, Label, MenuItem, MenuSection, Select, Tooltip, cn } from './primitives'
+import { Alert, Badge, Button, Card, CardContent, Chevron, Dialog, DropMenu, Input, Label, MenuItem, MenuSection, Select, Tooltip, cn } from './primitives'
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
   local: { label: 'Rien ne quitte votre ordinateur', tone: 'positive' },
@@ -531,8 +531,10 @@ function SetupDialog({
             </p>
           )}
 
-          <details className="text-sm">
-            <summary className="cursor-pointer text-muted-foreground">Réglages avancés</summary>
+          <details className="group/adv text-sm">
+            <summary className="flex cursor-pointer list-none items-center gap-1 text-muted-foreground [&::-webkit-details-marker]:hidden">
+            Réglages avancés <Chevron className="group-open/adv:rotate-180" />
+          </summary>
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="nom">Nom affiché</Label>

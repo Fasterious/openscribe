@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, Users } from 'lucide-react'
+import { CircleCheck, CircleHelp, Download, FileCode2, Lightbulb, OctagonAlert, Printer, Quote, Save, Scale, Users } from 'lucide-react'
 import { Fragment, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
 import { computeMetrics, METRICS_VERSION, withCurrentMetrics } from '@/core/analysis/metrics'
@@ -38,7 +38,7 @@ import { isExample } from '../Synthesis'
 import { Fold, freezeHeadroom, glideTo, markSeen, morphTo, placeStuck, revealMotif } from './fold'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, download, formatDate, plural, slug } from '../format'
-import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, cn, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
+import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, Chevron, cn, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
 import { helpText, STANCE_HELP } from '@/core/analysis/glossary'
 import { fragileShown, labelDoubt } from '@/core/analysis/highlights'
 import { doubtReason, fragileReason, themeVerdicts, verdictLabel, verdictOf, type Verdict } from '@/core/analysis/explain'
@@ -429,7 +429,7 @@ function MarkChip({ kind, open, onToggle, controls }: { kind: 'fragile' | 'doubt
       )}
     >
       {kind === 'fragile' ? 'fragile' : 'À vérifier'}
-      <ChevronDown aria-hidden className={cn('size-3.5 transition-transform duration-200 ease-out motion-reduce:transition-none', open && 'rotate-180')} />
+      <Chevron open={open} className="size-3.5 text-current" />
     </button>
   )
 }
@@ -581,9 +581,7 @@ function MoreItems({
       className="no-print inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md text-sm font-medium text-primary hover:underline"
     >
       {open ? hide : `Voir ${n > 1 ? `les ${n} autres thèmes` : "l'autre thème"} ${MORE_WORD[section]}`}
-      <span aria-hidden className={`transition-transform motion-reduce:transition-none ${open ? '-rotate-90' : 'rotate-90'}`}>
-        ›
-      </span>
+      <Chevron open={open} className="text-current" />
     </button>
   )
   return (
@@ -607,7 +605,7 @@ function MoreItems({
           }}
           className="no-print inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md text-sm font-medium text-primary hover:underline"
         >
-          <span aria-hidden>⌃</span> {hide}
+          {hide} <Chevron open className="text-current" />
         </button>
       )}
     </div>
@@ -728,7 +726,7 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
           {panelTitle(ideas, ctx)}
         </span>
         <button type="button" onClick={close} className="no-print inline-flex min-h-8 shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
-          <span aria-hidden>⌃</span> Replier
+          Replier <Chevron open className="text-current" />
         </button>
       </div>
       <ul className="space-y-1.5">
@@ -739,7 +737,7 @@ function QuotesPanel({ ids, ctx, onClose }: { ids: string[]; ctx: Ctx; onClose: 
         )}
       </ul>
       <button type="button" onClick={close} className="no-print inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
-        <span aria-hidden>⌃</span> Replier ces verbatims
+        Replier ces verbatims <Chevron open className="text-current" />
       </button>
     </div>
   )
@@ -759,7 +757,7 @@ function ContextPanel({ idea, ctx, onClose }: { idea: Idea; ctx: Ctx; onClose: (
         }}
         className="mt-1 inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md px-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
       >
-        <span aria-hidden>⌃</span> Replier
+        Replier <Chevron open className="text-current" />
       </button>
     </div>
   )
@@ -890,7 +888,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
         <p className="text-sm text-muted-foreground">{metricsLine(m)}</p>
         {/* Ce que veut dire l'étiquette, plié : dans la ligne fermée, ce n'est plus une infobulle (une seule cible). */}
         <details className="group/inner text-sm" onKeyDown={closeOnEscape}>
-          <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden"><ChevronRight className="size-4 transition-transform group-open/inner:rotate-90 motion-reduce:transition-none" aria-hidden />Que veut dire cette étiquette ?</summary>
+          <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden">Que veut dire cette étiquette ?<Chevron className="group-open/inner:rotate-180" /></summary>
           <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{helpText(STANCE_HELP[m.stance])}</p>
         </details>
         {dominantVoice(ideas) && <p className="text-sm text-muted-foreground">{dominantVoice(ideas)}</p>}
@@ -904,7 +902,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
         {/* La définition du motif : explication secondaire, pliée ; la synthèse se lit d'abord (remarque d'Arnaud, 17/10). */}
         {group.definition && (
           <details className="group/inner text-sm" onKeyDown={closeOnEscape}>
-            <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden"><ChevronRight className="size-4 transition-transform group-open/inner:rotate-90 motion-reduce:transition-none" aria-hidden />Ce qui compte comme positif ou négatif dans ce thème</summary>
+            <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden">Ce qui compte comme positif ou négatif dans ce thème<Chevron className="group-open/inner:rotate-180" /></summary>
             <p className="mt-1 rounded-md bg-muted px-3 py-2 text-muted-foreground">{definitionLine(group.definition)}</p>
           </details>
         )}
@@ -983,9 +981,7 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
                 lines.map((l) => l.participantId),
                 both,
               )}
-              <span aria-hidden className={`text-muted-foreground transition-transform motion-reduce:transition-none ${isOpen ? 'rotate-90' : ''}`}>
-                ›
-              </span>
+              <Chevron open={isOpen} />
             </button>
             {/* Toujours dans la page, caché quand le camp est fermé : l'impression le montre, Ctrl+F le trouve et l'ouvre. */}
             <ul

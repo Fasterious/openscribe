@@ -201,6 +201,21 @@ export function Dialog({
   )
 }
 
+/**
+ * L'indicateur d'ouverture unique de l'application (designer-ui, 20/10) : un chevron vers le bas, après le libellé, qui
+ * tourne de 180° à l'ouverture en 200 ms, sans mouvement si le lecteur l'a demandé. Pour un `<details>` natif, ne pas
+ * passer `open` mais une classe `group-open/<nom>:rotate-180` (un groupe nommé : un `group` anonyme tournerait avec
+ * n'importe quel ancêtre ouvert).
+ */
+export function Chevron({ open, className }: { open?: boolean; className?: string }) {
+  return (
+    <ChevronDown
+      aria-hidden
+      className={cn('size-4 shrink-0 text-muted-foreground transition-transform duration-200 ease-out motion-reduce:transition-none', open && 'rotate-180', className)}
+    />
+  )
+}
+
 /** Bloc repliable natif : accessible, imprimable, sans dépendance. */
 export function Disclosure({
   summary,
@@ -219,7 +234,7 @@ export function Disclosure({
   return (
     <details
       open={defaultOpen}
-      className={cn('group rounded-lg border bg-card', flat && 'max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0 max-sm:bg-transparent', className)}
+      className={cn('group/disclosure rounded-lg border bg-card', flat && 'max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0 max-sm:bg-transparent', className)}
     >
       <summary
         className={cn(
@@ -228,9 +243,7 @@ export function Disclosure({
         )}
       >
         <span className="min-w-0 flex-1">{summary}</span>
-        <span aria-hidden className="text-muted-foreground transition-transform group-open:rotate-90 motion-reduce:transition-none">
-          ›
-        </span>
+        <Chevron className="group-open/disclosure:rotate-180" />
       </summary>
       <div className={cn('border-t p-3', flat && 'max-sm:border-t-0 max-sm:px-0 max-sm:pt-1')}>{children}</div>
     </details>

@@ -1,9 +1,9 @@
-import { ArrowLeft, ArrowRight, ChevronRight, Info, Printer } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Info, Printer } from 'lucide-react'
 import { href } from '@/app/router'
 import { useEffect, useState } from 'react'
 import { activeParticipants } from '@/core/corpus'
 import type { PublishedStudy } from '@/core/observatoire'
-import { Disclosure, Explain } from './primitives'
+import { Chevron, Disclosure, Explain } from './primitives'
 import { ReportTab } from './project/ReportTab'
 import { TAB_ACTIONS } from './project/slots'
 
@@ -117,8 +117,8 @@ export function ObservatoryPage({ slug }: { slug: string }) {
             {!!f.questionnaire?.length && (
               <details className="group/q text-sm">
                 <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden">
-                  <ChevronRight className="size-4 transition-transform group-open/q:rotate-90 motion-reduce:transition-none" aria-hidden />
                   Voir les {f.questionnaire.length} questions du questionnaire
+                  <Chevron className="group-open/q:rotate-180" />
                 </summary>
                 <ol className="mt-1 list-decimal space-y-1 pl-8">
                   {f.questionnaire.map((q, i) => (

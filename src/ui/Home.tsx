@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   Check,
-  ChevronDown,
   FileUp,
   FlaskConical,
   HardDrive,
@@ -22,7 +21,7 @@ import { useEffect, useState } from 'react'
 import { href } from '@/app/router'
 import { useProjects } from '@/app/store'
 import { formatDate } from './format'
-import { Alert, Badge, Button, Card, cn } from './primitives'
+import { Alert, Badge, Button, Card, Chevron, cn } from './primitives'
 import { isExample, openExample, projectHref, useStudyActions } from './Synthesis'
 
 /**
@@ -224,10 +223,10 @@ export function Home() {
         <SectionTitle id="faq" title="Questions fréquentes" />
         <div className="divide-y rounded-xl border bg-card">
           {FAQ.map(([q, a]) => (
-            <details key={q} className="group">
+            <details key={q} className="group/faq">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 font-medium [&::-webkit-details-marker]:hidden">
                 {q}
-                <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
+                <Chevron className="group-open/faq:rotate-180" />
               </summary>
               <p className="px-4 pb-4 text-sm text-muted-foreground">{a}</p>
             </details>
