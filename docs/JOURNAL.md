@@ -2,6 +2,24 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-20 — Décisions d'Arnaud ; plus de transition de vue sur les blocs
+
+- **Mitigé (décision d'Arnaud)** : on garde la règle. Une personne qui dit du bien et du mal d'un même thème est
+  mitigée, même si l'un de ses avis vient d'une copie (codage en double) : P11 juge bien un service et mal un autre du
+  même thème « Accès aux services administratifs ». La pastille déroule ses deux avis.
+- **Nom du grand thème dans l'en-tête d'un thème lu** : non (Arnaud partagé, avis de l'orchestrateur suivi) ; une ligne
+  qui apparaît et disparaît coûterait plus qu'elle n'apporte, remonter un peu fait revenir le grand thème.
+- **« À vérifier », prochain chantier (piste d'Arnaud, à ne pas engager maintenant)** : reproduire ce rapport dans le
+  module Synthèse ; « à vérifier » n'y a de sens qu'avec une action du chercheur (valider ou déplacer). Dans une étude
+  automatique (Observatoire), c'est l'orchestrateur qui tranche lors de sa propre analyse, sans laisser de mention en
+  suspens.
+- **Blocs sans transition de vue** : la barre de l'application clignotait encore au repli d'un grand thème chez Arnaud
+  (non reproduit dans Chromium) ; les grands thèmes et thèmes s'ouvrent et se replient par leur hauteur. Seul le repli
+  d'un volet de verbatims garde la sienne (l'intitulé glisse jusqu'à la pastille).
+- **Repousser après une remontée** : la barre se recache au rythme du défilement (elle sautait d'un coup, la poussée
+  visée se calculant d'après le haut du grand thème, déjà loin au-dessus) ; mesuré : 57, 42, 27, 12, 0 px par pas de 15.
+- **En-têtes de verbatims collés dans l'explication « à vérifier »** : `overflow-clip` au lieu de `overflow-hidden`.
+
 ## 2026-10-19 (soir) — Les en-têtes se poussent comme des objets ; marques en étiquettes
 
 - **Chaîne physique** (Arnaud) : le grand thème qui arrive contre la barre la pousse pixel pour pixel ; le thème lu pousse

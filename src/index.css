@@ -142,20 +142,11 @@ html {
   animation: fold-in 160ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 /*
- * Transitions de vue (fold.tsx) : à l'ouverture comme au repli, le titre et la barre du bloc glissent de la ligne fermée
- * à l'en-tête ouvert ; le reste de la page ne fond pas (le contenu s'ouvre par sa hauteur). Au repli, l'ancienne image
- * se range vers le bas du titre (`--fold-line`), et laisse voir dessous le bloc suivant déjà en place.
+ * Transition de vue (fold.tsx, morphTo) : seul le repli d'un volet de verbatims en garde une, l'intitulé glisse jusqu'à
+ * sa pastille. Les blocs (grands thèmes, thèmes) s'ouvrent et se replient par leur hauteur, sans transition de vue :
+ * elle remplaçait la page par une image et la barre de l'application clignotait (Arnaud, 20/10).
  */
-.vt-active > summary [data-vt='title'] {
-  view-transition-name: fold-title;
-}
-.vt-active > summary [data-vt='bar'] {
-  view-transition-name: fold-bar;
-}
-.vt-active > summary [data-vt='meta'] {
-  view-transition-name: fold-meta;
-}
-/* La barre de l'application a sa propre couche pendant une transition : elle reste affichée telle quelle (Arnaud, 19/10). */
+/* La barre de l'application a sa propre couche pendant une transition : elle reste affichée telle quelle. */
 ::view-transition-group(app-bar) {
   animation: none;
   z-index: 10;
@@ -171,36 +162,10 @@ html {
   animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 ::view-transition-old(fold-chip),
-::view-transition-new(fold-chip),
-::view-transition-old(fold-title),
-::view-transition-new(fold-title),
-::view-transition-old(fold-meta),
-::view-transition-new(fold-meta) {
+::view-transition-new(fold-chip) {
   height: 100%;
   object-fit: none;
   object-position: left center;
-}
-.vt-open::view-transition-old(root) {
-  animation: none;
-  opacity: 0;
-}
-.vt-open::view-transition-new(root) {
-  animation: none;
-}
-.vt-fold::view-transition-new(root) {
-  animation: none;
-}
-.vt-fold::view-transition-old(root) {
-  z-index: 1;
-  animation: fold-tuck 240ms cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-@keyframes fold-tuck {
-  from {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    clip-path: inset(0 0 calc(100% - var(--fold-line, 0px)) 0);
-  }
 }
 /* La dernière pastille repliée : un contour bleu léger (fold.tsx, markSeen). */
 .chip-seen {

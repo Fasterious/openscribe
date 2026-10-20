@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import { flushSync } from 'react-dom'
 import { cn } from '../primitives'
 
 /**
@@ -148,8 +147,15 @@ export function useHeadroom(enabled: boolean, ref: React.RefObject<HTMLElement |
         themeOff = 0
       }
       if (dy > 0) {
-        appOff = Math.max(appOff, Math.min(barFull, Math.max(n.app, n.motif)))
-        themeOff = Math.max(themeOff, Math.min(n.head, n.motif - barFull))
+        // On repousse au rythme du défilement, jamais d'un coup : après une remontée, la barre (puis le grand thème) se
+        // recache pixel pour pixel (Arnaud, 20/10), sans dépasser ce que la position réelle des blocs demande.
+        let rest = dy
+        const wantApp = Math.min(barFull, Math.max(n.app, n.motif))
+        const pushApp = Math.min(rest, Math.max(0, wantApp - appOff))
+        appOff += pushApp
+        rest -= pushApp
+        const wantTheme = Math.max(0, Math.min(n.head, n.motif - barFull))
+        themeOff += Math.min(rest, Math.max(0, wantTheme - themeOff))
       } else {
         let rest = -dy
         const back = Math.min(rest, themeOff)
@@ -210,42 +216,6 @@ function instant(details: HTMLDetailsElement) {
   window.setTimeout(() => details.classList.remove('fold-instant'), 300)
 }
 
-/** L'état React de chaque bloc, mis à jour d'un coup pendant une transition (l'événement `toggle` arrive trop tard). */
-const setters = new WeakMap<HTMLDetailsElement, (open: boolean) => void>()
-
-/**
- * Ouvre ou ferme un bloc en transition de vue : la barre et le titre de la ligne glissent jusqu'à leur place dans
- * l'en-tête (et inversement) ; au repli, le contenu se range vers le titre, le bloc suivant apparaît dessous
- * (`index.css`, `vt-open` et `vt-fold`). Sans transition de vue, ou si le lecteur a demandé moins de mouvement, le
- * bloc s'ouvre ou se ferme comme avant.
- */
-function transition(details: HTMLDetailsElement, kind: 'open' | 'fold', update: () => void, line = 0) {
-  const start = (document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }).startViewTransition
-  if (!start || reduced()) {
-    update()
-    return false
-  }
-  const root = document.documentElement
-  details.classList.add('vt-active')
-  root.classList.add(`vt-${kind}`)
-  root.style.setProperty('--fold-line', `${Math.max(0, Math.round(line))}px`)
-  const t = start.call(document, () => {
-    // Le défilement du repli arrive ici, parfois longtemps après le clic : il ne doit pas être pris pour une remontée du
-    // lecteur (passe testeur du 19/10 : la barre revenait et recouvrait le titre replié).
-    freezeHeadroom()
-    update()
-    setters.get(details)?.(details.open)
-  })
-  // Une transition sautée (bloc hors de l'écran, onglet caché) rejette `ready` : le bloc est ouvert quand même.
-  ;(t as unknown as { ready: Promise<void> }).ready.catch(() => {})
-  holdUntil(t.finished)
-  t.finished.finally(() => {
-    details.classList.remove('vt-active')
-    root.classList.remove(`vt-${kind}`)
-  })
-  return true
-}
-
 /** Où se place le titre d'un bloc collé : sous la barre de l'application, et sous le grand thème pour un thème. */
 function stickLine(details: HTMLDetailsElement): number {
   if (details.dataset.fold === 'theme') return barPx
@@ -281,12 +251,11 @@ export function foldDetails(details: HTMLDetailsElement) {
     summary?.focus({ preventScroll: true })
     settle()
   }
-  // En transition de vue, le contenu se range par l'image : le bloc se ferme d'un coup dessous. Sinon, un grand bloc se
-  // referme sans animer des milliers de pixels.
-  const top = inside ? stick : r.top
-  const height = summary?.getBoundingClientRect().height ?? 0
-  if (r.height > window.innerHeight * 1.5 || reduced() || 'startViewTransition' in document) instant(details)
-  transition(details, 'fold', close, top + height)
+  // Pas de transition de vue : elle remplaçait la page par une image le temps du repli, et la barre de l'application
+  // disparaissait puis revenait selon les navigateurs (Arnaud, 20/10). Le contenu se range par sa hauteur (index.css) ;
+  // un grand bloc se referme sans animer des milliers de pixels.
+  if (r.height > window.innerHeight * 1.5 || reduced()) instant(details)
+  close()
   requestAnimationFrame(settle)
   window.setTimeout(() => {
     settle()
@@ -345,12 +314,6 @@ export function Fold({
     ro.observe(h)
     return () => ro.disconnect()
   }, [open])
-  useEffect(() => {
-    const d = ref.current
-    if (!d) return
-    setters.set(d, (v) => flushSync(() => setOpen(v)))
-    return () => void setters.delete(d)
-  }, [])
   const toggle = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     const d = ref.current

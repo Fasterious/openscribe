@@ -494,7 +494,8 @@ function ListItem({
                 : 'grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-180 ease-[cubic-bezier(0.4,0,1,1)]',
             )}
           >
-            <div className="min-h-0 overflow-hidden">
+            {/* overflow-clip et non overflow-hidden : les en-têtes collés des verbatims y collent encore (Arnaud, 20/10). */}
+            <div className="min-h-0 overflow-clip">
               {shown && (
                 <div key={shown} className="fold-in pt-2">
                   <WhyLabel group={group} ctx={ctx} only={shown} />
@@ -866,15 +867,15 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
       className="border-b py-0.5"
       row={
         <span className="flex flex-col gap-1.5 py-2 sm:flex-row sm:items-center sm:justify-between">
-          <H data-vt="title" className="text-base font-semibold">
+          <H className="text-base font-semibold">
             {group.title}
           </H>
           {/* Sur ordinateur, comptes et barres alignés sur le bord droit d'une ligne à l'autre : on compare d'un coup d'œil. */}
           <span className="flex flex-wrap items-center gap-2 sm:justify-end">
-            <span data-vt="bar" className="block w-14 sm:order-last sm:w-20">
+            <span data-bar className="block w-14 sm:order-last sm:w-20">
               <OpinionBar m={m} />
             </span>
-            <span data-vt="meta" className="flex flex-wrap items-center gap-2">
+            <span className="flex flex-wrap items-center gap-2">
               {marks}
               <span className="text-sm text-muted-foreground tabular-nums sm:w-10 sm:text-right">
                 <Users className="mr-0.5 inline size-3" aria-hidden />
@@ -1199,14 +1200,14 @@ function ThemeRow({ title, m, groups }: { title: string; m: Metrics; groups: Met
   return (
     <span className="block space-y-2 py-3">
       <span className="flex items-start justify-between gap-2">
-        <h3 data-vt="title" className="text-lg font-semibold">
+        <h3 className="text-lg font-semibold">
           {title}
         </h3>
-        <span data-vt="meta" className="shrink-0 pt-1 text-sm text-muted-foreground">
+        <span className="shrink-0 pt-1 text-sm text-muted-foreground">
           {plural(m.participants, 'participant')}
         </span>
       </span>
-      <span data-vt="bar" className="block">
+      <span data-bar className="block">
         <VerdictBar groups={groups} />
       </span>
       <VerdictLine groups={groups} />

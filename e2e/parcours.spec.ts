@@ -528,7 +528,7 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   await themeHead.click()
   await expect(theme).toHaveAttribute('open', '')
   // La barre du grand thème reste dans son en-tête ouvert (Arnaud, 18/10) ; sur un écran large, le compte des thèmes aussi.
-  await expect(themeHead.locator('[data-vt="bar"]')).toBeVisible()
+  await expect(themeHead.locator('[data-bar]')).toBeVisible()
   // L'en-tête collé est la ligne fermée elle-même : titre, barre, et la ligne des verdicts dessous (Arnaud, 18/10).
   await expect(themeHead).toContainText(/\d+ thèmes\u00a0:/)
   // Plus de « Replier » en bas du bloc : celui de l'en-tête collé suffit.
@@ -549,7 +549,7 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   const motifHead = motif.locator(':scope > summary')
   await motifHead.click()
   await expect(motif).toHaveAttribute('open', '')
-  await expect(motifHead.locator('[data-vt="bar"]')).toBeVisible()
+  await expect(motifHead.locator('[data-bar]')).toBeVisible()
   await scroll(600)
   await expect.poll(() => top(themeHead)).toBeLessThan(0)
   await expect.poll(() => top(motifHead)).toBeLessThanOrEqual(2)
