@@ -25,10 +25,16 @@ export function escapeHtml(s: string): string {
 const STALE_NOTE =
   "Attention : les données de la synthèse ont changé depuis ce rapport (source ajoutée, retirée ou questions modifiées). Relancez l'analyse pour qu'il en tienne compte."
 
+/** « claude-opus-5-5 » → « Claude Opus 5.5 » ; un autre identifiant reste tel quel, précédé de « Claude ». */
+export function claudeName(model: string): string {
+  const m = model.match(/^claude-(opus|sonnet|haiku|fable)-(\d+)-(\d+)/i)
+  return m ? `Claude ${m[1][0].toUpperCase()}${m[1].slice(1).toLowerCase()} ${m[2]}.${m[3]}` : `Claude (${model.replace(/^claude-/, '')})`
+}
+
 /** Nom lisible du moteur d'une analyse, pour la Méthode (écran et exports). */
 export function engineName(presetId: string, model?: string): string {
   if (presetId === 'simulation') return 'Simulation (démonstration, contenu fictif)'
-  if (presetId === 'bridge') return `Claude${model ? ` (${model.replace(/^claude-/, '')})` : ''}`
+  if (presetId === 'bridge') return model ? claudeName(model) : 'Claude'
   return presetById(presetId)?.label ?? presetId
 }
 

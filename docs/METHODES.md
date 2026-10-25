@@ -17,6 +17,20 @@ l'Observatoire et la Synthèse, pour tous les moteurs.
   commune` redonne les mêmes 1 051 idées, 73 thèmes et grands thèmes (seule la demande du résumé change, à cause du
   vocabulaire « thèmes » du 18/10, sans rapport avec la méthode).
 
+### Essayer un vrai moteur avec le pont (25/10)
+
+Le pont rejoue une analyse complète avec un vrai moteur, les réglages de son préréglage (débit, graine, format JSON) et
+la méthode de l'application pour ce modèle (`methodForModel`) :
+
+```bash
+NODE_USE_ENV_PROXY=1 npx tsx scripts/bridge.ts <fichier.csv> <dossier> --preset gemini --model gemini-3.5-flash-lite \
+  --question "…" --export <dossier>/etude.openscribe.json --name "…"
+```
+
+La clé est lue dans l'environnement, jamais en argument : `OPENSCRIBE_KEY_<PRESET>` (ex. `OPENSCRIBE_KEY_GEMINI`) ou
+`GEMINI_API_KEY`, `MISTRAL_API_KEY`, `ANTHROPIC_API_KEY`. `--rpm` règle le débit (par défaut, celui de l'offre gratuite),
+`--method` force une méthode. Les réponses vont dans `<dossier>/cache.json` : une relance ne repaie rien.
+
 ### Preuve côté Synthèse : un questionnaire à deux questions (25/10)
 
 Corpus réel d'une autre forme que l'école : 50 personnes du Grand débat 2019 (Licence Ouverte) qui répondent chacune à

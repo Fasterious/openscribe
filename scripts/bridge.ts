@@ -28,6 +28,9 @@ import { DEFAULT_SETTINGS } from '../src/core/analysis/types'
 import type { MethodId } from '../src/core/analysis/methods'
 import { analyzeCsv, csvToCorpus, type ColumnRole } from '../src/core/import/csv'
 import type { ChatRequest, LlmProvider } from '../src/core/providers/types'
+import { createOpenAiCompatibleProvider } from '../src/core/providers/openai-compatible'
+import { withLimits } from '../src/core/providers/limits'
+import { methodForModel, presetById } from '../src/core/providers/presets'
 
 const [csvPath, dir, ...rest] = process.argv.slice(2)
 if (!csvPath || !dir) {
@@ -76,7 +79,7 @@ for (const f of readdirSync(join(dir, 'requests')).filter((x) => x.endsWith('.js
   if (existsSync(oldRes) && !existsSync(newRes)) copyFileSync(oldRes, newRes)
 }
 
-const bridge: LlmProvider = {
+const files: LlmProvider = {
   label: `Pont de test · ${opt('model') ?? 'claude'}`,
   fingerprint: { presetId: 'bridge', model: opt('model') ?? 'claude', baseUrl: 'files' },
   async complete(req: ChatRequest) {
@@ -100,6 +103,42 @@ const bridge: LlmProvider = {
   },
 }
 
+/**
+ * --preset gemini|mistral|anthropic… : un vrai moteur, avec les réglages du préréglage de l'application (débit, graine,
+ * format JSON), au lieu des fichiers. La clé est lue dans l'environnement, jamais en argument :
+ * OPENSCRIBE_KEY_<PRESET> (ex. OPENSCRIBE_KEY_GEMINI), ou GEMINI_API_KEY, MISTRAL_API_KEY, ANTHROPIC_API_KEY.
+ * Node passe par le proxy de l'environnement s'il est lancé avec NODE_USE_ENV_PROXY=1.
+ */
+function realProvider(presetId: string): LlmProvider {
+  const preset = presetById(presetId)
+  if (!preset) throw new Error(`Préréglage inconnu : ${presetId}`)
+  const model = opt('model') ?? preset.defaultModel
+  const apiKey = process.env[`OPENSCRIBE_KEY_${presetId.toUpperCase()}`] ?? process.env[`${presetId.toUpperCase()}_API_KEY`]
+  if (preset.needsKey && !apiKey) throw new Error(`Clé absente : définissez OPENSCRIBE_KEY_${presetId.toUpperCase()} ou ${presetId.toUpperCase()}_API_KEY.`)
+  const base = createOpenAiCompatibleProvider({
+    presetId,
+    label: preset.label,
+    baseUrl: preset.baseUrl,
+    apiKey,
+    model,
+    seedParam: preset.seedParam,
+    supportsJsonMode: preset.supportsJsonMode,
+    extraHeaders: preset.extraHeaders,
+    omitTemperature: preset.omitTemperature,
+    maxOutputTokens: preset.maxOutputTokens,
+    tokenBudget: preset.tokenBudget,
+    extraBody: preset.models?.find((m) => m.id === model)?.extraBody ?? preset.modelExtraBody?.find((x) => model.includes(x.match))?.body,
+  })
+  return withLimits(base, {
+    requestsPerMinute: Number(opt('rpm') ?? preset.freeRequestsPerMinute),
+    concurrency: Number(opt('concurrency') ?? 4),
+    retries: 4,
+    onRetry: ({ waitMs, error }) => console.log(`Nouvel essai dans ${Math.round(waitMs / 1000)} s : ${error.message}`),
+  })
+}
+const presetOpt = opt('preset')
+const bridge: LlmProvider = presetOpt ? realProvider(presetOpt) : files
+
 const csv = analyzeCsv(readFileSync(csvPath, 'utf8'))
 const roles: Record<number, ColumnRole> = Object.fromEntries(csv.columns.map((c) => [c.index, c.suggestedRole]))
 console.log('Colonnes :', csv.columns.map((c) => `${c.header.slice(0, 40)} → ${c.suggestedRole}`).join(' | '))
@@ -110,7 +149,7 @@ const corpus = csvToCorpus(csv.table, { roles, sourceName: basename(csvPath) })
 const settings = {
   ...DEFAULT_SETTINGS,
   researchQuestion: opt('question') ?? '',
-  method: (opt('method') ?? 'commune') as MethodId,
+  method: (opt('method') ?? (presetOpt ? methodForModel(presetOpt, opt('model') ?? presetById(presetOpt)?.defaultModel ?? '') : 'commune')) as MethodId,
   ...(rest.includes('--mask-names') ? { maskNames: true } : {}),
   // --multi-coding : codage en double (une idée qui satisfait deux définitions est copiée dans le second motif).
   ...(rest.includes('--multi-coding') ? { multiCoding: true } : {}),

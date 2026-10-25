@@ -49,7 +49,7 @@ import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
 import { emptyCorpus, promptsOf, removeSource, renameSource } from './corpus'
 import { maskNames, verifiedNames } from './analysis/names'
 import { dividedFragile, fragileShown, highlightLine, highlights, labelDoubt } from './analysis/highlights'
-import { campLabel, categoryBar, categoryBarLabel, fullQuestionIds, leadSentence, wholeCamp, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext, stanceTitle, summaryDoubts } from './analysis/report'
+import { campLabel, categoryBar, claudeName, categoryBarLabel, fullQuestionIds, leadSentence, wholeCamp, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext, stanceTitle, summaryDoubts } from './analysis/report'
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
@@ -1335,6 +1335,14 @@ describe('méthodes par famille de modèles', () => {
     const gem = groupSummaryPrompt(input, { ...DEFAULT_SETTINGS, method: 'gemini' }).user
     expect(gem).toContain('Chaque phrase se comprend seule')
     expect(gem.replace(/9\. Chaque phrase[^\n]*\n/, '')).toBe(ref)
+  })
+})
+
+describe('nom du moteur', () => {
+  it('écrit le modèle de Claude comme on le dit', () => {
+    expect(claudeName('claude-opus-5-5')).toBe('Claude Opus 5.5')
+    expect(claudeName('claude-sonnet-5-5')).toBe('Claude Sonnet 5.5')
+    expect(claudeName('claude-sonnet')).toBe('Claude (sonnet)')
   })
 })
 
