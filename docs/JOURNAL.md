@@ -562,3 +562,17 @@ sourcées). Livré :
   Analyse en deux colonnes à plat séparées par un filet, listes à filets au lieu de boîtes empilées ; rapport sur une
   seule colonne (56 rem), bandeaux à la mesure du texte. Rôles et libellés accessibles inchangés : les 41 parcours
   passent.
+
+## 2026-10-25 — « À vérifier » réservé à la Synthèse ; « avis » et « participants » distingués partout
+
+- **Décision d'Arnaud** : l'Observatoire est le plus automatisé possible, pour montrer l'algorithme seul ; il ne porte
+  plus de marque « à vérifier ». La Synthèse la garde : le chercheur y reprend la main quand l'algorithme doute.
+  **Fait** : réglage d'analyse `doubtMarks` (vrai par défaut) ; `publishedStudy` le coupe pour toute étude publiée,
+  le pont aussi avec `--sans-a-verifier`. Coupé, il retire les marques des listes, des thèmes, du résumé, de la
+  Méthode et des exports, et les chiffres sans appui signalés dans les textes. L'école republiée sans ces marques ;
+  sa fiche (résumé et limites) ne les cite plus. Le calcul est inchangé.
+- **Décision d'Arnaud** : « 46 avis positifs · 47 verbatims » restait ambigu ; un avis est ce qui est dit, un
+  participant celui qui le dit. **Fait** : « 49 avis positifs · 47 participants (dont 1 mitigé) » pour les volets et
+  les camps ; dans les listes, « 12 participants sur 14 d'avis positif » ; la ligne de chiffres d'un thème dit
+  « 29 participants · 4 positifs, 20 négatifs » ; la pastille d'une liste compte les avis. Les chiffres donnés au
+  moteur d'IA ne changent pas (méthode et cache intacts).

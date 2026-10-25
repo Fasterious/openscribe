@@ -597,7 +597,7 @@ test('lire un grand thème : il reste collé, s’efface quand on lit un thème 
   expect(Math.abs((await top(themeHead)) - themeBefore)).toBeLessThanOrEqual(2)
 })
 
-test('résumé : la pastille « ● N », le volet replié revient à elle ; « À vérifier » s’explique juste dessous ; défiler vite ne décroche rien', async ({ page }) => {
+test('résumé : la pastille « ● N », le volet replié revient à elle ; pas de « À vérifier » dans l’Observatoire ; défiler vite ne décroche rien', async ({ page }) => {
   await page.goto('/#/observatoire/ecole-grand-debat-2019')
   const resume = page.locator('section[aria-labelledby="resume"]')
   const chip = resume.getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / }).first()
@@ -621,27 +621,9 @@ test('résumé : la pastille « ● N », le volet replié revient à elle ; « 
   await expect(chip).toBeFocused()
   await expect(chip).toHaveClass(/chip-seen/)
 
-  // « À vérifier » dans une liste : enfoncé une fois ouvert, son explication juste dessous, avant « Lire le thème en détail ».
-  const doubt = page.locator('li').getByRole('button', { name: /^À vérifier/ }).first()
-  if (await doubt.count()) {
-    await doubt.scrollIntoViewIfNeeded()
-    await doubt.click()
-    await expect(doubt).toHaveAttribute('aria-expanded', 'true')
-    const li = doubt.locator('xpath=ancestor::li[1]')
-    const why = li.getByText('Pourquoi cette étiquette ?')
-    await expect(why).toBeVisible()
-    const gap = (await why.boundingBox())!.y - ((await doubt.boundingBox())!.y + (await doubt.boundingBox())!.height)
-    expect(gap).toBeLessThan(40)
-    expect((await why.boundingBox())!.y).toBeLessThan((await li.getByRole('button', { name: 'Lire le thème en détail →' }).boundingBox())!.y)
-    // Les verbatims en cause, par camp : « ● N avis … ».
-    await expect(li.getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / }).first()).toBeVisible()
-    await doubt.click()
-    // Refermée : le volet se replie (sa hauteur tombe à 0) et sort du parcours clavier.
-    await expect(doubt).toHaveAttribute('aria-expanded', 'false')
-    const panel = li.locator(`[id="${await doubt.getAttribute('aria-controls')}"]`)
-    await expect(panel).toHaveAttribute('inert', '')
-    await expect.poll(() => panel.evaluate((el) => Math.round(el.getBoundingClientRect().height))).toBe(0)
-  }
+  // L'Observatoire montre l'algorithme seul : aucune marque « À vérifier » (Arnaud, 25/10 ; elles restent dans la Synthèse).
+  await expect(page.getByRole('button', { name: /^À vérifier/ })).toHaveCount(0)
+  await expect(page.getByText(/à vérifier/i)).toHaveCount(0)
 
   // Défiler vite dans un grand thème ouvert : son en-tête reste collé contre la barre, sans interstice.
   const theme = page.locator('details[data-fold="theme"]').nth(1)
@@ -703,7 +685,7 @@ test('replier un thème lu depuis son en-tête collé : sa ligne reste visible s
   await expect(head).toBeFocused()
 })
 
-test('lire un camp : son en-tête « ● N avis · N verbatims » colle sous le thème, et « Replier » le laisse où on l’a touché', async ({ page }) => {
+test('lire un camp : son en-tête « ● N avis · N participants » colle sous le thème, et « Replier » le laisse où on l’a touché', async ({ page }) => {
   await page.goto('/#/observatoire/ecole-grand-debat-2019')
   const theme = page.locator('details[data-fold="theme"]').first()
   await theme.locator(':scope > summary').click()
@@ -711,8 +693,8 @@ test('lire un camp : son en-tête « ● N avis · N verbatims » colle sous le 
   const motifHead = motif.locator(':scope > summary')
   await motifHead.click()
   await expect(motif).toHaveAttribute('open', '')
-  // Un grand camp reste fermé ; son intitulé a la forme du volet du résumé : le chiffre d'abord, avis puis verbatims.
-  const camp = motif.getByRole('button', { name: /^\d+\savis positifs.*·\s\d+\sverbatims$/ })
+  // Un grand camp reste fermé ; son intitulé a la forme du volet du résumé : le chiffre d'abord, les avis puis les participants.
+  const camp = motif.getByRole('button', { name: /^\d+\savis positifs\s·\s\d+\sparticipants/ })
   await expect(camp).toHaveAttribute('aria-expanded', 'false')
   const label = (await camp.innerText()).trim()
   await camp.scrollIntoViewIfNeeded()
@@ -738,4 +720,33 @@ test('lire un camp : son en-tête « ● N avis · N verbatims » colle sous le 
   await expect.poll(async () => Math.abs((await top(camp)) - before)).toBeLessThanOrEqual(4)
   await expect(camp).toBeFocused()
   await expect(camp).toHaveText(label)
+})
+
+test('Synthèse : « À vérifier » s’explique juste dessous, ses verbatims par camp, et se replie', async ({ page }) => {
+  // La même étude, lue comme une synthèse : les marques « à vérifier » y sont montrées (réglage `doubtMarks`).
+  await page.route('**/observatoire/ecole-grand-debat-2019/etude.json', async (route) => {
+    const study = await (await route.fetch()).json()
+    for (const a of study.project.analyses) a.settings.doubtMarks = true
+    await route.fulfill({ json: study })
+  })
+  await page.goto('/#/observatoire/ecole-grand-debat-2019')
+  const doubt = page.locator('li').getByRole('button', { name: /^À vérifier/ }).first()
+  await expect(doubt).toBeVisible()
+  await doubt.scrollIntoViewIfNeeded()
+  await doubt.click()
+  await expect(doubt).toHaveAttribute('aria-expanded', 'true')
+  const li = doubt.locator('xpath=ancestor::li[1]')
+  const why = li.getByText('Pourquoi cette étiquette ?')
+  await expect(why).toBeVisible()
+  const gap = (await why.boundingBox())!.y - ((await doubt.boundingBox())!.y + (await doubt.boundingBox())!.height)
+  expect(gap).toBeLessThan(40)
+  expect((await why.boundingBox())!.y).toBeLessThan((await li.getByRole('button', { name: 'Lire le thème en détail →' }).boundingBox())!.y)
+  // Les verbatims en cause, par camp : « ● N avis … ».
+  await expect(li.getByRole('button', { name: /^Voir les verbatims de \d+ participants? : / }).first()).toBeVisible()
+  await doubt.click()
+  // Refermée : le volet se replie (sa hauteur tombe à 0) et sort du parcours clavier.
+  await expect(doubt).toHaveAttribute('aria-expanded', 'false')
+  const panel = li.locator(`[id="${await doubt.getAttribute('aria-controls')}"]`)
+  await expect(panel).toHaveAttribute('inert', '')
+  await expect.poll(() => panel.evaluate((el) => Math.round(el.getBoundingClientRect().height))).toBe(0)
 })

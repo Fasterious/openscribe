@@ -82,8 +82,14 @@ bloqué sur ça. » Concrètement :
 - **Une note relative, pas une barrière** (17/10) : la note d'un moteur ou d'une méthode est un repère
   sur 10, posé par un évaluateur qui peut se tromper ; on la refait à chaque nouveau moteur. Une étude de
   l'Observatoire se publie sans seuil, avec le meilleur moteur du moment, la méthode et ses limites
-  expliquées, et les étiquettes discutables marquées « à vérifier » par le code. Arnaud ne relit pas chaque
+  expliquées, et les étiquettes discutables marquées « à vérifier » par le code (révisé le 25/10, voir ci-dessous). Arnaud ne relit pas chaque
   étude : la transparence remplace la relecture.
+- **L'Observatoire sans intervention humaine, la Synthèse avec** (25/10) : l'Observatoire est le plus automatisé possible,
+  pour montrer la puissance de l'algorithme seul ; il ne porte pas de marque « à vérifier ». Dans la Synthèse, le
+  chercheur garde la main : quand l'algorithme a un doute, la marque « à vérifier » reste. Même algorithme, une option
+  d'affichage (`doubtMarks`).
+- **Avis et participants** (25/10) : un avis est ce qui est dit, un participant celui qui le dit, et il peut donner
+  plusieurs avis. Les listes de verbatims disent les deux, les avis d'abord : « 49 avis positifs · 47 participants ».
 - **L'ambiguïté est dans les données** (17/10) : une même idée peut relever de plusieurs motifs, se découper
   autrement, ou se ranger dans une famille plus large ou plus fine ; un humain ne tranche pas toujours mieux,
   et l'effort de concentration qu'exige un corpus entier joue en faveur de la machine. On ne vise pas zéro

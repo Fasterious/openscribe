@@ -116,7 +116,7 @@ décision d'Arnaud du 17/10, pour la précision) ; « une personne » reste en l
 
 - **« fragile »** : une seule voix qui change d'avis changerait la conclusion (« large majorité, fragile »). Pas
   sur un « unanime » : une voix de moins en fait une « large majorité », la conclusion tient.
-- **« à vérifier »** : l'étiquette dépend d'avis comptés aussi dans un autre motif ; sans eux, elle serait
+- **« à vérifier »** (Synthèse seulement : l'Observatoire, publié sans intervention humaine, ne l'affiche pas) : l'étiquette dépend d'avis comptés aussi dans un autre motif ; sans eux, elle serait
   différente. Le rapport dit laquelle, et une ligne sous le résumé rappelle ces étiquettes avant qu'on le
   cite. C'est au lecteur de trancher, en relisant les citations.
 - **« minorité constante »** : au moins 2 personnes, au plus un quart des avis, à contre-courant sur le motif.

@@ -22,8 +22,8 @@ Sonnet est passée de 4,5 à 3 sur 5, sans avoir changé.
   Le plafond de structure (plus de la moitié des motifs à une personne, ou un fourre-tout de plus du tiers des
   idées) reste un compte du même genre.
 - **Aucun seuil de publication.** Une étude de l'Observatoire se publie avec le meilleur moteur dont on dispose
-  (Claude Opus 5.5 aujourd'hui), la méthode décrite dans le rapport, ses limites et les mentions « à vérifier »
-  calculées par le code. À chaque nouveau moteur, on refait le repère.
+  (Claude Opus 5.5 aujourd'hui), la méthode décrite dans le rapport, ses limites ; sans marque « à vérifier » depuis le 25/10
+  (elle reste à la Synthèse). À chaque nouveau moteur, on refait le repère.
 - **Pour proposer un moteur dans l'application**, le repère reste le niveau de Gemini Flash-Lite, idéalement
   celui de la référence, mesurés sur 10 au prochain essai.
 

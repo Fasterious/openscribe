@@ -152,6 +152,12 @@ export interface AnalysisSettings {
    * Chaque motif compte toujours des personnes, aucune deux fois. Deux motifs au plus par idée.
    */
   multiCoding?: boolean
+  /**
+   * Les marques « à vérifier » (étiquette qui dépend d'avis comptés dans deux thèmes, chiffre du texte sans appui) :
+   * affichées par défaut dans la Synthèse, où le chercheur reprend la main ; coupées pour l'Observatoire, qui montre
+   * l'algorithme seul, sans intervention humaine (Arnaud, 25/10/2026). Le calcul est le même ; seul l'affichage change.
+   */
+  doubtMarks?: boolean
   /** Remplacé par `method` (analyses enregistrées avant les profils de méthode). */
   lightModel?: boolean
 }

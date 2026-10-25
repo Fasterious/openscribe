@@ -55,6 +55,10 @@ const study = () => {
 }
 
 describe('Observatoire : étude publiée', () => {
+  it('sans marque « à vérifier » : l’Observatoire montre l’algorithme seul (la Synthèse les garde)', () => {
+    expect(study().project.analyses[0].settings.doubtMarks).toBe(false)
+  })
+
   it('masque un prénom et garde la position de ce qui suit', () => {
     const m = maskWithOffsets(TEXT, ['Karim', 'Mélodie-Rose'])
     expect(m.text).toBe(`Merci à ${NAME_MASK} pour l'accueil. La cantine est trop chère, demandez à ${NAME_MASK}. Les horaires conviennent.`)

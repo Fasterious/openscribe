@@ -126,6 +126,9 @@ const STANCE_WORD: Record<Metrics['stance'], string> = {
  * Le code mesure l'écart, le lecteur tranche en relisant les citations (décision d'Arnaud, 17/10). Un repère,
  * une seule cause : une étiquette qui tient à une voix se dit « fragile » (voir `dividedFragile`).
  */
+/** Les marques « à vérifier » sont-elles montrées pour cette analyse ? (Synthèse : oui ; Observatoire : non.) */
+export const showsDoubts = (settings: { doubtMarks?: boolean }): boolean => settings.doubtMarks !== false
+
 export function labelDoubt(g: Group, ideas: Map<string, Idea>): string | undefined {
   const own = g.ideaIds.filter((id) => !ideas.get(id)?.copyOf)
   const copies = g.ideaIds.length - own.length

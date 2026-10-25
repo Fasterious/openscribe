@@ -64,7 +64,8 @@ export function publishedStudy(project: Project, analysis: AnalysisState, meta: 
     ideas: analysis.ideas.map(moved),
     // Déjà masqué : la liste des prénoms ne part pas avec l'étude, et l'affichage n'a plus rien à masquer.
     names: [],
-    settings: { ...analysis.settings, maskNames: false },
+    // L'Observatoire montre l'algorithme seul, sans intervention humaine : pas de marque « à vérifier » (Arnaud, 25/10).
+    settings: { ...analysis.settings, maskNames: false, doubtMarks: false },
     cacheKeys: [],
   }
   const study: PublishedStudy = {

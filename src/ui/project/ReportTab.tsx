@@ -41,7 +41,7 @@ import { TAB_ACTIONS } from './slots'
 import { CATEGORY, download, formatDate, plural, slug } from '../format'
 import { Alert, Badge, Card, CardContent, CardHeader, CardTitle, Chevron, cn, DropMenu, MenuItem, MenuSection, Tooltip } from '../primitives'
 import { helpText, STANCE_HELP } from '@/core/analysis/glossary'
-import { fragileShown, labelDoubt } from '@/core/analysis/highlights'
+import { fragileShown, labelDoubt, showsDoubts } from '@/core/analysis/highlights'
 import { doubtReason, fragileReason, themeVerdicts, verdictLabel, verdictOf, type Verdict } from '@/core/analysis/explain'
 
 /** Classes écrites en entier : Tailwind ne génère pas une classe construite à la volée. */
@@ -54,6 +54,8 @@ const BORDER: Record<IdeaCategory, string> = {
 }
 
 interface Ctx {
+  /** Les marques « à vérifier » sont montrées (Synthèse) ou non (Observatoire) : `doubtMarks` de l'analyse. */
+  doubts: boolean
   ideaById: Map<string, Idea>
   contributionById: Map<string, Contribution>
   /** Participants retenus par le filtre de segment (tous si null). */
@@ -220,7 +222,7 @@ function CampChip({
   people,
   open,
   onToggle,
-  word = false,
+  text,
   pill,
   mixed = false,
 }: {
@@ -228,8 +230,8 @@ function CampChip({
   people: number
   open: boolean
   onToggle: () => void
-  /** Le mot après le nombre (« 46 avis positifs »), dans les listes ; le point seul suffit dans une phrase. */
-  word?: boolean
+  /** Ce que dit la pastille après le point (« 49 avis positifs » dans les listes) ; à défaut, le nombre de personnes, qui reprend celui de la phrase. */
+  text?: string
   pill?: string
   /** Des personnes d'avis mitigé (l'explication « à vérifier ») : un point mi-vert mi-rouge. */
   mixed?: boolean
@@ -253,8 +255,7 @@ function CampChip({
       }`}
     >
       <span className={`inline-block size-2 shrink-0 rounded-full ${mixed ? 'bg-linear-to-r from-positive from-50% to-negative to-50%' : BAR[cat]} ${open ? 'ring-1 ring-primary-foreground' : ''}`} aria-hidden />
-      {people}
-      {word && ` ${words[people > 1 ? 1 : 0]}`}
+      {text ?? people}
     </button>
   )
 }
@@ -400,7 +401,15 @@ function HighlightLine({
                 ideas.map((i) => i.id),
                 ctx,
               ).map((c) => (
-                <CampChip key={c.cat} cat={c.cat} people={c.people} word open={open === c.cat} onToggle={() => setOpen((o) => (o === c.cat ? null : c.cat))} />
+                // La pastille compte les avis (les verbatims du camp) ; son volet dit aussi les participants (Arnaud, 25/10).
+                <CampChip
+                  key={c.cat}
+                  cat={c.cat}
+                  people={c.people}
+                  text={campLabel(c.cat, c.people, c.ids.length).split('\u00a0·')[0]}
+                  open={open === c.cat}
+                  onToggle={() => setOpen((o) => (o === c.cat ? null : c.cat))}
+                />
               ))}
             </span>
           )}
@@ -665,7 +674,7 @@ function useFoldBack() {
   return [ref, back] as const
 }
 
-/** Ce que déroule un volet, dit dans son en-tête : « ● 46 avis positifs · 52 verbatims · Expérience globale de scolarisation ». */
+/** Ce que déroule un volet, dit dans son en-tête : « ● 49 avis positifs · 46 participants · Expérience globale de scolarisation ». */
 function panelTitle(ideas: Idea[], ctx: Ctx): string {
   const people = new Set(ideas.map((i) => i.participantId)).size
   const cats = [...new Set(ideas.map((i) => i.category))]
@@ -673,7 +682,7 @@ function panelTitle(ideas: Idea[], ctx: Ctx): string {
   const what =
     cats.length === 1
       ? campLabel(cats[0], people, ideas.length)
-      : `${plural(people, 'participant')} · ${plural(ideas.length, 'verbatim')}`
+      : `${plural(ideas.length, 'avis', 'avis')} · ${plural(people, 'participant')}`
   return groups.length === 1 ? `${what} · ${groups[0]}` : what
 }
 
@@ -852,7 +861,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
   const both = bothSides(ideas)
   const full = fullQuestionIds(displayOrder(ideas, m), ctx.context)
   // La mention « à vérifier » vaut pour le motif entier : elle se tait quand on regarde un segment.
-  const doubt = ctx.segment ? undefined : labelDoubt(group, ctx.ideaById)
+  const doubt = ctx.segment || !ctx.doubts ? undefined : labelDoubt(group, ctx.ideaById)
   if (!ideas.length) return null
   const H = headingLevel
   // La ligne fermée est une seule cible, qui ouvre : ses étiquettes ne sont plus des infobulles (au doigt, elles
@@ -915,7 +924,8 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
               {categoryBar(m).map(({ cat, people }) => (
                 <span key={cat} className="inline-flex items-center gap-1 tabular-nums">
                   <span aria-hidden className={cn('size-2 rounded-full', BAR[cat])} />
-                  {people} {CAMP_WORD[cat][people > 1 ? 1 : 0]}
+                  {/* La barre mesure des personnes : « avis positifs : 47 participants ». */}
+                  {CAMP_WORD[cat][1]} : {plural(people, 'participant')}
                 </span>
               ))}
             </p>
@@ -936,7 +946,7 @@ function GroupBlock({ group, ctx, headingLevel }: { group: Group; ctx: Ctx; head
         {group.summary && !ctx.segment && (
           <>
             <CitedText text={group.summary} ctx={ctx} />
-            <Unverified items={group.unverified} />
+            {ctx.doubts && <Unverified items={group.unverified} />}
           </>
         )}
         <Camps ideas={ideas} m={m} both={both} full={full} ctx={ctx} />
@@ -1079,7 +1089,7 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
  */
 function WhyLabel({ group, ctx, only, bare }: { group: Group; ctx: Ctx; only?: 'fragile' | 'doubt'; /** Dans la légende pliée : ni fond ni titre. */ bare?: boolean }) {
   const fragile = only === 'doubt' ? undefined : fragileReason(group)
-  const doubt = only === 'fragile' ? undefined : doubtReason(group, ctx.ideaById, ctx.alsoIn)
+  const doubt = only === 'fragile' || !ctx.doubts ? undefined : doubtReason(group, ctx.ideaById, ctx.alsoIn)
   const [open, setOpen] = useState<number | null>(null)
   if (!fragile && !doubt) return null
   return (
@@ -1104,7 +1114,8 @@ function WhyLabel({ group, ctx, only, bare }: { group: Group; ctx: Ctx; only?: '
                 cat={g.tone === 'mixed' ? 'positive' : g.tone}
                 mixed={g.tone === 'mixed'}
                 people={g.people}
-                word
+                // La phrase compte des personnes : la pastille aussi.
+                text={`${g.people}\u00a0${g.people > 1 ? 'participants' : 'participant'}${g.tone === 'mixed' ? (g.people > 1 ? ' mitigés' : ' mitigé') : ''}`}
                 open={open === k}
                 onToggle={() => setOpen((o) => (o === k ? null : k))}
               />
@@ -1373,6 +1384,7 @@ export function ReportTab({
     return () => document.removeEventListener('focusin', onFocus)
   }, [back])
   const ctx: Ctx = {
+    doubts: showsDoubts(analysis.settings),
     reveal: (groupId, from, label) => {
       const d = revealMotif(groupId)
       if (!d) return
@@ -1570,7 +1582,7 @@ export function ReportTab({
           </h2>
           <div className="max-w-lecture text-base">
             <CitedText text={analysis.globalSummary} ctx={ctx} camps={analysis.groups} />
-            <Unverified items={analysis.globalUnverified} />
+            {ctx.doubts && <Unverified items={analysis.globalUnverified} />}
             {summaryDoubts(sectionsHL) && <DoubtLinks sections={sectionsHL} ctx={ctx} />}
           </div>
         </section>
@@ -1649,7 +1661,7 @@ export function ReportTab({
                   {t.summary && !segment && (
                     <div className="max-w-lecture text-base">
                       <CitedText text={t.summary} ctx={ctx} />
-                      <Unverified items={t.unverified} />
+                      {ctx.doubts && <Unverified items={t.unverified} />}
                     </div>
                   )}
                   <div>

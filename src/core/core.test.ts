@@ -49,7 +49,7 @@ import { locateQuote, quoteText, withAntecedent } from './analysis/verbatim'
 import { emptyCorpus, promptsOf, removeSource, renameSource } from './corpus'
 import { maskNames, verifiedNames } from './analysis/names'
 import { dividedFragile, fragileShown, highlightLine, highlights, labelDoubt } from './analysis/highlights'
-import { categoryBar, categoryBarLabel, fullQuestionIds, leadSentence, wholeCamp, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext, stanceTitle, summaryDoubts } from './analysis/report'
+import { campLabel, categoryBar, categoryBarLabel, fullQuestionIds, leadSentence, wholeCamp, metricsLine, opinionSquares, refsToPeople, reportToHtml, reportToMarkdown, shortAnswerContext, stanceTitle, summaryDoubts } from './analysis/report'
 import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
@@ -910,8 +910,8 @@ describe('ligne de chiffres affichée', () => {
       idea('A', 'P20', 'positive'),
       idea('B', 'P21', 'neutral'),
     ])
-    expect(metricsLine(many)).toBe('12 participants · avis : 1 positif, 10 négatifs · 1 participant fait un constat · large majorité négative (10 sur 11 qui donnent un avis)')
-    expect(metricsLine(computeMetrics([idea('X', 'P1', 'negative')]))).toBe('1 participant · avis : 1 négatif')
+    expect(metricsLine(many)).toBe('12 participants · 1 positif, 10 négatifs · 1 participant fait un constat · large majorité négative (10 sur 11 qui donnent un avis)')
+    expect(metricsLine(computeMetrics([idea('X', 'P1', 'negative')]))).toBe('1 participant · 1 négatif')
   })
 })
 
@@ -1311,6 +1311,16 @@ describe('méthodes par famille de modèles', () => {
     const gem = groupSummaryPrompt(input, { ...DEFAULT_SETTINGS, method: 'gemini' }).user
     expect(gem).toContain('Chaque phrase se comprend seule')
     expect(gem.replace(/9\. Chaque phrase[^\n]*\n/, '')).toBe(ref)
+  })
+})
+
+describe('intitulé d’un camp : les avis, puis les participants', () => {
+  it('dit ce qui est dit puis qui le dit, au singulier comme au pluriel, mitigés compris', () => {
+    const nb = (t: string) => t.replace(/\u00a0/g, ' ')
+    expect(nb(campLabel('positive', 47, 49, 1))).toBe('49 avis positifs · 47 participants (dont 1 mitigé)')
+    expect(nb(campLabel('negative', 1, 1))).toBe('1 avis négatif · 1 participant')
+    expect(nb(campLabel('negative', 2, 3, 2))).toBe('3 avis négatifs · 2 participants, tous deux mitigés')
+    expect(nb(campLabel('suggestion', 3, 4))).toBe('4 suggestions · 3 participants')
   })
 })
 
@@ -1887,7 +1897,7 @@ describe('rapport', () => {
     ])
     expect(opinionSquares(m)).toBe('🟥🟥🟥🟩🟩🟪⬜')
     expect(opinionSquares(m, 5)).toBe('')
-    expect(categoryBarLabel(m)).toBe('Participants par catégorie : 3 avis négatifs (dont 1 mitigé), 2 avis positifs (dont 1 mitigé), 1 suggestion, 1 constat')
+    expect(categoryBarLabel(m)).toBe('Participants par catégorie : avis négatifs : 3 (dont 1 mitigé), avis positifs : 2 (dont 1 mitigé), suggestions : 1, constats : 1')
   })
 
   it('« notamment » quand la phrase compte plus de personnes que les renvois, numéros triés', () => {

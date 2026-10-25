@@ -2,7 +2,7 @@ import type { Corpus } from '../corpus'
 import { activeParticipants, duplicateContributions, promptsOf } from '../corpus'
 import { presetById } from '../providers/presets'
 import { DOUBT_HELP, FRAGILE_HELP, helpText, labelled, LIMITS_HELP, STANCE_HELP } from './glossary'
-import { dividedFragile, fragileShown, highlights, labelDoubt, type Highlight, type Highlights } from './highlights'
+import { dividedFragile, fragileShown, highlights, labelDoubt, showsDoubts, type Highlight, type Highlights } from './highlights'
 import { withCurrentMetrics } from './metrics'
 import { maskNames, maskWithOffsets } from './names'
 import { ARTICLE_SCRIPT, scriptJson } from './article'
@@ -129,7 +129,7 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
       `Balayage par définition : les idées rangées dans les autres thèmes ont été relues au regard de la définition ${w.motifs > 1 ? `des ${w.motifs} thèmes cités` : 'du thème cité'} dans le résumé ; ${done.length ? done.join(', ') : 'aucune n’y manquait'}.`,
     )
   }
-  const doubtful = state.groups.filter((g) => labelDoubt(g, new Map(state.ideas.map((i) => [i.id, i]))))
+  const doubtful = showsDoubts(state.settings) ? state.groups.filter((g) => labelDoubt(g, new Map(state.ideas.map((i) => [i.id, i])))) : []
   if (doubtful.length)
     lines.push(
       `Étiquettes à vérifier : ${doubtful.length} thème${doubtful.length > 1 ? 's' : ''} ${doubtful.length > 1 ? 'portent' : 'porte'} la mention « à vérifier », parce que ${doubtful.length > 1 ? 'leur étiquette dépend' : 'son étiquette dépend'} d'avis comptés aussi dans un autre thème. Le code mesure cet écart ; c'est au lecteur de trancher, en relisant les citations.`,
@@ -156,7 +156,7 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
     lines.push(
       `Sources : ${kinds.join(' ; ')}. Un entretien compte pour une personne, comme une ligne de questionnaire : on compte des personnes, pas la longueur de ce qu'elles disent.`,
     )
-  lines.push(labelled('Limites', LIMITS_HELP))
+  lines.push(labelled('Limites', showsDoubts(state.settings) ? LIMITS_HELP : { ...LIMITS_HELP, action: 'En cas de doute, relisez les citations et la définition du thème.' }))
   lines.push(
     'Principe : restituer ce que les participants ont dit, avec le moins de déformation possible. Les verbatims sont recopiés tels quels, sans correction ; seule une coupure « […] » peut sauter un passage sans rapport, jamais une négation ou une réserve. Le texte complet reste consultable dans OpenScribe.',
   )
@@ -173,7 +173,7 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   lines.push(
     `Moteur d'IA : ${state.engine.presetId === 'bridge' || state.engine.presetId === 'simulation' ? engine : `${engine}, modèle ${state.engine.model}`} · température ${state.settings.temperature} · graine ${state.settings.seed}.`,
     "Partage des rôles : le moteur d'IA découpe les réponses en idées (positif, négatif, suggestion, question ou constat), propose les thèmes et les réunit en grands thèmes, et rédige les synthèses ; le code vérifie chaque verbatim, range chaque idée exactement une fois et calcule tous les chiffres, y compris les listes « Ce qui a marché », « Ce qui bloque », « Ce qui divise », « Ce que proposent les participants » et « Questions soulevées ». « Ce qui divise » réunit les thèmes aux avis opposés et ceux où tous font la même critique mais proposent des remèdes opposés (repérés par le moteur d'IA ; le code vérifie qu'il s'agit de deux propositions de deux personnes différentes).",
-    `Indicateurs : on compte des participants. Dans « 4 avis négatifs sur 5 », le total (5) compte les participants qui disent du bien du thème, du mal, ou les deux (mitigés, comptés dans le total mais dans aucun camp ; dans les listes de verbatims, un mitigé figure dans les deux camps) ; suggestions, questions et constats ne sont pas des avis. Chaque liste de verbatims dit aussi combien de verbatims elle réunit (« 9 avis positifs · 14 verbatims ») : une personne peut s'exprimer plusieurs fois, elle ne compte qu'une fois. Le chiffre vient toujours avec le mot de l'échelle : « unanime » quand toutes les personnes qui donnent un avis sont du même côté ; « large majorité » à partir de 80 % ; « majorité » au-dessus de la moitié ; « pas de majorité » quand le camp en tête reste sous la moitié ; « avis partagés » quand les deux camps sont proches (chacun au moins deux personnes, le plus petit au moins la moitié du plus grand) ou quand les mitigés sont au moins aussi nombreux que le camp le plus fort ; en dessous de 4 avis, « peu d'avis ». « Fragile » signale qu'une seule voix changeant de camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver : la base est celle des personnes qui ont donné un avis spontanément. Ces proportions décrivent les personnes interrogées, pas une population. Un grand thème réunit des thèmes différents : on n'y additionne pas les avis.`,
+    `Indicateurs : on compte des participants. Dans « 4 participants sur 5 d'avis négatif », le total (5) compte les participants qui disent du bien du thème, du mal, ou les deux (mitigés, comptés dans le total mais dans aucun camp ; dans les listes de verbatims, un mitigé figure dans les deux camps) ; suggestions, questions et constats ne sont pas des avis. Un avis est ce qui est dit, un participant celui qui le dit : chaque liste de verbatims donne les deux (« 14 avis positifs · 9 participants »), car un participant peut donner plusieurs avis ; il ne compte qu'une fois. Le chiffre vient toujours avec le mot de l'échelle : « unanime » quand toutes les personnes qui donnent un avis sont du même côté ; « large majorité » à partir de 80 % ; « majorité » au-dessus de la moitié ; « pas de majorité » quand le camp en tête reste sous la moitié ; « avis partagés » quand les deux camps sont proches (chacun au moins deux personnes, le plus petit au moins la moitié du plus grand) ou quand les mitigés sont au moins aussi nombreux que le camp le plus fort ; en dessous de 4 avis, « peu d'avis ». « Fragile » signale qu'une seule voix changeant de camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver : la base est celle des personnes qui ont donné un avis spontanément. Ces proportions décrivent les personnes interrogées, pas une population. Un grand thème réunit des thèmes différents : on n'y additionne pas les avis.`,
     'Dans les synthèses, « (P2, P14) » renvoie aux participants dont un verbatim appuie la phrase ; « (notamment P2) » signale un exemple quand la phrase compte davantage de personnes.',
     'Une réponse de quelques mots est suivie de sa question, qui en donne le sens (en entier la première fois dans un thème, puis par son code).',
     "Les questions orientent les réponses (« qu'est-ce qui a bien marché ? ») : un thème où personne ne critique n'est pas pour autant un accord de tous, les autres participants n'en ont simplement pas parlé.",
@@ -218,7 +218,8 @@ export function metricsLine(m: Metrics): string {
   const mix = m.mixed.length
   const parts = [n(m.participants, 'participant')]
   const opinions = [pos && n(pos, 'positif'), neg && n(neg, 'négatif'), mix && n(mix, 'mitigé')].filter(Boolean)
-  if (opinions.length) parts.push(`avis : ${opinions.join(', ')}`)
+  // Des participants : « 29 participants · 4 positifs, 20 négatifs, 1 mitigé » (les avis se comptent dans les listes de verbatims).
+  if (opinions.length) parts.push(opinions.join(', '))
   const by = m.participantsByCategory
   const one = (cat: 'suggestion' | 'question') => m.mentionsByCategory[cat] === 1
   if (by.suggestion)
@@ -549,12 +550,12 @@ const BAR_WORD: Record<IdeaCategory, [string, string]> = {
   neutral: ['constat', 'constats'],
 }
 
-/** « 3 avis positifs (dont 1 mitigé), 1 suggestion » : ce que dit la barre, pour un lecteur d'écran ou une infobulle. */
+/** « Participants par catégorie : avis positifs : 3 (dont 1 mitigé), suggestions : 1 » : ce que dit la barre, pour un lecteur d'écran ou une infobulle. */
 export function categoryBarLabel(m: Metrics): string {
   return `Participants par catégorie : ${categoryBar(m)
     .map(({ cat, people }) => {
       const mixed = cat === 'positive' || cat === 'negative' ? m.mixed.length : 0
-      return `${people} ${BAR_WORD[cat][people > 1 ? 1 : 0]}${mixed ? ` (dont ${mixed} mitigé${mixed > 1 ? 's' : ''})` : ''}`
+      return `${BAR_WORD[cat][1]} : ${people}${mixed ? ` (dont ${mixed} mitigé${mixed > 1 ? 's' : ''})` : ''}`
     })
     .join(', ')}`
 }
@@ -565,21 +566,21 @@ export function displayOrder(ideas: Idea[], m: Metrics, order: IdeaCategory[] = 
 }
 
 /**
- * L'intitulé d'un camp, partout où il se déroule (volet du résumé, camps d'un thème, exports) : « 14 avis positifs
- * (dont 2 mitigés) · 17 verbatims ». Le premier nombre compte des personnes (un avis = une personne, comme dans
- * « 12 avis positifs sur 14 ») ; le second, ce qu'elles ont dit : 9 avis et 14 verbatims, c'est 9 personnes dont
- * certaines s'expriment plusieurs fois (Arnaud, 25/10 : le chiffre d'abord, les deux indicateurs, une seule forme).
+ * L'intitulé d'un camp, partout où il se déroule (volet du résumé, camps d'un thème, exports) : « 49 avis positifs ·
+ * 47 participants (dont 1 mitigé) ». Un avis, c'est ce qui est dit (un verbatim positif) ; un participant, la personne
+ * qui le dit, et qui peut donner plusieurs avis (Arnaud, 25/10 : les avis d'abord, puis les participants, une seule
+ * forme partout). Les échelles (« unanime », « large majorité ») comptent les participants.
  */
-export function campLabel(cat: IdeaCategory, people: number, verbatims: number, mixed = 0): string {
+export function campLabel(cat: IdeaCategory, people: number, avis: number, mixed = 0): string {
   const [one, many] = BAR_WORD[cat]
-  const head = `${people}\u00a0${people > 1 ? many : one}`
+  const head = `${avis}\u00a0${avis > 1 ? many : one}`
   const polar = cat === 'positive' || cat === 'negative'
   const both = !polar || !mixed ? '' : mixed === people ? (people > 2 ? ', tous mitigés' : people === 2 ? ', tous deux mitigés' : ', mitigé') : ` (dont ${mixed} mitigé${mixed > 1 ? 's' : ''})`
   // Espaces insécables : sur un écran étroit, la ligne se coupe après « · », jamais entre un nombre et son mot.
-  return `${head}${both}\u00a0· ${verbatims}\u00a0verbatim${verbatims > 1 ? 's' : ''}`
+  return `${head}\u00a0· ${people}\u00a0participant${people > 1 ? 's' : ''}${both}`
 }
 
-/** L'intitulé d'un camp d'après ses lignes (une par personne) : « 14 avis positifs (dont 2 mitigés) · 17 verbatims ». */
+/** L'intitulé d'un camp d'après ses lignes (une par personne) : « 17 avis positifs · 14 participants (dont 2 mitigés) ». */
 export function categoryHeading(cat: IdeaCategory, lines: { participantId: string; ideas: Idea[] }[], both: Set<string>): string {
   const mixed = lines.filter((l) => both.has(l.participantId)).length
   return campLabel(cat, lines.length, lines.reduce((n, l) => n + l.ideas.length, 0), mixed)
@@ -670,8 +671,9 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
   const h = highlights(state.groups, byId)
   const mask = (t: string) => maskNames(t, state.settings.maskNames ? state.names : undefined)
   const pl = (n: number) => (n > 1 ? 's' : '')
-  // Le chiffre d'abord : aucun accord à faire avec le titre du motif (« Délais de livraison — 5 avis négatifs sur 6 »).
-  const opinion = (x: Highlight, kind: string) => `${x.people} avis ${kind}${x.people > 1 ? 's' : ''} sur ${x.of}`
+  // Le chiffre d'abord : aucun accord à faire avec le titre du motif (« Délais de livraison — 5 participants sur 6 d'avis négatif »).
+  // Des participants, pas des avis : « 5 participants sur 6 d'avis négatif » (un participant peut donner plusieurs avis).
+  const opinion = (x: Highlight, kind: string) => `${x.people} participant${x.people > 1 ? 's' : ''} sur ${x.of} d'avis ${kind}`
   const INTRO = 'Chiffres : participants qui donnent un avis sur le thème.'
   const SHOWN = 6
   // Une liste n'est jamais coupée au milieu d'ex aequo : les motifs à égalité avec le dernier montré restent visibles.
@@ -684,7 +686,7 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
   const groupOf = new Map(state.groups.map((g) => [g.id, g]))
   const marks = (groupId: string) => {
     const g = groupOf.get(groupId)!
-    const doubt = labelDoubt(g, byId)
+    const doubt = showsDoubts(state.settings) ? labelDoubt(g, byId) : undefined
     const fragile = fragileShown(g.metrics) || dividedFragile(g)
     return { ...(fragile ? { fragile: true } : {}), ...(doubt ? { doubt } : {}) }
   }
@@ -829,7 +831,7 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
   const out: string[] = [`# ${title}`, '']
   if (opts.stale) out.push(`> ${STALE_NOTE}`, '')
   const warn = (items?: string[]) => {
-    if (items?.length) out.push(`> À vérifier : ${items.map((x) => `« ${x} »`).join(', ')} ne correspond à aucun chiffre calculé ni cité.`, '')
+    if (items?.length && showsDoubts(state.settings)) out.push(`> À vérifier : ${items.map((x) => `« ${x} »`).join(', ')} ne correspond à aucun chiffre calculé ni cité.`, '')
   }
   const sizeOf = motifSizes(state)
   const prose = (t: string) => refsToPeople(v.text(t), byId, undefined, sizeOf)
@@ -854,7 +856,7 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
     const squares = opinionSquares(g.metrics)
     out.push(`${level} ${g.title}`, '', `${squares ? `${squares}  ` : ''}*${metricsLine(g.metrics)}*`, '')
     if (g.definition) out.push(`*${definitionLine(g.definition)}*`, '')
-    const doubt = labelDoubt(g, byId)
+    const doubt = showsDoubts(state.settings) ? labelDoubt(g, byId) : undefined
     if (doubt) out.push(`**${cap(doubt)}.**`, '')
     const dominant = dominantVoice(ideasOf(g, byId))
     if (dominant) out.push(`*${dominant}*`, '')
@@ -997,7 +999,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
     const note = both.size ? `<p class="facts">* Personne qui s'exprime aussi dans l'autre sens sur ce thème.</p>` : ''
     const dominant = dominantVoice(ideasOf(g, byId))
     // La synthèse se lit en premier ; la définition du motif, explication secondaire, reste pliée (remarque d'Arnaud, 17/10).
-    const doubt = labelDoubt(g, byId)
+    const doubt = showsDoubts(state.settings) ? labelDoubt(g, byId) : undefined
     return `<section class="group"><${h}>${e(g.title)}</${h}>${bar(g.metrics)}<p class="facts">${e(metricsLine(g.metrics))}${help(stanceTitle(g.metrics))}</p>${doubt ? `<p class="facts"><strong>${e(cap(doubt))}.</strong>${help(helpText({ ...DOUBT_HELP, what: '' }))}</p>` : ''}${dominant ? `<p class="facts">${e(dominant)}</p>` : ''}${g.summary ? `<div class="synth">${para(g.summary)}</div>` : ''}${g.definition ? `<details class="def"><summary>Ce qui compte comme positif ou négatif dans ce thème</summary><p>${e(definitionLine(g.definition))}</p></details>` : ''}${blocks}${note}</section>`
   }
 
