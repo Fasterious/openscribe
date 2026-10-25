@@ -21,7 +21,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm',
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         outline: 'border border-input bg-card hover:bg-accent hover:text-accent-foreground',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         destructive: 'bg-negative text-white hover:bg-negative/90',
@@ -46,7 +46,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ classN
 Button.displayName = 'Button'
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('rounded-xl border bg-card text-card-foreground shadow-sm', className)} {...props} />
+  return <div className={cn('rounded-lg border bg-card text-card-foreground', className)} {...props} />
 }
 
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -131,26 +131,28 @@ export function Progress({ value, className, label }: { value: number; className
 }
 
 export function Alert({ className, tone = 'info', ...props }: React.HTMLAttributes<HTMLDivElement> & { tone?: 'info' | 'warning' | 'error' | 'success' }) {
+  // Un filet de couleur à gauche sur fond neutre : le ton se lit sans faire une tache de couleur dans la page (refonte du 25/10).
   const tones = {
-    info: 'border-primary/30 bg-accent/60',
-    warning: 'border-warning/60 bg-warning/10',
-    error: 'border-negative/50 bg-negative/10',
-    success: 'border-positive/50 bg-positive/10',
+    info: 'border-l-primary',
+    warning: 'border-l-warning',
+    error: 'border-l-negative',
+    success: 'border-l-positive',
   }
-  return <div role={tone === 'error' ? 'alert' : 'status'} className={cn('rounded-lg border p-3 text-sm', tones[tone], className)} {...props} />
+  return <div role={tone === 'error' ? 'alert' : 'status'} className={cn('rounded-md border-l-2 bg-muted/70 px-3.5 py-3 text-sm', tones[tone], className)} {...props} />
 }
 
 export const Tabs = TabsPrimitive.Root
 
 export function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
-  return <TabsPrimitive.List className={cn('inline-flex h-10 items-center gap-1 rounded-lg bg-muted p-1 text-muted-foreground', className)} {...props} />
+  // Onglets soulignés, posés sur le filet de l'en-tête : la page s'ancre sur une seule ligne (refonte du 25/10).
+  return <TabsPrimitive.List className={cn('inline-flex h-11 items-stretch gap-6 text-muted-foreground', className)} {...props} />
 }
 
 export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm disabled:opacity-50',
+        'relative -mb-px inline-flex items-center justify-center gap-1.5 whitespace-nowrap border-b-2 border-transparent px-0.5 text-sm font-medium transition-colors cursor-pointer hover:text-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground disabled:opacity-50 disabled:hover:text-muted-foreground',
         className,
       )}
       {...props}
@@ -223,6 +225,7 @@ export function Disclosure({
   defaultOpen,
   className,
   flat,
+  plain,
 }: {
   summary: React.ReactNode
   children: React.ReactNode
@@ -230,22 +233,30 @@ export function Disclosure({
   className?: string
   /** Sur petit écran, sans cadre : un simple trait sous chaque bloc, le contenu prend toute la largeur. */
   flat?: boolean
+  /** Sans cadre à toutes les largeurs : une ligne d'une liste à filets (le filet est celui de la liste). */
+  plain?: boolean
 }) {
   return (
     <details
       open={defaultOpen}
-      className={cn('group/disclosure rounded-lg border bg-card', flat && 'max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0 max-sm:bg-transparent', className)}
+      className={cn(
+        'group/disclosure',
+        !plain && 'rounded-lg border bg-card',
+        !plain && flat && 'max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0 max-sm:bg-transparent',
+        className,
+      )}
     >
       <summary
         className={cn(
           'flex cursor-pointer list-none items-center justify-between gap-2 p-3 text-sm font-medium [&::-webkit-details-marker]:hidden',
           flat && 'max-sm:px-0',
+          plain && 'px-0 py-2.5 hover:text-primary',
         )}
       >
         <span className="min-w-0 flex-1">{summary}</span>
         <Chevron className="group-open/disclosure:rotate-180" />
       </summary>
-      <div className={cn('border-t p-3', flat && 'max-sm:border-t-0 max-sm:px-0 max-sm:pt-1')}>{children}</div>
+      <div className={cn('border-t p-3', flat && 'max-sm:border-t-0 max-sm:px-0 max-sm:pt-1', plain && 'border-t-0 px-0 pt-0 pb-3')}>{children}</div>
     </details>
   )
 }

@@ -24,7 +24,7 @@
   --suggestion: oklch(0.5 0.17 270);
   --question: oklch(0.52 0.11 210);
   --warning: oklch(0.75 0.15 75);
-  --radius: 0.75rem;
+  --radius: 0.5rem;
 }
 
 @media (prefers-color-scheme: dark) {

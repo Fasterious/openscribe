@@ -97,95 +97,99 @@ function CorpusSummary({ project, update }: { project: Project; update: Update }
     })
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
-      <Card>
-        <CardHeader>
-          <CardTitle>Vos données</CardTitle>
-          <CardDescription>
+    // Deux colonnes séparées par un filet, sans cartes (refonte du 25/10) : les sources et les questions, puis les participants.
+    <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:gap-0">
+      <section aria-labelledby="vos-donnees" className="space-y-4 lg:border-r lg:pr-8">
+        <header>
+          <h2 id="vos-donnees" className="text-base font-semibold">
+            Vos données
+          </h2>
+          <p className="text-sm text-muted-foreground tabular-nums">
             {plural(people.length, 'participant')} · {plural(corpus.contributions.length, 'réponse')} ·{' '}
             {plural(corpus.sources.length, 'source')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <ul className="space-y-1 text-sm">
-            {corpus.sources.map((s) => (
-              <SourceRow
-                key={s.id}
-                source={s}
-                people={new Set(corpus.contributions.filter((c) => c.sourceId === s.id).map((c) => c.participantId)).size}
-                onRename={(name) => update((p) => ({ ...p, corpus: renameSource(p.corpus, s.id, name) }))}
-                onRemove={
-                  corpus.sources.length > 1
-                    ? () => update((p) => ({ ...p, corpus: removeSource(p.corpus, s.id), selectedPrompts: p.selectedPrompts.filter((q) => promptsOf(removeSource(p.corpus, s.id)).includes(q)) }))
-                    : undefined
-                }
-              />
-            ))}
-          </ul>
-          <p className="text-xs text-muted-foreground">
-            Une synthèse peut mêler un questionnaire et des entretiens : chaque entretien compte comme un participant aux réponses longues, analysé
-            avec la même méthode.
           </p>
-          {prompts.length > 0 && (
-            <fieldset className="space-y-2">
-              <legend className="mb-1 text-sm font-medium">Questions à analyser</legend>
-              {prompts.map((q) => {
-                const n = corpus.contributions.filter((c) => c.prompt === q).length
-                return (
-                  <label key={q} className="flex cursor-pointer items-start gap-2 rounded-md p-1 text-sm hover:bg-muted">
-                    <input type="checkbox" className="mt-1 accent-[var(--primary)]" checked={selected.has(q)} onChange={() => toggle(q)} />
-                    <span className="min-w-0">
-                      {q} <span className="text-muted-foreground">({plural(n, 'réponse')})</span>
-                    </span>
-                  </label>
-                )
-              })}
-            </fieldset>
-          )}
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Les participants</CardTitle>
-          <CardDescription>
+        </header>
+        <ul className="space-y-1 text-sm">
+          {corpus.sources.map((s) => (
+            <SourceRow
+              key={s.id}
+              source={s}
+              people={new Set(corpus.contributions.filter((c) => c.sourceId === s.id).map((c) => c.participantId)).size}
+              onRename={(name) => update((p) => ({ ...p, corpus: renameSource(p.corpus, s.id, name) }))}
+              onRemove={
+                corpus.sources.length > 1
+                  ? () => update((p) => ({ ...p, corpus: removeSource(p.corpus, s.id), selectedPrompts: p.selectedPrompts.filter((q) => promptsOf(removeSource(p.corpus, s.id)).includes(q)) }))
+                  : undefined
+              }
+            />
+          ))}
+        </ul>
+        <p className="text-xs text-muted-foreground">
+          Une synthèse peut mêler un questionnaire et des entretiens : chaque entretien compte comme un participant aux réponses longues, analysé
+          avec la même méthode.
+        </p>
+        {prompts.length > 0 && (
+          <fieldset className="space-y-2">
+            <legend className="mb-1 text-sm font-medium">Questions à analyser</legend>
+            {prompts.map((q) => {
+              const n = corpus.contributions.filter((c) => c.prompt === q).length
+              return (
+                <label key={q} className="flex cursor-pointer items-start gap-2 rounded-md p-1 text-sm hover:bg-muted">
+                  <input type="checkbox" className="mt-1 accent-[var(--primary)]" checked={selected.has(q)} onChange={() => toggle(q)} />
+                  <span className="min-w-0">
+                    {q} <span className="text-muted-foreground">({plural(n, 'réponse')})</span>
+                  </span>
+                </label>
+              )
+            })}
+          </fieldset>
+        )}
+      </section>
+      <section aria-labelledby="participants" className="space-y-4 lg:pl-8">
+        <header>
+          <h2 id="participants" className="text-base font-semibold">
+            Les participants
+          </h2>
+          <p className="text-sm text-muted-foreground">
             Chaque participant reçoit un pseudonyme (P1, P2…). Pour l'analyse, seuls ce pseudonyme et ses verbatims partent vers le moteur d'IA :
             jamais son nom ni son adresse.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="max-h-[28rem] space-y-2 overflow-y-auto">
-          {people.map((p) => {
-            const items = contributionsOf(corpus, p.id)
-            return (
-              <Disclosure
-                key={p.id}
-                summary={
-                  <span className="flex flex-wrap items-center gap-2">
-                    <strong>{p.label}</strong>
-                    {p.label !== p.id && <span className="text-xs text-muted-foreground">{p.id}</span>}
-                    {Object.entries(p.attributes)
-                      .slice(0, 2)
-                      .map(([k, v]) => (
-                        <span key={k} className="text-xs text-muted-foreground" title={`Profil (${k}) : sert à afficher un segment dans le rapport`}>
-                          <span className="opacity-70">{k} :</span> {v}
-                        </span>
-                      ))}
-                    <span className="text-xs text-muted-foreground">{plural(items.length, 'réponse')}</span>
-                  </span>
-                }
-              >
-                <ul className="space-y-2 text-sm">
-                  {items.map((c) => (
-                    <li key={c.id}>
-                      {c.prompt && <p className="text-xs font-medium text-muted-foreground">{c.prompt}</p>}
-                      <p className="whitespace-pre-wrap">{c.text}</p>
-                    </li>
-                  ))}
-                </ul>
-              </Disclosure>
-            )
-          })}
-        </CardContent>
-      </Card>
+          </p>
+        </header>
+        <div className="max-h-[32rem] divide-y overflow-y-auto border-y">
+        {people.map((p) => {
+          const items = contributionsOf(corpus, p.id)
+          return (
+            <Disclosure
+              key={p.id}
+              plain
+              summary={
+                <span className="flex flex-wrap items-center gap-2">
+                  <strong>{p.label}</strong>
+                  {p.label !== p.id && <span className="text-xs text-muted-foreground">{p.id}</span>}
+                  {Object.entries(p.attributes)
+                    .slice(0, 2)
+                    .map(([k, v]) => (
+                      <span key={k} className="text-xs text-muted-foreground" title={`Profil (${k}) : sert à afficher un segment dans le rapport`}>
+                        <span className="opacity-70">{k} :</span> {v}
+                      </span>
+                    ))}
+                  <span className="text-xs text-muted-foreground">{plural(items.length, 'réponse')}</span>
+                </span>
+              }
+            >
+              <ul className="space-y-2 text-sm">
+                {items.map((c) => (
+                  <li key={c.id}>
+                    {c.prompt && <p className="text-xs font-medium text-muted-foreground">{c.prompt}</p>}
+                    <p className="whitespace-pre-wrap">{c.text}</p>
+                  </li>
+                ))}
+              </ul>
+            </Disclosure>
+          )
+        })}
+        </div>
+      </section>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { Copy, FileUp, FlaskConical, MoreHorizontal, Pencil, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { Copy, FileUp, MoreHorizontal, Pencil, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { deleteProject, getResponses, putResponses } from '@/app/db'
 import { href, navigate } from '@/app/router'
@@ -7,7 +7,7 @@ import { activeParticipants } from '@/core/corpus'
 import { corpusHash } from '@/core/analysis/pipeline'
 import { corpusForAnalysis, exportProject, importProject, newProject, ProjectFileError, type Project } from '@/core/project'
 import { formatDate, plural } from './format'
-import { Alert, Badge, Button, Card, Dialog, DropMenu, Input, Label, MenuItem, Tooltip } from './primitives'
+import { Alert, Button, Dialog, DropMenu, Input, Label, MenuItem, Tooltip } from './primitives'
 
 function statusOf(p: Project, stale: boolean): { label: string; tone: 'default' | 'positive' | 'warning' | 'outline' } {
   const a = p.analyses[0]
@@ -158,10 +158,7 @@ export function SynthesisPage() {
             side="bottom"
             content="Importez des réponses de questionnaire, des transcriptions d'entretiens ou des notes : OpenScribe en tire les thèmes récurrents, compte qui dit quoi et rédige un rapport où chaque constat renvoie aux verbatims."
           >
-            <h1 tabIndex={0} className="flex cursor-help items-center gap-3 text-3xl font-bold tracking-tight">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-accent text-primary">
-                <FlaskConical className="size-5" />
-              </span>
+            <h1 tabIndex={0} className="cursor-help text-2xl font-semibold tracking-tight sm:text-3xl">
               Synthèse
             </h1>
           </Tooltip>
@@ -184,37 +181,35 @@ export function SynthesisPage() {
         {mine === null ? (
           <p className="text-sm text-muted-foreground">Chargement…</p>
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {mine.map((p) => (
-              <li key={p.id}>
-                <StudyCard
-                  project={p}
-                  actions={{
-                    rename: () => {
-                      setRenameValue(p.name)
-                      setToRename(p)
-                    },
-                    duplicate: () => duplicate(p),
-                    remove: () => setToDelete(p),
-                  }}
-                />
-              </li>
-            ))}
-            {mine.length === 0 && (
-              <li>
-                <button
-                  onClick={actions.newStudy}
-                  className="flex h-full min-h-32 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-4 text-sm text-muted-foreground hover:border-primary hover:text-primary"
-                >
-                  <Plus className="size-5" />
-                  Créer votre première synthèse
-                </button>
-              </li>
-            )}
-            <li>
+          <>
+            {/* Une liste, pas des cartes : une ligne par synthèse, alignée sur la même grille (refonte du 25/10). */}
+            <ul className="divide-y border-y">
+              {mine.map((p) => (
+                <li key={p.id}>
+                  <StudyCard
+                    project={p}
+                    actions={{
+                      rename: () => {
+                        setRenameValue(p.name)
+                        setToRename(p)
+                      },
+                      duplicate: () => duplicate(p),
+                      remove: () => setToDelete(p),
+                    }}
+                  />
+                </li>
+              ))}
+              {mine.length === 0 && (
+                <li className="py-5 text-sm text-muted-foreground">
+                  Aucune synthèse pour l'instant. « Nouvelle synthèse » importe un questionnaire, des entretiens ou des notes.
+                </li>
+              )}
+            </ul>
+            <div className="space-y-2 pt-4">
+              <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Pour découvrir</h2>
               <ExampleCard project={example} onOpen={() => openExample(projects)} />
-            </li>
-          </ul>
+            </div>
+          </>
         )}
       </section>
 
@@ -283,23 +278,30 @@ function useStale(p: Project): boolean {
   return stale
 }
 
+const STATUS_DOT = { default: 'bg-primary', positive: 'bg-positive', warning: 'bg-warning', outline: 'bg-muted-foreground/40' } as const
+
 export function StudyCard({ project: p, actions }: { project: Project; actions?: { rename: () => void; duplicate: () => void; remove: () => void } }) {
   const st = statusOf(p, useStale(p))
   return (
-    <Card className="relative flex h-full flex-col transition-shadow hover:shadow-md">
-      <a href={projectHref(p)} className="block flex-1 p-4 pr-12">
-        <h3 className="font-medium leading-snug">{p.name}</h3>
-        <p className="mt-1.5 text-xs text-muted-foreground">
-          {plural(activeParticipants(p.corpus).length, 'participant')} · {plural(p.corpus.contributions.length, 'réponse')} · modifiée le{' '}
-          {formatDate(p.updatedAt)}
-        </p>
-        <Badge tone={st.tone} className="mt-3 whitespace-nowrap">
-          {st.label}
-        </Badge>
+    <div className="group relative flex items-center gap-3">
+      <a href={projectHref(p)} className="flex min-w-0 flex-1 flex-col gap-1 py-3.5 pr-2 sm:flex-row sm:items-center sm:gap-6">
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-medium group-hover:text-primary">{p.name}</span>
+          <span className="block text-sm text-muted-foreground tabular-nums">
+            {plural(activeParticipants(p.corpus).length, 'participant')} · {plural(p.corpus.contributions.length, 'réponse')}
+          </span>
+        </span>
+        <span className="flex shrink-0 items-center gap-4 text-sm text-muted-foreground sm:w-80 sm:justify-between">
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-foreground">
+            <span aria-hidden className={`size-1.5 rounded-full ${STATUS_DOT[st.tone]}`} />
+            {st.label}
+          </span>
+          <span className="whitespace-nowrap tabular-nums">modifiée le {formatDate(p.updatedAt)}</span>
+        </span>
       </a>
-      {/* Les actions rares (renommer, dupliquer, supprimer) restent à portée sans encombrer la carte. */}
+      {/* Les actions rares (renommer, dupliquer, supprimer) restent à portée sans encombrer la ligne. */}
       {actions && (
-        <div className="absolute top-2 right-2">
+        <div className="shrink-0">
           <DropMenu iconOnly icon={<MoreHorizontal />} label="Actions" ariaLabel={`Actions sur ${p.name}`} width="w-52">
             {(close) => (
               <>
@@ -333,26 +335,24 @@ export function StudyCard({ project: p, actions }: { project: Project; actions?:
           </DropMenu>
         </div>
       )}
-    </Card>
+    </div>
   )
 }
 
-/** L'exemple : toujours là, visiblement à part de vos synthèses. */
+/** L'exemple : toujours là, à part de vos synthèses, sous la même forme de ligne. */
 function ExampleCard({ project, onOpen }: { project?: Project; onOpen: () => void }) {
   return (
     <button
       onClick={onOpen}
-      className="flex h-full w-full cursor-pointer flex-col rounded-xl border border-dashed border-primary/50 bg-accent/30 p-4 text-left transition-colors hover:border-primary hover:bg-accent/60"
+      className="group flex w-full cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors hover:border-primary/60 hover:bg-accent/40"
     >
-      <span className="flex items-start justify-between gap-2">
-        <span className="font-medium leading-snug">Application de médiathèque</span>
-        <Badge tone="default">
-          <Sparkles className="size-3" /> Exemple
-        </Badge>
-      </span>
-      <span className="mt-2 text-xs text-muted-foreground">
-        Questionnaire fictif · 12 participants · rapport prêt.{' '}
-        {project ? "Reprenez-le où vous l'avez laissé." : 'Pour voir un rapport complet sans rien configurer.'}
+      <Sparkles className="size-4 shrink-0 text-primary" aria-hidden />
+      <span className="min-w-0 flex-1">
+        <span className="block font-medium group-hover:text-primary">Application de médiathèque</span>
+        <span className="block text-sm text-muted-foreground">
+          Exemple · questionnaire fictif · 12 participants · rapport prêt.{' '}
+          {project ? "Reprenez-le où vous l'avez laissé." : 'Pour voir un rapport complet sans rien configurer.'}
+        </span>
       </span>
     </button>
   )

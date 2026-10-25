@@ -48,9 +48,9 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
   }
 
   return (
-    <div className="space-y-6">
-      <div className="no-print space-y-3">
-        <a href={href({ name: 'synthesis' })} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+    <div className="space-y-8">
+      <div className="no-print space-y-4">
+        <a href={href({ name: 'synthesis' })} className="inline-flex min-h-6 items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-4" /> Vos synthèses
         </a>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -68,7 +68,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
             </form>
           ) : (
             <div className="min-w-0">
-              <h1 className="flex items-center gap-2 text-2xl font-bold">
+              <h1 className="flex items-center gap-1.5 text-2xl font-semibold tracking-tight sm:text-3xl">
                 <span className="break-words">{project.name}</span>
                 <Button
                   variant="ghost"
@@ -82,7 +82,7 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
                   <Pencil />
                 </Button>
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="mt-1 text-sm text-muted-foreground tabular-nums">
                 {plural(activeParticipants(project.corpus).length, 'participant')} · {plural(project.corpus.contributions.length, 'réponse')}
                 {running && (
                   <>
@@ -111,21 +111,22 @@ export function ProjectPage({ id, tab }: { id: string; tab: 'data' | 'analysis' 
           )}
         </div>
         {/* Une seule barre : les onglets à gauche, les actions de l'onglet ouvert à droite (le rapport y place ses exports et ses filtres). */}
-        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        {/* Les onglets soulignés posés sur le filet de la page ; les actions de l'onglet ouvert à droite, sur la même ligne (au-dessus sur mobile). */}
+        <div className="flex flex-col-reverse gap-3 border-b lg:flex-row lg:items-center lg:justify-between lg:gap-4">
           <Tabs value={tab} onValueChange={(v) => navigate({ name: 'project', id, tab: v as typeof tab })}>
-            <TabsList className="w-full sm:w-auto">
-              <TabsTrigger value="data" className="flex-1 sm:flex-none">
+            <TabsList>
+              <TabsTrigger value="data">
                 <Table2 className="size-4" /> Données
               </TabsTrigger>
-              <TabsTrigger value="analysis" className="flex-1 sm:flex-none" disabled={!hasData}>
+              <TabsTrigger value="analysis" disabled={!hasData}>
                 <FlaskConical className="size-4" /> Analyse
               </TabsTrigger>
-              <TabsTrigger value="report" className="flex-1 sm:flex-none" disabled={!hasReport}>
+              <TabsTrigger value="report" disabled={!hasReport}>
                 <FileText className="size-4" /> Rapport
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <div id={TAB_ACTIONS} className="flex flex-wrap items-center gap-2 lg:justify-end" />
+          <div id={TAB_ACTIONS} className="flex flex-wrap items-center gap-2 empty:hidden lg:justify-end lg:pb-0" />
         </div>
       </div>
 
