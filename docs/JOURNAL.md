@@ -548,8 +548,7 @@ sourcées). Livré :
   de « motifs » (vocabulaire du 18/10).
 - **Prouvé côté Synthèse (même jour)** : sur un questionnaire réel à deux questions (50 personnes), la méthode commune
   obtient 7/10 aux deux lectures `methodologue` contre 6/10 pour la référence, et 7 contre 5 en langue (`docs/METHODES.md`).
-- **Reste à prouver** : la note de la méthode commune sur des entretiens (questionnaire à
-  plusieurs questions, entretiens) et avec un modèle léger ; les notes des moteurs (Gemini, Ministral) datent de
+- **Reste à prouver** : la note de la méthode commune sur des entretiens et avec un modèle léger ; les notes des moteurs (Gemini, Ministral) datent de
   l'ancienne méthode et sont à refaire.
 
 ## 2026-10-25 — Refonte de l'interface, première passe (Synthèse)
