@@ -1,7 +1,7 @@
 {
  "id": "an_3t0t0t1p601a",
  "createdAt": "2026-10-25T13:54:22.184Z",
- "updatedAt": "2026-10-25T13:56:28.349Z",
+ "updatedAt": "2026-10-25T13:57:08.400Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -545,7 +545,7 @@
    "state": "running",
    "done": 38,
    "total": 38,
-   "message": "Consolidation des thèmes"
+   "message": "Relecture des thèmes"
   },
   {
    "id": "summarize",
@@ -573,7 +573,7 @@
   }
  ],
  "calls": {
-  "total": 13,
+  "total": 15,
   "cached": 0,
   "inputTokens": 0,
   "outputTokens": 0
@@ -591,7 +591,9 @@
   "4b616b7f019530c3c253dc3ff7cfc64524a7d8f4e1ad03f575bcfc48babef66b",
   "b855f7807810a923ad78b68d8d693a9d0820f4c264582b919ca254c3c22d9072",
   "7859e4d95b494552917c33215481d538afaa984846e7fac0a1899305c2f36ece",
-  "98ea7be604a0b1a68dd1f8a6a77ddd9f1e22ba3361f8aae312c8fb91ea9a918a"
+  "98ea7be604a0b1a68dd1f8a6a77ddd9f1e22ba3361f8aae312c8fb91ea9a918a",
+  "1c0b9de09498eab81a67a8c5b376d8eef7f8a4e49d20ed35e1ab4ac639f58888",
+  "f2e0abe4e2d035e994e5928e9d2b655714f72fac6023d7514e889d717243cd52"
  ],
  "status": "running",
  "retoned": [],
