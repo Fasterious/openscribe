@@ -196,5 +196,15 @@
   "plume_motifs": 7,
   "erreurs_resume": 1,
   "reste": "école publique face au privé (définition du motif) ; décisions de méthode soumises à Arnaud"
+ },
+ {
+  "date": "2026-10-18",
+  "run": "run-opus-17",
+  "methode": "consultation, analyse de la passe 16c ; résumé régénéré (phrases plus courtes, le nombre avant le verbe) ; « fragile » affiché seulement quand les avis comptés dans deux motifs changent le mot de l'échelle (26 mentions en 16c, 14 en 17) ; renvois vérifiés",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "relecture": "non notée : mêmes données et mêmes comptes que la passe 16c, seuls le résumé et les marques « fragile » changent",
+  "erreurs_resume": 2,
+  "reste": "école publique face au privé (24 sur 34 : 18 jugent le public moins bon, 6 dénoncent l'inégalité) ; réforme du système éducatif (20 sur 24 : 15 visent le fonctionnement, 5 des réformes). Les deux sont expliquées dans « Méthode et limites » de la fiche",
+  "publie": true
  }
 ]

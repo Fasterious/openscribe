@@ -1,5 +1,24 @@
 # Journal de l'Observatoire
 
+## 2026-10-18 — École, passe 17, publiée (version en ligne)
+
+- Analyse de la passe 16c rejouée depuis le cache : 1 051 idées, 73 motifs, 10 thèmes, aucune citation écartée.
+- Résumé régénéré : phrases plus courtes, le nombre de personnes avant le verbe.
+- « fragile » n'apparaît plus que si les avis comptés dans deux motifs changent le mot de l'échelle (14 mentions
+  au lieu de 26) ; les renvois sont vérifiés.
+- Non notée : mêmes comptes que la passe 16c. Le résumé dit de nouveau « la réforme du système éducatif »
+  (20 sur 24) alors que 15 des 20 visent le fonctionnement de l'école : la fiche signale donc deux phrases
+  inexactes (privé et réforme) dans « Méthode et limites ».
+- Fiche publiée depuis la passe 17 (remplace la passe 16c). Détail dans `2026-10-ecole/notes.json`.
+
+## 2026-10-17 — École, passes 14 à 16c
+
+- 14 et 14b : résumé récrit (qui pense quoi, en personnes ; comptes en chiffres). Publiée en 14b.
+- 15 : synthèses des motifs sans « ceux qui en parlent », mot de l'échelle avec son nombre. Méthode 7/10 ×2,
+  langue des motifs 7/10.
+- 16, 16b, 16c : exemples fictifs dans les consignes, chaque camp compté, contrôles de comptes corrigés.
+  Méthode 7 et 7,5/10, une erreur au résumé (école publique face au privé). Publiée en 16c.
+
 ## 2026-10-17 — École, passe 13 (finale), notée sur 10, publiée
 
 - Code d'analyse de la passe 12 (commit d09a4cb), rejouée depuis le cache : mêmes idées, motifs et thèmes.
@@ -34,7 +53,7 @@
 
 | Date | Sujet d'actualité | Source | Échantillon | Notes (méthode / langue) | Publié |
 |---|---|---|---|---|---|
-| 2026-10-14/17 | Mobilisation lycéenne et étudiante | Grand débat 2019, « Organisation de l'État et des services publics », question scolarisation | 378 / 21 868 (± 5 pts) | 3,33/5 / 3,5/5 (passe 12, à re-noter sur 10) | Oui, 17/10 |
+| 2026-10-14/17 | Mobilisation lycéenne et étudiante | Grand débat 2019, « Organisation de l'État et des services publics », question scolarisation | 378 / 21 868 (± 5 pts) | 7 et 7,5/10 / 7/10 (passe 16c ; passe 17 non re-notée) | Oui, 17/10 ; passe 17 le 18/10 |
 
 ## Consultations repérées pour plus tard
 
