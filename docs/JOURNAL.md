@@ -546,7 +546,9 @@ sourcées). Livré :
 - **Preuve côté Observatoire** : l'école rejouée depuis son cache avec `--method commune` redonne les mêmes idées,
   thèmes et grands thèmes ; seule la demande du résumé est nouvelle, et elle ne diffère que par « thèmes » au lieu
   de « motifs » (vocabulaire du 18/10).
-- **Reste à prouver côté Synthèse** : la note de la méthode commune sur un corpus d'une autre forme (questionnaire à
+- **Prouvé côté Synthèse (même jour)** : sur un questionnaire réel à deux questions (50 personnes), la méthode commune
+  obtient 7/10 aux deux lectures `methodologue` contre 6/10 pour la référence, et 7 contre 5 en langue (`docs/METHODES.md`).
+- **Reste à prouver** : la note de la méthode commune sur des entretiens (questionnaire à
   plusieurs questions, entretiens) et avec un modèle léger ; les notes des moteurs (Gemini, Ministral) datent de
   l'ancienne méthode et sont à refaire.
 

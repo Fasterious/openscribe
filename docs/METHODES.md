@@ -17,6 +17,29 @@ l'Observatoire et la Synthèse, pour tous les moteurs.
   commune` redonne les mêmes 1 051 idées, 73 thèmes et grands thèmes (seule la demande du résumé change, à cause du
   vocabulaire « thèmes » du 18/10, sans rapport avec la méthode).
 
+### Preuve côté Synthèse : un questionnaire à deux questions (25/10)
+
+Corpus réel d'une autre forme que l'école : 50 personnes du Grand débat 2019 (Licence Ouverte) qui répondent chacune à
+deux questions (chercher une formation, scolariser son enfant), région en attribut ; échantillon tiré au hasard
+(graine 20261025), hors échantillon de l'école. Même découpage pour les deux méthodes (cache commun), modèle joué par
+des sous-agents (niveau Opus), rapports anonymisés (A, B) ; deux lectures `methodologue` dans des ordres inverses,
+une lecture `plume`. Fichiers : dépôt de l'Observatoire, `2026-10-essai-synthese/`.
+
+| | Méthode commune | Référence (ancienne méthode de la Synthèse) |
+|---|---|---|
+| Idées · thèmes · grands thèmes | 387 · 40 · 8 | 380 · 37 · 7 |
+| `methodologue`, lecture 1 | **7/10** · 3 erreurs qui changent une conclusion | 6/10 · 4 erreurs |
+| `methodologue`, lecture 2 | **7/10** · 4 erreurs (une discutable) | 6/10 · 3 erreurs |
+| `plume` | **7/10** (style « magazine » à reprendre) | 5/10 (« la plupart » 17 fois au lieu du nombre) |
+| Relecture humaine estimée | 1 h à 1 h 30 | 2 h 30 à 3 h |
+
+Ce qui fait la différence, selon les deux lectures : un résumé hiérarchisé (ce qui marche, bloque, divise, ce qu'on
+propose), un livre de codes par thème, la section « Hors question » (la référence intègre du hors-sujet à trois
+thèmes). Défauts communs aux deux, venus du découpage partagé : une réserve coupée de ce qu'elle nuance (« bien… le
+collège : que d'absences »), une idée de la première question rangée sous la seconde. Défauts propres à la méthode
+commune : deux fausses unanimités (une voix contraire rangée ailleurs), un détail surinterprété repris dans le résumé.
+Prochains leviers : la réserve qui suit un éloge au découpage ; une vérification des unanimités du résumé.
+
 ## Historique : une méthode par famille de modèles (13-24/10)
 
 Décision d'Arnaud (13/10/2026) : chaque famille de modèles a sa méthode d'analyse,
