@@ -1,0 +1,7 @@
+Colonnes : Horodateur → ignore | Adresse e-mail → ignore | Vous êtes… → attribute | Qu'est-ce qui vous plaît dans la nouvell → open | Qu'est-ce qui vous gêne ou vous manque ? → open | Une idée pour l'améliorer ? → open
+13:54:22 extract:running 0/12 group:pending summarize:pending themes:pending report:pending polish:pending
+13:55:46 extract:running 12/12 group:pending summarize:pending themes:pending report:pending polish:pending
+13:55:46 extract:done 12/12 group:pending summarize:pending themes:pending report:pending polish:pending
+13:55:46 extract:done 12/12 group:running summarize:pending themes:pending report:pending polish:pending
+13:56:28 extract:done 12/12 group:running 38/38 summarize:pending themes:pending report:pending polish:pending
+13:56:28 extract:done 12/12 group:running 38/38 summarize:pending themes:pending report:pending polish:pending
