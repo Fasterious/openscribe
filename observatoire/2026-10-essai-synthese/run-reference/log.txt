@@ -25,3 +25,8 @@ Colonnes : Région → attribute | Si vous avez été amené à chercher une fo 
 13:38:27 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 45/45
 13:38:27 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45
 13:38:27 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45
+13:41:49 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45
+13:41:50 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45
+Terminé : done  380 idées, 37 groupes, 7 thèmes, 0 citations écartées
+Demandes sans réponse : 0
+Étude exportée : observatoire/2026-10-essai-synthese/run-reference/essai.openscribe.json

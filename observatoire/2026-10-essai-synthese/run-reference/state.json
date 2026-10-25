@@ -1,7 +1,7 @@
 {
  "id": "an_5t2g101s0d2i",
  "createdAt": "2026-10-25T13:16:32.083Z",
- "updatedAt": "2026-10-25T13:38:27.759Z",
+ "updatedAt": "2026-10-25T13:41:50.137Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -5664,7 +5664,7 @@
     "I0344",
     "I0348"
    ],
-   "summary": "Toutes les personnes qui donnent un avis critiquent la gestion des enseignants, qu'il s'agisse du statut, des absences ou du rôle des directeurs [I0129, I0310, I0348, I0082, I0158, I0024]. 3 personnes visent un statut jugé trop protecteur : emplois à vie injustifiés, professeur inamovible, « état dans l'état » soutenu par les syndicats [I0129, I0130, I0310, I0311, I0348]. 3 personnes déplorent les absences non remplacées, des professeurs absents et des grèves fréquentes, et 2 trouvent les directeurs démunis ou sans poids face à leurs instituteurs [I0082, I0158, I0291, I0024, I0198]. 2 personnes proposent de confier aux directeurs l'évaluation de leur équipe ou de noter les professeurs [I0118, I0183] ; une personne qui a enseigné rapporte aussi harcèlement et intimidation de la part de chefs d'établissement [I0344].",
+   "summary": "3 personnes visent un statut jugé trop protecteur : emplois à vie injustifiés, professeur inamovible, « état dans l'état » soutenu par les syndicats [I0129, I0130, I0310, I0311, I0348]. 3 personnes déplorent les absences non remplacées, des professeurs absents et des grèves fréquentes, et 2 trouvent les directeurs démunis ou sans poids face à leurs instituteurs [I0082, I0158, I0291, I0024, I0198]. 2 personnes proposent de confier aux directeurs l'évaluation de leur équipe ou de noter les professeurs [I0118, I0183] ; une personne qui a enseigné rapporte aussi harcèlement et intimidation de la part de chefs d'établissement [I0344].",
    "metrics": {
     "mentions": 13,
     "participants": 9,
@@ -5713,9 +5713,7 @@
    },
    "id": "G8",
    "opposed": [],
-   "unverified": [
-    "Toutes les personnes"
-   ]
+   "unverified": []
   },
   {
    "title": "Orientation scolaire",
@@ -5730,7 +5728,7 @@
     "I0314",
     "I0349"
    ],
-   "summary": "Toutes les personnes qui en parlent jugent l'orientation difficile ou mal accompagnée [I0139, I0314, I0267, I0349, I0009]. 4 personnes mettent en cause ceux qui accompagnent les élèves : conseillers d'orientation qui ne connaissent ni les formations recommandées ni le monde privé, agents peu motivés, professeurs peu formés et sans temps [I0267, I0349, I0038, I0010]. 3 personnes, dont l'une des précédentes, trouvent les démarches difficiles à comprendre, entre « parcours du combattant », choix à faire en fin de cycle et logique d'affectation opaque [I0139, I0037, I0314]. L'une des premières personnes citées ajoute le stress que Parcoursup fait peser sur les familles, et une autre personne regrette que le titre de psychologue dissuade les jeunes de consulter le conseiller d'orientation [I0009, I0023].",
+   "summary": "4 personnes mettent en cause ceux qui accompagnent les élèves : conseillers d'orientation qui ne connaissent ni les formations recommandées ni le monde privé, agents peu motivés, professeurs peu formés et sans temps [I0267, I0349, I0038, I0010]. 3 personnes, dont l'une des précédentes, trouvent les démarches difficiles à comprendre, entre « parcours du combattant », choix à faire en fin de cycle et logique d'affectation opaque [I0139, I0037, I0314]. L'une des premières personnes citées ajoute le stress que Parcoursup fait peser sur les familles, et une autre personne regrette que le titre de psychologue dissuade les jeunes de consulter le conseiller d'orientation [I0009, I0023].",
    "metrics": {
     "mentions": 9,
     "participants": 7,
@@ -5776,9 +5774,7 @@
    },
    "id": "G9",
    "opposed": [],
-   "unverified": [
-    "Toutes les personnes"
-   ]
+   "unverified": []
   },
   {
    "title": "Formation des enseignants",
@@ -6047,7 +6043,7 @@
     "I0292",
     "I0345"
    ],
-   "summary": "Toutes les personnes qui donnent un avis jugent la communication entre l'école et les familles défaillante [I0021, I0127, I0232, I0292, I0345]. 2 personnes critiquent la circulation de l'information : espace numérique de travail et ProNote mal maîtrisés par les enseignants, informations envoyées aux deux parents après plus de 2 ans, messages peu clairs ; la première s'interroge sur la place des parents séparés [I0020, I0021, I0022, I0127]. 2 personnes, dont la seconde, trouvent les réunions parents-professeurs désorganisées ou fixées à 16 h 30, et l'une d'elles demande des horaires adaptés aux parents [I0121, I0122, I0292]. 2 autres personnes décrivent des relations tendues, entre parents et enseignants qui se renvoient la balle et jugements infondés envers les parents, et une personne souhaite pouvoir faire remonter les problèmes [I0232, I0345, I0263].",
+   "summary": "Toutes les personnes qui donnent un avis jugent la communication entre l'école et les familles défaillante [I0021, I0127, I0232, I0292, I0345]. 2 personnes critiquent la circulation de l'information : espace numérique de travail et ProNote mal maîtrisés par les enseignants, informations envoyées aux 2 parents après plus de 2 ans, messages peu clairs ; la première s'interroge sur la place des parents séparés [I0020, I0021, I0022, I0127]. 2 personnes, dont la seconde, trouvent les réunions parents-professeurs désorganisées ou fixées à 16 h 30, et l'une d'elles demande des horaires adaptés aux parents [I0121, I0122, I0292]. 2 autres personnes décrivent des relations tendues, entre parents et enseignants qui se renvoient la balle et jugements infondés envers les parents, et une personne souhaite pouvoir faire remonter les problèmes [I0232, I0345, I0263].",
    "metrics": {
     "mentions": 10,
     "participants": 6,
@@ -6280,7 +6276,7 @@
     "I0281",
     "I0283"
    ],
-   "summary": "Toutes les personnes qui en parlent critiquent l'organisation du temps scolaire [I0034, I0054, I0123, I0179, I0281]. 3 personnes trouvent les journées trop lourdes : semaines ou emplois du temps trop chargés, enfants contraints de rester assis des heures [I0054, I0123, I0281, I0283]. L'une d'elles juge en revanche les vacances d'été trop longues, avis que partage une autre personne, qui propose de les réduire en soulignant que les parents « galèrent » pendant ces périodes et que l'école est faite « pour les jeunes et non pour les professeurs » [I0179, I0181, I0182]. Une personne regrette enfin des horaires incompatibles avec ceux des parents qui travaillent, les mères n'étant pas toutes disponibles le mercredi [I0034].",
+   "summary": "Toutes les personnes qui en parlent critiquent l'organisation du temps scolaire [I0034, I0054, I0123, I0179, I0281]. 3 personnes trouvent les journées trop lourdes : semaines ou emplois du temps trop chargés, enfants contraints de rester assis des heures [I0054, I0123, I0281, I0283]. L'une d'elles juge en revanche les vacances d'été trop longues, avis que partage une autre personne, qui propose de les réduire en soulignant que les parents « galèrent » pendant ces périodes et que l'école est faite « pour les jeunes et non pour les professeurs » [I0123, I0179, I0181, I0182]. Une personne regrette enfin des horaires incompatibles avec ceux des parents qui travaillent, les mères n'étant pas toutes disponibles le mercredi [I0034].",
    "metrics": {
     "mentions": 8,
     "participants": 5,
@@ -6322,9 +6318,7 @@
    },
    "id": "G18",
    "opposed": [],
-   "unverified": [
-    "une autre"
-   ]
+   "unverified": []
   },
   {
    "title": "Offre de formations disponible",
@@ -7278,7 +7272,7 @@
     "G22",
     "G25"
    ],
-   "summary": "Trouver une formation, la financer puis y entrer reste un parcours difficile pour la plupart des personnes qui donnent un avis, même si une minorité salue l'information disponible ou l'organisation du compte personnel de formation [I0090, I0050, I0289, I0094, I0098]. La plupart des personnes qui s'expriment sur l'information ne savent pas à quel service s'adresser, se perdent sur des sites trop complexes ou ne trouvent pas les formations, quand d'autres citent l'Onisep, les portails régionaux ou les portes ouvertes comme des appuis utiles [I0087, I0090, I0134, I0016, I0172, I0006, I0268, I0094]. Le financement paraît complexe, restrictif ou coûteux à la plupart des personnes qui en donnent un avis, entre compte inaccessible aux demandeurs d'emploi et formations trop chères, et toutes celles qui évoquent l'entrée en formation la trouvent trop lente [I0050, I0107, I0079, I0096, I0102, I0136, I0141, I0289]. Côté propositions, 2 personnes veulent une enveloppe unique ou un compte qui laisse libre de choisir sa formation, tandis qu'une autre préfère libéraliser entièrement le système [I0046, I0051, I0245].",
+   "summary": "Trouver une formation, la financer puis y entrer reste un parcours difficile pour la plupart des personnes qui donnent un avis, même si une minorité salue l'information disponible ou l'organisation du compte personnel de formation [I0090, I0050, I0289, I0094, I0098]. La plupart des personnes qui s'expriment sur l'information ne savent pas à quel service s'adresser, se perdent sur des sites trop complexes ou ne trouvent pas les formations, quand d'autres ne signalent aucune difficulté ou citent l'Onisep, les portails régionaux ou les portes ouvertes comme des appuis utiles [I0087, I0090, I0134, I0016, I0172, I0006, I0268, I0094, I0095]. Le financement paraît complexe, restrictif ou coûteux à la plupart des personnes qui en donnent un avis, entre compte inaccessible aux demandeurs d'emploi et formations trop chères, et toutes celles qui évoquent l'entrée en formation la trouvent trop lente ou trop compliquée [I0050, I0107, I0079, I0096, I0102, I0136, I0141, I0289]. Côté propositions, 2 personnes veulent une enveloppe unique ou un compte qui laisse libre de choisir sa formation, tandis qu'une autre préfère libéraliser entièrement le système [I0046, I0051, I0245].",
    "metrics": {
     "mentions": 70,
     "participants": 34,
@@ -7687,7 +7681,7 @@
     "G21",
     "G29"
    ],
-   "summary": "La plupart des personnes qui en parlent reprochent à l'accompagnement des demandeurs d'emploi et aux organismes de formation leur faible efficacité, même si plusieurs saluent une formation suivie [I0058, I0074, I0157, I0187, I0001, I0070, I0005, I0276]. Toutes les personnes qui évoquent l'accompagnement des demandeurs d'emploi le critiquent, Pôle emploi en tête : propositions de formation inadaptées ou absentes, conseillers débordés, profils forcés dans des cases [I0002, I0008, I0058, I0074, I0192]. Selon toutes les personnes qui en donnent un avis, les formations destinées aux chômeurs mènent rarement à un emploi, et 2 personnes estiment qu'elles servent d'abord les statistiques alors que des offres restent vacantes [I0178, I0190, I0309, I0191]. 2 personnes proposent de bâtir les formations à partir des offres d'emploi ou de mettre en avant celles qui y mènent, et une autre de laisser les entreprises développer leurs propres filières en les rémunérant pour l'accueil des stagiaires [I0177, I0274, I0162, I0165].",
+   "summary": "La plupart des personnes qui en parlent reprochent à l'accompagnement des demandeurs d'emploi et aux organismes de formation leur faible efficacité, même si plusieurs saluent une formation suivie [I0058, I0074, I0157, I0187, I0001, I0070, I0005, I0276]. Toutes les personnes qui évoquent l'accompagnement des demandeurs d'emploi le critiquent, Pôle emploi en tête : propositions de formation inadaptées ou absentes, conseillers débordés, profils forcés dans des cases [I0002, I0008, I0058, I0074, I0192, I0193]. Selon toutes les personnes qui en donnent un avis, les formations destinées aux chômeurs mènent rarement à un emploi, et 2 personnes estiment qu'elles servent d'abord les statistiques alors que des offres restent vacantes [I0178, I0190, I0309, I0191]. 2 personnes proposent de bâtir les formations à partir des offres d'emploi ou de mettre en avant celles qui y mènent, et une autre de laisser les entreprises développer leurs propres filières en les rémunérant pour l'accueil des stagiaires [I0177, I0274, I0162, I0165].",
    "metrics": {
     "mentions": 51,
     "participants": 18,
@@ -7775,7 +7769,7 @@
     "G13",
     "G36"
    ],
-   "summary": "La plupart des personnes qui en parlent critiquent la gestion, la formation ou l'engagement des enseignants, et une seule souligne tout ce qu'ils apportent à l'éducation et à la culture des enfants [I0129, I0310, I0056, I0227, I0248, I0346]. Sur la gestion des personnels, les critiques font l'unanimité parmi les personnes qui donnent un avis : 3 visent un statut jugé trop protecteur, 3 dénoncent les absences non remplacées et les grèves fréquentes [I0129, I0310, I0348, I0082, I0158, I0291]. La formation des enseignants paraît insuffisante ou mal orientée à la plupart des personnes qui en parlent, et deux pistes s'opposent pour le handicap : une formation et un suivi pour une personne, une formation que les professeurs suivraient seuls pour une autre [I0056, I0347, I0153, I0243, I0301]. 2 personnes proposent de confier aux directeurs l'évaluation de leur équipe ou de noter les professeurs ; une personne décrit pour sa part un directeur d'école débordé, faute de secrétaire [I0118, I0183, I0376, I0378].",
+   "summary": "La plupart des personnes qui en parlent critiquent la gestion, la formation ou l'engagement des enseignants, et une seule souligne tout ce qu'ils apportent à l'éducation et à la culture des enfants [I0129, I0310, I0056, I0227, I0248, I0346]. Sur la gestion des personnels, les critiques font l'unanimité parmi les personnes qui donnent un avis : certaines visent un statut jugé trop protecteur, une autre veut mieux rémunérer les plus efficaces, et 3 dénoncent les absences non remplacées et les grèves fréquentes [I0129, I0310, I0348, I0082, I0158, I0291]. La formation des enseignants paraît insuffisante ou mal orientée à la plupart des personnes qui en parlent, et deux pistes s'opposent pour le handicap : une formation et un suivi pour une personne, une formation que les professeurs suivraient seuls pour une autre [I0056, I0347, I0153, I0243, I0301]. 2 personnes proposent de confier aux directeurs l'évaluation de leur équipe ou de noter les professeurs ; une personne décrit pour sa part un directeur d'école débordé, faute de secrétaire [I0118, I0183, I0376, I0378].",
    "metrics": {
     "mentions": 35,
     "participants": 17,
@@ -7847,7 +7841,7 @@
     "G31",
     "G34"
    ],
-   "summary": "La plupart des personnes qui donnent un avis jugent la prise en charge du handicap lente et mal adaptée, à l'école comme dans l'emploi, même si une personne salue l'implication de la maison départementale des personnes handicapées et des institutrices [I0271, I0297, I0026, I0363, I0088, I0089]. À l'école, 2 personnes dénoncent le manque de structures pour les jeunes autistes ou atteints de handicap cognitif ou mental, écartés vers des instituts plutôt qu'accompagnés, et une autre décrit un dossier de 25 pages à refaire chaque année [I0271, I0272, I0322, I0323, I0324, I0297]. Pour les adultes, toutes les personnes qui en parlent décrivent des démarches interminables, jusqu'à 12 mois d'attente pour une reconnaissance de travailleur handicapé ou 8 mois pour traiter un dossier [I0026, I0362]. Une personne dénonce enfin la tentation de traiter par le handicap les difficultés d'un enfant, avec un dossier ouvert « sans aucune légitimité » pour « dégager une classe » [I0201, I0212, I0213].",
+   "summary": "La plupart des personnes qui donnent un avis jugent la prise en charge du handicap lente et mal adaptée, à l'école comme dans l'emploi, même si une personne salue l'implication de la maison départementale des personnes handicapées et des institutrices [I0271, I0297, I0026, I0363, I0088, I0089]. À l'école, 2 personnes dénoncent le manque de structures pour les jeunes autistes ou atteints de handicap cognitif ou mental, écartés vers des instituts plutôt qu'accompagnés, et une autre décrit un dossier de 25 pages à refaire chaque année [I0271, I0272, I0322, I0323, I0324, I0297]. Pour les adultes, toutes les personnes qui en parlent décrivent des démarches interminables, jusqu'à 12 mois d'attente pour une reconnaissance de travailleur handicapé ou 8 mois pour traiter un dossier [I0026, I0363]. Une personne dénonce enfin la tentation de traiter par le handicap les difficultés d'un enfant, avec un dossier ouvert « sans aucune légitimité » pour « dégager une classe » [I0201, I0212, I0213].",
    "metrics": {
     "mentions": 48,
     "participants": 7,
@@ -7897,7 +7891,7 @@
    "unverified": []
   }
  ],
- "globalSummary": "Les participants retiennent peu de réussites : seule une minorité salue l'information disponible sur les formations ou l'organisation du compte personnel de formation, au sein de sujets surtout critiqués [I0016, I0017].\n\nLe financement des formations freine 10 des 13 personnes qui donnent un avis [I0017]. L'information sur l'offre de formation déçoit 10 des 14 personnes qui donnent un avis [I0016]. À l'école, 8 des 8 personnes qui donnent un avis critiquent la gestion des personnels enseignants [I0024]. La plupart des personnes qui donnent un avis reprochent aussi des défaillances à l'orientation scolaire, à la communication entre l'école et les familles et à l'accompagnement des demandeurs d'emploi [I0009, I0020, I0002].\n\nLes propositions portent d'abord sur la manière d'enseigner : 8 personnes en formulent, l'une demandant de la repenser [I0053]. Sur la conduite du système éducatif, une personne propose de laisser plus de liberté aux enseignants ; pour leur formation, une personne veut privilégier la capacité à motiver plutôt que la maîtrise d'une discipline [I0093, I0153]. Dans les établissements, une personne demande du personnel d'encadrement qualifié plutôt que la police ; pour financer les formations, une personne souhaite une enveloppe unique [I0042, I0046]. Les questions restent rares : une personne s'interroge sur la place des parents séparés dans la communication avec l'école, une autre se demande si les aides à la scolarité ont évolué [I0022, I0065].",
+ "globalSummary": "Les participants retiennent peu de réussites : seule une minorité salue l'information disponible sur les formations ou l'organisation du compte personnel de formation, au sein de sujets surtout critiqués [I0094, I0098, I0016, I0017].\n\nLe financement des formations freine 10 des 13 personnes qui donnent un avis [I0017]. L'information sur l'offre de formation déçoit 10 des 14 personnes qui donnent un avis [I0016]. À l'école, 8 des 8 personnes qui donnent un avis critiquent la gestion des personnels enseignants [I0024]. La plupart des personnes qui donnent un avis reprochent aussi des défaillances à l'orientation scolaire, à la communication entre l'école et les familles et à l'accompagnement des demandeurs d'emploi [I0009, I0020, I0002]. Les avis sont partagés sur « Démarches de scolarisation » : 8 positifs et 4 négatifs parmi les 12 participants qui en donnent un [I0004, I0068]. Ils le sont aussi sur « Qualité des organismes de formation » : 4 positifs et 6 négatifs parmi les 10 participants qui en donnent un [I0001, I0135]. Ils le sont aussi sur « État de l'école publique » : 3 positifs et 5 négatifs parmi les 8 participants qui en donnent un [I0039, I0052].\n\nLes propositions portent d'abord sur la manière d'enseigner : 8 personnes en formulent, l'une demandant de la repenser [I0053]. Sur la conduite du système éducatif, une personne propose de laisser plus de liberté aux enseignants ; pour leur formation, une personne veut privilégier la capacité à motiver plutôt que la maîtrise d'une discipline [I0093, I0153]. Dans les établissements, une personne demande du personnel d'encadrement qualifié plutôt que la police ; pour financer les formations, une personne souhaite un compte qui laisse libre de choisir sa formation [I0042, I0046]. Les questions restent rares : une personne s'interroge sur la place des parents séparés dans la communication avec l'école, une autre se demande si les aides à la scolarité ont évolué [I0022, I0065].",
  "steps": [
   {
    "id": "extract",
@@ -7933,12 +7927,11 @@
    "id": "polish",
    "state": "done",
    "done": 45,
-   "total": 45,
-   "message": "Vérification des renvois"
+   "total": 45
   }
  ],
  "calls": {
-  "total": 71,
+  "total": 76,
   "cached": 54,
   "inputTokens": 0,
   "outputTokens": 0
@@ -8014,9 +8007,14 @@
   "b5970e304fe240f1ead7d529a925d87bb51902aec3ec012899424bd1a8172855",
   "c7230c4f957c20568109930580ad837da6b0a3040ba766ddf9fdc1008e529fec",
   "0ff1782a3bb41df68bcd747d272230149efec724459df8343bf471f7962cb971",
-  "6f28472bd84db1058a291010dc7d191d82cf05ebb390318a0a86bf7cd81e56c2"
+  "6f28472bd84db1058a291010dc7d191d82cf05ebb390318a0a86bf7cd81e56c2",
+  "83f4be8d65b39137a1040982faba3a3df6907dfb3fcd390600e3fd5132cd2e39",
+  "2ad28a997c80a17009939902e255b4150b04445a0ac448d3aa619177c86eeb86",
+  "909f843dec351ca3d69d1890ddb0b496823edbec583546d02e1603d30fa1fd9c",
+  "b8681e907d61cc0a00f49e95729670688c66460c4ca7d307154b6cc6990b48f5",
+  "f3a43c005f7c752f7cda2e89147e2ee7f6cae4d236ff345e51fb4b8c35056029"
  ],
- "status": "running",
+ "status": "done",
  "polish": {
   "checked": 45,
   "changed": 15,
@@ -8097,5 +8095,12 @@
    "reason": "Les deux motifs décrivent les mêmes délais de traitement des dossiers (statut de travailleur handicapé, RQTH) qui bloquent l'accès aux droits et à la formation."
   }
  ],
- "globalUnverified": []
+ "globalUnverified": [],
+ "support": {
+  "checked": 171,
+  "fixed": 8,
+  "dropped": 0,
+  "added": 0
+ },
+ "removedSentences": 2
 }
