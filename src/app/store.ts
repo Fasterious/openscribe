@@ -144,7 +144,12 @@ export async function startAnalysis(
   })
   // Garde-fou : on ne reprend jamais une analyse avec un autre moteur que le sien.
   const sameEngine = resume && resume.engine.presetId === provider.fingerprint.presetId && resume.engine.model === provider.fingerprint.model
-  const initial = sameEngine ? resume : await newAnalysis(corpus, { ...settings, method: methodForModel(engine.presetId, engine.model) }, provider)
+  const initial = sameEngine ? resume : await newAnalysis(
+        corpus,
+        // La méthode commune, comme l'Observatoire : codage en double compris, sauf si le chercheur l'a décoché.
+        { ...settings, method: methodForModel(engine.presetId, engine.model), multiCoding: settings.multiCoding ?? true },
+        provider,
+      )
   const controller = new AbortController()
   running.set(projectId, controller)
   emit(`run:${projectId}`)

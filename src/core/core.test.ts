@@ -54,7 +54,7 @@ import { LlmRunner, MemoryCache } from './analysis/runner'
 import { DEFAULT_SETTINGS, type AnalysisState, type Group, type Idea, type IdeaCategory, type Metrics } from './analysis/types'
 import { locateVerbatim } from './analysis/verbatim'
 import { groupingPrompt, groupSummaryPrompt, groupSummarySchema, readDataBlock, reviewPrompt, splitPrompt } from './analysis/prompts'
-import { methodRules } from './analysis/methods'
+import { appendRules, METHODS, methodRules, TUNINGS } from './analysis/methods'
 import { activeParticipants, duplicateContributions, type Corpus } from './corpus'
 import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole } from './import/csv'
 import { detectSpeakers, textToCorpus } from './import/text'
@@ -1311,6 +1311,39 @@ describe('méthodes par famille de modèles', () => {
     const gem = groupSummaryPrompt(input, { ...DEFAULT_SETTINGS, method: 'gemini' }).user
     expect(gem).toContain('Chaque phrase se comprend seule')
     expect(gem.replace(/9\. Chaque phrase[^\n]*\n/, '')).toBe(ref)
+  })
+})
+
+describe('une seule méthode pour toute l’application (méthode commune)', () => {
+  const { id: _a, label: _b, ...commune } = METHODS.commune
+  const { id: _c, label: _d, ...consultation } = METHODS.consultation
+
+  it('l’Observatoire (« consultation ») et la Synthèse (« commune ») suivent exactement la même méthode', () => {
+    expect(consultation).toEqual(commune)
+  })
+
+  it('un réglage de moteur garde toutes les étapes de la méthode commune ; seuls ses lots et ses règles ajoutées diffèrent', () => {
+    const steps = ['keepOpposedOverlaps', 'codebook', 'reconcile', 'splitChecks', 'sweep', 'offTopic', 'scaleInLines', 'arrivalReview', 'compactDivided', 'globalContext', 'summaryChecks', 'campCoverage', 'summaryLines'] as const
+    for (const t of Object.keys(TUNINGS) as (keyof typeof TUNINGS)[]) {
+      const m = METHODS[`commune-${t}`]
+      for (const k of steps) expect(m[k], `${t} ${k}`).toEqual(commune[k])
+      // Chaque règle de la méthode commune reste, mot pour mot, en tête des règles du réglage.
+      for (const [k, rule] of Object.entries(commune.extraRules)) expect(m.extraRules[k as keyof typeof commune.extraRules]!.startsWith(rule!), `${t} ${k}`).toBe(true)
+    }
+  })
+
+  it('les règles d’un réglage suivent celles de la méthode, numérotées à la suite', () => {
+    expect(appendRules('6. Un.\n7. Deux.', '6. Trois.\n7. Quatre.')).toBe('6. Un.\n7. Deux.\n8. Trois.\n9. Quatre.')
+    expect(appendRules(undefined, '9. Seule.')).toBe('9. Seule.')
+    expect(appendRules('6. Un.', undefined)).toBe('6. Un.')
+    const gem = methodRules({ method: 'commune-gemini' }, 'grouping')
+    expect(gem).toContain('8. Le titre nomme l’objet'.replace('’', "'"))
+    expect(methodRules({ method: 'commune-gemini' }, 'summary')).toMatch(/\n14\. Chaque phrase se comprend seule/)
+  })
+
+  it('une analyse enregistrée avec une ancienne méthode la garde : la référence n’a toujours aucune règle propre', () => {
+    for (const k of ['grouping', 'assign', 'review', 'summary', 'themes', 'global'] as const) expect(methodRules({ method: 'reference' }, k)).toBe('')
+    expect(methodRules({}, 'grouping')).toBe('')
   })
 })
 

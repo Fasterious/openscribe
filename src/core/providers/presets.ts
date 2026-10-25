@@ -40,7 +40,7 @@ export interface ModelChoice {
   /** Partie de la liste (ex. « Inclus dans l'offre gratuite »). */
   section?: string
   recommended?: boolean
-  /** Méthode d'analyse propre à ce modèle (voir src/core/analysis/methods.ts) ; à défaut, la référence. */
+  /** Méthode commune réglée pour ce modèle (voir src/core/analysis/methods.ts) ; à défaut, la méthode commune. */
   method?: MethodId
   /** Paramètres propres au modèle, ajoutés à chaque demande. */
   extraBody?: Record<string, unknown>
@@ -143,12 +143,12 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         hint: 'Le plus capable des modèles gratuits.',
         section: "Inclus dans l'offre gratuite",
         recommended: true,
-        method: 'ministral',
+        method: 'commune-ministral',
         study: 'Sous le niveau de l’offre gratuite de Gemini sur un corpus réel (13/10/2026).',
         secondsPerCall: 10,
       },
-      { id: 'ministral-8b-2512', label: 'Ministral 8B', hint: 'Plus rapide, des idées moins fines.', section: "Inclus dans l'offre gratuite", method: 'ministral' },
-      { id: 'ministral-3b-2512', label: 'Ministral 3B', hint: 'Très rapide, pour un essai seulement.', section: "Inclus dans l'offre gratuite", method: 'ministral' },
+      { id: 'ministral-8b-2512', label: 'Ministral 8B', hint: 'Plus rapide, des idées moins fines.', section: "Inclus dans l'offre gratuite", method: 'commune-ministral' },
+      { id: 'ministral-3b-2512', label: 'Ministral 3B', hint: 'Très rapide, pour un essai seulement.', section: "Inclus dans l'offre gratuite", method: 'commune-ministral' },
       {
         id: 'mistral-small-2603',
         label: 'Mistral Small',
@@ -201,17 +201,17 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         hint: 'Le plus capable de l’offre gratuite.',
         section: "Inclus dans l'offre gratuite",
         recommended: true,
-        method: 'groq',
+        method: 'commune-groq',
         // Sa réflexion consomme la réponse : courte, pour laisser place au JSON.
         extraBody: { reasoning_effort: 'low' },
       },
-      { id: 'qwen/qwen3.8-27b', label: 'Qwen 3.8 27B', hint: 'Bon en français, mêmes limites.', section: "Inclus dans l'offre gratuite", method: 'groq' },
+      { id: 'qwen/qwen3.8-27b', label: 'Qwen 3.8 27B', hint: 'Bon en français, mêmes limites.', section: "Inclus dans l'offre gratuite", method: 'commune-groq' },
       {
         id: 'openai/gpt-oss-20b',
         label: 'GPT-OSS 20B',
         hint: 'Plus rapide, moins fin.',
         section: "Inclus dans l'offre gratuite",
-        method: 'groq',
+        method: 'commune-groq',
         extraBody: { reasoning_effort: 'low' },
       },
     ],
@@ -254,7 +254,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         hint: '500 demandes par jour : de quoi faire plusieurs synthèses.',
         section: "Inclus dans l'offre gratuite",
         recommended: true,
-        method: 'gemini',
+        method: 'commune-gemini',
         validated: { score: 2.5, date: '2026-10-14' },
         // ÉcoSol : 2 à 6 minutes pour 50 à 80 demandes.
         secondsPerCall: 5,
@@ -264,14 +264,14 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         label: 'Gemini 3.1 Flash-Lite',
         hint: 'Plus ancien, mêmes limites.',
         section: "Inclus dans l'offre gratuite",
-        method: 'gemini',
+        method: 'commune-gemini',
       },
       {
         id: 'gemini-3.8-flash',
         label: 'Gemini 3.8 Flash',
         hint: 'Plus fin, mais 20 demandes par jour en gratuit : une synthèse n’y tient pas.',
         section: 'Avec la facturation activée',
-        method: 'gemini',
+        method: 'commune-gemini',
         study: 'Payant : pas encore évalué sur un corpus réel.',
       },
     ],
@@ -345,9 +345,9 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
       { match: 'gemma', body: { reasoning_effort: 'none' } },
     ],
     modelMethods: [
-      { match: 'gpt-oss', method: 'gptoss' },
-      { match: 'gemma', method: 'gemma' },
-      { match: 'qwen', method: 'qwen' },
+      { match: 'gpt-oss', method: 'commune-gptoss' },
+      { match: 'gemma', method: 'commune-gemma' },
+      { match: 'qwen', method: 'commune-qwen' },
     ],
     seedParam: 'seed',
     supportsJsonMode: true,
@@ -734,8 +734,8 @@ export function presetById(id: string): ProviderPreset | undefined {
   return PROVIDER_PRESETS.find((p) => p.id === id)
 }
 
-/** La méthode d'analyse à suivre pour ce modèle : la sienne si elle existe, sinon la référence. */
+/** La méthode d'analyse d'une nouvelle synthèse : la méthode commune, avec le réglage de ce modèle s'il en a un. */
 export function methodForModel(presetId: string, model: string): MethodId {
   const preset = presetById(presetId)
-  return preset?.models?.find((m) => m.id === model)?.method ?? preset?.modelMethods?.find((x) => model.includes(x.match))?.method ?? 'reference'
+  return preset?.models?.find((m) => m.id === model)?.method ?? preset?.modelMethods?.find((x) => model.includes(x.match))?.method ?? 'commune'
 }

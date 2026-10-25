@@ -104,12 +104,13 @@ const csv = analyzeCsv(readFileSync(csvPath, 'utf8'))
 const roles: Record<number, ColumnRole> = Object.fromEntries(csv.columns.map((c) => [c.index, c.suggestedRole]))
 console.log('Colonnes :', csv.columns.map((c) => `${c.header.slice(0, 40)} → ${c.suggestedRole}`).join(' | '))
 const corpus = csvToCorpus(csv.table, { roles, sourceName: basename(csvPath) })
-// --method lots : essai d'une méthode (voir src/core/analysis/methods.ts) ; par défaut, la référence.
+// --method commune-gemini : la méthode commune avec le réglage d'un moteur, ou une ancienne méthode figée (voir
+// src/core/analysis/methods.ts) ; par défaut, la méthode commune, comme une nouvelle synthèse dans l'application.
 // --mask-names : les prénoms de particuliers sont masqués dans le rapport (publication grand public).
 const settings = {
   ...DEFAULT_SETTINGS,
   researchQuestion: opt('question') ?? '',
-  ...(opt('method') ? { method: opt('method') as MethodId } : {}),
+  method: (opt('method') ?? 'commune') as MethodId,
   ...(rest.includes('--mask-names') ? { maskNames: true } : {}),
   // --multi-coding : codage en double (une idée qui satisfait deux définitions est copiée dans le second motif).
   ...(rest.includes('--multi-coding') ? { multiCoding: true } : {}),

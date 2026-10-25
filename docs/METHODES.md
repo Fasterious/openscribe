@@ -1,10 +1,29 @@
-# Une méthode par famille de modèles
+# Une méthode commune, un réglage par famille de modèles
+
+**Décision d'Arnaud (25/10/2026)** : l'algorithme le plus abouti sert partout. La méthode mise au point sur l'étude
+école de l'Observatoire (« consultation », passes 1 à 17) devient la **méthode commune** de toute l'application :
+les nouvelles synthèses la suivent, l'Observatoire aussi. Ce qui change d'un moteur à l'autre n'est plus une méthode
+mais un **réglage** posé dessus (taille des lots, exemple de consigne, règles ajoutées à la suite), avec les mêmes
+étapes pour tous. Modifier la méthode commune (`COMMUNE` dans `src/core/analysis/methods.ts`) modifie d'un coup
+l'Observatoire et la Synthèse, pour tous les moteurs.
+
+- Identifiants : `commune` (moteurs sans réglage : Claude, Opus, Sonnet…), `commune-gemini`, `commune-ministral`,
+  `commune-groq`, `commune-gptoss`, `commune-gemma`, `commune-qwen`. `consultation` est la méthode commune sous son
+  premier nom (l'étude école publiée).
+- Les réglages reprennent ce qui avait été prouvé sur la référence (ÉcoSol) ; ils restent à re-mesurer sur la
+  méthode commune. Un apport qui ne fait pas monter la note est retiré du réglage.
+- Les anciennes méthodes (ci-dessous, du 13 au 17/10) sont figées pour les analyses enregistrées avec elles.
+- Preuve de non-régression de l'Observatoire (25/10) : l'étude école rejouée depuis son cache avec `--method
+  commune` redonne les mêmes 1 051 idées, 73 thèmes et grands thèmes (seule la demande du résumé change, à cause du
+  vocabulaire « thèmes » du 18/10, sans rapport avec la méthode).
+
+## Historique : une méthode par famille de modèles (13-24/10)
 
 Décision d'Arnaud (13/10/2026) : chaque famille de modèles a sa méthode d'analyse,
 la meilleure possible pour elle. Améliorer la méthode d'un modèle ne doit jamais
 dégrader celle d'un autre. Le code : `src/core/analysis/methods.ts`.
 
-## Le processus
+### Le processus
 
 1. **Partir de la meilleure méthode existante.** Une nouvelle famille (Gemini, Groq…)
    commence par une copie de la méthode la mieux notée, pas par une page blanche.
@@ -22,7 +41,7 @@ défectueuse (citation inventée retirée, renvois réparés, réponse mal form�
 réponse coupée signalée). Ils sont rodés sur les synthèses en cache de chaque méthode
 avant d'être gardés : aucun effet sur une réponse saine.
 
-## Les méthodes
+### Les méthodes
 
 | Méthode | Modèles | Diffère de la référence par | Note ÉcoSol (méthode / langue) |
 |---|---|---|---|

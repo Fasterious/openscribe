@@ -133,12 +133,13 @@ describe('où tourne un moteur', () => {
 })
 
 describe('méthode des modèles installés', () => {
-  it('un modèle Ollama reçoit la méthode de sa famille, sinon la référence', async () => {
+  it('une nouvelle synthèse suit la méthode commune, avec le réglage de la famille du modèle s’il en a un', async () => {
     const { methodForModel } = await import('./presets')
-    expect(methodForModel('ollama', 'gpt-oss:20b-32k')).toBe('gptoss')
-    expect(methodForModel('ollama', 'gemma4:12b')).toBe('gemma')
-    expect(methodForModel('ollama', 'llama3.1:8b')).toBe('reference')
-    expect(methodForModel('mistral', 'ministral-14b-2512')).toBe('ministral')
+    expect(methodForModel('ollama', 'gpt-oss:20b-32k')).toBe('commune-gptoss')
+    expect(methodForModel('ollama', 'gemma4:12b')).toBe('commune-gemma')
+    expect(methodForModel('ollama', 'llama3.1:8b')).toBe('commune')
+    expect(methodForModel('mistral', 'ministral-14b-2512')).toBe('commune-ministral')
+    expect(methodForModel('anthropic', 'claude-opus-5-5')).toBe('commune')
   })
 })
 

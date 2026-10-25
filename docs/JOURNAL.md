@@ -528,3 +528,24 @@ sourcées). Livré :
   exports ; l'en-tête d'un camp ouvert colle sous le thème (`data-stick-panel`, placé par `placeStuck`), avec « Replier » ;
   replier depuis l'en-tête collé le laisse où on l'a touché et lui rend le focus. Espaces insécables : la ligne se coupe
   après « · ». Test de parcours ajouté (ordinateur et mobile).
+
+## 2026-10-25 — Une méthode commune pour la Synthèse et l'Observatoire
+
+- **Demande d'Arnaud** : le rapport de l'Observatoire est le référentiel ; l'algorithme qui le produit doit servir
+  aussi à la Synthèse, avec les mêmes étapes, et une amélioration faite d'un côté doit profiter à l'autre. Seuls
+  changent l'appel au moteur et, au besoin, un réglage des consignes par moteur.
+- **Constat** : le moteur d'analyse (`pipeline.ts`) et l'affichage du rapport (`ReportTab`) étaient déjà communs ;
+  ce qui divergeait, c'était la méthode : la Synthèse suivait `reference` (ou une copie par famille de modèles),
+  l'Observatoire `consultation`.
+- **Fait** : `COMMUNE` (methods.ts) = la méthode « consultation » mot pour mot (vérifié octet par octet) ; les
+  familles de modèles deviennent des réglages (`TUNINGS`) composés par le code (`tuned`), qui gardent toutes les
+  étapes et ajoutent leurs règles à la suite, renumérotées (`appendRules`). Une nouvelle synthèse suit `commune`
+  ou `commune-<réglage>` (`methodForModel`) ; le pont aussi, par défaut. Le codage en double, gardé par Arnaud le
+  18/10 pour l'école, est activé par défaut dans la Synthèse (décochable). Les anciennes méthodes restent figées
+  pour les analyses enregistrées avec elles.
+- **Preuve côté Observatoire** : l'école rejouée depuis son cache avec `--method commune` redonne les mêmes idées,
+  thèmes et grands thèmes ; seule la demande du résumé est nouvelle, et elle ne diffère que par « thèmes » au lieu
+  de « motifs » (vocabulaire du 18/10).
+- **Reste à prouver côté Synthèse** : la note de la méthode commune sur un corpus d'une autre forme (questionnaire à
+  plusieurs questions, entretiens) et avec un modèle léger ; les notes des moteurs (Gemini, Ministral) datent de
+  l'ancienne méthode et sont à refaire.

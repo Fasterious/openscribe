@@ -290,14 +290,14 @@ export function AnalysisTab({ project }: { project: Project }) {
                   type="checkbox"
                   className="mt-0.5 size-4 accent-primary"
                   disabled={running}
-                  checked={settings.multiCoding === true}
+                  checked={settings.multiCoding !== false}
                   onChange={(e) => setSettings({ ...settings, multiCoding: e.target.checked })}
                 />
                 <span>
                   Une idée peut compter dans deux thèmes
                   <span className="block text-xs text-muted-foreground">
                     Codage en double : une idée qui répond à la définition de deux thèmes (la cause chez l'un, l'effet chez l'autre) est
-                    copiée dans le second. Chaque thème compte des personnes, aucune deux fois. Par défaut, une idée n'a qu'un thème.
+                    copiée dans le second. Chaque thème compte des personnes, aucune deux fois. Activé par défaut, comme pour les études de l'Observatoire ; décoché, une idée n'a qu'un thème.
                   </span>
                 </span>
               </label>

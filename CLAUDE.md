@@ -86,7 +86,7 @@ Règles apprises :
 - La note est un repère relatif sur 10 (chaque critère noté directement sur 10, jamais une note sur 5 doublée) ; les erreurs du résumé se comptent à côté, sans plafond. Une étude se publie sans seuil, avec le meilleur moteur, ses limites et les mentions « à vérifier » du code (`docs/NOTATION.md`).
 - Avant chaque commit : `npm run build && npx vitest run`, puis le test de confidentialité, chaînés ; un commit ne part jamais sur un build rouge.
 - Une étape qui ajoute ou déplace des avis se juge aux étiquettes qu'elle change : comparer par script les étiquettes avant et après, avant de payer l'aval.
-- Une méthode par famille de modèles : une nouvelle part de la meilleure, et un apport ne passe à une autre méthode que si sa note monte (`docs/METHODES.md`).
+- Une seule méthode, la méthode commune, pour l'Observatoire et la Synthèse ; un moteur n'a qu'un réglage posé dessus (lots, exemple, règles ajoutées), jamais d'autres étapes. Un apport de réglage ne reste que si sa note monte (`docs/METHODES.md`).
 - Un moteur d'IA n'est proposé qu'au niveau de Gemini Flash-Lite au moins sur ÉcoSol (grille `docs/NOTATION.md`, deux lectures `methodologue` sur Opus), idéalement à celui de la référence, et s'il n'est pas pénible à utiliser.
 - « Gratuit, sans carte » ne s'affiche qu'après un parcours réel dans la console du fournisseur, daté dans `docs/PARCOURS-FOURNISSEURS.md`.
 

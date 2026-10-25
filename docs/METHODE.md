@@ -16,9 +16,11 @@ chiffre du rapport ne vient du moteur.
 **On compte des personnes, pas des mentions.** Une personne qui revient dix fois sur le même sujet compte
 une fois dans ce motif.
 
-**Deux méthodes existent.** La méthode de référence sert par défaut. La méthode « consultation », mise au
-point sur une consultation publique (l'étude école de l'Observatoire), ajoute des contrôles de rangement
-décrits plus bas ; ils sont signalés par « consultation ».
+**Une seule méthode, la méthode commune** (décision d'Arnaud, 25/10/2026). Mise au point sur une consultation
+publique (l'étude école de l'Observatoire, sous le nom « consultation »), elle sert aussi à toute nouvelle synthèse,
+quel que soit le moteur : seul un réglage (taille des lots, exemple de consigne) s'adapte au moteur. Ses contrôles de
+rangement, ajoutés à la méthode de référence d'origine, sont signalés plus bas par « consultation ». Les synthèses
+enregistrées avec la méthode de référence la gardent.
 
 ## 1. Découper en idées
 
@@ -60,7 +62,7 @@ C'est l'étape la plus longue, et celle où se jouent la plupart des erreurs.
   confronté, avec sa définition, à tous les avis rangés ailleurs : le moteur y cherche les avis que la
   définition réclame, et corrige les tons qui la contredisent. Le code n'accepte que ces deux gestes, jamais un
   changement de proposition ou de question.
-- **Codage en double** (option du chercheur, désactivée par défaut). Une idée qui répond à la définition de
+- **Codage en double** (activé par défaut depuis le 25/10, comme pour l'étude école ; le chercheur peut le décocher). Une idée qui répond à la définition de
   deux motifs (la cause chez l'un, l'effet chez l'autre) compte dans les deux, par une copie. Deux motifs au
   plus par idée ; chaque motif compte des personnes, aucune deux fois. Sans l'option, l'idée va dans un seul
   motif, ou change de motif.
