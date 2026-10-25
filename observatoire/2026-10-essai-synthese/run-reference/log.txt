@@ -13,3 +13,15 @@ Colonnes : Région → attribute | Si vous avez été amené à chercher une fo 
 13:26:50 extract:done 50/50 group:done 368/368 summarize:running 13/37 themes:pending report:pending polish:pending
 13:28:21 extract:done 50/50 group:done 368/368 summarize:running 26/37 themes:pending report:pending polish:pending
 13:29:17 extract:done 50/50 group:done 368/368 summarize:running 30/37 themes:pending report:pending polish:pending
+13:30:29 extract:done 50/50 group:done 368/368 summarize:running 37/37 themes:pending report:pending polish:pending
+13:30:29 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:pending report:pending polish:pending
+13:30:29 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:running 0/37 report:pending polish:pending
+13:34:57 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:pending polish:pending
+13:34:57 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:running polish:pending
+13:35:59 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 0/45
+13:36:53 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 9/45
+13:37:17 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 21/45
+13:38:07 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 33/45
+13:38:27 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 45/45
+13:38:27 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45
+13:38:27 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45

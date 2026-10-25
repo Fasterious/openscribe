@@ -1,7 +1,7 @@
 {
  "id": "an_3c34282m6d6k",
  "createdAt": "2026-10-25T13:09:57.410Z",
- "updatedAt": "2026-10-25T13:28:28.734Z",
+ "updatedAt": "2026-10-25T13:40:29.558Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -5175,7 +5175,2436 @@
   }
  ],
  "rejected": [],
- "groups": [],
+ "groups": [
+  {
+   "title": "Recherche de formation",
+   "ideaIds": [
+    "I0018",
+    "I0036",
+    "I0088",
+    "I0091",
+    "I0095",
+    "I0096",
+    "I0135",
+    "I0141",
+    "I0174",
+    "I0175",
+    "I0176",
+    "I0244",
+    "I0245",
+    "I0274",
+    "I0279",
+    "I0309",
+    "I0313",
+    "I0319",
+    "I0320",
+    "I0359"
+   ],
+   "summary": "8 personnes peinent à trouver l'information ou le bon interlocuteur : documentation administrative complexe, multiplication des guichets, service à contacter inconnu, organisme ou formation introuvables, sites trop complexes ou démarches jugées « beaucoup trop nébuleux » [I0036, I0088, I0091, I0135, I0174, I0175, I0279, I0313, I0319]. L'une d'elles finit par abandonner après des heures passées à comprendre, une autre d'entre elles demande d'homogénéiser les portails d'accès [I0176, I0320]. À l'inverse, 4 autres personnes trouvent facilement l'information : services d'information et portails régionaux jugés « excellents », forums et journées portes ouvertes, information en ligne souvent satisfaisante, services privés plus efficaces, recherche jugée facile [I0018, I0095, I0096, I0141, I0274]. Une personne mitigée salue la dématérialisation des informations tout en notant qu'elle peut gêner ceux qui en maîtrisent mal les moyens [I0244, I0245] ; une autre se demande si l'on peut chercher une formation avec les services publics [I0309].",
+   "metrics": {
+    "mentions": 20,
+    "participants": 15,
+    "participantIds": [
+     "P4",
+     "P6",
+     "P14",
+     "P15",
+     "P16",
+     "P21",
+     "P22",
+     "P25",
+     "P28",
+     "P32",
+     "P34",
+     "P39",
+     "P40",
+     "P43",
+     "P47"
+    ],
+    "mentionsByCategory": {
+     "positive": 6,
+     "negative": 11,
+     "neutral": 2,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 5,
+     "negative": 9,
+     "neutral": 2,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P4",
+     "P16",
+     "P22",
+     "P32"
+    ],
+    "negativeOnly": [
+     "P6",
+     "P14",
+     "P15",
+     "P21",
+     "P25",
+     "P34",
+     "P40",
+     "P43"
+    ],
+    "mixed": [
+     "P28"
+    ],
+    "consensusRate": 0.6153846153846154,
+    "majority": "negative",
+    "stance": "divided",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G1",
+   "definition": {
+    "positive": "trouver facilement l'information ou les formations recherchées",
+    "negative": "peiner à trouver l'information, l'interlocuteur ou la formation adaptée",
+    "neutral": "s'interroger sur les sources d'information sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Expérience globale de scolarisation",
+   "ideaIds": [
+    "I0004",
+    "I0033",
+    "I0035",
+    "I0039",
+    "I0047",
+    "I0098",
+    "I0100",
+    "I0105",
+    "I0106",
+    "I0169",
+    "I0258",
+    "I0287",
+    "I0294",
+    "I0350",
+    "I0360"
+   ],
+   "summary": "La scolarité des enfants s'est bien passée pour les 12 personnes qui donnent un avis : pas de difficulté particulière, rien d'insurmontable, aucun problème d'adaptation, un parcours à l'école de la République jusqu'au doctorat en médecine [I0004, I0033, I0039, I0047, I0098, I0100, I0106, I0169, I0258, I0287, I0294, I0360]. L'une d'elles précise avoir toujours inscrit ses enfants dans les établissements proches de leur lieu de naissance, une autre d'entre elles que sa fille est en école d'ingénieurs [I0035, I0105]. Une personne, enfin, juge son expérience trop ancienne pour en tirer un avis [I0350].",
+   "metrics": {
+    "mentions": 15,
+    "participants": 13,
+    "participantIds": [
+     "P1",
+     "P5",
+     "P6",
+     "P7",
+     "P16",
+     "P17",
+     "P18",
+     "P24",
+     "P30",
+     "P35",
+     "P36",
+     "P46",
+     "P47"
+    ],
+    "mentionsByCategory": {
+     "positive": 12,
+     "negative": 0,
+     "neutral": 3,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 12,
+     "negative": 0,
+     "neutral": 3,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P1",
+     "P5",
+     "P6",
+     "P7",
+     "P16",
+     "P17",
+     "P18",
+     "P24",
+     "P30",
+     "P35",
+     "P36",
+     "P47"
+    ],
+    "negativeOnly": [],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "positive",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G2",
+   "definition": {
+    "positive": "juger la scolarité des enfants globalement facile ou satisfaisante",
+    "negative": "juger la scolarité des enfants globalement difficile ou décevante",
+    "neutral": "décrire son parcours scolaire familial sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Financement des formations",
+   "ideaIds": [
+    "I0046",
+    "I0051",
+    "I0052",
+    "I0080",
+    "I0097",
+    "I0099",
+    "I0101",
+    "I0108",
+    "I0109",
+    "I0110",
+    "I0111",
+    "I0137",
+    "I0138",
+    "I0172",
+    "I0173",
+    "I0192",
+    "I0249",
+    "I0250",
+    "I0382"
+   ],
+   "summary": "Le financement des formations est critiqué par 8 personnes : dispositifs incompréhensibles ou trop complexes, formations chères, refus de Pôle emploi et des organismes paritaires collecteurs, compte de formation inutilisable pour un demandeur d'emploi ou pour une formation non certifiante, conversion des heures en euros vécue comme une « grande arnaque », fin des droits à l'issue de la formation [I0051, I0080, I0097, I0108, I0109, I0110, I0111, I0137, I0138, I0192, I0249, I0382]. À contre-courant, 2 personnes saluent la bonne organisation du compte personnel de formation ou la prise en charge des formations par Pôle emploi pour les chômeurs et les allocataires du revenu de solidarité active [I0099, I0101]. Une personne mitigée juge le compte personnel de formation « une bonne idée », mais sa mise en service « totalement opaque » [I0172, I0173]. 3 personnes demandent plus de liberté : choisir soi-même sa formation avec son compte, disposer d'une enveloppe unique à dépenser librement, ou libéraliser entièrement le système [I0046, I0052, I0250].",
+   "metrics": {
+    "mentions": 19,
+    "participants": 12,
+    "participantIds": [
+     "P7",
+     "P8",
+     "P13",
+     "P16",
+     "P17",
+     "P18",
+     "P19",
+     "P21",
+     "P25",
+     "P27",
+     "P29",
+     "P49"
+    ],
+    "mentionsByCategory": {
+     "positive": 3,
+     "negative": 13,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 3,
+     "negative": 9,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P17",
+     "P18"
+    ],
+    "negativeOnly": [
+     "P8",
+     "P13",
+     "P16",
+     "P19",
+     "P21",
+     "P27",
+     "P29",
+     "P49"
+    ],
+    "mixed": [
+     "P25"
+    ],
+    "consensusRate": 0.7272727272727273,
+    "majority": "negative",
+    "stance": "majority",
+    "fragile": false,
+    "minority": {
+     "side": "positive",
+     "participantIds": [
+      "P17",
+      "P18"
+     ],
+     "ideaIds": [
+      "I0099",
+      "I0101"
+     ]
+    }
+   },
+   "id": "G3",
+   "definition": {
+    "positive": "apprécier les dispositifs qui financent ou prennent en charge les formations",
+    "negative": "subir les coûts, refus ou complexités des financements de formation",
+    "neutral": "décrire les dispositifs de financement sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Accompagnement des demandeurs d'emploi",
+   "ideaIds": [
+    "I0002",
+    "I0003",
+    "I0008",
+    "I0015",
+    "I0026",
+    "I0027",
+    "I0028",
+    "I0029",
+    "I0030",
+    "I0031",
+    "I0059",
+    "I0060",
+    "I0061",
+    "I0062",
+    "I0067",
+    "I0075",
+    "I0076",
+    "I0193",
+    "I0194",
+    "I0195",
+    "I0196",
+    "I0284",
+    "I0285",
+    "I0286",
+    "I0322",
+    "I0323",
+    "I0357"
+   ],
+   "summary": "Absents, lents ou inadaptés : c'est ainsi que 10 personnes jugent les services d'accompagnement des demandeurs d'emploi, entre formations inadaptées ou jamais proposées, absence d'accompagnement, informations rares, orientation vers la recherche numérique, conseillers qui ignorent les métiers, statut de cadre non reconnu, chiffres prioritaires sur le retour à l'emploi et aide réservée aux personnes « battantes » [I0002, I0008, I0015, I0026, I0059, I0067, I0075, I0076, I0193, I0194, I0285, I0357]. L'une d'elles raconte des mois sans contact ni réponse de Cap emploi pour un conjoint en attente de reconnaissance de la qualité de travailleur handicapé, une autre d'entre elles regrette l'absence totale de soutien moral après un licenciement [I0027, I0028, I0029, I0030, I0031, I0286]. Une personne mitigée juge la Mission locale inutile, mais note que Pôle emploi s'est récemment amélioré, notamment dans le respect des volontés de l'usager [I0322, I0323]. 2 personnes demandent un service plus efficace : l'une veut un Pôle emploi « plus efficace », l'autre propose de réorganiser l'Agence nationale pour l'emploi par branches et métiers, ou de déléguer ce rôle aux branches professionnelles et aux sociétés d'intérim [I0003, I0060, I0061, I0062].",
+   "metrics": {
+    "mentions": 27,
+    "participants": 11,
+    "participantIds": [
+     "P1",
+     "P3",
+     "P4",
+     "P5",
+     "P9",
+     "P11",
+     "P13",
+     "P27",
+     "P35",
+     "P44",
+     "P47"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 21,
+     "neutral": 1,
+     "suggestion": 4,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 11,
+     "neutral": 1,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P1",
+     "P3",
+     "P4",
+     "P5",
+     "P9",
+     "P11",
+     "P13",
+     "P27",
+     "P35",
+     "P47"
+    ],
+    "mixed": [
+     "P44"
+    ],
+    "consensusRate": 0.9090909090909091,
+    "majority": "negative",
+    "stance": "consensus",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G4",
+   "definition": {
+    "positive": "apprécier l'aide reçue des services d'accompagnement vers l'emploi",
+    "negative": "juger ces services absents, inefficaces, lents ou inadaptés",
+    "neutral": "décrire son parcours de demandeur d'emploi sans juger ces services"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Qualité des organismes de formation",
+   "ideaIds": [
+    "I0001",
+    "I0005",
+    "I0032",
+    "I0071",
+    "I0136",
+    "I0160",
+    "I0162",
+    "I0168",
+    "I0178",
+    "I0189",
+    "I0190",
+    "I0191",
+    "I0282",
+    "I0283",
+    "I0324"
+   ],
+   "summary": "6 personnes critiquent les organismes de formation : formation professionnelle « largement défaillante », formations de Pôle emploi jugées « nulles » ou réduites à un pauvre stage, sociétés de formation inefficaces qui profitent des subventions sans contrôle ni évaluation, budget formation détourné, organismes qui recrutent surtout pour se faire financer, universités en décalage avec les stagiaires adultes, centre d'Aubervilliers décevant [I0032, I0136, I0160, I0162, I0168, I0178, I0189, I0190, I0191, I0324]. À l'inverse, 4 autres personnes saluent la formation suivie : une « belle réussite » avec la chambre de commerce et d'industrie des Yvelines, un organisme privé qui a expliqué les démarches, une longue formation technique dans un groupement d'établissements (Greta), une « très bonne formation » en anglais et un bilan de compétences « très positif » [I0001, I0005, I0071, I0282, I0283].",
+   "metrics": {
+    "mentions": 15,
+    "participants": 10,
+    "participantIds": [
+     "P1",
+     "P2",
+     "P5",
+     "P12",
+     "P21",
+     "P24",
+     "P26",
+     "P27",
+     "P35",
+     "P44"
+    ],
+    "mentionsByCategory": {
+     "positive": 5,
+     "negative": 10,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 4,
+     "negative": 6,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P1",
+     "P2",
+     "P12",
+     "P35"
+    ],
+    "negativeOnly": [
+     "P5",
+     "P21",
+     "P24",
+     "P26",
+     "P27",
+     "P44"
+    ],
+    "mixed": [],
+    "consensusRate": 0.6,
+    "majority": "negative",
+    "stance": "divided",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G5",
+   "definition": {
+    "positive": "apprécier la qualité et l'efficacité des formations suivies",
+    "negative": "juger les organismes inefficaces, opportunistes ou mal contrôlés",
+    "neutral": "évoquer les organismes de formation sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Conditions d'accès aux formations",
+   "ideaIds": [
+    "I0006",
+    "I0017",
+    "I0043",
+    "I0044",
+    "I0045",
+    "I0102",
+    "I0103",
+    "I0142",
+    "I0187",
+    "I0295",
+    "I0296",
+    "I0297",
+    "I0301",
+    "I0386"
+   ],
+   "summary": "Refus, délais, critères restrictifs : 8 personnes décrivent une entrée en formation semée d'obstacles, entre formations refusées ou inaccessibles pour se reconvertir, inscription conditionnée à l'examen, entrées calquées sur l'année scolaire, langues jamais accordées aux cadres âgés, accès réservé aux personnes « assez au chômage », démarches lourdes et manque de moyens ou de temps [I0017, I0043, I0045, I0102, I0142, I0187, I0295, I0301, I0386]. L'une d'elles a trouvé la formation complète en revenant s'inscrire, une autre d'entre elles a dû attendre 1 an [I0103, I0296]. Celle qui juge la reconversion impossible demande que la formation « permette une évolution » [I0044]. Une autre personne n'a rencontré aucun gros point bloquant [I0006].",
+   "metrics": {
+    "mentions": 14,
+    "participants": 9,
+    "participantIds": [
+     "P2",
+     "P4",
+     "P7",
+     "P18",
+     "P22",
+     "P27",
+     "P37",
+     "P38",
+     "P50"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 12,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 8,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P2"
+    ],
+    "negativeOnly": [
+     "P4",
+     "P7",
+     "P18",
+     "P22",
+     "P27",
+     "P37",
+     "P38",
+     "P50"
+    ],
+    "mixed": [],
+    "consensusRate": 0.8888888888888888,
+    "majority": "negative",
+    "stance": "consensus",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G6",
+   "definition": {
+    "positive": "juger l'entrée en formation simple, rapide et ouverte à tous",
+    "negative": "subir refus, délais, critères restrictifs ou démarches lourdes",
+    "neutral": "décrire les conditions d'entrée en formation sans les juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Inclusion des jeunes handicapés",
+   "ideaIds": [
+    "I0089",
+    "I0090",
+    "I0217",
+    "I0218",
+    "I0219",
+    "I0220",
+    "I0248",
+    "I0276",
+    "I0277",
+    "I0278",
+    "I0307",
+    "I0308",
+    "I0329",
+    "I0330",
+    "I0331",
+    "I0372"
+   ],
+   "summary": "Le manque de places, de structures et d'adaptation pour les jeunes handicapés est dénoncé par 3 personnes : formations trop normalisées, autistes privés d'éducation, places en institut financées plutôt que des accompagnants, explications à répéter chaque année à de nouveaux professeurs [I0276, I0277, I0278, I0307, I0329, I0330, I0331]. Une personne mitigée cite des enfants handicapés peu pris en considération et un enfant refusé par une structure spécifique parce que « c'est trop compliqué pour eux », puis accueilli dans une structure « formidable » à l'hôpital de Garches [I0217, I0218, I0220, I0219]. Une autre salue la très bonne implication de la maison départementale des personnes handicapées, des services sociaux et des institutrices [I0089, I0090]. 2 pistes s'opposent sur la formation des professeurs au handicap : les accompagner par une formation et un suivi, ou les laisser se former seuls, sans prise en charge par l'État [I0248, I0308] ; une personne demande aussi plus d'auxiliaires de vie scolaire dans les écoles [I0372].",
+   "metrics": {
+    "mentions": 16,
+    "participants": 7,
+    "participantIds": [
+     "P14",
+     "P27",
+     "P28",
+     "P33",
+     "P38",
+     "P44",
+     "P48"
+    ],
+    "mentionsByCategory": {
+     "positive": 3,
+     "negative": 10,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 2,
+     "negative": 4,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P14"
+    ],
+    "negativeOnly": [
+     "P33",
+     "P38",
+     "P44"
+    ],
+    "mixed": [
+     "P27"
+    ],
+    "consensusRate": 0.6,
+    "majority": "negative",
+    "stance": "majority",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G7",
+   "definition": {
+    "positive": "saluer l'accueil et l'accompagnement des jeunes handicapés à l'école",
+    "negative": "déplorer le manque de places, d'accompagnants ou d'adaptation",
+    "neutral": "évoquer la situation des jeunes handicapés sans porter de jugement"
+   },
+   "opposed": [
+    {
+     "a": "I0248",
+     "b": "I0308",
+     "about": "la prise en charge de la formation des professeurs au handicap"
+    }
+   ]
+  },
+  {
+   "title": "Méthodes pédagogiques",
+   "ideaIds": [
+    "I0054",
+    "I0056",
+    "I0085",
+    "I0087",
+    "I0104",
+    "I0107",
+    "I0151",
+    "I0157",
+    "I0170",
+    "I0171",
+    "I0234",
+    "I0235",
+    "I0281"
+   ],
+   "summary": "Changer la manière d'enseigner : c'est le souhait de 6 personnes, qui proposent de nouvelles pédagogies, une remise en question des pratiques enseignantes, des écoles Montessori dans toutes les écoles publiques, des apprentissages dès la maternelle ou une explication aux enfants que les matières servent à « apprendre à apprendre » [I0054, I0056, I0087, I0151, I0170, I0171, I0234, I0235, I0281]. L'une d'elles juge aussi les matières trop cloisonnées [I0085]. Une autre personne apprécie au contraire l'école Steiner fréquentée par son enfant, qui lui a appris à « apprendre avec curiosité naturelle » [I0104, I0107].",
+   "metrics": {
+    "mentions": 13,
+    "participants": 7,
+    "participantIds": [
+     "P8",
+     "P13",
+     "P18",
+     "P22",
+     "P24",
+     "P27",
+     "P34"
+    ],
+    "mentionsByCategory": {
+     "positive": 2,
+     "negative": 1,
+     "neutral": 1,
+     "suggestion": 9,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 1,
+     "neutral": 1,
+     "suggestion": 6,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P18"
+    ],
+    "negativeOnly": [
+     "P13"
+    ],
+    "mixed": [],
+    "consensusRate": 0.5,
+    "majority": null,
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G8",
+   "definition": {
+    "positive": "apprécier des méthodes d'enseignement adaptées, motivantes ou innovantes",
+    "negative": "juger les façons d'enseigner dépassées, cloisonnées ou inadaptées",
+    "neutral": "énoncer un principe général sur l'apprentissage sans juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Relations école-familles",
+   "ideaIds": [
+    "I0020",
+    "I0021",
+    "I0022",
+    "I0122",
+    "I0123",
+    "I0128",
+    "I0236",
+    "I0269",
+    "I0299",
+    "I0314",
+    "I0352"
+   ],
+   "summary": "Entre l'école et les familles, la communication est jugée difficile par les 6 personnes qui donnent un avis : outils numériques mal maîtrisés par les enseignants, informations envoyées aux 2 parents après plus de 2 ans, ce qui pose la question des parents séparés, réunions anarchiques ou à des horaires impossibles, information obtenue par le bouche-à-oreille, parents et enseignants qui se renvoient la balle, jugements infondés envers un parent [I0020, I0021, I0022, I0122, I0128, I0236, I0299, I0314, I0352]. 2 personnes proposent d'adapter les horaires de rencontre au rythme des parents ou de pouvoir faire remonter les problèmes [I0123, I0269].",
+   "metrics": {
+    "mentions": 11,
+    "participants": 7,
+    "participantIds": [
+     "P4",
+     "P20",
+     "P27",
+     "P30",
+     "P37",
+     "P40",
+     "P46"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 8,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 1
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 6,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 1
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P4",
+     "P20",
+     "P27",
+     "P37",
+     "P40",
+     "P46"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G9",
+   "definition": {
+    "positive": "apprécier la communication et le dialogue entre l'école et les parents",
+    "negative": "déplorer une information lacunaire ou un dialogue difficile avec l'école",
+    "neutral": "décrire les échanges entre école et familles sans les juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Gestion du corps enseignant",
+   "ideaIds": [
+    "I0024",
+    "I0094",
+    "I0119",
+    "I0130",
+    "I0131",
+    "I0185",
+    "I0200",
+    "I0317",
+    "I0318",
+    "I0355"
+   ],
+   "summary": "Pour 5 personnes, la gestion du corps enseignant pose problème : statut de fonctionnaire et emploi à vie jugés injustifiés, professeur alcoolique impossible à retirer de son poste, enseignement vu comme « un état dans l'état », directeurs sans pouvoir sur leurs équipes ou démunis [I0024, I0130, I0131, I0200, I0317, I0318, I0355]. 3 personnes proposent de faire évoluer l'encadrement : l'une veut laisser plus de liberté aux enseignants dans l'organisation de l'école, les 2 autres veulent confier leur évaluation au directeur ou au proviseur, ou noter les professeurs [I0094, I0119, I0185].",
+   "metrics": {
+    "mentions": 10,
+    "participants": 7,
+    "participantIds": [
+     "P4",
+     "P15",
+     "P20",
+     "P26",
+     "P27",
+     "P42",
+     "P46"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 7,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 5,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P4",
+     "P20",
+     "P27",
+     "P42",
+     "P46"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G10",
+   "definition": {
+    "positive": "approuver la façon dont les enseignants sont recrutés, évalués, encadrés",
+    "negative": "critiquer le statut, l'évaluation ou l'encadrement des enseignants",
+    "neutral": "décrire l'organisation du corps enseignant sans la juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Orientation scolaire",
+   "ideaIds": [
+    "I0009",
+    "I0010",
+    "I0023",
+    "I0037",
+    "I0038",
+    "I0140",
+    "I0273",
+    "I0321",
+    "I0356"
+   ],
+   "summary": "Les 7 personnes qui donnent un avis critiquent l'orientation scolaire : stress de Parcoursup, étape difficile en fin de cycle, « vrai parcours du combattant », logique des choix d'écoles difficile à comprendre, conseillers d'orientation qui ne connaissent pas les formations recommandées ou dont le titre de psychologue rebute les élèves, services publics jugés « trop mauvais » [I0009, I0023, I0037, I0140, I0273, I0321, I0356]. 2 d'entre elles ajoutent que les professeurs manquent de formation et de temps pour accompagner les élèves, ou que les fonctionnaires chargés de l'orientation sont peu motivés [I0010, I0038].",
+   "metrics": {
+    "mentions": 9,
+    "participants": 7,
+    "participantIds": [
+     "P3",
+     "P4",
+     "P6",
+     "P21",
+     "P31",
+     "P43",
+     "P47"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 9,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 7,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P3",
+     "P4",
+     "P6",
+     "P21",
+     "P31",
+     "P43",
+     "P47"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G11",
+   "definition": {
+    "positive": "juger l'orientation des élèves claire, bien accompagnée et efficace",
+    "negative": "subir une orientation stressante, opaque ou mal conseillée",
+    "neutral": "décrire les étapes de l'orientation sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Qualité des enseignants",
+   "ideaIds": [
+    "I0204",
+    "I0205",
+    "I0206",
+    "I0231",
+    "I0237",
+    "I0238",
+    "I0253",
+    "I0259",
+    "I0260",
+    "I0261",
+    "I0262",
+    "I0263",
+    "I0264",
+    "I0265",
+    "I0266",
+    "I0300",
+    "I0353",
+    "I0361"
+   ],
+   "summary": "4 personnes critiquent l'attitude ou l'engagement de certains enseignants : un enfant laissé sans attention, des professeurs « au service minimum », des opinions données devant les élèves, une professeure d'anglais qui reprochait leur accent à des enfants bilingues [I0204, I0205, I0253, I0300, I0361]. L'une d'elles regrette aussi les enseignants « humains, cultivés et motivés » d'autrefois et invite à parler aux jeunes en face, en les écoutant [I0231, I0237, I0238]. Une personne mitigée a rencontré des professeurs compétents et équilibrés, mais aussi des enseignants de maternelle dépressifs ou fatigués et d'autres dépassés en primaire [I0259, I0264, I0265, I0260, I0261, I0262, I0266]. Une autre personne souligne que de nombreux enseignants apportent beaucoup à la construction éducative et à la culture des enfants [I0353].",
+   "metrics": {
+    "mentions": 18,
+    "participants": 6,
+    "participantIds": [
+     "P27",
+     "P29",
+     "P30",
+     "P37",
+     "P46",
+     "P47"
+    ],
+    "mentionsByCategory": {
+     "positive": 4,
+     "negative": 12,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 2,
+     "negative": 5,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P46"
+    ],
+    "negativeOnly": [
+     "P27",
+     "P29",
+     "P37",
+     "P47"
+    ],
+    "mixed": [
+     "P30"
+    ],
+    "consensusRate": 0.6666666666666666,
+    "majority": "negative",
+    "stance": "majority",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G12",
+   "definition": {
+    "positive": "apprécier la compétence, l'engagement ou l'humanité des enseignants",
+    "negative": "déplorer l'incompétence, la fatigue ou l'attitude de certains enseignants",
+    "neutral": "évoquer les enseignants sans porter de jugement sur eux"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Système éducatif public",
+   "ideaIds": [
+    "I0053",
+    "I0058",
+    "I0073",
+    "I0074",
+    "I0084",
+    "I0139",
+    "I0143",
+    "I0145",
+    "I0147",
+    "I0148",
+    "I0149",
+    "I0150",
+    "I0251"
+   ],
+   "summary": "L'école publique est jugée en déclin par 5 personnes, qui décrivent un « magnifique outil » qui se dégrade, une école qui « se vide petit à petit de sa substance », des locaux dégradés ou un système scolaire en échec [I0053, I0058, I0073, I0084, I0143, I0251]. Pour l'une d'elles, la loi de l'offre et de la demande a gangrené les établissements [I0074] ; une autre d'entre elles regrette que le sujet n'intéresse personne [I0145]. 2 personnes avancent des pistes : l'une demande que l'État soutienne les établissements publics [I0139], l'autre veut utiliser autrement des moyens jugés importants, en s'inspirant de la Finlande ou de l'Allemagne et en bousculant les mentalités [I0147, I0148, I0150].",
+   "metrics": {
+    "mentions": 13,
+    "participants": 6,
+    "participantIds": [
+     "P8",
+     "P12",
+     "P13",
+     "P21",
+     "P22",
+     "P29"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 8,
+     "neutral": 0,
+     "suggestion": 5,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 5,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P8",
+     "P12",
+     "P13",
+     "P22",
+     "P29"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G13",
+   "definition": {
+    "positive": "défendre ou apprécier l'école publique dans son ensemble",
+    "negative": "juger l'école publique en déclin, en échec ou dégradée",
+    "neutral": "énoncer un principe général sur l'école sans juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Vie scolaire",
+   "ideaIds": [
+    "I0025",
+    "I0040",
+    "I0041",
+    "I0042",
+    "I0132",
+    "I0230",
+    "I0239",
+    "I0240",
+    "I0241",
+    "I0242",
+    "I0243",
+    "I0247"
+   ],
+   "summary": "Pour 3 personnes, l'encadrement des élèves fait défaut : manque de surveillants, de sécurité ou de conseillers d'éducation bien recrutés, discipline trop sévère avec les élèves sages ou absence de sanction [I0025, I0040, I0041, I0230, I0241]. L'une d'elles ajoute que l'exclusion envoie l'élève « directement à la rue » et s'interroge sur l'attitude à adopter [I0240, I0239] ; une autre personne propose au contraire de placer tôt les élèves perturbateurs en internat ou en collège spécialisé [I0132]. 2 personnes réclament du personnel qualifié : des encadrants autour des enseignants plutôt que la police, ou des psychologues et des assistantes sociales « motivées » [I0042, I0243]. Une personne juge en revanche la tenue vestimentaire « une bonne chose » [I0247].",
+   "metrics": {
+    "mentions": 12,
+    "participants": 5,
+    "participantIds": [
+     "P4",
+     "P6",
+     "P20",
+     "P27",
+     "P28"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 7,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 1
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 1
+    },
+    "positiveOnly": [
+     "P28"
+    ],
+    "negativeOnly": [
+     "P4",
+     "P6",
+     "P27"
+    ],
+    "mixed": [],
+    "consensusRate": 0.75,
+    "majority": "negative",
+    "stance": "majority",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G14",
+   "definition": {
+    "positive": "apprécier le cadre, la discipline ou l'encadrement des élèves",
+    "negative": "déplorer un manque de surveillance, d'encadrement ou de discipline adaptée",
+    "neutral": "s'interroger sur la discipline scolaire sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Rythmes scolaires",
+   "ideaIds": [
+    "I0034",
+    "I0055",
+    "I0124",
+    "I0181",
+    "I0182",
+    "I0183",
+    "I0184",
+    "I0290",
+    "I0291"
+   ],
+   "summary": "Les 5 personnes qui donnent un avis critiquent l'organisation du temps scolaire, jugée mal adaptée aux enfants comme aux parents [I0034, I0055, I0124, I0184, I0290]. 2 d'entre elles dénoncent les heures passées assis sans bouger [I0055, I0290]. Les vacances paraissent trop longues à 2 autres personnes : l'une trouve aussi les semaines trop chargées, l'autre évoque les parents qui « galèrent » et propose de raccourcir les vacances, en rappelant que l'école est « faite pour les jeunes et non pour les professeurs » [I0124, I0184, I0181, I0183]. Une personne regrette des horaires incompatibles avec ceux des parents qui travaillent [I0034] ; 2 personnes proposent plus de sport, et l'une d'elles moins de cours théoriques [I0182, I0291].",
+   "metrics": {
+    "mentions": 9,
+    "participants": 5,
+    "participantIds": [
+     "P5",
+     "P8",
+     "P20",
+     "P26",
+     "P35"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 6,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 5,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P5",
+     "P8",
+     "P20",
+     "P26",
+     "P35"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G15",
+   "definition": {
+    "positive": "apprécier l'organisation des journées, semaines et vacances scolaires",
+    "negative": "juger les journées trop chargées, les vacances trop longues",
+    "neutral": "décrire le calendrier scolaire sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Charge de travail des élèves",
+   "ideaIds": [
+    "I0063",
+    "I0125",
+    "I0126",
+    "I0127",
+    "I0267",
+    "I0268",
+    "I0270",
+    "I0288",
+    "I0289",
+    "I0292"
+   ],
+   "summary": "Trop de devoirs, des emplois du temps chargés, des cartables trop lourds : 3 personnes jugent excessive la charge de travail des élèves [I0125, I0127, I0270, I0288, I0289]. L'une d'elles raconte qu'un directeur exigeait 2 heures de devoirs par soir en CE2, au point que son enfant a été en souffrance [I0267, I0268]. 2 personnes veulent que les devoirs soient accompagnés par des enseignants : l'une demande de rendre obligatoire le dispositif « devoir fait », l'autre de supprimer les devoirs à la maison au profit d'une permanence après le sport [I0126, I0292]. Une autre personne, sans juger cette charge, dit faire du soutien scolaire bénévole [I0063].",
+   "metrics": {
+    "mentions": 10,
+    "participants": 4,
+    "participantIds": [
+     "P9",
+     "P20",
+     "P30",
+     "P35"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 7,
+     "neutral": 1,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 1,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P20",
+     "P30",
+     "P35"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G16",
+   "definition": {
+    "positive": "juger la charge de travail des élèves raisonnable et adaptée",
+    "negative": "déplorer devoirs excessifs, emplois du temps chargés ou cartables lourds",
+    "neutral": "évoquer le travail des élèves sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Coût de la scolarité",
+   "ideaIds": [
+    "I0048",
+    "I0049",
+    "I0065",
+    "I0066",
+    "I0082",
+    "I0310",
+    "I0311",
+    "I0312"
+   ],
+   "summary": "Sur le coût de la scolarité, 2 personnes regrettent un manque d'aides : l'une ne recevait aucune aide sociale malgré l'absence de pension alimentaire, l'autre déplore que les enfants scolarisés dans des établissements privés limitrophes ne soient pas pris en compte [I0065, I0310]. Cette dernière propose d'indemniser la cantine et les transports quel que soit l'établissement [I0311] ; la première se demande si les aides ont évolué depuis [I0066]. Une personne mitigée a trouvé tout facile, sauf le coût, tout en notant les gros efforts de la région [I0048, I0049]. Une autre salue la quasi-gratuité de l'enseignement [I0082].",
+   "metrics": {
+    "mentions": 8,
+    "participants": 4,
+    "participantIds": [
+     "P7",
+     "P10",
+     "P13",
+     "P39"
+    ],
+    "mentionsByCategory": {
+     "positive": 2,
+     "negative": 3,
+     "neutral": 1,
+     "suggestion": 1,
+     "question": 1
+    },
+    "participantsByCategory": {
+     "positive": 2,
+     "negative": 3,
+     "neutral": 1,
+     "suggestion": 1,
+     "question": 1
+    },
+    "positiveOnly": [
+     "P13"
+    ],
+    "negativeOnly": [
+     "P10",
+     "P39"
+    ],
+    "mixed": [
+     "P7"
+    ],
+    "consensusRate": 0.5,
+    "majority": "negative",
+    "stance": "lean",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G17",
+   "definition": {
+    "positive": "juger la scolarité gratuite, abordable ou bien aidée financièrement",
+    "negative": "juger la scolarité coûteuse ou les aides insuffisantes",
+    "neutral": "s'interroger sur les coûts ou les aides sans juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Formation des agents publics",
+   "ideaIds": [
+    "I0070",
+    "I0254",
+    "I0255",
+    "I0256",
+    "I0257",
+    "I0271",
+    "I0272",
+    "I0293"
+   ],
+   "summary": "Selon 2 personnes, les agents de l'Éducation nationale accèdent mal à la formation : pas de droit à des formations ni à des bilans de compétences, ou pas d'heures décomptées pour se former [I0271, I0293]. L'une d'elles regrette aussi que les formations aux outils numériques pour l'enseignement soient proposées seulement sur PC [I0272]. Une personne mitigée apprécie la formation continue qui lui a permis de prendre du recul et de s'enrichir, mais n'a pas pu choisir son domaine, a attendu l'accord et regrette le manque d'information sur le salaire réellement perçu [I0254, I0256, I0255, I0257]. Une autre cite comme élément de satisfaction ses 4 années d'aide-éducateur à l'Éducation nationale [I0070].",
+   "metrics": {
+    "mentions": 8,
+    "participants": 4,
+    "participantIds": [
+     "P12",
+     "P30",
+     "P31",
+     "P36"
+    ],
+    "mentionsByCategory": {
+     "positive": 3,
+     "negative": 5,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 2,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P12"
+    ],
+    "negativeOnly": [
+     "P31",
+     "P36"
+    ],
+    "mixed": [
+     "P30"
+    ],
+    "consensusRate": 0.5,
+    "majority": "negative",
+    "stance": "lean",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G18",
+   "definition": {
+    "positive": "apprécier les formations continues accessibles aux agents publics",
+    "negative": "déplorer le manque de temps, de choix ou d'accès aux formations",
+    "neutral": "décrire son parcours d'agent public sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Gouvernance de l'Éducation nationale",
+   "ideaIds": [
+    "I0118",
+    "I0120",
+    "I0121",
+    "I0201",
+    "I0228",
+    "I0229",
+    "I0351",
+    "I0381"
+   ],
+   "summary": "Aucune des 4 personnes qui donnent un avis ne défend le fonctionnement de l'Éducation nationale : elles critiquent une gestion difficile à comprendre, des acteurs qui se renvoient la balle sous la pression des rectorats, le harcèlement d'un enseignant par des chefs d'établissement ou l'excès de réformes [I0118, I0201, I0351, I0381]. 2 personnes proposent des changements : réduire les postes administratifs de l'académie au profit des professeurs, voire supprimer les inspecteurs, ou clarifier les relations avec les rectorats et les jeux de pouvoir entre acteurs [I0120, I0121, I0228, I0229].",
+   "metrics": {
+    "mentions": 8,
+    "participants": 4,
+    "participantIds": [
+     "P20",
+     "P27",
+     "P46",
+     "P49"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 4,
+     "neutral": 0,
+     "suggestion": 4,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 4,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P20",
+     "P27",
+     "P46",
+     "P49"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G19",
+   "definition": {
+    "positive": "approuver le pilotage et l'organisation administrative de l'Éducation nationale",
+    "negative": "critiquer bureaucratie, réformes, opacité ou jeux de pouvoir",
+    "neutral": "décrire le fonctionnement de l'institution sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Offre de formation disponible",
+   "ideaIds": [
+    "I0016",
+    "I0077",
+    "I0078",
+    "I0079",
+    "I0081",
+    "I0134",
+    "I0186",
+    "I0188"
+   ],
+   "summary": "3 personnes jugent l'offre de formation insuffisante ou inadaptée : référencement limité, trop peu de formations dans les groupements d'établissements (Greta), centres éloignés, aucune proposition correcte pour les personnes plus instruites dans les banlieues [I0016, I0077, I0078, I0186, I0188]. L'une d'elles critique aussi, chez les organismes privés, une profusion de sites et de formations non diplômantes [I0079, I0081]. Une autre personne se réjouit au contraire d'un grand choix de formations [I0134].",
+   "metrics": {
+    "mentions": 8,
+    "participants": 4,
+    "participantIds": [
+     "P4",
+     "P13",
+     "P21",
+     "P27"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 7,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P21"
+    ],
+    "negativeOnly": [
+     "P4",
+     "P13",
+     "P27"
+    ],
+    "mixed": [],
+    "consensusRate": 0.75,
+    "majority": "negative",
+    "stance": "majority",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G20",
+   "definition": {
+    "positive": "apprécier la diversité ou la disponibilité des formations proposées",
+    "negative": "juger l'offre de formations insuffisante, éloignée, confuse ou inadaptée",
+    "neutral": "constater l'existence de formations sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Choix entre public et privé",
+   "ideaIds": [
+    "I0072",
+    "I0112",
+    "I0115",
+    "I0116",
+    "I0117",
+    "I0275"
+   ],
+   "summary": "Le privé donne satisfaction à 2 personnes, dont les enfants n'y ont rencontré aucun problème [I0112, I0275]. Une personne qui a alterné public et privé est mitigée : le privé permet d'avoir ce que l'on souhaite et le public de mêler plus largement la population, mais on y a l'impression de ne pas maîtriser son destin, « au profit d'initiés » [I0115, I0116, I0117]. Une autre indique, sans porter de jugement, que son enfant est scolarisé dans le privé [I0072].",
+   "metrics": {
+    "mentions": 6,
+    "participants": 4,
+    "participantIds": [
+     "P12",
+     "P19",
+     "P20",
+     "P32"
+    ],
+    "mentionsByCategory": {
+     "positive": 3,
+     "negative": 1,
+     "neutral": 2,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 3,
+     "negative": 1,
+     "neutral": 2,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P19",
+     "P32"
+    ],
+    "negativeOnly": [],
+    "mixed": [
+     "P20"
+    ],
+    "consensusRate": 0.6666666666666666,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G21",
+   "definition": {
+    "positive": "apprécier l'établissement choisi, public ou privé, ou ses atouts",
+    "negative": "déplorer les défauts du secteur public ou privé fréquenté",
+    "neutral": "constater le type d'établissement fréquenté sans le juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Niveau d'exigence scolaire",
+   "ideaIds": [
+    "I0086",
+    "I0152",
+    "I0153",
+    "I0232",
+    "I0233",
+    "I0252"
+   ],
+   "summary": "Le niveau d'exigence est jugé en baisse par 3 personnes, qui citent un niveau des élèves en recul, une grammaire, une orthographe et une culture générale négligées, la minimisation de certains enseignements ou la disparition des notes jusqu'en troisième [I0086, I0232, I0233, I0252]. Une autre personne propose de fixer des objectifs, de valider les niveaux réels et de cesser de régler le curseur sur des « statistiques de réussite fallacieuses » [I0152, I0153].",
+   "metrics": {
+    "mentions": 6,
+    "participants": 4,
+    "participantIds": [
+     "P13",
+     "P22",
+     "P27",
+     "P29"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 4,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P13",
+     "P27",
+     "P29"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G22",
+   "definition": {
+    "positive": "défendre ou apprécier un niveau d'exigence élevé à l'école",
+    "negative": "déplorer la baisse du niveau ou le manque d'exigence",
+    "neutral": "évoquer le niveau scolaire sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Adéquation formation-emploi",
+   "ideaIds": [
+    "I0158",
+    "I0179",
+    "I0180",
+    "I0280",
+    "I0316"
+   ],
+   "summary": "Pour 3 personnes, les formations proposées ne mènent pas à l'emploi : formations inadaptées, chômeurs placés dans « n'importe quelle formation » pour les statistiques, formations qui prolongent surtout les indemnités et coûtent « un argent fou » [I0158, I0180, I0316]. 2 personnes veulent rapprocher les formations des emplois : l'une propose de lister d'abord les offres d'emploi, l'autre de mettre clairement en avant les propositions qui y débouchent [I0179, I0280].",
+   "metrics": {
+    "mentions": 5,
+    "participants": 4,
+    "participantIds": [
+     "P23",
+     "P26",
+     "P34",
+     "P42"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P23",
+     "P26",
+     "P42"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G23",
+   "definition": {
+    "positive": "juger les formations utiles pour accéder à un emploi",
+    "negative": "juger les formations inadaptées aux besoins réels d'emploi",
+    "neutral": "évoquer le lien entre formation et emploi sans juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Absences des enseignants",
+   "ideaIds": [
+    "I0083",
+    "I0133",
+    "I0159",
+    "I0298"
+   ],
+   "summary": "Absences non remplacées, absentéisme, grèves fréquentes : 3 personnes regrettent que les enseignants manquent devant les élèves [I0083, I0159, I0298]. Une autre personne juge anormal que les professeurs se forment sur leur temps de présence en classe plutôt que sur leur « large temps libre » [I0133].",
+   "metrics": {
+    "mentions": 4,
+    "participants": 4,
+    "participantIds": [
+     "P13",
+     "P20",
+     "P23",
+     "P37"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 4,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 4,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P13",
+     "P20",
+     "P23",
+     "P37"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "G24",
+   "definition": {
+    "positive": "saluer la présence ou le remplacement rapide des enseignants",
+    "negative": "déplorer absences, grèves ou heures de cours non remplacées",
+    "neutral": "évoquer la présence des enseignants sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Constitution des classes",
+   "ideaIds": [
+    "I0007",
+    "I0064",
+    "I0199",
+    "I0246"
+   ],
+   "summary": "Selon 3 personnes, les classes sont mal constituées : effectifs difficiles à prévoir dans des quartiers en forte croissance, enfants étrangers placés selon leur âge et non selon leur connaissance du français, classes surchargées par des enfants étrangers [I0007, I0064, I0199]. Une autre personne propose de généraliser les classes à effectif réduit en primaire, qu'elle juge « une bonne chose » [I0246].",
+   "metrics": {
+    "mentions": 4,
+    "participants": 4,
+    "participantIds": [
+     "P2",
+     "P9",
+     "P27",
+     "P28"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P2",
+     "P9",
+     "P27"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G25",
+   "definition": {
+    "positive": "apprécier des effectifs réduits ou des classes bien constituées",
+    "negative": "déplorer des classes surchargées ou mal réparties",
+    "neutral": "décrire la composition des classes sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Formation des enseignants",
+   "ideaIds": [
+    "I0057",
+    "I0154",
+    "I0227",
+    "I0354"
+   ],
+   "summary": "La formation des enseignants paraît insuffisante à 2 personnes, l'une pour la faible place de la pédagogie dans le cursus, l'autre pour la préparation à la gestion d'un groupe d'enfants ou d'adolescents [I0057, I0354]. 2 autres personnes proposent de la revoir : privilégier la capacité à motiver les élèves plutôt que la maîtrise d'une discipline, ou y ajouter « une sérieuse dose de psychologie » [I0154, I0227].",
+   "metrics": {
+    "mentions": 4,
+    "participants": 4,
+    "participantIds": [
+     "P8",
+     "P22",
+     "P27",
+     "P46"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P8",
+     "P46"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G26",
+   "definition": {
+    "positive": "juger la formation des enseignants solide et adaptée",
+    "negative": "juger la formation des enseignants insuffisante ou mal orientée",
+    "neutral": "évoquer la formation des enseignants sans la juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Inscription scolaire",
+   "ideaIds": [
+    "I0069",
+    "I0092",
+    "I0093",
+    "I0129"
+   ],
+   "summary": "Les 3 personnes qui donnent un avis ont rencontré des difficultés d'inscription : refus d'un lycée public après un passage dans le privé, inscription en mairie alors que les parents veulent traiter avec l'école, confirmation attendue jusqu'à la rentrée pour un dossier déposé en juin [I0069, I0092, I0129]. L'une d'elles signale aussi de fréquentes mésententes entre l'école et la mairie, surtout dans les villages et les petites communes [I0093].",
+   "metrics": {
+    "mentions": 4,
+    "participants": 3,
+    "participantIds": [
+     "P11",
+     "P15",
+     "P20"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 4,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P11",
+     "P15",
+     "P20"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G27",
+   "definition": {
+    "positive": "juger les démarches d'inscription simples, rapides et claires",
+    "negative": "subir refus, lenteurs ou complications lors de l'inscription",
+    "neutral": "décrire les démarches d'inscription sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Accompagnement par l'APEC",
+   "ideaIds": [
+    "I0068",
+    "I0325",
+    "I0358"
+   ],
+   "summary": "Sur l'Association pour l'emploi des cadres, 2 personnes se félicitent de son aide : l'une s'en réjouit, l'autre y a fait transférer son dossier avant de trouver un travail par ses propres moyens [I0068, I0358]. Une autre personne estime au contraire que l'association cherche surtout à se faire financer, « au détriment des demandeurs d'emplois » [I0325].",
+   "metrics": {
+    "mentions": 3,
+    "participants": 3,
+    "participantIds": [
+     "P11",
+     "P44",
+     "P47"
+    ],
+    "mentionsByCategory": {
+     "positive": 2,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 2,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P11",
+     "P47"
+    ],
+    "negativeOnly": [
+     "P44"
+    ],
+    "mixed": [],
+    "consensusRate": 0.6666666666666666,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G28",
+   "definition": {
+    "positive": "apprécier l'aide apportée par l'APEC aux cadres en recherche",
+    "negative": "juger l'APEC intéressée, inefficace ou difficile d'accès",
+    "neutral": "évoquer l'APEC sans porter de jugement sur son action"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Procédure MDPH",
+   "ideaIds": [
+    "I0302",
+    "I0303",
+    "I0304",
+    "I0305",
+    "I0306",
+    "I0369",
+    "I0370",
+    "I0379",
+    "I0380"
+   ],
+   "summary": "Lourdeur et lenteur : voilà ce que critiquent dans la procédure de la maison départementale des personnes handicapées les 2 personnes qui donnent un avis, avec des dossiers traités en 8 mois [I0304, I0370, I0380]. L'une décrit un dossier à refaire tous les ans, de nombreux intervenants et comptes rendus, le coût des consultations et des congés à poser pour les rendez-vous [I0302, I0303, I0305, I0306]. L'autre demande d'accélérer les démarches administratives [I0369, I0379].",
+   "metrics": {
+    "mentions": 9,
+    "participants": 2,
+    "participantIds": [
+     "P38",
+     "P48"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 7,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P38",
+     "P48"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G29",
+   "definition": {
+    "positive": "juger les démarches auprès de la MDPH simples ou rapides",
+    "negative": "subir la lourdeur, les délais ou les coûts des dossiers",
+    "neutral": "décrire la procédure MDPH sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Formation en entreprise",
+   "ideaIds": [
+    "I0161",
+    "I0163",
+    "I0165",
+    "I0166",
+    "I0167",
+    "I0326",
+    "I0327",
+    "I0328"
+   ],
+   "summary": "Trouver une entreprise pour un stage ou une alternance est difficile, estime une personne, qui dénonce aussi des stages réduits au « sale boulot » ou au travail gratuit et des partenariats entre entreprises et administrations rarement effectifs [I0326, I0327, I0328]. Une autre personne, mitigée, juge les entreprises capables d'offrir une vraie formation qualifiante, mais trouve prohibitif le coût d'accueil d'un alternant pour une petite structure [I0167, I0165]. Partant du principe que les compétences se trouvent là où on les applique, elle propose de laisser les entreprises développer leurs propres filières et de les payer pour accueillir les stagiaires plutôt que l'inverse [I0161, I0163, I0166].",
+   "metrics": {
+    "mentions": 8,
+    "participants": 2,
+    "participantIds": [
+     "P24",
+     "P44"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 4,
+     "neutral": 1,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 2,
+     "neutral": 1,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P44"
+    ],
+    "mixed": [
+     "P24"
+    ],
+    "consensusRate": 0.5,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G30",
+   "definition": {
+    "positive": "apprécier la formation dispensée en entreprise ou en alternance",
+    "negative": "subir coûts, difficultés d'accès ou abus liés aux stages",
+    "neutral": "énoncer un principe général sur l'apprentissage en entreprise"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Égalité des chances",
+   "ideaIds": [
+    "I0144",
+    "I0146",
+    "I0155",
+    "I0156",
+    "I0315"
+   ],
+   "summary": "L'égalité des chances fait défaut aux yeux de 2 personnes : l'une affirme qu'elle « n'existe pas en France » et y voit l'origine de nombreuses injustices, l'autre oppose les écoles « pour riches » à celles « pour les pauvres » [I0144, I0146, I0315]. La première propose de redonner à chaque enfant la chance de réaliser son potentiel et de déconnecter réussite scolaire et réussite sociale [I0155, I0156].",
+   "metrics": {
+    "mentions": 5,
+    "participants": 2,
+    "participantIds": [
+     "P22",
+     "P40"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P22",
+     "P40"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G31",
+   "definition": {
+    "positive": "saluer une école offrant les mêmes chances à tous",
+    "negative": "déplorer des inégalités scolaires ou sociales entre élèves",
+    "neutral": "énoncer un principe général sur l'égalité sans juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Mobilité vers les formations",
+   "ideaIds": [
+    "I0362",
+    "I0371",
+    "I0387"
+   ],
+   "summary": "Le transport vers une formation pourtant subventionnée coûte un prix « exorbitant », selon une personne [I0387]. Une autre propose davantage de transports en commun dans les secteurs ruraux et des lignes directes vers les grandes villes [I0362, I0371].",
+   "metrics": {
+    "mentions": 3,
+    "participants": 2,
+    "participantIds": [
+     "P48",
+     "P50"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P50"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G32",
+   "definition": {
+    "positive": "juger les déplacements vers les formations faciles ou abordables",
+    "negative": "subir le coût ou le manque de transports vers les formations",
+    "neutral": "évoquer la mobilité vers les formations sans la juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Transports scolaires",
+   "ideaIds": [
+    "I0019",
+    "I0113",
+    "I0114"
+   ],
+   "summary": "Une personne salue des navettes scolaires bien organisées et gratuites [I0019]. Une autre regrette au contraire une desserte insuffisante : le bus ne passant qu'une fois le matin, ses enfants devaient se lever 1 h 30 plus tôt pour aller dans le public [I0113, I0114].",
+   "metrics": {
+    "mentions": 3,
+    "participants": 2,
+    "participantIds": [
+     "P4",
+     "P19"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P4"
+    ],
+    "negativeOnly": [
+     "P19"
+    ],
+    "mixed": [],
+    "consensusRate": 0.5,
+    "majority": null,
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G33",
+   "definition": {
+    "positive": "apprécier l'organisation, la desserte ou la gratuité des transports scolaires",
+    "negative": "subir des horaires contraignants ou une desserte insuffisante",
+    "neutral": "décrire les transports scolaires sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Implication éducative des familles",
+   "ideaIds": [
+    "I0197",
+    "I0198",
+    "I0207",
+    "I0208",
+    "I0209",
+    "I0210",
+    "I0211",
+    "I0222",
+    "I0223",
+    "I0224",
+    "I0225",
+    "I0226"
+   ],
+   "summary": "Bénévole auprès de familles étrangères de son quartier, une personne déplore que de nombreuses familles délèguent l'éducation de leurs jeunes enfants, n'appliquent pas les conseils reçus, ne prennent pas le relais à la maison et perçoivent les aides comme un dû [I0197, I0198, I0209, I0222, I0223].",
+   "metrics": {
+    "mentions": 12,
+    "participants": 1,
+    "participantIds": [
+     "P27"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 9,
+     "neutral": 3,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 1,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P27"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G34",
+   "definition": {
+    "positive": "saluer l'engagement des parents dans l'éducation de leurs enfants",
+    "negative": "déplorer le désengagement ou les lacunes éducatives des familles",
+    "neutral": "décrire des situations familiales sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Signalement du handicap par l'école",
+   "ideaIds": [
+    "I0203",
+    "I0212",
+    "I0213",
+    "I0214",
+    "I0215",
+    "I0216"
+   ],
+   "summary": "D'après une personne, une institutrice avait décidé qu'un enfant était autiste, puis une réunion a cherché à ouvrir pour lui, « sans aucune légitimité », un dossier auprès de la maison départementale des personnes handicapées, démarche qui a finalement échoué [I0203, I0212, I0214, I0215, I0216].",
+   "metrics": {
+    "mentions": 6,
+    "participants": 1,
+    "participantIds": [
+     "P27"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 5,
+     "neutral": 1,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 1,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P27"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G35",
+   "definition": {
+    "positive": "approuver le repérage du handicap et les orientations proposées par l'école",
+    "negative": "dénoncer des signalements hâtifs ou des orientations injustifiées",
+    "neutral": "décrire les démarches de signalement sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Micro-lycées",
+   "ideaIds": [
+    "I0011",
+    "I0012",
+    "I0013",
+    "I0014"
+   ],
+   "summary": "Les micro-lycées sont salués par une personne comme des structures innovantes qui permettent à des jeunes de se rescolariser ; elle propose de leur donner les moyens de développer des projets pédagogiques innovants, de ne plus les installer dans des collèges et d'offrir à leurs élèves une cantine, comme à tous les lycéens [I0011, I0012, I0013, I0014].",
+   "metrics": {
+    "mentions": 4,
+    "participants": 1,
+    "participantIds": [
+     "P3"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P3"
+    ],
+    "negativeOnly": [],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G36",
+   "definition": {
+    "positive": "apprécier les micro-lycées comme solution de rescolarisation",
+    "negative": "juger insuffisants les moyens ou conditions des micro-lycées",
+    "neutral": "évoquer les micro-lycées sans porter de jugement"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Moyens administratifs des écoles",
+   "ideaIds": [
+    "I0383",
+    "I0384",
+    "I0385"
+   ],
+   "summary": "Une personne critique le manque de personnel administratif : une école primaire de 280 élèves n'a pas de secrétaire, ce poste n'était auparavant qu'un emploi aidé, « pas idéal non plus », et le directeur « fait tout et rien » [I0383, I0384, I0385].",
+   "metrics": {
+    "mentions": 3,
+    "participants": 1,
+    "participantIds": [
+     "P49"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P49"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G37",
+   "definition": {
+    "positive": "juger suffisant le personnel administratif dont disposent les écoles",
+    "negative": "déplorer le manque de personnel ou de moyens administratifs",
+    "neutral": "décrire l'organisation administrative des écoles sans la juger"
+   },
+   "opposed": []
+  },
+  {
+   "title": "Recours aux orthophonistes",
+   "ideaIds": [
+    "I0202",
+    "I0221"
+   ],
+   "summary": "La saturation des réseaux d'orthophonistes inquiète une personne, qui estime qu'ils deviennent « LA solution » et que ces professionnelles « n'en peuvent plus », en fin de chaîne et sous la pression de parents qui les voient comme des sauveurs [I0202, I0221].",
+   "metrics": {
+    "mentions": 2,
+    "participants": 1,
+    "participantIds": [
+     "P27"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P27"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G38",
+   "opposed": []
+  },
+  {
+   "title": "Certification des organismes de formation",
+   "ideaIds": [
+    "I0164"
+   ],
+   "summary": "Pour une personne, la procédure de reconnaissance comme organisme de formation (Datadock notamment) est un modèle de technocratie incompréhensible [I0164].",
+   "metrics": {
+    "mentions": 1,
+    "participants": 1,
+    "participantIds": [
+     "P24"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P24"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G39",
+   "opposed": []
+  },
+  {
+   "title": "Fermeture des écoles rurales",
+   "ideaIds": [
+    "I0177"
+   ],
+   "summary": "Dans sa commune, une personne déplore la fermeture prochaine de l'école rurale, avant même que son enfant soit scolarisé [I0177].",
+   "metrics": {
+    "mentions": 1,
+    "participants": 1,
+    "participantIds": [
+     "P25"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P25"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G40",
+   "definition": {
+    "positive": "approuver le maintien ou la réorganisation des écoles rurales",
+    "negative": "déplorer la fermeture ou la menace de fermeture d'écoles rurales",
+    "neutral": "évoquer la carte scolaire rurale sans porter de jugement"
+   },
+   "opposed": []
+  }
+ ],
  "themes": [],
  "globalSummary": "",
  "steps": [
@@ -5187,22 +7616,21 @@
   },
   {
    "id": "group",
-   "state": "running",
+   "state": "done",
    "done": 375,
-   "total": 375,
-   "message": "Balayage des thèmes du résumé"
+   "total": 375
   },
   {
    "id": "summarize",
-   "state": "pending",
-   "done": 0,
-   "total": 0
+   "state": "done",
+   "done": 40,
+   "total": 40
   },
   {
    "id": "themes",
-   "state": "pending",
+   "state": "running",
    "done": 0,
-   "total": 0
+   "total": 40
   },
   {
    "id": "report",
@@ -5218,7 +7646,7 @@
   }
  ],
  "calls": {
-  "total": 70,
+  "total": 78,
   "cached": 0,
   "inputTokens": 0,
   "outputTokens": 0
@@ -5293,7 +7721,15 @@
   "d609575a11818b7f8b4434ce250c8919f096665d868b9b2d13751144b27cef3f",
   "6987e2cb66e635976716278b3613eb4a2fef1fc2dcf6d66aa235d2841bd49710",
   "cd61e813cb828bc5d4e7c6458d50c705f227a5bdb3588f4c4cf881e94d132a78",
-  "686120bec8404573536a192e217cae85597432aa0acf655a1f1ef9278e8501f5"
+  "686120bec8404573536a192e217cae85597432aa0acf655a1f1ef9278e8501f5",
+  "79e9ab449d4d612a1578b25700426a4c756e0e994ca77161ee077df77759c1bd",
+  "58644b1a83ba5b3541df3ea9f0568d25eb34d8ccfeca468cfdc1b53d950beec3",
+  "94f9bf34cd581ca43532ff7858c0aec896cdeb0a66da969a1c995331623a9ed6",
+  "0b8c690c389cfafb5bd287f7c42fc3e3e433c8e428669ce53bc79a93ad5420d1",
+  "9070c212b005115651f9dd5e30586ab4a06111380eb0dc3e71cba9d84ceba7ea",
+  "fc642423144f9af303be0686ce1b2366e1c45db7b54e4f3c550f44a120baf1fd",
+  "60f80f3a8545d6eda424cea2b45c533d372fdc60a3ad800d5a023c7694295a87",
+  "32256bb7f7bfea15f58855718d984e7185bcdf7e13d68a318ef9be3e8c26d3f0"
  ],
  "status": "running",
  "retoned": [
@@ -5458,6 +7894,11 @@
    "id": "I0221",
    "from": "Inclusion des jeunes handicapés",
    "to": "Recours aux orthophonistes"
+  },
+  {
+   "id": "I0006",
+   "from": "Recherche de formation",
+   "to": "Conditions d'accès aux formations"
   }
  ],
  "offTopic": [
@@ -5498,5 +7939,11 @@
  "reconciled": {
   "pairs": 8,
   "merges": 0
+ },
+ "swept": {
+  "motifs": 9,
+  "copied": 0,
+  "moved": 1,
+  "retoned": 0
  }
 }
