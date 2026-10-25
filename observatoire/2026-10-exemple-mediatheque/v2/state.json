@@ -1,7 +1,7 @@
 {
  "id": "an_6n0r5d5d5o30",
  "createdAt": "2026-10-25T14:07:10.313Z",
- "updatedAt": "2026-10-25T14:07:10.347Z",
+ "updatedAt": "2026-10-25T14:08:10.423Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -528,6 +528,20 @@
    },
    "approximate": false,
    "id": "I0038"
+  },
+  {
+   "participantId": "P10",
+   "contributionId": "P10-Q5",
+   "label": "Application confuse",
+   "verbatim": "Je trouve l'application lente et un peu confuse",
+   "category": "negative",
+   "span": {
+    "start": 0,
+    "end": 47
+   },
+   "approximate": false,
+   "id": "I0039",
+   "copyOf": "I0030"
   }
  ],
  "rejected": [],
@@ -546,7 +560,7 @@
    "state": "running",
    "done": 38,
    "total": 38,
-   "message": "Relecture des thèmes"
+   "message": "Réconciliation du livre de codes"
   },
   {
    "id": "summarize",
@@ -574,7 +588,7 @@
   }
  ],
  "calls": {
-  "total": 15,
+  "total": 17,
   "cached": 15,
   "inputTokens": 0,
   "outputTokens": 0
@@ -594,12 +608,26 @@
   "7859e4d95b494552917c33215481d538afaa984846e7fac0a1899305c2f36ece",
   "98ea7be604a0b1a68dd1f8a6a77ddd9f1e22ba3361f8aae312c8fb91ea9a918a",
   "1c0b9de09498eab81a67a8c5b376d8eef7f8a4e49d20ed35e1ab4ac639f58888",
-  "f2e0abe4e2d035e994e5928e9d2b655714f72fac6023d7514e889d717243cd52"
+  "f2e0abe4e2d035e994e5928e9d2b655714f72fac6023d7514e889d717243cd52",
+  "5de12f4f903690f37337d669b831d6fe5dce0baec0542430909a7771f9a183c7",
+  "a754dd153593fb0d2de87621871ccb686e1dbd872882549e48b8be45c5e768ec"
  ],
  "status": "running",
  "retoned": [],
- "moved": [],
+ "moved": [
+  {
+   "id": "I0016",
+   "from": "Identification du lecteur",
+   "to": "Carte de lecteur numérique"
+  }
+ ],
  "offTopic": [],
- "copied": [],
+ "copied": [
+  {
+   "id": "I0039",
+   "from": "Ergonomie de l'interface",
+   "to": "Vitesse de l'application"
+  }
+ ],
  "merges": []
 }

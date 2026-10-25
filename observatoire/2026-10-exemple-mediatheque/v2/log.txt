@@ -6,3 +6,5 @@ Colonnes : Horodateur → ignore | Adresse e-mail → ignore | Vous êtes… →
 14:07:10 extract:done 12/12 group:running 38/38 summarize:pending themes:pending report:pending polish:pending
 14:07:10 extract:done 12/12 group:running 38/38 summarize:pending themes:pending report:pending polish:pending
 14:07:10 extract:done 12/12 group:running 38/38 summarize:pending themes:pending report:pending polish:pending
+14:07:58 extract:done 12/12 group:running 38/38 summarize:pending themes:pending report:pending polish:pending
+14:08:10 extract:done 12/12 group:running 38/38 summarize:pending themes:pending report:pending polish:pending
