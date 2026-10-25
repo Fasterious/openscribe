@@ -35,8 +35,8 @@ une lecture `plume`. Fichiers : dépôt de l'Observatoire, `2026-10-essai-synthe
 
 Ce qui fait la différence, selon les deux lectures : un résumé hiérarchisé (ce qui marche, bloque, divise, ce qu'on
 propose), un livre de codes par thème, la section « Hors question » (la référence intègre du hors-sujet à trois
-thèmes). Défauts communs aux deux, venus du découpage partagé : une réserve coupée de ce qu'elle nuance (« bien… le
-collège : que d'absences »), une idée de la première question rangée sous la seconde. Défauts propres à la méthode
+thèmes). Défauts communs aux deux, venus du découpage partagé : une réserve coupée de l'éloge qu'elle nuance (un
+jugement positif suivi d'une critique du collège), une idée de la première question rangée sous la seconde. Défauts propres à la méthode
 commune : deux fausses unanimités (une voix contraire rangée ailleurs), un détail surinterprété repris dans le résumé.
 Prochains leviers : la réserve qui suit un éloge au découpage ; une vérification des unanimités du résumé.
 
