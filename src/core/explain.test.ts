@@ -41,7 +41,7 @@ describe('étiquettes expliquées au cas par cas', () => {
     expect(r?.ideaIds).toEqual(['I0007'])
     expect(r?.groups).toEqual([{ tone: 'negative', ids: ['I0007'], people: 1 }])
     expect(plain(r?.text)).toBe(
-      "1 des 7 personnes qui donnent un avis n'est comptée ici que par une idée rangée d'abord dans un autre thème : 1 avis négatif (« Horaires » : P7). Sans ces idées, il resterait 6 avis : « unanime » (6 sur 6), une étiquette plus nette. À vous de juger si ce verbatim parle bien du thème « Piscine ».",
+      "1 des 7 personnes qui donnent un avis n'est comptée ici que par une idée rangée d'abord dans un autre thème : 1 participant d'avis négatif (« Horaires » : P7). Sans ces idées, il resterait 6 participants qui donnent un avis : « unanime » (6 sur 6), une étiquette plus nette. À vous de juger si ce verbatim parle bien du thème « Piscine ».",
     )
     // Aucune ligne ne commence par « : » : espace insécable avant les deux-points.
     expect(r?.text).toContain('\u00a0:')
@@ -52,7 +52,7 @@ describe('étiquettes expliquées au cas par cas', () => {
     const ideas = [...many(1, 4, 'negative'), idea(9, 'positive', 'I0098', 1)]
     const r = doubtReason(group(ideas), new Map(ideas.map((i) => [i.id, i])), () => 'Horaires')
     expect(plain(r?.text)).toBe(
-      "Sans les idées rangées d'abord dans un autre thème, 1 personne passerait d'un avis mitigé à un avis négatif. Il resterait alors 4 avis : « unanime » (4 sur 4), une étiquette plus nette. À vous de juger si ce verbatim parle bien du thème « Piscine ».",
+      "Sans les idées rangées d'abord dans un autre thème, 1 personne passerait d'un avis mitigé à un avis négatif. Il resterait alors 4 participants qui donnent un avis : « unanime » (4 sur 4), une étiquette plus nette. À vous de juger si ce verbatim parle bien du thème « Piscine ».",
     )
     // La pastille suit la phrase : 1 avis mitigé (le texte), qui déroule ses deux avis : le sien (négatif) et la copie (positive).
     expect(r?.groups).toEqual([{ tone: 'mixed', ids: ['I0001', 'I0009'], people: 1 }])

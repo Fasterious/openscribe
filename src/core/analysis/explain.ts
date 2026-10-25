@@ -112,8 +112,8 @@ export function fragileReason(g: Group): string | undefined {
 }
 
 /**
- * Les verbatims en cause, groupés comme la phrase les compte (pastilles « ● 6 avis positifs ● 5 avis négatifs
- * ● 1 avis mitigé ») : les personnes qui ne sont comptées ici que par une copie, par camp, puis celles qui changeraient
+ * Les verbatims en cause, groupés comme la phrase les compte (pastilles « ● 6 participants ● 5 participants
+ * ● 1 participant mitigé », chacune à la couleur de son camp) : les personnes qui ne sont comptées ici que par une copie, par camp, puis celles qui changeraient
  * de camp. Les copies d'une personne déjà comptée par une idée à elle ne changent pas l'étiquette : elles n'y sont pas.
  */
 export type DoubtGroup = { tone: 'positive' | 'negative' | 'mixed'; ids: string[]; people: number }
@@ -164,7 +164,12 @@ export function doubtReason(
     // Le motif d'abord, puis ses personnes : « (« Démarches d'inscription » : P109 et P227 ; « Carte scolaire » : P137) ».
     return `${count(people.length, one, many)} (${[...where].map(([other, who]) => `« ${other} » : ${list(who.sort(byNumber))}`).join(' ; ')})`
   }
-  const parts = [describe('positive', 'avis positif', 'avis positifs'), describe('negative', 'avis négatif', 'avis négatifs'), describe('mixed', 'avis mitigé', 'avis mitigés')].filter(Boolean)
+  // Des personnes, pas des avis (Arnaud, 25/10) : « 1 participant d'avis négatif ».
+  const parts = [
+    describe('positive', "participant d'avis positif", "participants d'avis positif"),
+    describe('negative', "participant d'avis négatif", "participants d'avis négatif"),
+    describe('mixed', "participant d'avis mitigé", "participants d'avis mitigé"),
+  ].filter(Boolean)
   const to = now.get(changed[0]?.[0] ?? '') === 'positive' ? 'positif' : 'négatif'
   const movedText = (other: boolean) =>
     `${changed.length} ${other ? (changed.length > 1 ? 'autres personnes passeraient' : 'autre personne passerait') : changed.length > 1 ? 'personnes passeraient' : 'personne passerait'} d'un avis mitigé à un avis ${to}`
@@ -192,6 +197,6 @@ export function doubtReason(
   const inCause = copies.filter((i) => groups.some((g) => g.ids.includes(i.id)))
   const judge =
     inCause.length > 1 ? `À\u00a0vous de juger si ces ${inCause.length} verbatims parlent bien ${motifName(g.title)}.` : `À\u00a0vous de juger si ce verbatim parle bien ${motifName(g.title)}.`
-  const text = nbsp(`${head} ${T2} avis : ${verdict}. ${judge}`)
+  const text = nbsp(`${head} ${T2} participant${T2 > 1 ? 's' : ''} qui donne${T2 > 1 ? 'nt' : ''} un avis : ${verdict}. ${judge}`)
   return { text, ideaIds: inCause.map((i) => i.id), groups }
 }
