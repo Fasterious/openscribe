@@ -2,6 +2,7 @@ import { z } from 'zod'
 import type { AnalysisState } from './analysis/types'
 import { CORPUS_FORMAT_VERSION, emptyCorpus, type Corpus } from './corpus'
 import { randomId } from './ids'
+import type { PublishedStudy } from './observatoire'
 
 /**
  * Un projet = une étude : son corpus, ses analyses, ses réglages.
@@ -25,6 +26,8 @@ export interface Project {
   /** Questions retenues pour l'analyse (toutes si vide). */
   selectedPrompts: string[]
   analyses: AnalysisState[]
+  /** La fiche d'une étude publiée (question, collecte, échantillon, limites), quand la synthèse en vient : l'exemple. */
+  brief?: PublishedStudy['fiche']
 }
 
 export function newProject(name: string): Project {

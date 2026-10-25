@@ -294,7 +294,7 @@ const ROADMAP = [
   { title: 'Tests à distance et ateliers en direct', text: 'Mener vos tests et vos ateliers directement dans OpenScribe.', status: 'Envisagé' },
 ]
 
-/** Montre la traçabilité plutôt que de l'affirmer : un constat de l'exemple, dont on déplie les verbatims. */
+/** Montre la traçabilité plutôt que de l'affirmer : un constat (illustration fictive), dont on déplie les verbatims. */
 function ProofDemo() {
   const [open, setOpen] = useState(false)
   const quotes = [
@@ -304,7 +304,7 @@ function ProofDemo() {
   ]
   return (
     <Card className="p-5 shadow-md">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Extrait du rapport d'exemple</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Comment se lit un constat</p>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <p className="font-semibold">Vitesse de l'application</p>
         <span className="flex items-center gap-2">

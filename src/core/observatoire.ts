@@ -1,6 +1,7 @@
 import type { AnalysisState, Idea } from './analysis/types'
 import { maskNames, maskWithOffsets, remainingNames } from './analysis/names'
 import type { Contribution } from './corpus'
+import { randomId } from './ids'
 import type { Project } from './project'
 
 /**
@@ -86,4 +87,26 @@ export function publishedStudy(project: Project, analysis: AnalysisState, meta: 
   const left = remainingNames(JSON.stringify(study), names)
   if (left.length) throw new Error(`Prénom encore présent dans l'étude publiée (${left.length}) : publication refusée.`)
   return study
+}
+
+/** La marque de l'exemple, en tête de sa description : l'exemple se reconnaît et se remplace quand une étude plus récente paraît. */
+export const EXAMPLE_MARK = "Exemple tiré de l'Observatoire"
+
+/**
+ * L'exemple de la Synthèse : la dernière étude publiée de l'Observatoire, de vraies données (Arnaud, 25/10), ouverte
+ * comme une synthèse. Elle garde sa fiche (« Avant de lire ») ; les marques « à vérifier », coupées à la publication,
+ * reviennent : dans la Synthèse, le lecteur reprend la main.
+ */
+export function exampleProject(study: PublishedStudy): Project {
+  return {
+    ...study.project,
+    id: randomId('prj'),
+    name: study.title,
+    description: `${EXAMPLE_MARK} : ${study.title}`,
+    brief: study.fiche,
+    analyses: study.project.analyses.map((a) => {
+      const { doubtMarks: _published, ...settings } = a.settings
+      return { ...a, settings }
+    }),
+  }
 }

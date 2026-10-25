@@ -3,6 +3,7 @@ import { LIMITS_HELP } from '@/core/analysis/glossary'
 import { showsDoubts } from '@/core/analysis/highlights'
 import { engineName } from '@/core/analysis/report'
 import type { AnalysisState } from '@/core/analysis/types'
+import type { PublishedStudy } from '@/core/observatoire'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { Chevron, Disclosure } from '../primitives'
 
@@ -101,8 +102,28 @@ function QuestionList({ questions, index }: { questions: string[]; index?: numbe
 
 const KIND: Record<SourceKind, string> = { survey: 'Questionnaire', transcript: 'Entretien', notes: 'Notes' }
 
-/** Le volet d'une synthèse, tiré de ses propres données : mêmes parties que la fiche d'une étude de l'Observatoire. */
+const paras = (t: string) => t.split(/\n+/).filter((p) => p.trim())
+
+/** Le volet d'une étude publiée, tiré de sa fiche. */
+export function ficheBeforeReading(f: PublishedStudy['fiche']): BeforeReadingData {
+  return {
+    question: f.question,
+    questionContext: f.questionContext,
+    questions: f.questionnaire,
+    questionIndex: f.questionIndex,
+    collection: f.collection ? paras(f.collection) : [],
+    source: f.source,
+    sample: [f.sample, ...paras(f.sampling)],
+    warnings: f.warnings,
+  }
+}
+
+/**
+ * Le volet d'une synthèse : la fiche de l'étude dont elle vient (l'exemple), sinon ses propres données, en mêmes parties
+ * que la fiche d'une étude de l'Observatoire.
+ */
 export function synthesisBeforeReading(project: Project, analysis: AnalysisState): BeforeReadingData {
+  if (project.brief) return ficheBeforeReading(project.brief)
   const corpus = corpusForAnalysis(project)
   const prompts = promptsOf(corpus)
   const people = activeParticipants(corpus).length

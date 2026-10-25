@@ -130,10 +130,14 @@ test('accueil : la promesse, la preuve dépliable, les sections de réassurance'
 test('exemple : de l’accueil au rapport, verbatims dépliés sur place et exports', async ({ page }, testInfo) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Voir un exemple de rapport' }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('médiathèque')
+  // L'exemple est la dernière étude de l'Observatoire, de vraies réponses, ouverte comme une synthèse.
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Grand débat')
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
   await expect(page.getByText("Rapport d'exemple")).toBeVisible()
-  await expect(page.getByText('À vérifier', { exact: true })).toHaveCount(0)
+  // Dans la Synthèse, les marques « à vérifier » restent (elles sont coupées à la publication de l'Observatoire).
+  await expect(page.getByRole('button', { name: /^À vérifier/ }).first()).toBeVisible()
+  // Son volet « Avant de lire » est la fiche de l'étude.
+  await expect(page.getByText('Avant de lire : la question, les données, les limites')).toBeVisible()
   // Le second niveau existe : des thèmes rapprochent les motifs, dans « Le détail, thème par thème ».
   await expect(page.getByRole('heading', { name: 'Le détail, par grand thème' })).toBeVisible()
   expect(await page.locator('details[data-fold="theme"]').count()).toBeGreaterThan(1)
@@ -432,7 +436,7 @@ test('un double clic sur l’exemple ne crée qu’une seule étude', async ({ p
   await page.getByRole('button', { name: 'Voir un exemple de rapport' }).dblclick()
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
   await page.goto('/#/synthese')
-  await page.getByRole('button', { name: /Application de médiathèque/ }).click()
+  await page.getByRole('button', { name: /Grand débat/ }).click()
   await expect(page.getByRole('heading', { name: 'Résumé' })).toBeVisible()
   expect(await projectCount(page)).toBe(1)
 })

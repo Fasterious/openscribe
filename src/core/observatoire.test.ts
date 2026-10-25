@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { maskWithOffsets, NAME_MASK } from './analysis/names'
 import type { AnalysisState, Idea } from './analysis/types'
 import { CUT_MARK } from './analysis/verbatim'
-import { publishedStudy, type PublishedStudy } from './observatoire'
+import { EXAMPLE_MARK, exampleProject, publishedStudy, type PublishedStudy } from './observatoire'
 import { newProject } from './project'
 
 // Données fictives : aucun texte d'un corpus réel (src/core/privacy.test.ts).
@@ -57,6 +57,16 @@ const study = () => {
 describe('Observatoire : étude publiée', () => {
   it('sans marque « à vérifier » : l’Observatoire montre l’algorithme seul (la Synthèse les garde)', () => {
     expect(study().project.analyses[0].settings.doubtMarks).toBe(false)
+  })
+
+  it('l’exemple de la Synthèse : l’étude publiée, sa fiche, et les marques « à vérifier » revenues', () => {
+    const s = study()
+    const p = exampleProject(s)
+    expect(p.description.startsWith(EXAMPLE_MARK)).toBe(true)
+    expect(p.name).toBe(s.title)
+    expect(p.brief).toEqual(s.fiche)
+    expect(p.analyses[0].settings.doubtMarks).toBeUndefined()
+    expect(p.id).not.toBe(s.project.id)
   })
 
   it('masque un prénom et garde la position de ce qui suit', () => {

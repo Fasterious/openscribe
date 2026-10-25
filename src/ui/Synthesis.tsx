@@ -5,6 +5,7 @@ import { href, navigate } from '@/app/router'
 import { createProject, notifyProjectsChanged, updateProject, useProjects } from '@/app/store'
 import { activeParticipants } from '@/core/corpus'
 import { corpusHash } from '@/core/analysis/pipeline'
+import { exampleProject, EXAMPLE_MARK, type PublishedStudy } from '@/core/observatoire'
 import { corpusForAnalysis, exportProject, importProject, newProject, ProjectFileError, type Project } from '@/core/project'
 import { formatDate, plural } from './format'
 import { Alert, Button, Dialog, DropMenu, Input, Label, MenuItem, Tooltip } from './primitives'
@@ -19,11 +20,33 @@ function statusOf(p: Project, stale: boolean): { label: string; tone: 'default' 
   return { label: 'Analyse à reprendre', tone: 'warning' }
 }
 
-const EXAMPLE_FILE = '/exemple-mediatheque.openscribe.json'
-
-/** L'étude d'exemple est livrée avec son analyse : un rapport produit une fois par un vrai moteur d'IA, puis enregistré. */
+/** L'exemple : la dernière étude publiée de l'Observatoire (Arnaud, 25/10), plutôt qu'un questionnaire fictif. */
 export function isExample(p: Project): boolean {
-  return p.description.startsWith('Questionnaire fictif')
+  // « Questionnaire fictif » : l'ancien exemple, encore dans certains navigateurs ; il est remplacé à la prochaine ouverture.
+  return p.description.startsWith(EXAMPLE_MARK) || p.description.startsWith('Questionnaire fictif')
+}
+
+type StudyEntry = { slug: string; title: string; publishedAt: string }
+
+/** La dernière étude publiée, d'après la liste de l'Observatoire. */
+async function latestStudy(): Promise<StudyEntry | undefined> {
+  const list = (await (await fetch('/observatoire/index.json')).json()) as StudyEntry[]
+  return [...list].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))[0]
+}
+
+/** Le titre de l'exemple, pour sa ligne dans « Pour découvrir » (rien tant qu'il n'est pas chargé). */
+function useLatestStudy(): StudyEntry | undefined {
+  const [entry, setEntry] = useState<StudyEntry>()
+  useEffect(() => {
+    let alive = true
+    latestStudy()
+      .then((e) => alive && setEntry(e))
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [])
+  return entry
 }
 
 export function projectHref(p: Project): string {
@@ -33,20 +56,26 @@ export function projectHref(p: Project): string {
 let openingExample: Promise<void> | null = null
 
 /**
- * Ouvre l'exemple, en le créant la première fois. Si une version plus récente
- * de l'exemple est livrée, elle remplace l'ancienne. Un double clic ne doit
+ * Ouvre l'exemple, en le créant la première fois. Si l'Observatoire publie une
+ * étude plus récente, elle remplace l'ancien exemple. Un double clic ne doit
  * pas créer deux exemples.
  */
 export function openExample(projects: Project[] | null): Promise<void> {
   openingExample ??= (async () => {
-    const { project, responses } = importProject(await (await fetch(EXAMPLE_FILE)).text())
+    const entry = await latestStudy()
+    if (!entry) return
+    const study = (await (await fetch(`/observatoire/${entry.slug}/etude.json`)).json()) as PublishedStudy
+    const masked = exampleProject(study)
+    // L'étude publiée a ses prénoms masqués : l'empreinte de ses données est recalculée, sinon le rapport se dirait périmé.
+    const hash = await corpusHash(corpusForAnalysis(masked))
+    const project = { ...masked, analyses: masked.analyses.map((a) => ({ ...a, corpusHash: hash })) }
     const existing = projects?.find(isExample)
-    if (existing && existing.analyses[0]?.updatedAt === project.analyses[0]?.updatedAt) {
+    // Déjà là, à jour (même étude, même analyse) : on l'ouvre. Une étude plus récente remplace l'exemple.
+    if (existing && existing.name === project.name && existing.analyses[0]?.updatedAt === project.analyses[0]?.updatedAt) {
       window.location.hash = projectHref(existing)
       return
     }
     if (existing) await deleteProject(existing.id)
-    await putResponses(responses)
     await createProject(project)
     navigate({ name: 'project', id: project.id, tab: 'report' })
   })().finally(() => (openingExample = null))
@@ -341,6 +370,7 @@ export function StudyCard({ project: p, actions }: { project: Project; actions?:
 
 /** L'exemple : toujours là, à part de vos synthèses, sous la même forme de ligne. */
 function ExampleCard({ project, onOpen }: { project?: Project; onOpen: () => void }) {
+  const latest = useLatestStudy()
   return (
     <button
       onClick={onOpen}
@@ -348,9 +378,9 @@ function ExampleCard({ project, onOpen }: { project?: Project; onOpen: () => voi
     >
       <Sparkles className="size-4 shrink-0 text-primary" aria-hidden />
       <span className="min-w-0 flex-1">
-        <span className="block font-medium group-hover:text-primary">Application de médiathèque</span>
+        <span className="block font-medium group-hover:text-primary">{latest?.title ?? project?.name ?? "La dernière étude de l'Observatoire"}</span>
         <span className="block text-sm text-muted-foreground">
-          Exemple · questionnaire fictif · 12 participants · rapport prêt.{' '}
+          Exemple · de vraies réponses, publiées par l'Observatoire · rapport prêt.{' '}
           {project ? "Reprenez-le où vous l'avez laissé." : 'Pour voir un rapport complet sans rien configurer.'}
         </span>
       </span>

@@ -6,6 +6,7 @@ import { maskNames } from '@/core/analysis/names'
 import {
   bothSides,
   campLabel,
+  engineName,
   categoryHeading,
   dominantVoice,
   alsoInOf,
@@ -1568,7 +1569,7 @@ export function ReportTab({
       {analysis.engine.presetId === 'bridge' && !published && (
         <Alert tone="info" className="max-w-lecture">
           {isExample(project)
-            ? `Rapport d'exemple : produit une fois par un vrai moteur d'IA (${analysis.engine.model}) à partir d'un questionnaire fictif, puis conservé tel quel. Pour vos propres données, choisissez un moteur dans « Moteurs d'IA ».`
+            ? `Rapport d'exemple : la dernière étude de l'Observatoire, de vraies réponses publiées en données ouvertes, analysées avec ${engineName(analysis.engine.presetId, analysis.engine.model)} et la même méthode que vos synthèses. Pour vos propres données, choisissez un moteur dans « Moteurs d'IA ».`
             : `Rapport produit hors de l'application par un vrai moteur d'IA (${analysis.engine.model}), puis importé avec la synthèse.`}
         </Alert>
       )}

@@ -600,3 +600,14 @@ sourcées). Livré :
 - **Mesuré avant de coder** : école 14 thèmes ajoutés en queue (dans « Et aussi »), essai à 50 personnes 10, exemple 4
   (listes jusque-là vides). L'école rejouée depuis son cache n'envoie aucune demande nouvelle : les 8 lignes données au
   résumé et les thèmes balayés ne changent pas.
+
+## 2026-10-25 — L'exemple de la Synthèse : la dernière étude de l'Observatoire (décision d'Arnaud)
+
+- **Décision d'Arnaud** : plutôt que le questionnaire fictif de la médiathèque, l'exemple est la dernière étude publiée
+  de l'Observatoire : plus complet, et réel.
+- **Fait** : l'exemple n'est plus un fichier à part (des données réelles hors de `public/observatoire/` seraient
+  interdites) ; `openExample` lit la liste de l'Observatoire, prend l'étude la plus récente et l'ouvre comme une
+  synthèse (`exampleProject`) : sa fiche devient le volet « Avant de lire », les marques « à vérifier » reviennent
+  (Synthèse), l'empreinte des données est recalculée (prénoms masqués). Une étude plus récente remplace l'exemple ;
+  l'ancien exemple fictif est remplacé à la prochaine ouverture. L'encart de l'accueil devient une illustration
+  (« Comment se lit un constat ») : ses verbatims sont fictifs.

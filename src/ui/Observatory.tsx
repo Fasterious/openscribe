@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { activeParticipants } from '@/core/corpus'
 import type { PublishedStudy } from '@/core/observatoire'
 import { Explain } from './primitives'
-import { BeforeReading } from './project/BeforeReading'
+import { BeforeReading, ficheBeforeReading } from './project/BeforeReading'
 import { ReportTab } from './project/ReportTab'
 import { TAB_ACTIONS } from './project/slots'
 
@@ -106,18 +106,7 @@ export function ObservatoryPage({ slug }: { slug: string }) {
       </div>
 
 
-      <BeforeReading
-        data={{
-          question: f.question,
-          questionContext: f.questionContext,
-          questions: f.questionnaire,
-          questionIndex: f.questionIndex,
-          collection: f.collection ? paras(f.collection) : [],
-          source: f.source,
-          sample: [f.sample, ...paras(f.sampling)],
-          warnings: f.warnings,
-        }}
-      />
+      <BeforeReading data={ficheBeforeReading(f)} />
 
       <ReportTab project={study.project} analysis={analysis} published />
     </div>
