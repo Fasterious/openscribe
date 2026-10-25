@@ -278,3 +278,16 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - **Bien marché** : reprendre le découpage du cache pour ne faire varier que le regroupement ; deux modèles et deux lectures chacun ont tranché sans débat (langue +0,5, méthode inchangée).
 - **Coûté pour rien** : une commande de push qui ne s'arrêtait pas sur l'échec du test de confidentialité. Les sous-agents qui jouent le modèle lisaient mal les demandes écrites sur une seule ligne de 80 000 caractères.
 - **On change** : le push est enchaîné au test de confidentialité par `&&`, jamais par `;`. Dans la documentation, un défaut se décrit sans citer le verbatim. Le pont de test écrira une copie lisible de chaque demande.
+
+## 2026-10-25 — Chantiers camps, méthode commune, refonte, « avant de lire »
+
+- **Bien marché** : prouver la factorisation par le cache (l'école rejouée à l'identique avec `--method commune`) ; un
+  relais de sous-agents qui répond aux demandes au fil de l'eau (10 à 14 par relais) plutôt qu'un sous-agent par
+  demande ; la notation à l'aveugle (A/B, ordres inverses), qui a donné le même écart aux deux lectures.
+- **Coûté pour rien** : un formateur lancé sans la configuration du projet (tout un fichier reformaté, refait à la
+  main).
+- **On change** : les données fictives restent hors de `fixtures/private/` ; aucune citation d'un corpus réel dans
+  `docs/`, même pour illustrer un défaut (on décrit le défaut).
+- **À trancher par Arnaud** : sur un petit corpus (exemple : 12 personnes), aucun thème n'atteint le seuil de 4 avis ;
+  « Ce qui a marché » et « Ce qui bloque » sont vides et le résumé n'a plus de chiffres (« plusieurs »). Pour la
+  Synthèse (souvent 5 à 20 personnes), faut-il lister aussi les thèmes à 2 ou 3 avis, avec leur nombre et « peu d'avis » ?

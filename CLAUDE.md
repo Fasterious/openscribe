@@ -67,6 +67,7 @@ Règles apprises :
   vérification : sinon il est plus fiable qu'un vrai modèle et le test perd sa valeur.
   Tester aussi avec un modèle léger pour éprouver la robustesse.
 - Les données envoyées au modèle sont en JSON compact : l'indentation coûte des jetons pour rien.
+- Les données fictives ne vont jamais dans `fixtures/private/` (le test de confidentialité les prendrait pour réelles), et aucune citation d'un corpus réel n'entre dans `docs/`.
 - La qualité de la langue fait partie de la qualité : un rapport juste mais qui
   sonne traduit n'est pas fini. Elle ne passe jamais avant la fidélité aux données.
 - Un défaut de style qui revient partout vient presque toujours d'un texte que nous
