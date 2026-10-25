@@ -44,21 +44,35 @@ const opinions = (g: Group) => g.metrics.positiveOnly.length + g.metrics.negativ
 export function highlights(groups: Group[], ideas?: Map<string, Idea>): Highlights {
   const ofCategory = (g: Group, cat: Idea['category']) => (ideas ? g.ideaIds.filter((id) => ideas.get(id)?.category === cat) : g.ideaIds)
   // « Ce qui a marché » et « ce qui bloque » : les motifs unanimes, en large majorité ou en majorité d'un côté, jamais « plutôt » ; la liste ne contredit pas la fiche du motif.
-  const consensus = (side: 'positive' | 'negative') =>
+  // Puis les motifs à 2 ou 3 avis dont un camp l'emporte, avec leur nombre et « peu d'avis » (Arnaud, 25/10 : sur une
+  // petite synthèse, aucun motif n'atteint 4 avis, et les listes comme le résumé restaient vides de chiffres). Ils
+  // viennent toujours après les autres : sur un grand corpus, ils restent dans « Et aussi ».
+  const side = (g: Group): 'positive' | 'negative' | undefined => {
+    const m = g.metrics
+    if (m.stance !== 'thin') return m.stance === 'unanimous' || m.stance === 'consensus' || m.stance === 'majority' ? (m.majority ?? undefined) : undefined
+    const p = m.positiveOnly.length
+    const n = m.negativeOnly.length
+    const k = Math.max(p, n)
+    return p !== n && k >= 2 && k * 2 > opinions(g) ? (p > n ? 'positive' : 'negative') : undefined
+  }
+  const consensus = (camp: 'positive' | 'negative') =>
     groups
-      .filter((g) => (g.metrics.stance === 'unanimous' || g.metrics.stance === 'consensus' || g.metrics.stance === 'majority') && g.metrics.majority === side)
+      .filter((g) => side(g) === camp)
       .map((g) => ({
         groupId: g.id,
         title: g.title,
-        people: (side === 'positive' ? g.metrics.positiveOnly : g.metrics.negativeOnly).length,
+        people: (camp === 'positive' ? g.metrics.positiveOnly : g.metrics.negativeOnly).length,
         of: opinions(g),
-        ideaIds: ofCategory(g, side),
+        ideaIds: ofCategory(g, camp),
         stance: g.metrics.stance,
         // Le moteur ne reçoit pas « fragile » pour un « unanime » (sinon « unanimes, mais fragiles » dans le résumé).
         fragile: fragileShown(g.metrics),
       }))
-      // À nombre égal, le motif le plus net d'abord (4 sur 4 avant 4 sur 5).
-      .sort((a, b) => b.people - a.people || b.people / b.of - a.people / a.of || a.title.localeCompare(b.title))
+      // Les motifs à peu d'avis après les autres ; à nombre égal, le motif le plus net d'abord (4 sur 4 avant 4 sur 5).
+      .sort(
+        (a, b) =>
+          Number(a.stance === 'thin') - Number(b.stance === 'thin') || b.people - a.people || b.people / b.of - a.people / a.of || a.title.localeCompare(b.title),
+      )
   // Ce qui divise : des avis qui s'opposent sur le motif, ou un constat partagé dont les pistes de solution s'opposent.
   const divided: Highlight[] = groups
     .filter((g) => g.metrics.stance === 'divided' || g.opposed?.length)
@@ -103,7 +117,7 @@ export function highlightLine(h: Highlight, kind: keyof Highlights, lang: 'fr' |
   if (kind === 'divided' && h.opposed) return `${h.title} : constat partagé, propositions opposées (${h.opposed.about})`
   if (kind === 'divided') return `${h.title} : avis partagés entre ${h.of} personnes`
   if (scale && (kind === 'strengths' || kind === 'blockers')) {
-    const word = h.stance === 'unanimous' ? 'unanime' : h.stance === 'consensus' ? 'large majorité' : h.stance === 'majority' ? 'majorité' : ''
+    const word = h.stance === 'unanimous' ? 'unanime' : h.stance === 'consensus' ? 'large majorité' : h.stance === 'majority' ? 'majorité' : h.stance === 'thin' ? "peu d'avis" : ''
     // Le mot de l'échelle dit déjà « de ceux qui en parlent » : le chiffre reste nu (plume, passe 9 : « ceux qui en parlent » et « qui donnent un avis » dans la même phrase).
     const count = h.people === h.of ? `${h.of} sur ${h.of}` : `${h.people} sur ${h.of}`
     return `${h.title} : ${word ? `${word}${h.fragile ? ' (fragile)' : ''}, ` : ''}${count}`

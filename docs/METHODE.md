@@ -92,7 +92,8 @@ introduction pour chacun. Un thème rapproche des motifs voisins ; on n'y additi
 ## 5. Écrire le résumé
 
 Le code prépare les listes « Ce qui a marché », « Ce qui bloque », « Ce qui divise », « Ce que proposent
-les participants » et « Questions soulevées » : des motifs classés par le code, avec leurs chiffres. Le
+les participants » et « Questions soulevées » : des motifs classés par le code, avec leurs chiffres. Les deux premières
+montrent aussi, après les autres, les motifs à 2 ou 3 avis dont un camp l'emporte, avec « peu d'avis » (25/10). Le
 moteur rédige le résumé à partir de ces listes et des synthèses : sa première phrase dit qui pense quoi, en
 nombre de personnes (le jugement d'ensemble, puis la critique ou l'éloge le plus partagé), jamais un compte global
 des critiques. Le code vérifie que chaque nombre du résumé correspond à un chiffre calculé ; sinon la phrase est

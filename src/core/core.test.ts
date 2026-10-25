@@ -661,12 +661,14 @@ describe('balayage par définition', () => {
       label: base.label,
       async complete(req) {
         const res = await base.complete(req)
-        // Trois motifs assez peuplés pour figurer au résumé (le petit corpus en donne sinon une trentaine à un avis).
+        // Des motifs assez peuplés pour figurer au résumé (le petit corpus en donne sinon une trentaine à un avis).
         if (req.task === 'group') {
           const out = JSON.parse(res.text) as { groups: { title: string; items: string[] }[] }
           const items = out.groups.flatMap((g) => g.items)
-          const third = Math.ceil(items.length / 3)
-          return { ...res, text: JSON.stringify({ groups: [{ title: 'Accueil', items: items.slice(0, third) }, { title: 'Horaires', items: items.slice(third, 2 * third) }, { title: 'Tarifs', items: items.slice(2 * third) }] }) }
+          // Quatre motifs : les motifs à 2 ou 3 avis entrent aussi au résumé, un lot de balayage en porte trois, le quatrième garde des idées hors du lot.
+          const q = Math.ceil(items.length / 4)
+          const titles = ['Accueil', 'Horaires', 'Tarifs', 'Parking']
+          return { ...res, text: JSON.stringify({ groups: titles.map((title, k) => ({ title, items: items.slice(k * q, (k + 1) * q) })) }) }
         }
         if (req.task === 'review' && !req.user.includes('"rule"')) {
           const data = readDataBlock<{ groups: { id: string }[] }>(req.user)
@@ -674,8 +676,10 @@ describe('balayage par définition', () => {
           return { ...res, text: JSON.stringify({ definitions: data.groups.map((g) => ({ id: g.id, positive: 'le juger utile', negative: 'le juger inutile' })), ...out }) }
         }
         if (req.task !== 'sweep') return res
-        sweep ??= readDataBlock(req.user)
+        // Un seul lot reçoit les changements (les motifs à peu d'avis du résumé sont balayés aussi, dans d'autres lots).
         const data = readDataBlock<{ motifs: { id: string; ideas: { id: string }[] }[]; pool: { id: string }[] }>(req.user)
+        if (sweep || data.pool.length < 2) return res
+        sweep = data
         const m = data.motifs[0] as { id: string; ideas: { id: string; category: string }[] }
         const [a, b] = data.pool
         return {
@@ -900,6 +904,26 @@ describe('faits saillants', () => {
     ])
     // Les propositions portent leurs propres idées, pour les montrer.
     expect(h.proposals[0].ideaIds).toEqual(['G4-0', 'G4-1'])
+  })
+
+  it('liste aussi les thèmes à 2 ou 3 avis dont un camp l’emporte, toujours après les autres, avec « peu d’avis »', () => {
+    const mk = (id: string, title: string, list: [string, IdeaCategory][]) => {
+      const ideas = list.map(([p, c], k) => idea(`${id}-${k}`, p, c))
+      return { id, title, ideaIds: ideas.map((i) => i.id), summary: '', metrics: computeMetrics(ideas), ideas }
+    }
+    const groups = [
+      mk('G1', 'Lenteur', [['P1', 'negative'], ['P2', 'negative'], ['P3', 'negative']]),
+      mk('G2', 'Catalogue', [['P1', 'positive'], ['P2', 'positive'], ['P3', 'negative']]),
+      mk('G3', 'Budget', [['P1', 'negative'], ['P2', 'negative'], ['P3', 'negative'], ['P4', 'negative']]),
+      // Un seul avis, ou deux camps à égalité : rien à conclure, aucune liste.
+      mk('G4', 'Affiches', [['P1', 'negative']]),
+      mk('G5', 'Couleurs', [['P1', 'positive'], ['P2', 'negative']]),
+    ]
+    const h = highlights(groups, new Map(groups.flatMap((g) => g.ideas).map((i) => [i.id, i])))
+    // 4 sur 4 avant 3 sur 3 : un motif à peu d'avis vient après, même à ratio meilleur.
+    expect(h.blockers.map((x) => [x.title, x.people, x.of, x.stance])).toEqual([['Budget', 4, 4, 'unanimous'], ['Lenteur', 3, 3, 'thin']])
+    expect(h.strengths.map((x) => [x.title, x.people, x.of])).toEqual([['Catalogue', 2, 3]])
+    expect(highlightLine(h.blockers[1], 'blockers', 'fr', true)).toBe("Lenteur : peu d'avis, 3 sur 3")
   })
 })
 

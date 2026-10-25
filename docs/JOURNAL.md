@@ -589,3 +589,14 @@ sourcées). Livré :
   données (`synthesisBeforeReading` : la question ou les questions analysées, les sources, les participants, les
   limites et le moteur) ; la ligne de chiffres dit « participants · idées », comme l'en-tête de l'Observatoire. Restent
   propres à la Synthèse : segments, masquage des prénoms, exports, « à vérifier ».
+
+## 2026-10-25 — Les thèmes à 2 ou 3 avis entrent dans les listes (décision d'Arnaud)
+
+- **Constat** : sur l'exemple (12 personnes), aucun thème n'atteint le seuil de 4 avis ; « Ce qui a marché » et « Ce
+  qui bloque » étaient vides et le résumé écrivait « plusieurs personnes » faute de chiffres.
+- **Décision d'Arnaud** : lister aussi les thèmes à 2 ou 3 avis. **Fait** (`highlights.ts`) : un thème à peu d'avis
+  entre dans la liste de son camp quand ce camp compte au moins 2 personnes et plus de la moitié des avis ; il vient
+  toujours après les thèmes à 4 avis et plus, avec « peu d'avis » à côté de son chiffre (écran, consignes du résumé).
+- **Mesuré avant de coder** : école 14 thèmes ajoutés en queue (dans « Et aussi »), essai à 50 personnes 10, exemple 4
+  (listes jusque-là vides). L'école rejouée depuis son cache n'envoie aucune demande nouvelle : les 8 lignes données au
+  résumé et les thèmes balayés ne changent pas.

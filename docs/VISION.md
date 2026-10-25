@@ -88,6 +88,9 @@ bloqué sur ça. » Concrètement :
   pour montrer la puissance de l'algorithme seul ; il ne porte pas de marque « à vérifier ». Dans la Synthèse, le
   chercheur garde la main : quand l'algorithme a un doute, la marque « à vérifier » reste. Même algorithme, une option
   d'affichage (`doubtMarks`).
+- **Petites synthèses** (25/10) : les listes « Ce qui a marché » et « Ce qui bloque » montrent aussi les thèmes à 2
+  ou 3 avis dont un camp l'emporte, avec leur nombre et « peu d'avis », après les autres ; sur 12 personnes, aucun
+  thème n'atteint 4 avis et le résumé restait sans chiffres.
 - **Avis et participants** (25/10) : un avis est ce qui est dit, un participant celui qui le dit, et il peut donner
   plusieurs avis. Les listes de verbatims disent les deux, les avis d'abord : « 49 avis positifs · 47 participants ».
 - **L'ambiguïté est dans les données** (17/10) : une même idée peut relever de plusieurs motifs, se découper

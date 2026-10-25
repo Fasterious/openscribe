@@ -673,7 +673,8 @@ export function highlightSections(state: AnalysisState): HighlightSection[] {
   const pl = (n: number) => (n > 1 ? 's' : '')
   // Le chiffre d'abord : aucun accord à faire avec le titre du motif (« Délais de livraison — 5 participants sur 6 d'avis négatif »).
   // Des participants, pas des avis : « 5 participants sur 6 d'avis négatif » (un participant peut donner plusieurs avis).
-  const opinion = (x: Highlight, kind: string) => `${x.people} participant${x.people > 1 ? 's' : ''} sur ${x.of} d'avis ${kind}`
+  // Un motif à 2 ou 3 avis le dit à côté de son chiffre : « 3 participants sur 3 d'avis négatif · peu d'avis ».
+  const opinion = (x: Highlight, kind: string) => `${x.people} participant${x.people > 1 ? 's' : ''} sur ${x.of} d'avis ${kind}${x.stance === 'thin' ? " · peu d'avis" : ''}`
   const INTRO = 'Chiffres : participants qui donnent un avis sur le thème.'
   const SHOWN = 6
   // Une liste n'est jamais coupée au milieu d'ex aequo : les motifs à égalité avec le dernier montré restent visibles.
