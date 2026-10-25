@@ -113,7 +113,8 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ✅ Lire le rapport (`docs/LECTURE-RAPPORT.md`) : en-têtes collants avec « Replier », barre qui se cache en lecture, « Le détail, thème par thème » aux étiquettes par verdict, « Pourquoi cette étiquette ? » au cas par cas, « Et aussi » dépliable, saut vers un motif avec retour, impression complète ; « fragile » seulement quand une voix change la conclusion
 - ✅ Vocabulaire « grand thème / thème » ; barre gardée et glissée dans l'en-tête ouvert ; grand thème collé qui s'efface pendant la lecture d'un thème et revient en remontant ; repli qui range ; sauts doux ou éclairés ; pastilles « ● N » partout, volet replié qui revient à sa pastille ; mesure de lecture unique et alignements (premier audit `designer-ui`) — en production le 19/10
 - ⏳ Décisions pour Arnaud : motif « A face à B » (option B recommandée), rubrique des propositions opposées, mot du lecteur pour « motif », le chercheur qui tranche les doubles comptes
-- ⏳ Lecture, suite : sommaire qui suit la lecture (grand écran), adresse d'un motif, camp en cours dans l'en-tête collant (mobile)
+- ✅ Camp en cours dans l'en-tête collant, avec « Replier », sous la même forme que le volet du résumé : « ● 9 avis positifs · 14 verbatims » (25/10)
+- ⏳ Lecture, suite : sommaire qui suit la lecture (grand écran), adresse d'un motif
 
 ## Itération 7 — Offres gratuites et modèles locaux (13-14/10)
 

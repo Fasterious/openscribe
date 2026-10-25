@@ -5,6 +5,7 @@ import { computeMetrics, METRICS_VERSION, withCurrentMetrics } from '@/core/anal
 import { maskNames } from '@/core/analysis/names'
 import {
   bothSides,
+  campLabel,
   categoryHeading,
   dominantVoice,
   alsoInOf,
@@ -664,21 +665,16 @@ function useFoldBack() {
   return [ref, back] as const
 }
 
-const PANEL_WORD: Record<IdeaCategory, [string, string]> = {
-  positive: ['avis positif', 'avis positifs'],
-  negative: ['avis négatif', 'avis négatifs'],
-  suggestion: ['suggestion', 'suggestions'],
-  question: ['question', 'questions'],
-  neutral: ['constat', 'constats'],
-}
-
-/** Ce que déroule un volet, dit dans son en-tête : « ● 46 avis positifs · Expérience globale de scolarisation ». */
+/** Ce que déroule un volet, dit dans son en-tête : « ● 46 avis positifs · 52 verbatims · Expérience globale de scolarisation ». */
 function panelTitle(ideas: Idea[], ctx: Ctx): string {
   const people = new Set(ideas.map((i) => i.participantId)).size
   const cats = [...new Set(ideas.map((i) => i.category))]
   const groups = [...new Set(ideas.map((i) => ctx.groupTitle(i.id)).filter(Boolean))]
-  const what = cats.length === 1 ? PANEL_WORD[cats[0]][people > 1 ? 1 : 0] : people > 1 ? 'participants' : 'participant'
-  return groups.length === 1 ? `${people} ${what} · ${groups[0]}` : `${people} ${what}`
+  const what =
+    cats.length === 1
+      ? campLabel(cats[0], people, ideas.length)
+      : `${plural(people, 'participant')} · ${plural(ideas.length, 'verbatim')}`
+  return groups.length === 1 ? `${what} · ${groups[0]}` : what
 }
 
 /**
@@ -987,9 +983,37 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
     .filter((c) => c.lines.length)
   const [open, setOpen] = useState(() => new Set(camps.filter((c) => c.lines.length <= CAMP_OPEN_MAX).map((c) => c.cat)))
   const refs = useRef(new Map<IdeaCategory, HTMLElement>())
+  const heads = useRef(new Map<IdeaCategory, HTMLElement>())
+  // Un camp qui s'ouvre ajoute un en-tête collé : il prend sa place dans la pile tout de suite.
+  useLayoutEffect(() => placeStuck(), [open])
   const show = (cat: IdeaCategory) => {
     setOpen((o) => new Set(o).add(cat))
     requestAnimationFrame(() => refs.current.get(cat)?.scrollIntoView({ block: 'nearest' }))
+  }
+  // Replier un camp dont l'en-tête est collé : l'en-tête reste là où on l'a touché, le camp suivant remonte dessous
+  // (comme « Replier » d'un volet du résumé) ; la barre de l'application ne prend pas ce défilement pour une remontée.
+  const toggle = (cat: IdeaCategory) => {
+    const head = heads.current.get(cat)
+    const before = head?.getBoundingClientRect().top
+    freezeHeadroom()
+    flushSync(() =>
+      setOpen((o) => {
+        const next = new Set(o)
+        if (next.has(cat)) next.delete(cat)
+        else next.add(cat)
+        return next
+      }),
+    )
+    if (!head || before === undefined) return
+    // Replié depuis « Replier », le focus revient à l'intitulé du camp (le bouton « Replier » a disparu).
+    head.querySelector<HTMLElement>('button[aria-expanded]')?.focus({ preventScroll: true })
+    const settle = () => {
+      const now = head.getBoundingClientRect().top
+      if (Math.abs(now - before) > 1) window.scrollBy({ top: now - before, behavior: 'instant' })
+    }
+    settle()
+    // Le navigateur peut ancrer le défilement après coup : on revérifie à l'image suivante.
+    requestAnimationFrame(settle)
   }
   return (
     <div className="space-y-1">
@@ -1001,25 +1025,36 @@ function Camps({ ideas, m, both, full, ctx }: { ideas: Idea[]; m: Metrics; both:
         const polar = cat === 'positive' || cat === 'negative'
         return (
           <div key={cat} ref={(el) => void (el ? refs.current.set(cat, el) : refs.current.delete(cat))} className="scroll-mt-32">
-            <button
-              type="button"
-              aria-expanded={isOpen}
-              onClick={() => setOpen((o) => {
-                const next = new Set(o)
-                if (next.has(cat)) next.delete(cat)
-                else next.add(cat)
-                return next
-              })}
-              className="flex min-h-8 cursor-pointer items-center gap-2 rounded-md text-left text-sm font-semibold hover:text-primary"
+            {/*
+              L'en-tête d'un camp ouvert reste collé sous ceux du grand thème et du thème tant qu'on lit ses verbatims, comme
+              celui d'un volet du résumé, et sous la même forme : « ● 9 avis positifs · 12 verbatims », puis « Replier »
+              (Arnaud, 25/10). Sa position est donnée par fold.tsx (placeStuck).
+            */}
+            <div
+              ref={(el) => void (el ? heads.current.set(cat, el) : heads.current.delete(cat))}
+              data-stick-panel={isOpen ? '' : undefined}
+              className={cn('flex items-center justify-between gap-2 text-sm', isOpen && 'sticky top-14 z-[5] border-b bg-background print:static')}
             >
-              <span className={`inline-block size-2.5 shrink-0 rounded-full ${BAR[cat]}`} aria-hidden />
-              {categoryHeading(
-                cat,
-                lines.map((l) => l.participantId),
-                both,
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                onClick={() => toggle(cat)}
+                className="flex min-h-8 min-w-0 cursor-pointer items-center gap-1.5 rounded-md text-left font-medium tabular-nums hover:text-primary"
+              >
+                <span className={`inline-block size-2 shrink-0 rounded-full ${BAR[cat]}`} aria-hidden />
+                <span className="min-w-0">{categoryHeading(cat, lines, both)}</span>
+                {!isOpen && <Chevron open={false} />}
+              </button>
+              {isOpen && (
+                <button
+                  type="button"
+                  onClick={() => toggle(cat)}
+                  className="no-print inline-flex min-h-8 shrink-0 cursor-pointer items-center gap-1 rounded-md px-2 font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  Replier <Chevron open className="text-current" />
+                </button>
               )}
-              <Chevron open={isOpen} />
-            </button>
+            </div>
             {/* Toujours dans la page, caché quand le camp est fermé : l'impression le montre, Ctrl+F le trouve et l'ouvre. */}
             <ul
               ref={foundable(isOpen, () => setOpen((o) => new Set(o).add(cat)))}

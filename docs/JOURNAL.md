@@ -513,3 +513,18 @@ sourcées). Livré :
   « Ce qui compte comme positif ou négatif » sont réunis dans un seul volet plié, « Comment lire ces indicateurs ». La barre y est expliquée en tête : une couleur par catégorie, segments à la mesure des personnes, le mitigé compté dans les deux couleurs, avec la légende en clair (« ● 47 avis positifs »). La ligne de chiffres (participants, avis, échelle) y entre aussi (Arnaud) : la barre, l'étiquette et le compte de personnes restent dans la ligne du thème.
   Pourquoi : la synthèse et les verbatims, qui portent le contenu, remontent. Fragile et à vérifier restent aussi
   expliqués depuis leur marque dans la ligne du thème.
+
+## 2026-10-25 — Camps : en-tête collé, une seule forme « ● 9 avis positifs · 14 verbatims »
+
+- **Demande d'Arnaud** : l'en-tête d'un camp déplié (avis positifs, négatifs…) dans le détail d'un thème doit coller
+  en haut et se replier, comme celui d'un volet du résumé ; les deux intitulés doivent avoir la même forme, le chiffre
+  d'abord, et dire à la fois les avis et ce qui est compté.
+- **Ce qui est compté** : partout, le nombre d'un camp compte des personnes (`campsOf`, `personLines`, `categoryHeading`) :
+  « 9 avis positifs », c'est 9 personnes. La Méthode le définit ainsi (« 4 avis négatifs sur 5 » compte des participants),
+  et toute l'échelle d'avis en dépend. Le second indicateur proposé par Arnaud (une personne qui s'exprime plusieurs fois)
+  est donc le nombre de **verbatims** : « 9 avis positifs · 14 verbatims » = 9 personnes, 14 verbatims. Écrire « 14 avis ·
+  9 participants » aurait fait de l'avis un verbatim et contredit les listes (« 12 avis positifs sur 14 ») et la Méthode.
+- **Fait** : `campLabel` (report.ts), seule source de l'intitulé, pour le volet du résumé, les camps d'un thème et les
+  exports ; l'en-tête d'un camp ouvert colle sous le thème (`data-stick-panel`, placé par `placeStuck`), avec « Replier » ;
+  replier depuis l'en-tête collé le laisse où on l'a touché et lui rend le focus. Espaces insécables : la ligne se coupe
+  après « · ». Test de parcours ajouté (ordinateur et mobile).

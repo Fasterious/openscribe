@@ -702,3 +702,40 @@ test('replier un thème lu depuis son en-tête collé : sa ligne reste visible s
   expect(gap).toBeGreaterThanOrEqual(-1)
   await expect(head).toBeFocused()
 })
+
+test('lire un camp : son en-tête « ● N avis · N verbatims » colle sous le thème, et « Replier » le laisse où on l’a touché', async ({ page }) => {
+  await page.goto('/#/observatoire/ecole-grand-debat-2019')
+  const theme = page.locator('details[data-fold="theme"]').first()
+  await theme.locator(':scope > summary').click()
+  const motif = theme.locator('details[data-fold="motif"]').first()
+  const motifHead = motif.locator(':scope > summary')
+  await motifHead.click()
+  await expect(motif).toHaveAttribute('open', '')
+  // Un grand camp reste fermé ; son intitulé a la forme du volet du résumé : le chiffre d'abord, avis puis verbatims.
+  const camp = motif.getByRole('button', { name: /^\d+\savis positifs.*·\s\d+\sverbatims$/ })
+  await expect(camp).toHaveAttribute('aria-expanded', 'false')
+  const label = (await camp.innerText()).trim()
+  await camp.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(300)
+  const b = (await camp.boundingBox())!
+  await page.mouse.click(b.x + 10, b.y + b.height / 2)
+  await expect(camp).toHaveAttribute('aria-expanded', 'true')
+  const head = camp.locator('xpath=..')
+  for (let i = 0; i < 8; i++) {
+    await page.mouse.wheel(0, 150)
+    await page.waitForTimeout(60)
+  }
+  // On lit ses verbatims : l'en-tête du camp reste collé juste sous celui du thème.
+  const top = (l: Locator) => l.evaluate((el) => Math.round(el.getBoundingClientRect().top))
+  const bottom = (l: Locator) => l.evaluate((el) => Math.round(el.getBoundingClientRect().bottom))
+  await expect.poll(async () => Math.abs((await top(head)) - (await bottom(motifHead)))).toBeLessThanOrEqual(2)
+  const before = await top(head)
+  // « Replier » depuis l'en-tête collé : l'intitulé reste où on l'a touché et garde le focus.
+  const fold = head.getByRole('button', { name: 'Replier', exact: true })
+  const fb = (await fold.boundingBox())!
+  await page.mouse.click(fb.x + fb.width / 2, fb.y + fb.height / 2)
+  await expect(camp).toHaveAttribute('aria-expanded', 'false')
+  await expect.poll(async () => Math.abs((await top(camp)) - before)).toBeLessThanOrEqual(4)
+  await expect(camp).toBeFocused()
+  await expect(camp).toHaveText(label)
+})

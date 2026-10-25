@@ -17,14 +17,6 @@ import type { AnalysisState, Group, GroupDefinition, Idea, IdeaCategory, Metrics
  * ne peut pas injecter de code dans le rapport.
  */
 
-const CATEGORY_LABEL: Record<IdeaCategory, string> = {
-  positive: 'Avis positifs',
-  negative: 'Avis négatifs',
-  neutral: 'Constats',
-  suggestion: 'Suggestions',
-  question: 'Questions',
-}
-
 export function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 }
@@ -181,7 +173,7 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   lines.push(
     `Moteur d'IA : ${state.engine.presetId === 'bridge' || state.engine.presetId === 'simulation' ? engine : `${engine}, modèle ${state.engine.model}`} · température ${state.settings.temperature} · graine ${state.settings.seed}.`,
     "Partage des rôles : le moteur d'IA découpe les réponses en idées (positif, négatif, suggestion, question ou constat), propose les thèmes et les réunit en grands thèmes, et rédige les synthèses ; le code vérifie chaque verbatim, range chaque idée exactement une fois et calcule tous les chiffres, y compris les listes « Ce qui a marché », « Ce qui bloque », « Ce qui divise », « Ce que proposent les participants » et « Questions soulevées ». « Ce qui divise » réunit les thèmes aux avis opposés et ceux où tous font la même critique mais proposent des remèdes opposés (repérés par le moteur d'IA ; le code vérifie qu'il s'agit de deux propositions de deux personnes différentes).",
-    `Indicateurs : on compte des participants. Dans « 4 avis négatifs sur 5 », le total (5) compte les participants qui disent du bien du thème, du mal, ou les deux (mitigés, comptés dans le total mais dans aucun camp ; dans les listes de verbatims, un mitigé figure dans les deux camps) ; suggestions, questions et constats ne sont pas des avis. Le chiffre vient toujours avec le mot de l'échelle : « unanime » quand toutes les personnes qui donnent un avis sont du même côté ; « large majorité » à partir de 80 % ; « majorité » au-dessus de la moitié ; « pas de majorité » quand le camp en tête reste sous la moitié ; « avis partagés » quand les deux camps sont proches (chacun au moins deux personnes, le plus petit au moins la moitié du plus grand) ou quand les mitigés sont au moins aussi nombreux que le camp le plus fort ; en dessous de 4 avis, « peu d'avis ». « Fragile » signale qu'une seule voix changeant de camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver : la base est celle des personnes qui ont donné un avis spontanément. Ces proportions décrivent les personnes interrogées, pas une population. Un grand thème réunit des thèmes différents : on n'y additionne pas les avis.`,
+    `Indicateurs : on compte des participants. Dans « 4 avis négatifs sur 5 », le total (5) compte les participants qui disent du bien du thème, du mal, ou les deux (mitigés, comptés dans le total mais dans aucun camp ; dans les listes de verbatims, un mitigé figure dans les deux camps) ; suggestions, questions et constats ne sont pas des avis. Chaque liste de verbatims dit aussi combien de verbatims elle réunit (« 9 avis positifs · 14 verbatims ») : une personne peut s'exprimer plusieurs fois, elle ne compte qu'une fois. Le chiffre vient toujours avec le mot de l'échelle : « unanime » quand toutes les personnes qui donnent un avis sont du même côté ; « large majorité » à partir de 80 % ; « majorité » au-dessus de la moitié ; « pas de majorité » quand le camp en tête reste sous la moitié ; « avis partagés » quand les deux camps sont proches (chacun au moins deux personnes, le plus petit au moins la moitié du plus grand) ou quand les mitigés sont au moins aussi nombreux que le camp le plus fort ; en dessous de 4 avis, « peu d'avis ». « Fragile » signale qu'une seule voix changeant de camp changerait l'étiquette. Se taire n'est ni approuver ni désapprouver : la base est celle des personnes qui ont donné un avis spontanément. Ces proportions décrivent les personnes interrogées, pas une population. Un grand thème réunit des thèmes différents : on n'y additionne pas les avis.`,
     'Dans les synthèses, « (P2, P14) » renvoie aux participants dont un verbatim appuie la phrase ; « (notamment P2) » signale un exemple quand la phrase compte davantage de personnes.',
     'Une réponse de quelques mots est suivie de sa question, qui en donne le sens (en entier la première fois dans un thème, puis par son code).',
     "Les questions orientent les réponses (« qu'est-ce qui a bien marché ? ») : un thème où personne ne critique n'est pas pour autant un accord de tous, les autres participants n'en ont simplement pas parlé.",
@@ -572,13 +564,25 @@ export function displayOrder(ideas: Idea[], m: Metrics, order: IdeaCategory[] = 
   return order.flatMap((cat) => personLines(ideas.filter((i) => i.category === cat)).flatMap((l) => l.ideas))
 }
 
-/** « Avis positifs — 14 participants (dont 2 mitigés) » : le même compte que la ligne de chiffres du motif. */
-export function categoryHeading(cat: IdeaCategory, people: string[], both: Set<string>): string {
-  const n = people.length
-  const mixed = cat === 'positive' || cat === 'negative' ? people.filter((p) => both.has(p)).length : 0
-  if (mixed && mixed === n)
-    return `${CATEGORY_LABEL[cat]} — ${n} participant${n > 1 ? 's' : ''}, ${n > 2 ? 'tous mitigés' : n === 2 ? 'tous deux mitigés' : 'mitigé'}`
-  return `${CATEGORY_LABEL[cat]} — ${n} participant${n > 1 ? 's' : ''}${mixed ? ` (dont ${mixed} mitigé${mixed > 1 ? 's' : ''})` : ''}`
+/**
+ * L'intitulé d'un camp, partout où il se déroule (volet du résumé, camps d'un thème, exports) : « 14 avis positifs
+ * (dont 2 mitigés) · 17 verbatims ». Le premier nombre compte des personnes (un avis = une personne, comme dans
+ * « 12 avis positifs sur 14 ») ; le second, ce qu'elles ont dit : 9 avis et 14 verbatims, c'est 9 personnes dont
+ * certaines s'expriment plusieurs fois (Arnaud, 25/10 : le chiffre d'abord, les deux indicateurs, une seule forme).
+ */
+export function campLabel(cat: IdeaCategory, people: number, verbatims: number, mixed = 0): string {
+  const [one, many] = BAR_WORD[cat]
+  const head = `${people}\u00a0${people > 1 ? many : one}`
+  const polar = cat === 'positive' || cat === 'negative'
+  const both = !polar || !mixed ? '' : mixed === people ? (people > 2 ? ', tous mitigés' : people === 2 ? ', tous deux mitigés' : ', mitigé') : ` (dont ${mixed} mitigé${mixed > 1 ? 's' : ''})`
+  // Espaces insécables : sur un écran étroit, la ligne se coupe après « · », jamais entre un nombre et son mot.
+  return `${head}${both}\u00a0· ${verbatims}\u00a0verbatim${verbatims > 1 ? 's' : ''}`
+}
+
+/** L'intitulé d'un camp d'après ses lignes (une par personne) : « 14 avis positifs (dont 2 mitigés) · 17 verbatims ». */
+export function categoryHeading(cat: IdeaCategory, lines: { participantId: string; ideas: Idea[] }[], both: Set<string>): string {
+  const mixed = lines.filter((l) => both.has(l.participantId)).length
+  return campLabel(cat, lines.length, lines.reduce((n, l) => n + l.ideas.length, 0), mixed)
 }
 
 export interface HighlightSection {
@@ -863,11 +867,7 @@ export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: st
       if (!items.length) continue
       const lines = personLines(items)
       out.push(
-        `**${categoryHeading(
-          cat,
-          lines.map((l) => l.participantId),
-          both,
-        )}**`,
+        `**${categoryHeading(cat, lines, both)}**`,
         '',
       )
       for (const line of lines) {
@@ -978,11 +978,7 @@ export function reportToHtml(saved: AnalysisState, corpus: Corpus, title: string
         const lines = personLines(items)
         const polar = cat === 'positive' || cat === 'negative'
         return `<details open class="cat-${cat}"><summary>${e(
-          categoryHeading(
-            cat,
-            lines.map((l) => l.participantId),
-            both,
-          ),
+          categoryHeading(cat, lines, both),
         )}</summary><ul>${lines
           .map(
             (l) =>

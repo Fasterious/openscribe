@@ -328,9 +328,10 @@ marques (`de justesse`, `à vérifier`, `Minorité constante`). Les étiquettes 
      choisit son camp. Aucun échantillon : un camp se déroule entier ou pas du tout (pas de « 5 premiers » choisis).
    - Sur ordinateur, les camps s'empilent en une seule colonne (fin du grand vide à droite) ; deux colonnes
      seulement si les deux camps sont ouverts et de longueurs proches (écart inférieur à 30 %).
-   - Le camp ouvert a son propre en-tête collant sous celui du sujet **sur ordinateur seulement** (trois niveaux
-     collés sur mobile prendraient trop de place) ; sur mobile, l'en-tête du sujet affiche à la place le camp en
-     cours : `Enseignement privé › Avis positifs`.
+   - Le camp ouvert a son propre en-tête collant sous celui du sujet, avec « Replier », sur ordinateur comme sur
+     mobile (Arnaud, 25/10 ; sur mobile, le grand thème s'efface pendant la lecture d'un thème : deux niveaux seulement
+     restent collés). Son intitulé a la forme du volet du résumé : `● 9 avis positifs · 14 verbatims` (personnes, puis
+     verbatims).
 5. En bas du sujet : `⌃ Replier « Enseignement privé »` (en plus de celui de l'en-tête collant).
 
 **Réponse entière d'un verbatim** : inchangée (sous la ligne de la personne). Son « Replier » passe à 32 px de haut
