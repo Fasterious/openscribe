@@ -20,3 +20,7 @@ Colonnes : Région → attribute | Si vous avez été amené à chercher une fo 
 13:40:29 extract:done 50/50 group:done 375/375 summarize:done 40/40 themes:running 0/40 report:pending polish:pending
 13:42:55 extract:done 50/50 group:done 375/375 summarize:done 40/40 themes:done 40/40 report:pending polish:pending
 13:42:55 extract:done 50/50 group:done 375/375 summarize:done 40/40 themes:done 40/40 report:running polish:pending
+13:43:51 extract:done 50/50 group:done 375/375 summarize:done 40/40 themes:done 40/40 report:done polish:running 0/49
+13:44:09 extract:done 50/50 group:done 375/375 summarize:done 40/40 themes:done 40/40 report:done polish:running 1/49
+13:44:45 extract:done 50/50 group:done 375/375 summarize:done 40/40 themes:done 40/40 report:done polish:running 13/49
+13:45:13 extract:done 50/50 group:done 375/375 summarize:done 40/40 themes:done 40/40 report:done polish:running 25/49
