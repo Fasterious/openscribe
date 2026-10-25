@@ -1422,7 +1422,9 @@ export function ReportTab({
   const simulated = analysis.engine.presetId === 'simulation'
 
   return (
-    <article className="space-y-6">
+    // Une seule colonne pour tout le rapport (bandeaux, listes, détail) : plus de bloc étiré sur toute la page à côté d'un
+    // texte étroit (refonte du 25/10, docs/UI.md §2) ; le texte courant garde sa mesure de lecture à l'intérieur.
+    <article className="max-w-4xl space-y-6">
       {/* Une étude publiée dit sa date et ses chiffres dans son en-tête : pas de seconde ligne (remarque d'Arnaud, 17/10). */}
       <p className={published && !segment ? 'hidden' : 'text-base text-muted-foreground'}>
         Rapport du {formatDate(analysis.updatedAt)} · {plural(all.participants, 'participant')} · {plural(all.mentions, 'occurrence')}
@@ -1543,20 +1545,20 @@ export function ReportTab({
       </TabActions>
 
       {stale && (
-        <Alert tone="warning">
+        <Alert tone="warning" className="max-w-lecture">
           Les données ont changé depuis ce rapport (source ajoutée, retirée ou questions modifiées). Il reste consultable, mais relancez l'analyse dans l'onglet
           Analyse pour qu'il en tienne compte.
         </Alert>
       )}
       {analysis.engine.presetId === 'bridge' && !published && (
-        <Alert tone="info">
+        <Alert tone="info" className="max-w-lecture">
           {isExample(project)
             ? `Rapport d'exemple : produit une fois par un vrai moteur d'IA (${analysis.engine.model}) à partir d'un questionnaire fictif, puis conservé tel quel. Pour vos propres données, choisissez un moteur dans « Moteurs d'IA ».`
             : `Rapport produit hors de l'application par un vrai moteur d'IA (${analysis.engine.model}), puis importé avec la synthèse.`}
         </Alert>
       )}
       {simulated && (
-        <Alert tone="warning">
+        <Alert tone="warning" className="max-w-lecture">
           Rapport de démonstration : produit par le moteur de simulation, son contenu est fictif. Configurez un vrai moteur d'IA pour analyser vos données.
         </Alert>
       )}
@@ -1613,7 +1615,7 @@ export function ReportTab({
       )}
 
       {/* La partie détaillée, séparée de « la température » du haut : on y explore, thème par thème, motif par motif. */}
-      <section aria-labelledby="detail" className="max-w-4xl space-y-3 border-t-4 border-foreground/10 pt-8">
+      <section aria-labelledby="detail" className="space-y-3 border-t pt-8">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div className="space-y-1">
             <h2 id="detail" className="text-xl font-semibold">

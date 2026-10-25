@@ -549,3 +549,16 @@ sourcées). Livré :
 - **Reste à prouver côté Synthèse** : la note de la méthode commune sur un corpus d'une autre forme (questionnaire à
   plusieurs questions, entretiens) et avec un modèle léger ; les notes des moteurs (Gemini, Ministral) datent de
   l'ancienne méthode et sont à refaire.
+
+## 2026-10-25 — Refonte de l'interface, première passe (Synthèse)
+
+- **Demande d'Arnaud** : la Synthèse « flottait » ; une interface moderne, nette, minimaliste, efficace.
+- **Diagnostic** (captures avant/après à 1440 et 390 px, dans le dossier de travail) : cartes à ombre douce et grands
+  arrondis posées côte à côte, encadrés colorés empilés, largeurs différentes d'un bloc à l'autre (bandeau sur toute
+  la page, texte sur 38 rem, détail sur 56 rem), onglets en pastilles détachés de l'en-tête.
+- **Fait** : arrondi de base 12 → 8 px ; cartes sans ombre ; onglets soulignés posés sur le filet de l'en-tête de
+  page, actions de l'onglet sur la même ligne ; alertes en filet de couleur sur fond neutre ; liste des synthèses en
+  lignes alignées (nom, comptes, état, date, menu), l'exemple à part sous « Pour découvrir » ; onglets Données et
+  Analyse en deux colonnes à plat séparées par un filet, listes à filets au lieu de boîtes empilées ; rapport sur une
+  seule colonne (56 rem), bandeaux à la mesure du texte. Rôles et libellés accessibles inchangés : les 41 parcours
+  passent.
