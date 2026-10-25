@@ -1,7 +1,7 @@
 {
  "id": "an_3c34282m6d6k",
  "createdAt": "2026-10-25T13:09:57.410Z",
- "updatedAt": "2026-10-25T13:45:13.906Z",
+ "updatedAt": "2026-10-25T13:48:50.450Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -5200,7 +5200,7 @@
     "I0320",
     "I0359"
    ],
-   "summary": "8 personnes peinent à trouver l'information ou le bon interlocuteur : documentation administrative complexe, multiplication des guichets, service à contacter inconnu, organisme ou formation introuvables, sites trop complexes ou démarches jugées « beaucoup trop nébuleux » [I0036, I0088, I0091, I0135, I0174, I0175, I0279, I0313, I0319]. L'une d'elles finit par abandonner après des heures passées à comprendre, une autre d'entre elles demande d'homogénéiser les portails d'accès [I0176, I0320]. À l'inverse, 4 autres personnes trouvent facilement l'information : services d'information et portails régionaux jugés « excellents », forums et journées portes ouvertes, information en ligne souvent satisfaisante, services privés plus efficaces, recherche jugée facile [I0018, I0095, I0096, I0141, I0274]. Une personne mitigée salue la dématérialisation des informations tout en notant qu'elle peut gêner ceux qui en maîtrisent mal les moyens [I0244, I0245] ; une autre se demande si l'on peut chercher une formation avec les services publics [I0309].",
+   "summary": "8 personnes peinent à trouver l'information ou le bon interlocuteur : documentation administrative complexe, multiplication des guichets, service à contacter inconnu, organisme ou formation introuvables, sites trop complexes ou démarches jugées « beaucoup trop nébuleux » [I0036, I0088, I0091, I0135, I0174, I0175, I0279, I0313, I0319]. L'une d'elles finit par abandonner après des heures passées à comprendre, une autre demande d'homogénéiser les portails d'accès [I0176, I0320]. À l'inverse, 4 autres personnes trouvent facilement l'information : services d'information et portails régionaux jugés « excellents », forums et journées portes ouvertes, information en ligne souvent satisfaisante, services privés plus efficaces, recherche jugée facile [I0018, I0095, I0096, I0141, I0274]. Une personne mitigée salue la dématérialisation des informations tout en notant qu'elle peut gêner ceux qui en maîtrisent mal les moyens [I0244, I0245] ; une autre se demande si l'on peut chercher une formation avec les services publics [I0309].",
    "metrics": {
     "mentions": 20,
     "participants": 15,
@@ -5266,7 +5266,8 @@
     "negative": "peiner à trouver l'information, l'interlocuteur ou la formation adaptée",
     "neutral": "s'interroger sur les sources d'information sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Expérience globale de scolarisation",
@@ -5287,7 +5288,7 @@
     "I0350",
     "I0360"
    ],
-   "summary": "La scolarité des enfants s'est bien passée pour les 12 personnes qui donnent un avis : pas de difficulté particulière, rien d'insurmontable, aucun problème d'adaptation, un parcours à l'école de la République jusqu'au doctorat en médecine [I0004, I0033, I0039, I0047, I0098, I0100, I0106, I0169, I0258, I0287, I0294, I0360]. L'une d'elles précise avoir toujours inscrit ses enfants dans les établissements proches de leur lieu de naissance, une autre d'entre elles que sa fille est en école d'ingénieurs [I0035, I0105]. Une personne, enfin, juge son expérience trop ancienne pour en tirer un avis [I0350].",
+   "summary": "La scolarité des enfants s'est bien passée pour les 12 personnes qui donnent un avis : pas de difficulté particulière, rien d'insurmontable, aucun problème d'adaptation, un parcours à l'école de la République jusqu'au doctorat en médecine [I0004, I0033, I0039, I0047, I0098, I0100, I0106, I0169, I0258, I0287, I0294, I0360]. L'une d'elles précise avoir toujours inscrit ses enfants dans les établissements proches de leur lieu de naissance, une autre, que sa fille est en école d'ingénieurs [I0035, I0105]. Une personne, enfin, juge son expérience trop ancienne pour en tirer un avis [I0350].",
    "metrics": {
     "mentions": 15,
     "participants": 13,
@@ -5348,7 +5349,8 @@
     "negative": "juger la scolarité des enfants globalement difficile ou décevante",
     "neutral": "décrire son parcours scolaire familial sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Financement des formations",
@@ -5444,7 +5446,8 @@
     "negative": "subir les coûts, refus ou complexités des financements de formation",
     "neutral": "décrire les dispositifs de financement sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Accompagnement des demandeurs d'emploi",
@@ -5477,7 +5480,7 @@
     "I0323",
     "I0357"
    ],
-   "summary": "Absents, lents ou inadaptés : c'est ainsi que 10 personnes jugent les services d'accompagnement des demandeurs d'emploi, entre formations inadaptées ou jamais proposées, absence d'accompagnement, informations rares, orientation vers la recherche numérique, conseillers qui ignorent les métiers, statut de cadre non reconnu, chiffres prioritaires sur le retour à l'emploi et aide réservée aux personnes « battantes » [I0002, I0008, I0015, I0026, I0059, I0067, I0075, I0076, I0193, I0194, I0285, I0357]. L'une d'elles raconte des mois sans contact ni réponse de Cap emploi pour un conjoint en attente de reconnaissance de la qualité de travailleur handicapé, une autre d'entre elles regrette l'absence totale de soutien moral après un licenciement [I0027, I0028, I0029, I0030, I0031, I0286]. Une personne mitigée juge la Mission locale inutile, mais note que Pôle emploi s'est récemment amélioré, notamment dans le respect des volontés de l'usager [I0322, I0323]. 2 personnes demandent un service plus efficace : l'une veut un Pôle emploi « plus efficace », l'autre propose de réorganiser l'Agence nationale pour l'emploi par branches et métiers, ou de déléguer ce rôle aux branches professionnelles et aux sociétés d'intérim [I0003, I0060, I0061, I0062].",
+   "summary": "Absents, lents ou inadaptés : c'est ainsi que 10 personnes jugent les services d'accompagnement des demandeurs d'emploi, entre formations inadaptées ou jamais proposées, absence d'accompagnement, informations rares, orientation vers la recherche numérique, conseillers qui ignorent les métiers, statut de cadre non reconnu, chiffres prioritaires sur le retour à l'emploi et aide réservée aux personnes « battantes » [I0002, I0008, I0015, I0026, I0059, I0067, I0075, I0076, I0193, I0194, I0285, I0357]. L'une d'elles raconte des mois sans contact ni réponse de Cap emploi pour un conjoint en attente de reconnaissance de la qualité de travailleur handicapé, une autre regrette l'absence totale de soutien moral après un licenciement [I0027, I0028, I0029, I0030, I0031, I0286]. Une personne mitigée juge la Mission locale inutile, mais note que Pôle emploi s'est récemment amélioré, notamment dans le respect des volontés de l'usager [I0322, I0323]. 2 personnes demandent un service plus efficace : l'une veut un Pôle emploi « plus efficace », l'autre propose de réorganiser l'Agence nationale pour l'emploi par branches et métiers, ou de déléguer ce rôle aux branches professionnelles et aux sociétés d'intérim [I0003, I0060, I0061, I0062].",
    "metrics": {
     "mentions": 27,
     "participants": 11,
@@ -5536,7 +5539,8 @@
     "negative": "juger ces services absents, inefficaces, lents ou inadaptés",
     "neutral": "décrire son parcours de demandeur d'emploi sans juger ces services"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Qualité des organismes de formation",
@@ -5614,7 +5618,8 @@
     "negative": "juger les organismes inefficaces, opportunistes ou mal contrôlés",
     "neutral": "évoquer les organismes de formation sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Conditions d'accès aux formations",
@@ -5634,7 +5639,7 @@
     "I0301",
     "I0386"
    ],
-   "summary": "Refus, délais, critères restrictifs : 8 personnes décrivent une entrée en formation semée d'obstacles, entre formations refusées ou inaccessibles pour se reconvertir, inscription conditionnée à l'examen, entrées calquées sur l'année scolaire, langues jamais accordées aux cadres âgés, accès réservé aux personnes « assez au chômage », démarches lourdes et manque de moyens ou de temps [I0017, I0043, I0045, I0102, I0142, I0187, I0295, I0301, I0386]. L'une d'elles a trouvé la formation complète en revenant s'inscrire, une autre d'entre elles a dû attendre 1 an [I0103, I0296]. Celle qui juge la reconversion impossible demande que la formation « permette une évolution » [I0044]. Une autre personne n'a rencontré aucun gros point bloquant [I0006].",
+   "summary": "Refus, délais, critères restrictifs : 8 personnes décrivent une entrée en formation semée d'obstacles, entre formations refusées ou inaccessibles pour se reconvertir, inscription conditionnée à l'examen, entrées calquées sur l'année scolaire, langues jamais accordées aux cadres âgés, accès réservé aux personnes « assez au chômage », démarches lourdes et manque de moyens ou de temps [I0017, I0043, I0045, I0102, I0142, I0187, I0295, I0301, I0386]. L'une d'elles a trouvé la formation complète en revenant s'inscrire, une autre a dû attendre 1 an [I0103, I0296]. La personne qui juge la reconversion impossible demande que la formation « permette une évolution » [I0044]. Une autre personne n'a rencontré aucun gros point bloquant [I0006].",
    "metrics": {
     "mentions": 14,
     "participants": 9,
@@ -5689,7 +5694,8 @@
     "negative": "subir refus, délais, critères restrictifs ou démarches lourdes",
     "neutral": "décrire les conditions d'entrée en formation sans les juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Inclusion des jeunes handicapés",
@@ -5767,7 +5773,8 @@
      "b": "I0308",
      "about": "la prise en charge de la formation des professeurs au handicap"
     }
-   ]
+   ],
+   "unverified": []
   },
   {
    "title": "Méthodes pédagogiques",
@@ -5786,7 +5793,7 @@
     "I0235",
     "I0281"
    ],
-   "summary": "Changer la manière d'enseigner : c'est le souhait de 6 personnes, qui proposent de nouvelles pédagogies, une remise en question des pratiques enseignantes, des écoles Montessori dans toutes les écoles publiques, des apprentissages dès la maternelle ou une explication aux enfants que les matières servent à « apprendre à apprendre » [I0054, I0056, I0087, I0151, I0170, I0171, I0234, I0235, I0281]. L'une d'elles juge aussi les matières trop cloisonnées [I0085]. Une autre personne apprécie au contraire l'école Steiner fréquentée par son enfant, qui lui a appris à « apprendre avec curiosité naturelle » [I0104, I0107].",
+   "summary": "Changer la manière d'enseigner : c'est le souhait de 6 personnes, qui proposent de nouvelles pédagogies, une remise en question des pratiques enseignantes, des écoles Montessori dans toutes les écoles publiques, des apprentissages dès la maternelle ou une explication aux enfants que les matières servent à « entrainer notre cerveau » [I0054, I0056, I0087, I0151, I0170, I0171, I0234, I0235, I0281]. L'une d'elles juge aussi les matières trop cloisonnées [I0085]. Une autre personne apprécie au contraire l'école Steiner fréquentée par son enfant, qui lui a appris à « apprendre avec curiosité naturelle » [I0104, I0107].",
    "metrics": {
     "mentions": 13,
     "participants": 7,
@@ -5832,7 +5839,8 @@
     "negative": "juger les façons d'enseigner dépassées, cloisonnées ou inadaptées",
     "neutral": "énoncer un principe général sur l'apprentissage sans juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Relations école-familles",
@@ -5898,7 +5906,8 @@
     "negative": "déplorer une information lacunaire ou un dialogue difficile avec l'école",
     "neutral": "décrire les échanges entre école et familles sans les juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Gestion du corps enseignant",
@@ -5914,7 +5923,7 @@
     "I0318",
     "I0355"
    ],
-   "summary": "Pour 5 personnes, la gestion du corps enseignant pose problème : statut de fonctionnaire et emploi à vie jugés injustifiés, professeur alcoolique impossible à retirer de son poste, enseignement vu comme « un état dans l'état », directeurs sans pouvoir sur leurs équipes ou démunis [I0024, I0130, I0131, I0200, I0317, I0318, I0355]. 3 personnes proposent de faire évoluer l'encadrement : l'une veut laisser plus de liberté aux enseignants dans l'organisation de l'école, les 2 autres veulent confier leur évaluation au directeur ou au proviseur, ou noter les professeurs [I0094, I0119, I0185].",
+   "summary": "Pour 5 personnes, la gestion du corps enseignant pose problème : statut de fonctionnaire et emploi à vie jugés injustifiés, professeur alcoolique impossible à retirer de son poste, enseignement vu comme « un état dans l'état », directeurs sans pouvoir sur leurs équipes ou démunis [I0024, I0130, I0131, I0200, I0317, I0318, I0355]. 3 personnes proposent de faire évoluer l'encadrement : l'une veut laisser plus de liberté aux enseignants dans l'organisation de l'école, les autres veulent confier leur évaluation au directeur ou au proviseur, ou noter les professeurs [I0094, I0119, I0185].",
    "metrics": {
     "mentions": 10,
     "participants": 7,
@@ -5962,7 +5971,8 @@
     "negative": "critiquer le statut, l'évaluation ou l'encadrement des enseignants",
     "neutral": "décrire l'organisation du corps enseignant sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Orientation scolaire",
@@ -6027,7 +6037,8 @@
     "negative": "subir une orientation stressante, opaque ou mal conseillée",
     "neutral": "décrire les étapes de l'orientation sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Qualité des enseignants",
@@ -6101,7 +6112,8 @@
     "negative": "déplorer l'incompétence, la fatigue ou l'attitude de certains enseignants",
     "neutral": "évoquer les enseignants sans porter de jugement sur eux"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Système éducatif public",
@@ -6167,7 +6179,8 @@
     "negative": "juger l'école publique en déclin, en échec ou dégradée",
     "neutral": "énoncer un principe général sur l'école sans juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Vie scolaire",
@@ -6231,7 +6244,8 @@
     "negative": "déplorer un manque de surveillance, d'encadrement ou de discipline adaptée",
     "neutral": "s'interroger sur la discipline scolaire sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Rythmes scolaires",
@@ -6292,7 +6306,8 @@
     "negative": "juger les journées trop chargées, les vacances trop longues",
     "neutral": "décrire le calendrier scolaire sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Charge de travail des élèves",
@@ -6351,7 +6366,8 @@
     "negative": "déplorer devoirs excessifs, emplois du temps chargés ou cartables lourds",
     "neutral": "évoquer le travail des élèves sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Coût de la scolarité",
@@ -6411,7 +6427,8 @@
     "negative": "juger la scolarité coûteuse ou les aides insuffisantes",
     "neutral": "s'interroger sur les coûts ou les aides sans juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Formation des agents publics",
@@ -6471,7 +6488,8 @@
     "negative": "déplorer le manque de temps, de choix ou d'accès aux formations",
     "neutral": "décrire son parcours d'agent public sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Gouvernance de l'Éducation nationale",
@@ -6529,7 +6547,8 @@
     "negative": "critiquer bureaucratie, réformes, opacité ou jeux de pouvoir",
     "neutral": "décrire le fonctionnement de l'institution sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Offre de formation disponible",
@@ -6588,7 +6607,8 @@
     "negative": "juger l'offre de formations insuffisante, éloignée, confuse ou inadaptée",
     "neutral": "constater l'existence de formations sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Choix entre public et privé",
@@ -6644,7 +6664,8 @@
     "negative": "déplorer les défauts du secteur public ou privé fréquenté",
     "neutral": "constater le type d'établissement fréquenté sans le juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Niveau d'exigence scolaire",
@@ -6699,7 +6720,8 @@
     "negative": "déplorer la baisse du niveau ou le manque d'exigence",
     "neutral": "évoquer le niveau scolaire sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Adéquation formation-emploi",
@@ -6753,7 +6775,8 @@
     "negative": "juger les formations inadaptées aux besoins réels d'emploi",
     "neutral": "évoquer le lien entre formation et emploi sans juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Absences des enseignants",
@@ -6807,7 +6830,8 @@
     "negative": "déplorer absences, grèves ou heures de cours non remplacées",
     "neutral": "évoquer la présence des enseignants sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Constitution des classes",
@@ -6860,7 +6884,8 @@
     "negative": "déplorer des classes surchargées ou mal réparties",
     "neutral": "décrire la composition des classes sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Formation des enseignants",
@@ -6912,7 +6937,8 @@
     "negative": "juger la formation des enseignants insuffisante ou mal orientée",
     "neutral": "évoquer la formation des enseignants sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Inscription scolaire",
@@ -6964,7 +6990,8 @@
     "negative": "subir refus, lenteurs ou complications lors de l'inscription",
     "neutral": "décrire les démarches d'inscription sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Accompagnement par l'APEC",
@@ -7016,7 +7043,8 @@
     "negative": "juger l'APEC intéressée, inefficace ou difficile d'accès",
     "neutral": "évoquer l'APEC sans porter de jugement sur son action"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Procédure MDPH",
@@ -7031,7 +7059,7 @@
     "I0379",
     "I0380"
    ],
-   "summary": "Lourdeur et lenteur : voilà ce que critiquent dans la procédure de la maison départementale des personnes handicapées les 2 personnes qui donnent un avis, avec des dossiers traités en 8 mois [I0304, I0370, I0380]. L'une décrit un dossier à refaire tous les ans, de nombreux intervenants et comptes rendus, le coût des consultations et des congés à poser pour les rendez-vous [I0302, I0303, I0305, I0306]. L'autre demande d'accélérer les démarches administratives [I0369, I0379].",
+   "summary": "Les 2 personnes qui donnent un avis critiquent la lourdeur et la lenteur de la procédure de la maison départementale des personnes handicapées, avec des dossiers traités en 8 mois [I0304, I0370, I0380]. L'une décrit un dossier à refaire tous les ans, de nombreux intervenants et comptes rendus, le coût des consultations et des congés à poser pour les rendez-vous [I0302, I0303, I0305, I0306]. L'autre demande d'accélérer les démarches administratives [I0369, I0379].",
    "metrics": {
     "mentions": 9,
     "participants": 2,
@@ -7071,7 +7099,8 @@
     "negative": "subir la lourdeur, les délais ou les coûts des dossiers",
     "neutral": "décrire la procédure MDPH sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Formation en entreprise",
@@ -7085,7 +7114,7 @@
     "I0327",
     "I0328"
    ],
-   "summary": "Trouver une entreprise pour un stage ou une alternance est difficile, estime une personne, qui dénonce aussi des stages réduits au « sale boulot » ou au travail gratuit et des partenariats entre entreprises et administrations rarement effectifs [I0326, I0327, I0328]. Une autre personne, mitigée, juge les entreprises capables d'offrir une vraie formation qualifiante, mais trouve prohibitif le coût d'accueil d'un alternant pour une petite structure [I0167, I0165]. Partant du principe que les compétences se trouvent là où on les applique, elle propose de laisser les entreprises développer leurs propres filières et de les payer pour accueillir les stagiaires plutôt que l'inverse [I0161, I0163, I0166].",
+   "summary": "Trouver une entreprise pour un stage ou une alternance est difficile, estime une personne, qui dénonce aussi des stages réduits au « sale boulot » et des partenariats entre entreprises et administrations rarement effectifs [I0326, I0327, I0328]. Une autre personne, mitigée, juge les entreprises capables d'offrir une vraie formation qualifiante, mais trouve prohibitif le coût d'accueil d'un alternant pour une petite structure [I0167, I0165]. Partant du principe que les compétences se trouvent là où on les applique, elle propose de laisser les entreprises développer leurs propres filières et de les payer pour accueillir les stagiaires plutôt que l'inverse [I0161, I0163, I0166].",
    "metrics": {
     "mentions": 8,
     "participants": 2,
@@ -7126,7 +7155,8 @@
     "negative": "subir coûts, difficultés d'accès ou abus liés aux stages",
     "neutral": "énoncer un principe général sur l'apprentissage en entreprise"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Égalité des chances",
@@ -7177,7 +7207,8 @@
     "negative": "déplorer des inégalités scolaires ou sociales entre élèves",
     "neutral": "énoncer un principe général sur l'égalité sans juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Mobilité vers les formations",
@@ -7225,7 +7256,8 @@
     "negative": "subir le coût ou le manque de transports vers les formations",
     "neutral": "évoquer la mobilité vers les formations sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Transports scolaires",
@@ -7275,7 +7307,8 @@
     "negative": "subir des horaires contraignants ou une desserte insuffisante",
     "neutral": "décrire les transports scolaires sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Implication éducative des familles",
@@ -7331,7 +7364,8 @@
     "negative": "déplorer le désengagement ou les lacunes éducatives des familles",
     "neutral": "décrire des situations familiales sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Signalement du handicap par l'école",
@@ -7381,7 +7415,8 @@
     "negative": "dénoncer des signalements hâtifs ou des orientations injustifiées",
     "neutral": "décrire les démarches de signalement sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Micro-lycées",
@@ -7429,7 +7464,8 @@
     "negative": "juger insuffisants les moyens ou conditions des micro-lycées",
     "neutral": "évoquer les micro-lycées sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Moyens administratifs des écoles",
@@ -7476,7 +7512,8 @@
     "negative": "déplorer le manque de personnel ou de moyens administratifs",
     "neutral": "décrire l'organisation administrative des écoles sans la juger"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Recours aux orthophonistes",
@@ -7517,7 +7554,8 @@
     "minority": null
    },
    "id": "G38",
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Certification des organismes de formation",
@@ -7557,7 +7595,8 @@
     "minority": null
    },
    "id": "G39",
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   },
   {
    "title": "Fermeture des écoles rurales",
@@ -7602,7 +7641,8 @@
     "negative": "déplorer la fermeture ou la menace de fermeture d'écoles rurales",
     "neutral": "évoquer la carte scolaire rurale sans porter de jugement"
    },
-   "opposed": []
+   "opposed": [],
+   "unverified": []
   }
  ],
  "themes": [
@@ -7725,7 +7765,8 @@
      ]
     }
    },
-   "id": "T1"
+   "id": "T1",
+   "unverified": []
   },
   {
    "title": "Parcours scolaire des enfants",
@@ -7825,7 +7866,8 @@
     "fragile": false,
     "minority": null
    },
-   "id": "T2"
+   "id": "T2",
+   "unverified": []
   },
   {
    "title": "Enseignants et pédagogie",
@@ -7837,7 +7879,7 @@
     "G24",
     "G26"
    ],
-   "summary": "Le travail des enseignants concentre les critiques : 4 personnes visent l'engagement de certains d'entre eux, 4 leurs absences, et 5 critiquent un emploi à vie et des directeurs sans prise sur leurs équipes [I0204, I0205, I0253, I0300, I0361, I0083, I0159, I0298, I0133, I0024, I0130, I0131, I0200, I0317, I0318, I0355]. Les avis favorables existent aussi : une personne souligne l'apport de nombreux enseignants à la culture des enfants, et une personne mitigée a rencontré des professeurs compétents à côté d'enseignants fatigués ou dépassés [I0353, I0259, I0260]. Les propositions portent surtout sur la pédagogie : 6 personnes veulent changer la manière d'enseigner, de Montessori à « apprendre à apprendre », et 2 personnes proposent de recentrer la formation des enseignants sur la motivation des élèves ou la psychologie [I0054, I0056, I0087, I0151, I0170, I0171, I0234, I0235, I0281, I0154, I0227]. Le niveau d'exigence paraît en baisse à 3 personnes, et une autre propose de valider les niveaux réels plutôt que des « statistiques de réussite fallacieuses » [I0086, I0232, I0233, I0252, I0152, I0153].",
+   "summary": "Le travail des enseignants concentre les critiques : 4 personnes visent l'engagement de certains d'entre eux, 4 leurs absences, et 5 critiquent la gestion du corps enseignant, de l'emploi à vie au manque de poids des directeurs [I0204, I0205, I0253, I0300, I0361, I0083, I0159, I0298, I0133, I0024, I0130, I0131, I0200, I0317, I0318, I0355]. Les avis favorables existent aussi : une personne souligne l'apport de nombreux enseignants à la culture des enfants, et une personne mitigée a rencontré des professeurs compétents à côté d'enseignants fatigués ou dépassés [I0353, I0265, I0262, I0266]. Les propositions portent surtout sur la pédagogie : 6 personnes veulent changer la manière d'enseigner, des écoles Montessori à des matières qui servent à « entrainer notre cerveau », et 2 personnes proposent de recentrer la formation des enseignants sur la motivation des élèves ou la psychologie [I0054, I0056, I0087, I0151, I0170, I0171, I0234, I0235, I0281, I0154, I0227]. Le niveau d'exigence paraît en baisse à 3 personnes, et une autre propose de valider les niveaux réels plutôt que des « statistiques de réussite fallacieuses » [I0086, I0232, I0233, I0252, I0152, I0153].",
    "metrics": {
     "mentions": 55,
     "participants": 18,
@@ -7900,7 +7942,8 @@
     "fragile": false,
     "minority": null
    },
-   "id": "T3"
+   "id": "T3",
+   "unverified": []
   },
   {
    "title": "Vie quotidienne à l'école",
@@ -7969,7 +8012,8 @@
     "fragile": false,
     "minority": null
    },
-   "id": "T4"
+   "id": "T4",
+   "unverified": []
   },
   {
    "title": "Pilotage de l'école publique",
@@ -8036,7 +8080,8 @@
     "fragile": true,
     "minority": null
    },
-   "id": "T5"
+   "id": "T5",
+   "unverified": []
   },
   {
    "title": "Qualité et débouchés des formations",
@@ -8046,7 +8091,7 @@
     "G30",
     "G39"
    ],
-   "summary": "La valeur des formations suivies divise : 6 personnes jugent les organismes inefficaces ou plus attentifs aux subventions qu'aux stagiaires, quand 4 autres saluent une formation réussie [I0032, I0136, I0160, I0162, I0168, I0178, I0189, I0190, I0191, I0324, I0001, I0005, I0071, I0282, I0283]. Le lien avec l'emploi pose aussi question : 3 personnes estiment que les formations proposées n'y mènent pas, et 2 personnes veulent partir des offres d'emploi ou mettre en avant les formations qui y débouchent [I0158, I0180, I0316, I0179, I0280]. Les entreprises apparaissent comme une autre voie : une personne leur reconnaît la capacité d'offrir une vraie formation qualifiante et propose de les payer pour accueillir les stagiaires, mais une autre peine à y trouver stages et alternances [I0167, I0161, I0163, I0166, I0326].",
+   "summary": "La valeur des formations suivies divise : 6 personnes jugent les organismes inefficaces ou plus attentifs aux subventions qu'aux stagiaires, quand 4 autres saluent une formation réussie [I0032, I0136, I0160, I0162, I0168, I0178, I0189, I0190, I0191, I0324, I0001, I0005, I0071, I0282, I0283]. Le lien avec l'emploi pose aussi question : 3 personnes estiment que les formations proposées n'y mènent pas, et 2 personnes veulent partir des offres d'emploi ou mettre en avant les formations qui y débouchent [I0158, I0180, I0316, I0179, I0280]. Les entreprises apparaissent comme une autre voie : une personne leur reconnaît la capacité d'offrir une vraie formation qualifiante et propose de les payer pour accueillir les stagiaires, mais une autre peine à y trouver stages et alternances [I0167, I0161, I0163, I0166, I0326, I0327].",
    "metrics": {
     "mentions": 29,
     "participants": 13,
@@ -8103,7 +8148,8 @@
     "fragile": false,
     "minority": null
    },
-   "id": "T6"
+   "id": "T6",
+   "unverified": []
   },
   {
    "title": "Accompagnement vers l'emploi",
@@ -8164,7 +8210,8 @@
     "fragile": false,
     "minority": null
    },
-   "id": "T7"
+   "id": "T7",
+   "unverified": []
   },
   {
    "title": "Scolarisation des enfants handicapés",
@@ -8174,7 +8221,7 @@
     "G35",
     "G38"
    ],
-   "summary": "Pour les jeunes handicapés, 3 personnes dénoncent le manque de places et d'adaptation, et les 2 personnes qui donnent un avis sur la procédure de la maison départementale des personnes handicapées la jugent lourde et lente [I0276, I0277, I0278, I0307, I0329, I0330, I0331, I0304, I0370, I0380]. À l'inverse, une personne salue la très bonne implication de cette maison départementale, des services sociaux et des institutrices, et une personne mitigée a fini par trouver une structure « formidable » après un refus [I0089, I0090, I0217, I0219]. La formation des professeurs au handicap oppose 2 personnes : l'une veut les former et les suivre, l'autre les laisser se former seuls, sans prise en charge publique [I0248, I0308]. Une personne décrit aussi un signalement d'autisme engagé « sans aucune légitimité » par l'école et des orthophonistes saturées, devenues « LA solution » [I0203, I0214, I0202].",
+   "summary": "Pour les jeunes handicapés, 3 personnes dénoncent le manque de places et d'adaptation, et les 2 personnes qui donnent un avis sur la procédure de la maison départementale des personnes handicapées la jugent lourde et lente [I0276, I0277, I0278, I0307, I0329, I0330, I0331, I0304, I0370, I0380]. À l'inverse, une personne salue la très bonne implication de cette maison départementale, des services sociaux et des institutrices, et une personne mitigée a fini par trouver une structure « formidable » après un refus [I0089, I0090, I0218, I0219]. La formation des professeurs au handicap oppose 2 personnes : l'une veut les former et les suivre, l'autre les laisser se former seuls, sans prise en charge publique [I0248, I0308]. Une personne décrit aussi un signalement d'autisme engagé « sans aucune légitimité » par l'école et des orthophonistes saturées, devenues « LA solution » [I0203, I0215, I0202].",
    "metrics": {
     "mentions": 33,
     "participants": 7,
@@ -8219,10 +8266,11 @@
     "fragile": true,
     "minority": null
    },
-   "id": "T8"
+   "id": "T8",
+   "unverified": []
   }
  ],
- "globalSummary": "12 personnes portent un jugement positif d'ensemble sur la scolarité de leurs enfants, que certaines nuancent ailleurs [I0004] ; la critique la plus partagée vise l'accompagnement des demandeurs d'emploi : 10 des 11 personnes qui donnent un avis (large majorité) [I0002].\n\nLa formation des adultes concentre d'autres critiques : ses conditions d'accès sont visées par 8 des 9 personnes qui donnent un avis (large majorité), son financement par 8 sur 11 (majorité) [I0017, I0051]. À l'école, 7 sur 7 (unanime) critiquent l'orientation scolaire et 6 sur 6 (unanime) les relations entre l'école et les familles [I0009, I0020]. La gestion du corps enseignant est critiquée par 5 sur 5 (unanime), de même que les rythmes scolaires, par 5 sur 5 (unanime) [I0024, I0034]. Le système éducatif public, enfin, recueille les critiques de 5 sur 5 (unanime) [I0053].\n\nLes propositions les plus partagées visent la pédagogie : 6 personnes veulent changer la manière d'enseigner [I0054]. Pour le financement des formations, 3 personnes demandent plus de liberté dans l'usage de leurs droits [I0046]. La gestion du corps enseignant inspire aussi 3 personnes, qui veulent en faire évoluer l'encadrement [I0094]. Du côté des demandeurs d'emploi, 2 personnes réclament un accompagnement plus efficace [I0003]. Les questions posées, chacune par une personne, portent sur l'information des parents séparés, l'attitude à adopter face à l'exclusion scolaire et l'évolution des aides à la scolarité [I0022, I0239, I0066].",
+ "globalSummary": "12 personnes portent un jugement positif d'ensemble sur la scolarité de leurs enfants, que certaines nuancent ailleurs [I0004] ; la critique la plus partagée vise l'accompagnement des demandeurs d'emploi : 10 des 11 personnes qui donnent un avis (large majorité) [I0002].\n\nLa formation des adultes concentre d'autres critiques : ses conditions d'accès sont visées par 8 des 9 personnes qui donnent un avis (large majorité), son financement par 8 sur 11 (majorité) [I0017, I0051]. À l'école, 7 sur 7 (unanime) critiquent l'orientation scolaire et 6 sur 6 (unanime) les relations entre l'école et les familles [I0009, I0020]. La gestion du corps enseignant est critiquée par 5 sur 5 (unanime), de même que les rythmes scolaires, par 5 sur 5 (unanime) [I0024, I0034]. Le système éducatif public, enfin, recueille les critiques de 5 sur 5 (unanime) [I0053]. Les avis sont partagés sur 2 sujets : recherche de formation (4 positifs, 8 négatifs et 1 mitigé parmi les 13 participants qui donnent un avis) [I0018, I0036] et qualité des organismes de formation (4 positifs et 6 négatifs) [I0001, I0032]. Deux propositions vont en sens contraire sur la prise en charge de la formation des professeurs au handicap [I0248, I0308].\n\nLes propositions les plus partagées visent la pédagogie : 6 personnes veulent changer la manière d'enseigner [I0054]. Pour le financement des formations, 3 personnes demandent plus de liberté dans l'usage de leurs droits [I0046]. La gestion du corps enseignant inspire aussi des propositions à 3 personnes [I0094]. Du côté des demandeurs d'emploi, 2 personnes réclament un accompagnement plus efficace [I0003]. Les questions posées, chacune par une personne, portent sur l'information des parents séparés, l'attitude à adopter face à l'exclusion scolaire et l'évolution des aides à la scolarité [I0022, I0239, I0066].",
  "steps": [
   {
    "id": "extract",
@@ -8256,13 +8304,13 @@
   },
   {
    "id": "polish",
-   "state": "running",
-   "done": 25,
+   "state": "done",
+   "done": 49,
    "total": 49
   }
  ],
  "calls": {
-  "total": 85,
+  "total": 90,
   "cached": 0,
   "inputTokens": 0,
   "outputTokens": 0
@@ -8352,12 +8400,17 @@
   "57d6a6c1cf3db48d24f0aa29f6b96d2d47d260351a30f71a6e03fbaeb7bafb49",
   "4d949813cae68876287d96025cb50b98885f834d953fb66ee351ce11d734c7b7",
   "61f27a9c13b3d626beeea4600eb31cc513866e5974f695085467499cb12633ae",
-  "cd1d33f190afe9ad19346c852300b78b2464cf0c29c79f39af6725fcd56a60c6"
+  "cd1d33f190afe9ad19346c852300b78b2464cf0c29c79f39af6725fcd56a60c6",
+  "d903056fdc8b9fa57f9b80d4a2d1d24d6da80a17371666f261311c555ca27a7a",
+  "a54e9bbcf15144d111d0d44eea049a20906868e56c33e304b69eee75dc50559c",
+  "277c1bd07c4f4404c6a15f003f7c7546dbe0ac1b70407b7f1d27c2b3a16a6217",
+  "5f2c7cd1e0f3c3a468df390b8557ec15dc2c818d0c3d21a46402e5fd80debfba",
+  "da30dd7cd72496754fbb1de4a410d8a9a81ffc095d566614f7d6aa26717272d2"
  ],
- "status": "running",
+ "status": "done",
  "polish": {
-  "checked": 25,
-  "changed": 3,
+  "checked": 49,
+  "changed": 8,
   "refused": 0
  },
  "retoned": [
@@ -8573,5 +8626,13 @@
   "copied": 0,
   "moved": 1,
   "retoned": 0
- }
+ },
+ "globalUnverified": [],
+ "support": {
+  "checked": 143,
+  "fixed": 10,
+  "dropped": 0,
+  "added": 0
+ },
+ "removedSentences": 0
 }
