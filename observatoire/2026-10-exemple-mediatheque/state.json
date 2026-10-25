@@ -1,7 +1,7 @@
 {
  "id": "an_3t0t0t1p601a",
  "createdAt": "2026-10-25T13:54:22.184Z",
- "updatedAt": "2026-10-25T13:57:08.400Z",
+ "updatedAt": "2026-10-25T13:57:58.463Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -545,7 +545,7 @@
    "state": "running",
    "done": 38,
    "total": 38,
-   "message": "Relecture des thèmes"
+   "message": "Seconde relecture des thèmes"
   },
   {
    "id": "summarize",
@@ -573,7 +573,7 @@
   }
  ],
  "calls": {
-  "total": 15,
+  "total": 16,
   "cached": 0,
   "inputTokens": 0,
   "outputTokens": 0
@@ -593,11 +593,18 @@
   "7859e4d95b494552917c33215481d538afaa984846e7fac0a1899305c2f36ece",
   "98ea7be604a0b1a68dd1f8a6a77ddd9f1e22ba3361f8aae312c8fb91ea9a918a",
   "1c0b9de09498eab81a67a8c5b376d8eef7f8a4e49d20ed35e1ab4ac639f58888",
-  "f2e0abe4e2d035e994e5928e9d2b655714f72fac6023d7514e889d717243cd52"
+  "f2e0abe4e2d035e994e5928e9d2b655714f72fac6023d7514e889d717243cd52",
+  "5417bc94ca6d94f1ddd67cc861f74c3b84e0422bc937786e8e826fba3d20692d"
  ],
  "status": "running",
  "retoned": [],
- "moved": [],
+ "moved": [
+  {
+   "id": "I0016",
+   "from": "Identification du lecteur",
+   "to": "Carte de lecteur numérique"
+  }
+ ],
  "offTopic": [],
  "copied": [],
  "merges": []
