@@ -576,3 +576,15 @@ sourcées). Livré :
   les camps ; dans les listes, « 12 participants sur 14 d'avis positif » ; la ligne de chiffres d'un thème dit
   « 29 participants · 4 positifs, 20 négatifs » ; la pastille d'une liste compte les avis. Les chiffres donnés au
   moteur d'IA ne changent pas (méthode et cache intacts).
+
+## 2026-10-25 — Le rapport d'une synthèse a la forme de celui de l'Observatoire
+
+- **Demande d'Arnaud** : le rapport ouvert à chacun dans la Synthèse doit avoir la même forme que celui de
+  l'Observatoire (mécanisme, logique, algorithme et forme), pensé mobile d'abord.
+- **Constat** : le corps du rapport et le mode lecture (barre qui se cache) étaient déjà communs (`ReportTab`) ; l'en-tête
+  différait : l'Observatoire ouvre sur « Avant de lire : la question, les données, les limites », la Synthèse sur une
+  ligne « Rapport du … · participants · occurrences » et rien pour situer le lecteur.
+- **Fait** : un seul volet `BeforeReading`, rempli par la fiche pour l'Observatoire et, pour une synthèse, par ses
+  données (`synthesisBeforeReading` : la question ou les questions analysées, les sources, les participants, les
+  limites et le moteur) ; la ligne de chiffres dit « participants · idées », comme l'en-tête de l'Observatoire. Restent
+  propres à la Synthèse : segments, masquage des prénoms, exports, « à vérifier ».

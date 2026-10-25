@@ -36,6 +36,7 @@ import type { AnalysisState, Group, Idea, IdeaCategory, Metrics } from '@/core/a
 import type { Contribution } from '@/core/corpus'
 import { corpusForAnalysis, type Project } from '@/core/project'
 import { isExample } from '../Synthesis'
+import { BeforeReading, synthesisBeforeReading } from './BeforeReading'
 import { Fold, freezeHeadroom, glideTo, markSeen, morphTo, placeStuck, revealMotif } from './fold'
 import { TAB_ACTIONS } from './slots'
 import { CATEGORY, download, formatDate, plural, slug } from '../format'
@@ -1438,8 +1439,10 @@ export function ReportTab({
     // texte étroit (refonte du 25/10, docs/UI.md §2) ; le texte courant garde sa mesure de lecture à l'intérieur.
     <article className="max-w-4xl space-y-6">
       {/* Une étude publiée dit sa date et ses chiffres dans son en-tête : pas de seconde ligne (remarque d'Arnaud, 17/10). */}
-      <p className={published && !segment ? 'hidden' : 'text-base text-muted-foreground'}>
-        Rapport du {formatDate(analysis.updatedAt)} · {plural(all.participants, 'participant')} · {plural(all.mentions, 'occurrence')}
+      <p className={published && !segment ? 'hidden' : 'text-sm text-muted-foreground tabular-nums'}>
+        {/* Les mêmes chiffres que l'en-tête d'une étude de l'Observatoire : participants, puis idées (sans les copies du codage en double). */}
+        Rapport du {formatDate(analysis.updatedAt)} · {plural(all.participants, 'participant')} ·{' '}
+        {plural(analysis.ideas.filter((i) => !i.copyOf && (!segment || segment.has(i.participantId))).length, 'idée')}
         {names.length > 0 &&
           (masked
             ? ` · ${plural(names.length, 'prénom')} cité${names.length > 1 ? 's' : ''} ${names.length > 1 ? 'masqués' : 'masqué'}`
@@ -1574,6 +1577,9 @@ export function ReportTab({
           Rapport de démonstration : produit par le moteur de simulation, son contenu est fictif. Configurez un vrai moteur d'IA pour analyser vos données.
         </Alert>
       )}
+
+      {/* Le même volet que l'étude de l'Observatoire (qui le pose avant le rapport, avec sa fiche) : même forme partout. */}
+      {!published && <BeforeReading data={synthesisBeforeReading(project, analysis)} />}
 
       {analysis.globalSummary && !segment && (
         <section aria-labelledby="resume" className="space-y-2">

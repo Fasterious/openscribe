@@ -3,7 +3,8 @@ import { href } from '@/app/router'
 import { useEffect, useState } from 'react'
 import { activeParticipants } from '@/core/corpus'
 import type { PublishedStudy } from '@/core/observatoire'
-import { Chevron, Disclosure, Explain } from './primitives'
+import { Explain } from './primitives'
+import { BeforeReading } from './project/BeforeReading'
 import { ReportTab } from './project/ReportTab'
 import { TAB_ACTIONS } from './project/slots'
 
@@ -105,60 +106,18 @@ export function ObservatoryPage({ slug }: { slug: string }) {
       </div>
 
 
-      {/* À la largeur du texte qu'il ouvre : plus de grand vide à droite sur ordinateur (Arnaud, 19/10). */}
-      <Disclosure flat className="max-w-lecture" summary={<span className="text-base font-semibold">Avant de lire : la question, les données, les limites</span>}>
-        {/* Quatre parties titrées : la question, la collecte, notre échantillon, les limites (Arnaud, 20/10 : on ne savait
-            pas ce qu'était la citation, ni comment les données avaient été recueillies). */}
-        <div className="space-y-5 text-base">
-          <section className="space-y-2">
-            <h3 className="font-semibold">La question posée</h3>
-            <blockquote className="border-l-[3px] border-primary pl-3 italic">{f.question}</blockquote>
-            {f.questionContext && <p className="text-sm text-muted-foreground">{f.questionContext}</p>}
-            {!!f.questionnaire?.length && (
-              <details className="group/q text-sm">
-                <summary className="flex cursor-pointer list-none items-center gap-1 py-1 text-muted-foreground [&::-webkit-details-marker]:hidden">
-                  Voir les {f.questionnaire.length} questions du questionnaire
-                  <Chevron className="group-open/q:rotate-180" />
-                </summary>
-                <ol className="mt-1 list-decimal space-y-1 pl-8">
-                  {f.questionnaire.map((q, i) => (
-                    <li key={i} className={i === f.questionIndex ? 'font-semibold text-foreground' : 'text-muted-foreground'}>
-                      {q}
-                      {i === f.questionIndex && <span className="font-normal"> (celle qu'analyse ce rapport)</span>}
-                    </li>
-                  ))}
-                </ol>
-              </details>
-            )}
-          </section>
-          <section className="space-y-2">
-            <h3 className="font-semibold">Comment les données ont été recueillies</h3>
-            {f.collection && paras(f.collection).map((p, i) => <p key={i}>{p}</p>)}
-            <p>
-              Source :{' '}
-              <a className="text-primary underline" href={f.source.url}>
-                {f.source.name}
-              </a>
-              , {f.source.period}. {f.source.license}.
-            </p>
-          </section>
-          <section className="space-y-2">
-            <h3 className="font-semibold">Notre échantillon</h3>
-            <p>{f.sample}</p>
-            {paras(f.sampling).map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </section>
-          <section className="space-y-2">
-            <h3 className="font-semibold">Les limites</h3>
-            <ul className="list-disc space-y-2 pl-5">
-              {f.warnings.map((w, i) => (
-                <li key={i}>{w}</li>
-              ))}
-            </ul>
-          </section>
-        </div>
-      </Disclosure>
+      <BeforeReading
+        data={{
+          question: f.question,
+          questionContext: f.questionContext,
+          questions: f.questionnaire,
+          questionIndex: f.questionIndex,
+          collection: f.collection ? paras(f.collection) : [],
+          source: f.source,
+          sample: [f.sample, ...paras(f.sampling)],
+          warnings: f.warnings,
+        }}
+      />
 
       <ReportTab project={study.project} analysis={analysis} published />
     </div>
