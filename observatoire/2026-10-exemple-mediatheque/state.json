@@ -1,7 +1,7 @@
 {
  "id": "an_3t0t0t1p601a",
  "createdAt": "2026-10-25T13:54:22.184Z",
- "updatedAt": "2026-10-25T13:57:58.463Z",
+ "updatedAt": "2026-10-25T14:04:51.104Z",
  "settings": {
   "language": "fr",
   "mode": "free",
@@ -530,9 +530,978 @@
   }
  ],
  "rejected": [],
- "groups": [],
- "themes": [],
- "globalSummary": "",
+ "groups": [
+  {
+   "title": "Réservation en ligne",
+   "ideaIds": [
+    "I0001",
+    "I0012",
+    "I0013",
+    "I0014",
+    "I0029"
+   ],
+   "summary": "La possibilité de réserver à distance est saluée par 3 personnes, qui la jugent pratique ou constatent qu'elle désengorge l'accueil [I0001, I0029, I0012]. L'une d'elles, mitigée, regrette aussi que les réservations arrivent sans délai de préparation, ce qu'elle juge compliqué pour l'équipe [I0013]. Cette personne propose un délai minimum avant le retrait d'une réservation [I0014].",
+   "metrics": {
+    "mentions": 5,
+    "participants": 3,
+    "participantIds": [
+     "P1",
+     "P4",
+     "P10"
+    ],
+    "mentionsByCategory": {
+     "positive": 3,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 3,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P1",
+     "P10"
+    ],
+    "negativeOnly": [],
+    "mixed": [
+     "P4"
+    ],
+    "consensusRate": 0.6666666666666666,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G1",
+   "definition": {
+    "positive": "apprécier de réserver à distance ou ses effets sur l'accueil",
+    "negative": "subir des contraintes ou difficultés liées aux réservations en ligne",
+    "neutral": "décrire l'usage des réservations sans le juger"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Ergonomie de l'interface",
+   "ideaIds": [
+    "I0030",
+    "I0031",
+    "I0032",
+    "I0036"
+   ],
+   "summary": "2 personnes critiquent l'interface, qu'elles trouvent confuse ou datée [I0030, I0031, I0036]. La première juge l'application un peu confuse et ses menus mal rangés ; elle propose de simplifier le menu principal [I0030, I0031, I0032]. La seconde trouve le design un peu daté, tout en précisant que ce n'est pas grave [I0036].",
+   "metrics": {
+    "mentions": 4,
+    "participants": 2,
+    "participantIds": [
+     "P10",
+     "P12"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P10",
+     "P12"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G2",
+   "definition": {
+    "positive": "trouver l'interface claire, simple ou agréable à parcourir",
+    "negative": "juger l'interface confuse, mal organisée ou datée",
+    "neutral": "décrire la navigation sans porter de jugement"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Rappels et notifications",
+   "ideaIds": [
+    "I0002",
+    "I0009",
+    "I0010",
+    "I0011"
+   ],
+   "summary": "Les rappels avant la date de retour sont appréciés par 2 personnes, qui les disent utiles [I0002, I0009]. L'une d'elles, mitigée, estime pourtant recevoir trop de notifications, jusqu'à trois messages pour le même livre [I0010]. Elle propose de laisser chacun choisir les notifications qu'il reçoit [I0011].",
+   "metrics": {
+    "mentions": 4,
+    "participants": 2,
+    "participantIds": [
+     "P1",
+     "P3"
+    ],
+    "mentionsByCategory": {
+     "positive": 2,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 2,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P1"
+    ],
+    "negativeOnly": [],
+    "mixed": [
+     "P3"
+    ],
+    "consensusRate": 0.5,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G3",
+   "definition": {
+    "positive": "apprécier les rappels ou notifications reçus",
+    "negative": "juger les notifications trop nombreuses ou mal adaptées",
+    "neutral": "décrire les notifications reçues sans les juger"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Gestion des prêts",
+   "ideaIds": [
+    "I0004",
+    "I0007",
+    "I0008"
+   ],
+   "summary": "Pour gérer leurs prêts, 2 personnes demandent de nouvelles fonctions dans l'application [I0004, I0008]. L'une ne trouve pas comment consulter l'historique de ses emprunts et propose d'en ajouter un [I0007, I0008] ; l'autre souhaite pouvoir prolonger un prêt en un seul clic [I0004].",
+   "metrics": {
+    "mentions": 3,
+    "participants": 2,
+    "participantIds": [
+     "P1",
+     "P2"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P2"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G4",
+   "definition": {
+    "positive": "apprécier les outils de suivi de ses prêts",
+    "negative": "manquer d'outils ou peiner à gérer ses prêts",
+    "neutral": "décrire ses usages de prêt sans les juger"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Recherche dans le catalogue",
+   "ideaIds": [
+    "I0005",
+    "I0006",
+    "I0023"
+   ],
+   "summary": "Les 2 personnes qui donnent un avis apprécient la recherche dans le catalogue [I0005, I0006, I0023]. L'une trouve le catalogue clair et la recherche efficace [I0005, I0006] ; l'autre juge la recherche rapide et ses résultats pertinents [I0023].",
+   "metrics": {
+    "mentions": 3,
+    "participants": 2,
+    "participantIds": [
+     "P2",
+     "P8"
+    ],
+    "mentionsByCategory": {
+     "positive": 3,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 2,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P2",
+     "P8"
+    ],
+    "negativeOnly": [],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G5",
+   "definition": {
+    "positive": "trouver la recherche efficace ou le catalogue clair",
+    "negative": "juger la recherche difficile ou les résultats peu pertinents",
+    "neutral": "décrire sa façon de chercher sans la juger"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Vitesse de l'application",
+   "ideaIds": [
+    "I0003",
+    "I0015"
+   ],
+   "summary": "Lente au démarrage ou sur un vieux téléphone : c'est ainsi que 2 personnes décrivent l'application [I0003, I0015]. L'une précise qu'il faut parfois attendre dix secondes au lancement [I0003].",
+   "metrics": {
+    "mentions": 2,
+    "participants": 2,
+    "participantIds": [
+     "P1",
+     "P5"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P1",
+     "P5"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G6",
+   "definition": {
+    "positive": "trouver l'application rapide et réactive",
+    "negative": "subir des lenteurs ou des temps d'attente",
+    "neutral": "décrire son appareil ou son usage sans juger la vitesse"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Découverte de lectures",
+   "ideaIds": [
+    "I0035",
+    "I0037",
+    "I0038"
+   ],
+   "summary": "Les recommandations de lecture plaisent à une personne, qui y a découvert plusieurs auteurs et propose aussi de pouvoir noter les livres et partager des avis avec les autres lecteurs [I0035, I0037, I0038].",
+   "metrics": {
+    "mentions": 3,
+    "participants": 1,
+    "participantIds": [
+     "P12"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P12"
+    ],
+    "negativeOnly": [],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G7",
+   "definition": {
+    "positive": "apprécier les recommandations ou découvertes de lectures",
+    "negative": "juger les recommandations peu pertinentes ou insuffisantes",
+    "neutral": "décrire ses habitudes de découverte sans les juger"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Identification du lecteur",
+   "ideaIds": [
+    "I0017",
+    "I0018",
+    "I0019"
+   ],
+   "summary": "Retaper son mot de passe à cause de déconnexions incessantes agace une personne, qui propose de rester connecté plus longtemps ou de se connecter avec un code reçu par SMS [I0017, I0018, I0019].",
+   "metrics": {
+    "mentions": 3,
+    "participants": 1,
+    "participantIds": [
+     "P6"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P6"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G8",
+   "definition": {
+    "positive": "trouver la connexion au compte simple et durable",
+    "negative": "subir des déconnexions ou une connexion contraignante",
+    "neutral": "décrire sa façon de se connecter sans la juger"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Accessibilité visuelle",
+   "ideaIds": [
+    "I0024",
+    "I0025"
+   ],
+   "summary": "Une personne juge l'application peu accessible aux malvoyants, avec des textes trop petits, et propose un mode gros caractères [I0024, I0025].",
+   "metrics": {
+    "mentions": 2,
+    "participants": 1,
+    "participantIds": [
+     "P8"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P8"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G9",
+   "definition": {
+    "positive": "trouver l'application lisible et adaptée aux déficiences visuelles",
+    "negative": "juger l'affichage peu lisible ou mal adapté",
+    "neutral": "décrire ses besoins visuels sans juger l'application"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Communication sur l'application",
+   "ideaIds": [
+    "I0027",
+    "I0028"
+   ],
+   "summary": "Selon une personne, les usagers ne savent pas que l'application existe, faute de communication ; elle propose une campagne d'affichage dans la médiathèque [I0027, I0028].",
+   "metrics": {
+    "mentions": 2,
+    "participants": 1,
+    "participantIds": [
+     "P9"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P9"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G10",
+   "definition": {
+    "positive": "juger l'application bien connue ou bien promue",
+    "negative": "regretter que l'application soit méconnue ou peu promue",
+    "neutral": "décrire les canaux d'information sans les juger"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Intérêt perçu de l'application",
+   "ideaIds": [
+    "I0033",
+    "I0034"
+   ],
+   "summary": "L'intérêt même de l'application échappe à une personne, qui préfère venir sur place et juge que tout se fait très bien au guichet [I0033, I0034].",
+   "metrics": {
+    "mentions": 2,
+    "participants": 1,
+    "participantIds": [
+     "P11"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 2,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P11"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G11",
+   "definition": {
+    "positive": "voir un intérêt réel à utiliser l'application",
+    "negative": "douter de l'intérêt de l'application face au guichet",
+    "neutral": "décrire ses habitudes d'usage sans juger l'application"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Offre jeunesse",
+   "ideaIds": [
+    "I0020",
+    "I0022"
+   ],
+   "summary": "Une personne rapporte que ses enfants adorent la section jeunesse, bien illustrée, et propose d'afficher les animations pour enfants avec une inscription en ligne [I0020, I0022].",
+   "metrics": {
+    "mentions": 2,
+    "participants": 1,
+    "participantIds": [
+     "P7"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P7"
+    ],
+    "negativeOnly": [],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G12",
+   "definition": {
+    "positive": "apprécier les contenus ou services destinés aux enfants",
+    "negative": "juger l'offre jeunesse insuffisante ou peu visible",
+    "neutral": "décrire les usages des enfants sans les juger"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Carte de lecteur numérique",
+   "ideaIds": [
+    "I0016"
+   ],
+   "summary": "La carte numérique séduit une personne, qui n'a plus besoin de la carte plastique [I0016].",
+   "metrics": {
+    "mentions": 1,
+    "participants": 1,
+    "participantIds": [
+     "P6"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P6"
+    ],
+    "negativeOnly": [],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G13",
+   "definition": {
+    "positive": "apprécier de présenter sa carte de lecteur sur son téléphone",
+    "negative": "juger la carte numérique peu pratique ou peu fiable",
+    "neutral": "décrire l'usage de la carte sans le juger"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Horaires d'ouverture",
+   "ideaIds": [
+    "I0021"
+   ],
+   "summary": "Une personne signale que les horaires d'ouverture affichés dans l'application ne sont pas à jour [I0021].",
+   "metrics": {
+    "mentions": 1,
+    "participants": 1,
+    "participantIds": [
+     "P7"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P7"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G14",
+   "definition": {
+    "positive": "trouver les horaires affichés fiables et à jour",
+    "negative": "constater des horaires erronés ou non mis à jour",
+    "neutral": "mentionner les horaires sans juger leur affichage"
+   },
+   "opposed": [],
+   "unverified": []
+  },
+  {
+   "title": "Statistiques d'emprunt",
+   "ideaIds": [
+    "I0026"
+   ],
+   "summary": "L'outil statistique rend service à une personne, qui s'en sert pour voir ce qui est emprunté [I0026].",
+   "metrics": {
+    "mentions": 1,
+    "participants": 1,
+    "participantIds": [
+     "P9"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 0,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P9"
+    ],
+    "negativeOnly": [],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "positive",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "G15",
+   "definition": {
+    "positive": "trouver l'outil statistique utile au travail de l'équipe",
+    "negative": "juger les statistiques insuffisantes ou difficiles à exploiter",
+    "neutral": "décrire les données consultées sans les juger"
+   },
+   "opposed": [],
+   "unverified": []
+  }
+ ],
+ "themes": [
+  {
+   "title": "Parcours d'emprunt",
+   "groupIds": [
+    "G1",
+    "G3",
+    "G4"
+   ],
+   "summary": "Les fonctions d'emprunt à distance séduisent 4 personnes, qu'il s'agisse de réserver depuis chez soi ou d'être prévenu avant la date de retour [I0001, I0029, I0012, I0009]. 2 personnes signalent pourtant des excès : des réservations à préparer sans délai pour l'une, trop de notifications pour l'autre [I0013, I0010]. Pour la suite, 3 personnes proposent des gestes plus simples, comme prolonger un prêt en un clic, retrouver l'historique des emprunts ou choisir ses notifications [I0004, I0008, I0011].",
+   "metrics": {
+    "mentions": 12,
+    "participants": 5,
+    "participantIds": [
+     "P1",
+     "P2",
+     "P3",
+     "P4",
+     "P10"
+    ],
+    "mentionsByCategory": {
+     "positive": 5,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 4,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 4,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 4,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P1",
+     "P10"
+    ],
+    "negativeOnly": [
+     "P2"
+    ],
+    "mixed": [
+     "P3",
+     "P4"
+    ],
+    "consensusRate": 0.4,
+    "majority": "positive",
+    "stance": "divided",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "T1",
+   "unverified": []
+  },
+  {
+   "title": "Confort d'utilisation",
+   "groupIds": [
+    "G2",
+    "G6",
+    "G9"
+   ],
+   "summary": "5 personnes critiquent le confort d'utilisation de l'application, qu'elles jugent lente, confuse, datée ou peu lisible [I0003, I0015, I0030, I0036, I0024]. Leurs critiques diffèrent toutefois : l'attente au démarrage pour l'une, des menus mal rangés pour une autre, des textes trop petits pour les malvoyants pour une troisième [I0003, I0031, I0024]. Les pistes avancées restent modestes, comme un menu principal allégé ou un mode gros caractères [I0032, I0025].",
+   "metrics": {
+    "mentions": 8,
+    "participants": 5,
+    "participantIds": [
+     "P1",
+     "P5",
+     "P8",
+     "P10",
+     "P12"
+    ],
+    "mentionsByCategory": {
+     "positive": 0,
+     "negative": 6,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 0,
+     "negative": 5,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P1",
+     "P5",
+     "P8",
+     "P10",
+     "P12"
+    ],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "negative",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "T2",
+   "unverified": []
+  },
+  {
+   "title": "Découverte des collections",
+   "groupIds": [
+    "G5",
+    "G7",
+    "G12"
+   ],
+   "summary": "Trouver et découvrir des livres dans l'application satisfait 4 personnes, grâce à la recherche, aux recommandations ou à la section jeunesse [I0005, I0023, I0035, I0020]. 2 personnes souhaitent aller plus loin : noter les livres et partager des avis pour l'une, s'inscrire en ligne aux animations pour enfants pour l'autre [I0037, I0038, I0022].",
+   "metrics": {
+    "mentions": 8,
+    "participants": 4,
+    "participantIds": [
+     "P2",
+     "P7",
+     "P8",
+     "P12"
+    ],
+    "mentionsByCategory": {
+     "positive": 5,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 3,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 4,
+     "negative": 0,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "positiveOnly": [
+     "P2",
+     "P7",
+     "P8",
+     "P12"
+    ],
+    "negativeOnly": [],
+    "mixed": [],
+    "consensusRate": 1,
+    "majority": "positive",
+    "stance": "unanimous",
+    "fragile": true,
+    "minority": null
+   },
+   "id": "T3",
+   "unverified": []
+  },
+  {
+   "title": "Lien avec la médiathèque",
+   "groupIds": [
+    "G10",
+    "G11",
+    "G14",
+    "G15"
+   ],
+   "summary": "3 personnes pointent les limites de l'application dans son lien avec la médiathèque : méconnue des usagers selon l'une, sans intérêt face au guichet pour une autre, porteuse d'horaires périmés pour une troisième [I0027, I0034, I0021]. La première salue pourtant l'outil statistique, qui l'aide à voir ce qui est emprunté [I0026]. Pour faire connaître l'application, elle propose une campagne d'affichage dans la médiathèque [I0028].",
+   "metrics": {
+    "mentions": 6,
+    "participants": 3,
+    "participantIds": [
+     "P7",
+     "P9",
+     "P11"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 4,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 3,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [
+     "P7",
+     "P11"
+    ],
+    "mixed": [
+     "P9"
+    ],
+    "consensusRate": 0.6666666666666666,
+    "majority": "negative",
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "T4",
+   "unverified": []
+  },
+  {
+   "title": "Compte lecteur",
+   "groupIds": [
+    "G8",
+    "G13"
+   ],
+   "summary": "La dématérialisation du compte lecteur ne convainc qu'à moitié une personne : elle apprécie la carte numérique mais subit des déconnexions répétées [I0016, I0017]. Pour la connexion, cette personne propose une session plus longue ou un code reçu par SMS [I0018, I0019]. Elle ne formule en revanche aucune demande sur la carte numérique, qui lui évite la carte plastique [I0016].",
+   "metrics": {
+    "mentions": 4,
+    "participants": 1,
+    "participantIds": [
+     "P6"
+    ],
+    "mentionsByCategory": {
+     "positive": 1,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 2,
+     "question": 0
+    },
+    "participantsByCategory": {
+     "positive": 1,
+     "negative": 1,
+     "neutral": 0,
+     "suggestion": 1,
+     "question": 0
+    },
+    "positiveOnly": [],
+    "negativeOnly": [],
+    "mixed": [
+     "P6"
+    ],
+    "consensusRate": 0,
+    "majority": null,
+    "stance": "thin",
+    "fragile": false,
+    "minority": null
+   },
+   "id": "T5",
+   "unverified": []
+  }
+ ],
+ "globalSummary": "Les éloges portent d'abord sur les services à distance : réserver depuis chez soi, être prévenu avant la date de retour, chercher dans un catalogue jugé clair et aux résultats pertinents. Les recommandations de lecture, la section jeunesse et la carte numérique ne sont saluées que par une personne chacune.\n\nLes critiques visent surtout le confort d'utilisation : une application jugée lente, des menus confus, un design daté, des textes trop petits pour les malvoyants. D'autres freins, signalés chacun par une personne, touchent les notifications trop nombreuses, les déconnexions répétées et les réservations à préparer sans délai pour l'équipe. Une personne ne voit pas l'intérêt de l'application face au guichet, et une autre estime que les usagers ignorent son existence.\n\n2 personnes demandent de nouveaux outils pour gérer leurs prêts [I0004]. Une personne propose de pouvoir noter les livres [I0037], une autre de rester connecté plus longtemps [I0018]. Les autres pistes, portées chacune par une personne, vont d'un mode gros caractères [I0025] à une campagne d'affichage dans la médiathèque [I0028], en passant par un menu principal simplifié [I0032]. Afficher les animations pour enfants avec inscription en ligne [I0022] et laisser choisir les notifications reçues [I0011] complètent ces demandes.",
  "steps": [
   {
    "id": "extract",
@@ -542,38 +1511,37 @@
   },
   {
    "id": "group",
-   "state": "running",
+   "state": "done",
    "done": 38,
-   "total": 38,
-   "message": "Seconde relecture des thèmes"
+   "total": 38
   },
   {
    "id": "summarize",
-   "state": "pending",
-   "done": 0,
-   "total": 0
+   "state": "done",
+   "done": 15,
+   "total": 15
   },
   {
    "id": "themes",
-   "state": "pending",
-   "done": 0,
-   "total": 0
+   "state": "done",
+   "done": 15,
+   "total": 15
   },
   {
    "id": "report",
-   "state": "pending",
+   "state": "done",
    "done": 0,
    "total": 0
   },
   {
    "id": "polish",
-   "state": "pending",
-   "done": 0,
-   "total": 0
+   "state": "done",
+   "done": 21,
+   "total": 21
   }
  ],
  "calls": {
-  "total": 16,
+  "total": 30,
   "cached": 0,
   "inputTokens": 0,
   "outputTokens": 0
@@ -594,9 +1562,28 @@
   "98ea7be604a0b1a68dd1f8a6a77ddd9f1e22ba3361f8aae312c8fb91ea9a918a",
   "1c0b9de09498eab81a67a8c5b376d8eef7f8a4e49d20ed35e1ab4ac639f58888",
   "f2e0abe4e2d035e994e5928e9d2b655714f72fac6023d7514e889d717243cd52",
-  "5417bc94ca6d94f1ddd67cc861f74c3b84e0422bc937786e8e826fba3d20692d"
+  "5417bc94ca6d94f1ddd67cc861f74c3b84e0422bc937786e8e826fba3d20692d",
+  "789c3c304069f34376d7a6950ee4ac51d4a441f0a14afc24ea927b5a1c6ffd49",
+  "5a04b32a733fa16b553ff50a60852a567aa8b547747a7731058858e1496c1dfa",
+  "0520464fbe7478c81818f9202920728d2bb2cb7fb0343529bf8ecf29404158cc",
+  "c19914fa776bc22f54e7523cc408b63169843e5df8e5d496b5f810e6d3c7c9e8",
+  "c91b0012df70e564293071e23757d01e10d159489dd14d35f0c0dde40df4c997",
+  "504099e02e589386fb5363a41a754849d4c410161a117fdbd1f8d4ae7febc677",
+  "48fd8405ef9a791f45e30240c2aff1946a4e1b4c56a143069483ee6ba99d23e7",
+  "820d0ec9a3ab3d102b8a5e5ea965d74ba64926af8eee7c798257d03dcb221a76",
+  "e7198556237e3ee10d522b8e1fca9a9652ac86d964520f9bfbdafb1f71997b29",
+  "21db127bfc7947e08fea71c6c9b68a6207c6d2731e869f4e5552a67cf63a1d1e",
+  "e34876bcc6e18efb46990adfee1eea3744534691e0d1d55440603a990be6c11e",
+  "c0b2037272d616e3cb48e9c4a2123e56420c2181e0368fbacd1e11ebfb883c7e",
+  "2cc19986e480fe72cea845c045af7467a7356f34872dddd71f370e0f69673852",
+  "8994097df9e4c2ec76b2fb03a30ba5c1e3c4f33a2ec416d3195c1a394d1e291e"
  ],
- "status": "running",
+ "status": "done",
+ "polish": {
+  "checked": 21,
+  "changed": 5,
+  "refused": 0
+ },
  "retoned": [],
  "moved": [
   {
@@ -607,5 +1594,17 @@
  ],
  "offTopic": [],
  "copied": [],
- "merges": []
+ "merges": [],
+ "reconciled": {
+  "pairs": 5,
+  "merges": 0
+ },
+ "globalUnverified": [],
+ "support": {
+  "checked": 48,
+  "fixed": 1,
+  "dropped": 1,
+  "added": 0
+ },
+ "removedSentences": 0
 }
