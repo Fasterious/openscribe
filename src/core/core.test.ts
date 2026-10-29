@@ -1641,6 +1641,7 @@ describe('contrôles ajoutés à la certification B8', () => {
     // Une locution, pas une autre personne.
     expect(impliedOthers("Une personne voit le menu du restaurant changer d'un jour à l'autre [I0001].", person)).toEqual([])
     expect(impliedOthers("Une personne trouve le tarif différent d'une agence à l'autre [I0001].", person)).toEqual([])
+    expect(impliedOthers("Une personne voit le secteur changer d'un côté de la rue à l'autre [I0001].", person)).toEqual([])
   })
   it('« il faut » n’est pas une reprise ; une question de deux mots emporte sa phrase ; jamais par-dessus une autre idée', () => {
     const text = 'Le magasin est loin. Il faut prendre la voiture. Pourquoi pas ? comment ?'
