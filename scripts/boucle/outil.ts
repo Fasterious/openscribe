@@ -76,6 +76,8 @@ interface Etat {
   merges: Merge[]
   /** Appels d'outils, pour mesurer la boucle (nombre de tours). */
   calls: Record<string, number>
+  /** Analyse importée d'un pipeline : ses bilans d'étapes (relecture, balayage…), gardés pour la section Méthode. */
+  extra?: Partial<AnalysisState>
 }
 
 const [dirArg, cmd, ...args] = process.argv.slice(2)
@@ -161,6 +163,46 @@ if (cmd === 'init') {
   }
   writeFileSync(join(dir, 'corpus.md'), lines.join('\n'))
   console.log(`Prêt : ${activeParticipants(corpus).length} participants, ${corpus.contributions.length} réponses. Corpus lisible : ${join(dir, 'corpus.md')}`)
+  process.exit(0)
+}
+
+// ─── importer ────────────────────────────────────────────────────────────────
+
+/** Les phrases que le code ajoute au résumé sur ce qui divise : retirées à l'import, le code les réécrit en finalisant. */
+const CODE_DIVIDED = /\s*(Les avis sont partagés sur |Un autre sujet divise aussi|\d+ autres sujets divisent aussi|Deux propositions vont en sens contraire|Des propositions vont en sens contraire).*$/s
+
+if (cmd === 'importer') {
+  // Reprend l'état final d'un pipeline (state.json) pour qu'un agent le corrige avec les mêmes outils.
+  const st: AnalysisState = JSON.parse(readFileSync(resolve(args[0]), 'utf8'))
+  const csvPath = resolve(args[1] ?? join(dir, 'corpus.csv'))
+  const num = (id: string) => Number(id.slice(1))
+  const paragraphs = st.globalSummary.split(/\n\s*\n/)
+  if (paragraphs.length > 1) paragraphs[1] = paragraphs[1].replace(CODE_DIVIDED, '')
+  const { reconciled, swept, support, polish, campsAdded, reviewSkipped } = st
+  const etat: Etat = {
+    csv: csvPath,
+    modele: st.engine.model,
+    settings: st.settings,
+    createdAt: st.createdAt,
+    nextIdea: Math.max(0, ...st.ideas.map((i) => num(i.id))) + 1,
+    nextGroup: Math.max(0, ...st.groups.map((g) => num(g.id))) + 1,
+    ideas: st.ideas,
+    extracted: st.extractedParticipants,
+    rejected: st.rejected,
+    names: st.names ?? [],
+    groups: st.groups.map((g) => ({ id: g.id, title: g.title, ideaIds: g.ideaIds, ...(g.definition ? { definition: g.definition } : {}), summary: g.summary, opposed: g.opposed ?? [] })),
+    offTopic: st.offTopic ?? [],
+    themes: st.themes.map((t) => ({ title: t.title, groupIds: t.groupIds, summary: t.summary })),
+    globalSummary: paragraphs.join('\n\n'),
+    moved: st.moved ?? [],
+    retoned: st.retoned ?? [],
+    copied: st.copied ?? [],
+    merges: st.merges ?? [],
+    calls: {},
+    extra: { reconciled, swept, support, polish, campsAdded, reviewSkipped, calls: st.calls },
+  }
+  save(etat)
+  console.log(`Importé : ${etat.ideas.length} idées, ${etat.groups.length} motifs, ${etat.themes.length} thèmes.`)
   process.exit(0)
 }
 
@@ -565,6 +607,7 @@ function workingState(): AnalysisState {
     calls: { total: Object.values(etat.calls).reduce((a, b) => a + b, 0), cached: 0, inputTokens: 0, outputTokens: 0 },
     cacheKeys: [],
     status: 'done',
+    ...(etat.extra ?? {}),
   }
 }
 
