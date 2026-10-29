@@ -1,0 +1,12 @@
+[
+{"op":"ton","idee":"I0123","category":"neutral"},
+{"op":"ton","idee":"I0661","category":"neutral"},
+{"op":"ranger","motif":"G22","idees":["I0712"]},
+{"op":"renommer","motif":"G34","titre":"Rôle des collectivités locales"},
+{"op":"definir","motif":"G34","definition":{"positive":"apprécier l'action ou l'organisation des collectivités pour l'école","negative":"déplorer l'absence, les limites ou l'éclatement de l'action locale","neutral":"proposer une autre répartition des compétences sans juger"}},
+{"op":"fusionner","motifs":["G12","G21"],"titre":"Niveau d'exigence","raison":"Le passage automatique et l'absence de redoublement sont jugés comme un manque d'exigence : même objet."},
+{"op":"definir","motif":"Niveau d'exigence","definition":{"positive":"juger satisfaisants le niveau et l'exigence de l'école","negative":"déplorer la baisse du niveau, le nivellement ou le passage automatique","neutral":"évoquer le niveau ou le redoublement sans les juger"}},
+{"op":"fusionner","motifs":["G46","G52"],"titre":"Coût de la scolarité","raison":"La gratuité de l'école et le coût des études jugent le même objet : ce que la scolarité coûte aux familles."},
+{"op":"definir","motif":"Coût de la scolarité","definition":{"positive":"apprécier la gratuité ou un coût abordable des études","negative":"déplorer le coût des études ou des bourses absentes, réduites, tardives","neutral":"proposer un mode de financement sans juger l'existant"}},
+{"op":"copier","idee":"I0289","motif":"Enseignement privé","category":"negative"}
+]
