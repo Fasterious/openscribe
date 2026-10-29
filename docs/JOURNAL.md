@@ -2,6 +2,20 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-29 (suite) — Défauts du pipeline relevés par l'essai, corrigés et vérifiés
+
+- **Demande d'Arnaud** : garder la méthode actuelle, la meilleure, corriger les défauts identifiés, et garder la trace de
+  l'essai sans l'utiliser dans le projet.
+- **Fait** : exemple tiré du corpus remplacé ; contradictions de consignes tranchées ; règle 15 (un regret de règle ou de
+  service disparu ou contourné est une critique, à la relecture et au balayage) ; contrôle `trustedPairs` ; locution
+  « d'un côté… à l'autre ». Kit de l'essai déplacé dans `essais/boucle-unique/` avec son `BILAN.md` ; rien dans `src/` ne
+  l'appelle ; règle du protocole à armes égales dans `CLAUDE.md`.
+- **Vérifié** sur l'école, même analyse rejouée depuis son cache : `methodologue` 7 et 7 → 7,5 et 8, erreurs du résumé
+  4 et 3 → 2 et 1, `plume` 7 → 7,5. Détail : `docs/METHODES.md`, « Corrections tirées de l'essai ».
+- **À trancher par Arnaud** : republier l'étude école avec cette version (meilleure que la passe 17 publiée, mêmes
+  évaluateurs : 7,5 et 7,5, 3 et 4 erreurs) ; « unanime » à remèdes contraires ; « avis partagés » quand les camps décrivent
+  des situations différentes (et le seuil, 20 contre 10 affiché partagé).
+
 ## 2026-10-29 — Boucle unique (article d'Anthropic) : essayée, pas de migration
 
 - **Demande d'Arnaud** : essayer, sur une branche, la recommandation d'Anthropic (« Building agents: When to fold subagents

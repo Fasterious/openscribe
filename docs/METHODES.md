@@ -661,3 +661,37 @@ des modèles locaux.
    à un motif sans rapport.
 4. Le balayage, qui cherche d'abord le camp le moins nombreux, retourne encore des étiquettes par des copies (déjà vu en
    passe 12).
+
+### Corrections tirées de l'essai, vérifiées sur l'école (29/10/2026)
+
+Appliquées à la méthode « consultation » (commits `bd3943d`, `873172c`, `bba498b`), puis éprouvées sur l'analyse A
+rejouée depuis son cache : découpage et premier regroupement gardés, tout le reste redemandé (relectures, balayage,
+synthèses, thèmes, résumé, langue, renvois), modèles simulés Opus en une passe.
+
+1. Exemple du codage en double tiré du corpus de certification → exemple fictif (médiathèque, annexe fermée).
+2. Contradictions de consignes tranchées : chiffres de la première phrase d'une synthèse et des intros de thèmes (la règle
+   de la méthode remplace la ligne du style), « unanime » permis au résumé comme mot de l'échelle, ligne à la fois force et
+   sujet qui divise, chiffres gardés à la relecture, format de réponse de la relecture avec le livre de codes.
+3. Règle 15 (relecture et balayage) : regretter qu'une règle ou un service manque, ait disparu ou soit contourné est une
+   critique, rangée avec ce qui ne va pas ; plus jamais un avis favorable à la règle.
+4. Contrôle `trustedPairs` : une paire de la réconciliation dont la règle nomme d'autres motifs est corrigée ou écartée
+   (sans effet sur les passes en cache, sauf le cas défectueux).
+5. Contrôle « l'autre » : « d'un côté de la rue à l'autre » est une locution.
+
+Étiquettes avant et après, par script : Redoublement passe de « majorité positive » (3 sur 4) à « unanime négatif » (4 sur
+4) ; Carte scolaire de 23 sur 30 à 25 sur 29 (large majorité). Une première version (balayage sans la règle 15) recopiait en
+positif le regret d'une carte disparue et en négatif des regrets de fermetures dans « Écoles rurales » : arrêtée avant les
+synthèses, corrigée, rejouée.
+
+| Même analyse A | avant | après |
+|---|---|---|
+| `methodologue`, lecture 1 | 7 · 4 erreurs du résumé | 7,5 · 2 erreurs |
+| `methodologue`, lecture 2 | 7 · 3 erreurs | 8 · 1 erreur |
+| `plume` | 7 | 7,5 |
+
+**Gardé** : gain d'au moins un demi-point aux deux lectures, erreurs du résumé de 3,5 à 1,5 en moyenne. Restent, relevés
+aux deux lectures : un « unanime » qui réunit deux remèdes contraires (gestion des enseignants : sanctionner ou mieux
+payer), des éloges de l'école publique restés dans le motif d'appréciation d'ensemble, « Écoles rurales » encore partagé
+par des regrets de fermetures (la définition du motif les réclame), et la refusion de « Respect de la carte scolaire » dans
+« Carte scolaire ». Prochain levier, décision de méthode : signaler « unanime » quand les propositions du camp vont en sens
+contraire (`opposed`), et définir ce qu'affiche « avis partagés » quand les deux camps décrivent des situations différentes.

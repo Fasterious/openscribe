@@ -130,5 +130,6 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 
 - ✅ Recommandation d'Anthropic (un seul agent avec compétences) essayée à armes égales sur l'école : les deux arbitres
   externes préfèrent le pipeline ; pas de migration (`docs/METHODES.md`). Banc d'essai gardé : `essais/boucle-unique/`
-- ⏳ Défauts du pipeline relevés par l'essai : exemple tiré du corpus de certification, consignes contradictoires, paire de
-  réconciliation mal nommée acceptée, balayage qui retourne des étiquettes
+- ✅ Défauts du pipeline relevés par l'essai corrigés et vérifiés sur l'école : `methodologue` 7 et 7 → 7,5 et 8, erreurs du
+  résumé 4 et 3 → 2 et 1, `plume` 7 → 7,5 (`docs/METHODES.md`)
+- ⏳ Décisions d'Arnaud : republier l'école avec cette version ; « unanime » à remèdes contraires ; sens d'« avis partagés »

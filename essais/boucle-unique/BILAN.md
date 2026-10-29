@@ -85,5 +85,8 @@ favorable. La première comparaison, déséquilibrée, disait déjà la même ch
    qui a marché », des plaintes contre les passe-droits du côté favorable de la carte scolaire) : c'est maintenant une
    critique, rangée avec ce qui ne va pas.
 
+Vérification (même analyse rejouée depuis son cache, deux lectures `methodologue`) : 7 et 7 avant, **7,5 et 8 après** ;
+erreurs du résumé 4 et 3 avant, **2 et 1 après** ; langue 7 puis 7,5. Corrections gardées.
+
 Détail des notes et des passes : `docs/METHODES.md`, « Boucle unique contre pipeline ». Toutes les analyses, notations et
 arbitrages : dépôt de l'Observatoire, `2026-10-ecole/essai-boucle/`.

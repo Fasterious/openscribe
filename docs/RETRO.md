@@ -11,6 +11,9 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
   fidélité du kit (une règle oubliée, une référence laissée au modèle) qui ont gâché la passe 1 de la boucle. Un pipeline
   rejoué à neuf coûte une soixantaine d'agents à orchestrer à la main.
 - **On change** : une compétence tirée d'une consigne se vérifie règle par règle contre la consigne avant la première passe.
+- **Corrections du pipeline (suite)** : comparer les étiquettes par script avant de payer les synthèses a évité une passe
+  entière (la règle 15 manquait au balayage) ; une règle de rangement doit être portée par toutes les étapes qui rangent
+  (relecture, balayage), pas seulement par celle où le défaut a été vu.
 
 ## 2026-10-19 — Premier tour du `designer-ui`
 
