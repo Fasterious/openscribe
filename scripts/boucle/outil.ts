@@ -482,10 +482,20 @@ function cmdVoir(what: string, arg?: string) {
     const lines = m.summaryLines ?? 6
     const all = computeMetrics(etat.ideas)
     const groupById = new Map(groups.map((g) => [g.id, g]))
+    // La référence de chaque ligne, choisie par le code comme dans le pipeline : pour une force ou un frein, la première idée
+    // du camp citée par la synthèse du motif, de préférence d'une personne qui critique aussi ailleurs.
+    const critics = new Set(etat.ideas.filter((i) => i.category === 'negative').map((i) => i.participantId))
+    const refOf = (kind: keyof typeof h, x: (typeof h)['strengths'][number]) => {
+      if (kind !== 'strengths' && kind !== 'blockers') return x.ideaIds[0]
+      const side = new Set(x.ideaIds)
+      const cited = (groupById.get(x.groupId)?.summary.match(/I\d{4,}/g) ?? []).filter((id) => side.has(id))
+      return cited.find((id) => critics.has(byId.get(id)?.participantId ?? '')) ?? cited[0] ?? x.ideaIds[0]
+    }
     const fmt = (kind: keyof typeof h, list: typeof h.strengths) =>
       list.map((x) => {
-        const ex = kind === 'proposals' || kind === 'questions' ? ` — exemple ${x.ideaIds[0]} : « ${short(byId.get(x.ideaIds[0])?.verbatim ?? '', 220)} »` : ''
-        return `  ${highlightLine(x, kind, 'fr', true)} [${x.groupId}]${ex}`
+        const ref = refOf(kind, x)
+        const ex = kind === 'proposals' || kind === 'questions' ? ` — exemple : « ${short(byId.get(ref)?.verbatim ?? '', 220)} »` : ''
+        return `  ${highlightLine(x, kind, 'fr', true)} [${x.groupId}] · ref ${ref}${ex}`
       })
     const out = [
       `${all.participants} participants sur ${activeParticipants(corpus).length} ayant répondu.`,

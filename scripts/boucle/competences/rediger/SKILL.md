@@ -87,10 +87,11 @@ il y a des propositions : il commence par les premières, les plus partagées. 6
 en une minute ce que les participants retiennent.
 
 1. Un chiffre qualifie un motif entier, tel qu'il figure dans les listes (« 4 des 5 participants qui donnent un avis »),
-   jamais un détail cité par une seule personne. N'attache à ce chiffre aucune précision que tous ne partagent pas. Pas
-   d'autre chiffre, pas d'addition entre motifs.
-2. Chaque affirmation tirée d'une liste cite entre crochets une idée de son motif, de préférence l'exemple que cite déjà la
-   synthèse du motif.
+   jamais un détail cité par une seule personne. N'attache à ce chiffre aucune précision que tous ne partagent pas : « 6 des
+   7 participants critiquent les délais de livraison », pas « 6 des 7 disent que leur colis est arrivé abîmé ». Pas d'autre
+   chiffre, pas d'addition entre motifs. Ne mets pas plus d'un chiffre par phrase.
+2. Chaque affirmation tirée d'une liste cite la référence de sa ligne (« ref », donnée par `outil voir listes`), entre
+   crochets, et aucune autre : [I0042].
 3. Les participants ont répondu à des questions qui orientent : l'absence de critique n'est pas un accord. Ne parle ni
    d'unanimité, ni de « tout le monde ».
 4. N'écris rien sur les sujets de « Ce qui divise » : le code ajoute lui-même, à la fin du deuxième paragraphe, la phrase qui
@@ -104,8 +105,9 @@ en une minute ce que les participants retiennent.
    qui donnent un avis (large majorité) », « le stationnement, par 12 sur 15 (large majorité, fragile) »). La base se dit une
    fois par paragraphe, à sa première ligne, toujours « qui donnent un avis » ; ensuite le nombre suffit (« 12 sur 15 »,
    « les 14 »). N'écris jamais « une large majorité » sans son nombre, ni « tout le monde ». Varie les attaques d'une phrase
-   à l'autre. Deux lignes voisines peuvent partager une phrase, chacune avec son objet nommé, son nombre et son mot : le
-   résumé peut alors compter jusqu'à 12 phrases.
+   à l'autre : l'objet en sujet, le verbe, le nombre ; pas deux phrases de suite sur le même moule. Deux lignes voisines
+   peuvent partager une phrase, chacune avec son objet nommé, son nombre et son mot (la limite d'un chiffre par phrase de la
+   règle 1 ne s'applique pas à elles ; le reste de la règle 1 s'applique) : le résumé peut alors compter jusqu'à 12 phrases.
 8. Un motif d'appréciation d'ensemble (« Expérience globale », « Bilan ») ne recueille que des jugements généraux, parfois de
    personnes qui décrivent ailleurs des difficultés : ne le présente pas comme l'avis de la plupart, ni par le mot de
    l'échelle ; dis « N personnes portent un jugement positif d'ensemble, que certaines nuancent ailleurs », jamais « aucune
