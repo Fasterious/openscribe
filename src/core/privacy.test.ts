@@ -63,7 +63,7 @@ describe('confidentialité', () => {
         grams.set(g, (grams.get(g) ?? true) && a.open)
       }
     }
-    const files = [...walk('src'), ...walk('e2e'), ...walk('docs'), ...walk('public'), ...walk('scripts'), 'CLAUDE.md'].filter((f) =>
+    const files = [...walk('src'), ...walk('e2e'), ...walk('docs'), ...walk('public'), ...walk('scripts'), ...walk('essais'), 'CLAUDE.md'].filter((f) =>
       /\.(ts|tsx|md|json|css|html)$/.test(f),
     )
     const leaks: string[] = []

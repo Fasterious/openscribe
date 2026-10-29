@@ -611,7 +611,7 @@ avis » répété (46 fois), des passifs « par N personnes », « 18 sur 18 » 
 
 Question d'Arnaud, d'après l'article d'Anthropic du 22/10/2026 (« Building agents: When to fold subagents into your main
 agent loop ») : un seul agent qui garde tout le contexte, avec des compétences (le savoir-faire des consignes) et des outils
-(les contrôles du code), fait-il mieux que le pipeline à étapes, où chaque demande ne voit qu'un lot ? Kit : `scripts/boucle/`
+(les contrôles du code), fait-il mieux que le pipeline à étapes, où chaque demande ne voit qu'un lot ? Kit : `essais/boucle-unique/`
 (outils `outil.ts`, compétences reprises mot pour mot de la méthode « consultation », consigne de l'agent). Le rapport est
 rendu par le même code ; seule l'architecture change. Données : dépôt de l'Observatoire, `2026-10-ecole/essai-boucle/`.
 
@@ -620,7 +620,7 @@ précédentes ; une ronde d'évaluation et de correction dans chacun ; deux arbi
 - **A, pipeline** : à neuf, sans cache, 452 demandes répondues par des modèles simulés Opus (un agent neuf par étape, une
   passe) ; `methodologue` et `plume` en sous-agents notent et proposent ; un orchestrateur applique leurs corrections.
 - **B, boucle unique** : un agent Opus, 66 appels d'outils ; puis, dans le même contexte, les deux casquettes converties en
-  compétences (`scripts/boucle/competences-evaluation/`) : il s'évalue et corrige.
+  compétences (`essais/boucle-unique/kit/competences-evaluation/`) : il s'évalue et corrige.
 - **Arbitres** : deux Opus neufs, sans les casquettes du projet, grille de `NOTATION.md`, à l'aveugle (X/Y, même titre,
   même rendu), ordre inversé de l'un à l'autre.
 

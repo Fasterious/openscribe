@@ -30,6 +30,7 @@ import {
   withDivided,
   missingCamps,
   thinCamps,
+  trustedPairs,
   describeMetrics,
   describeTheme,
   dropSentences,
@@ -1947,5 +1948,33 @@ describe('limites de débit', () => {
     }
     const l2 = withLimits(refused, { requestsPerMinute: 6000, concurrency: 1, retries: 3, sleep: async () => {} })
     await expect(l2.complete({ task: 't', system: '', user: '', json: true, temperature: 0 })).rejects.toThrow('401')
+  })
+})
+
+describe('réconciliation : paires relues', () => {
+  const known = new Set(['G1', 'G2', 'G3', 'G4', 'G5'])
+  it('garde une paire saine, telle quelle', () => {
+    expect(trustedPairs([{ a: 'G1', b: 'G2', rule: 'Toute critique du tarif va dans G2.' }], known)).toEqual([{ a: 'G1', b: 'G2', rule: 'Toute critique du tarif va dans G2.' }])
+  })
+  it('suit les deux motifs que la règle nomme quand "b" en recopie mal un', () => {
+    const [p] = trustedPairs([{ a: 'G1', b: 'G3', rule: 'Un éloge du tram va dans G1, une critique du bus dans G4.' }], known)
+    expect([p.a, p.b]).toEqual(['G1', 'G4'])
+  })
+  it('écarte une règle qui nomme un motif hors de sa paire', () => {
+    expect(trustedPairs([{ a: 'G1', b: 'G2', rule: 'Ce qui touche G1, G2 ou G5 va dans G1.' }], known)).toEqual([])
+  })
+  it('un motif dans une seule paire, motifs connus et distincts, huit au plus', () => {
+    const pairs = trustedPairs(
+      [
+        { a: 'G1', b: 'G2', rule: 'r' },
+        { a: 'G2', b: 'G3', rule: 'r' },
+        { a: 'G4', b: 'G4', rule: 'r' },
+        { a: 'G4', b: 'G9', rule: 'r' },
+        { a: 'G4', b: 'G5', rule: ' ' },
+        { a: 'G3', b: 'G4', rule: 'r' },
+      ],
+      known,
+    )
+    expect(pairs.map((p) => `${p.a}/${p.b}`)).toEqual(['G1/G2', 'G3/G4'])
   })
 })

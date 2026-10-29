@@ -129,6 +129,6 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 ## Essai « boucle unique » (29/10)
 
 - ✅ Recommandation d'Anthropic (un seul agent avec compétences) essayée à armes égales sur l'école : les deux arbitres
-  externes préfèrent le pipeline ; pas de migration (`docs/METHODES.md`). Banc d'essai gardé : `scripts/boucle/`
+  externes préfèrent le pipeline ; pas de migration (`docs/METHODES.md`). Banc d'essai gardé : `essais/boucle-unique/`
 - ⏳ Défauts du pipeline relevés par l'essai : exemple tiré du corpus de certification, consignes contradictoires, paire de
   réconciliation mal nommée acceptée, balayage qui retourne des étiquettes

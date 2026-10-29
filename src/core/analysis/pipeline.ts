@@ -924,11 +924,7 @@ async function groupIdeas(corpus: Corpus, state: AnalysisState, runner: LlmRunne
       // Les identifiants de la demande ne survivent pas à la relecture des paires (les motifs sont renumérotés) :
       // les fusions se retrouvent par leur titre.
       const titleOfAsked = new Map(groups.map((g) => [g.id, titleKey(g.title)]))
-      const used = new Set<string>()
-      const pairs = res.overlaps
-        .filter((o) => o.a !== o.b && byId.has(o.a) && byId.has(o.b) && !used.has(o.a) && !used.has(o.b) && o.rule.trim())
-        .slice(0, 8)
-      for (const o of pairs) used.add(o.a).add(o.b)
+      const pairs = trustedPairs(res.overlaps, new Set(byId.keys()))
       // Les paires sont disjointes : elles se relisent en parallèle.
       const changes = (
         await Promise.all(
@@ -1147,6 +1143,27 @@ export function checkOpposed(
 }
 
 const sameTitle = (t: string) => t.trim().toLowerCase()
+
+/**
+ * Paires de la réconciliation qu'on peut relire : deux motifs connus et distincts, chacun dans une seule paire, huit au plus.
+ * Une règle qui nomme exactement deux motifs désigne la paire, même si "a" ou "b" en recopie mal un (école, 29/10 : « G11 »
+ * pour G42, et la règle du privé appliquée à un motif sans rapport) ; une règle qui nomme d'autres motifs que les siens est
+ * écartée. Sans effet sur une réponse saine : aucune autre paire des passes en cache n'est touchée.
+ */
+export function trustedPairs<O extends { a: string; b: string; rule: string }>(overlaps: O[], known: Set<string>, max = 8): O[] {
+  const used = new Set<string>()
+  const out: O[] = []
+  for (const o of overlaps) {
+    const cited = [...new Set(o.rule.match(/\bG\d+\b/g) ?? [])].filter((id) => known.has(id))
+    const [a, b] = cited.length === 2 ? cited : [o.a, o.b]
+    if (cited.some((id) => id !== a && id !== b)) continue
+    if (a === b || !known.has(a) || !known.has(b) || used.has(a) || used.has(b) || !o.rule.trim()) continue
+    used.add(a).add(b)
+    out.push({ ...o, a, b })
+    if (out.length >= max) break
+  }
+  return out
+}
 
 /** Idées déplacées par la relecture (une idée partie « Hors question » n'est plus dans un motif). */
 export function arrivals(moved: { id: string; to: string }[]): Set<string> {

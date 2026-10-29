@@ -415,7 +415,7 @@ function arrivedRule(input: ReviewInput): string {
 /** Codage en double (option du chercheur) : une idée qui satisfait deux définitions compte dans les deux motifs, par une copie. */
 function multiRule(settings: AnalysisSettings): string {
   if (!settings.multiCoding) return ''
-  return `Codage en double. Une idée qui satisfait la définition de DEUX motifs (la cause chez l'un, l'effet chez l'autre : « 40 km par jour à cause du regroupement scolaire » juge l'éloignement de l'école et le regroupement) compte dans les deux : {"id":"I0042","also":"G7","category":"negative"} ajoute une copie dans G7, avec le ton jugé par rapport à G7 ; l'idée reste dans son motif. Deux motifs au plus par idée, et seulement quand les deux définitions la réclament ("titles" donne la définition de chaque motif quand elle existe) : dans le doute, un seul motif.\n`
+  return `Codage en double. Une idée qui satisfait la définition de DEUX motifs (la cause chez l'un, l'effet chez l'autre : « 30 minutes de route chaque samedi depuis la fermeture de l'annexe du quartier » juge l'éloignement de la médiathèque et la fermeture de l'annexe) compte dans les deux : {"id":"I0042","also":"G7","category":"negative"} ajoute une copie dans G7, avec le ton jugé par rapport à G7 ; l'idée reste dans son motif. Deux motifs au plus par idée, et seulement quand les deux définitions la réclament ("titles" donne la définition de chaque motif quand elle existe) : dans le doute, un seul motif.\n`
 }
 
 /** Réconciliation : deux motifs voisins relus ensemble, avec la règle qui dit où va chaque sorte d'idée. */
@@ -438,7 +438,10 @@ Règles :
 5. Ne renvoie que les changements. Dans le doute, ne change rien : la plupart des idées sont bien rangées.
 ${methodRules(settings, 'review')}${arrivedRule(input)}${sharedRule(input)}${multiRule(settings)}${lang(settings)}
 
-Réponds avec : {"changes":[…]}
+Réponds avec : ${
+      // Livre de codes : la règle 14 demande les définitions ; le format de fin le disait seul (école, 29/10 : trois modèles sur quatre l'ont relevé).
+      methodOf(settings).codebook && input.groups.some((g) => !g.definition) ? '{"definitions":[…],"changes":[…]}' : '{"changes":[…]}'
+    }
 
 ${dataBlock(input)}`,
     json: true,

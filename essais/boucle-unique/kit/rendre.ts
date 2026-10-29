@@ -1,10 +1,10 @@
 /**
  * Rend le rapport d'un état d'analyse avec le code actuel, pour comparer deux analyses sous la même mise en forme.
- * Usage : npx tsx scripts/boucle/rendre.ts <fichier.csv> <state.json> <sortie.md> [--titre "…"]
+ * Usage : npx tsx essais/boucle-unique/kit/rendre.ts <fichier.csv> <state.json> <sortie.md> [--titre "…"]
  */
 import { readFileSync, writeFileSync } from 'node:fs'
-import { analyzeCsv, csvToCorpus, type ColumnRole } from '../../src/core/import/csv'
-import { reportToMarkdown } from '../../src/core/analysis/report'
+import { analyzeCsv, csvToCorpus, type ColumnRole } from '../../../src/core/import/csv'
+import { reportToMarkdown } from '../../../src/core/analysis/report'
 
 const [csvPath, statePath, out, ...rest] = process.argv.slice(2)
 const i = rest.indexOf('--titre')

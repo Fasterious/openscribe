@@ -1,11 +1,11 @@
 /**
  * Essai « boucle unique » (article d'Anthropic du 22/10/2026, « When to fold subagents into your main agent loop ») :
  * un seul agent mène toute la synthèse dans un seul contexte, au lieu des centaines de demandes séparées du pipeline.
- * Le savoir-faire des consignes devient des compétences (`scripts/boucle/competences/`), les contrôles du code
+ * Le savoir-faire des consignes devient des compétences (`essais/boucle-unique/kit/competences/`), les contrôles du code
  * deviennent des outils : l'agent propose (découpe, range, rédige), ces outils vérifient et calculent avec le code
  * du moteur, et lui renvoient en clair ce qui ne va pas.
  *
- * Usage : npx tsx scripts/boucle/outil.ts <dossier> <commande> [arguments]
+ * Usage : npx tsx essais/boucle-unique/kit/outil.ts <dossier> <commande> [arguments]
  *   init <fichier.csv> --question "…" [--modele nom]   prépare le dossier (corpus.md, etat.json)
  *   idees <fichier.json>                  découpe d'une ou plusieurs personnes : citations vérifiées mot pour mot
  *   motifs <fichier.json>                 rangement : creer, ranger, copier, ton, hors_question, renommer, definir, fusionner…
@@ -15,8 +15,8 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { activeParticipants, contributionsOf, type Corpus } from '../../src/core/corpus'
-import { analyzeCsv, csvToCorpus, type ColumnRole } from '../../src/core/import/csv'
+import { activeParticipants, contributionsOf, type Corpus } from '../../../src/core/corpus'
+import { analyzeCsv, csvToCorpus, type ColumnRole } from '../../../src/core/import/csv'
 import {
   checkOpposed,
   corpusHash,
@@ -34,14 +34,14 @@ import {
   thinCamps,
   verifyNumbers,
   withDivided,
-} from '../../src/core/analysis/pipeline'
-import { computeMetrics } from '../../src/core/analysis/metrics'
-import { fragileShown, highlightLine, highlights, labelDoubt } from '../../src/core/analysis/highlights'
-import { uncoveredWithContext } from '../../src/core/analysis/coverage'
-import { reportToHtml, reportToMarkdown } from '../../src/core/analysis/report'
-import { DEFAULT_SETTINGS, type AnalysisSettings, type AnalysisState, type Group, type GroupDefinition, type Idea, type IdeaCategory, type Merge, type RejectedIdea, type Theme } from '../../src/core/analysis/types'
-import type { LlmRunner } from '../../src/core/analysis/runner'
-import { methodOf } from '../../src/core/analysis/methods'
+} from '../../../src/core/analysis/pipeline'
+import { computeMetrics } from '../../../src/core/analysis/metrics'
+import { fragileShown, highlightLine, highlights, labelDoubt } from '../../../src/core/analysis/highlights'
+import { uncoveredWithContext } from '../../../src/core/analysis/coverage'
+import { reportToHtml, reportToMarkdown } from '../../../src/core/analysis/report'
+import { DEFAULT_SETTINGS, type AnalysisSettings, type AnalysisState, type Group, type GroupDefinition, type Idea, type IdeaCategory, type Merge, type RejectedIdea, type Theme } from '../../../src/core/analysis/types'
+import type { LlmRunner } from '../../../src/core/analysis/runner'
+import { methodOf } from '../../../src/core/analysis/methods'
 
 const CATS: IdeaCategory[] = ['positive', 'negative', 'neutral', 'suggestion', 'question']
 const CAT_FR: Record<IdeaCategory, string> = { positive: 'positif', negative: 'négatif', neutral: 'constat', suggestion: 'suggestion', question: 'question' }
@@ -82,7 +82,7 @@ interface Etat {
 
 const [dirArg, cmd, ...args] = process.argv.slice(2)
 if (!dirArg || !cmd) {
-  console.error('Usage : npx tsx scripts/boucle/outil.ts <dossier> <commande> [arguments]')
+  console.error('Usage : npx tsx essais/boucle-unique/kit/outil.ts <dossier> <commande> [arguments]')
   process.exit(1)
 }
 const dir = resolve(dirArg)
