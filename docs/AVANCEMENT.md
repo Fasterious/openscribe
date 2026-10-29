@@ -132,4 +132,5 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
   externes préfèrent le pipeline ; pas de migration (`docs/METHODES.md`). Banc d'essai gardé : `essais/boucle-unique/`
 - ✅ Défauts du pipeline relevés par l'essai corrigés et vérifiés sur l'école : `methodologue` 7 et 7 → 7,5 et 8, erreurs du
   résumé 4 et 3 → 2 et 1, `plume` 7 → 7,5 (`docs/METHODES.md`)
-- ⏳ Décisions d'Arnaud : republier l'école avec cette version ; « unanime » à remèdes contraires ; sens d'« avis partagés »
+- ✅ École republiée avec cette version (29/10)
+- ⏳ Décisions d'Arnaud : « unanime » à remèdes contraires ; sens d'« avis partagés »

@@ -2,6 +2,15 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-29 (fin) — L'école republiée avec la méthode corrigée (décision d'Arnaud)
+
+- `public/observatoire/ecole-grand-debat-2019/` refait par `scripts/observatoire/publier.ts` depuis l'analyse corrigée
+  (`observatoire/2026-10-ecole/essai-boucle/A-corrections-v3`) : méthode 7,5 et 8/10 au lieu de 7,5 et 7,5,
+  erreurs du résumé 2 et 1 au lieu de 3 et 4, langue 7,5. Fiche réécrite et relue par la `plume`.
+- L'export s'est fait sur le code noté (une consigne des thèmes a changé depuis, son cache ne servait plus) : une étude se
+  publie depuis le commit de sa notation.
+- Vérifié : build, 152 tests, 39 parcours (ordinateur et mobile), page chargée dans le navigateur, aucun prénom en clair.
+
 ## 2026-10-29 (suite) — Défauts du pipeline relevés par l'essai, corrigés et vérifiés
 
 - **Demande d'Arnaud** : garder la méthode actuelle, la meilleure, corriger les défauts identifiés, et garder la trace de
