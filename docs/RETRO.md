@@ -2,6 +2,16 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-10-29 — Essai boucle unique
+
+- **Bien marché** : comparer à armes égales (deux premiers essais, une ronde interne chacun, arbitres externes à
+  l'aveugle, ordre inversé) ; les deux arbitres ont trouvé les mêmes erreurs, la conclusion tient. Les modèles simulés ont
+  relevé des contradictions de consignes qu'aucune notation n'avait vues.
+- **Coûté pour rien** : la première comparaison contre une passe réglée 17 fois (Arnaud l'a reprise) ; deux écarts de
+  fidélité du kit (une règle oubliée, une référence laissée au modèle) qui ont gâché la passe 1 de la boucle. Un pipeline
+  rejoué à neuf coûte une soixantaine d'agents à orchestrer à la main.
+- **On change** : une compétence tirée d'une consigne se vérifie règle par règle contre la consigne avant la première passe.
+
 ## 2026-10-19 — Premier tour du `designer-ui`
 
 - **Bien marché** : un audit par mesures (caractères par ligne, positions des barres, espaces vides) a trouvé en une

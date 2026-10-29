@@ -2,6 +2,24 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-29 — Boucle unique (article d'Anthropic) : essayée, pas de migration
+
+- **Demande d'Arnaud** : essayer, sur une branche, la recommandation d'Anthropic (« Building agents: When to fold subagents
+  into your main agent loop », 22/10/2026) : un seul agent qui garde tout le contexte, avec des compétences, au lieu de
+  sous-agents ; migrer seulement si la note monte, et à armes égales (deux premiers essais, une ronde d'évaluation interne
+  chacun, arbitres externes).
+- **Fait** (branche `claude/agent-architecture-refactor-8v45n3`) : kit `scripts/boucle/` (outils qui appliquent les
+  contrôles du code, compétences reprises des consignes, import d'une analyse du pipeline) ; pipeline rejoué à neuf
+  (452 demandes) ; deux arbitres Opus à l'aveugle. Détail et chiffres : `docs/METHODES.md`, « Boucle unique contre pipeline ».
+- **Résultat** : les deux arbitres préfèrent le pipeline (confiance faible, puis modérée) ; méthode 7,25 contre 6,75 en
+  moyenne, langue 7,5 contre 8. **On garde le pipeline.** La boucle reste dans `scripts/boucle/` comme banc d'essai (six fois
+  moins d'appels : à reprendre si un futur modèle change la donne).
+- **Casquettes** (`.claude/agents/`) : gardées. Le `methodologue`, la `plume`, le `testeur`, le `relecteur-code` et le
+  `modele-simule` sont des vérificateurs au contexte neuf, le cas où l'article garde des sous-agents (vérification en boîte
+  noire, contexte jetable) ; la note ne mesure pas les autres, rien ne justifie de les convertir.
+- **À trancher par Arnaud** (relevé par l'essai) : le seuil « avis partagés » (20 contre 10 s'affiche partagé) ; corriger
+  l'exemple tiré du corpus de certification et les consignes qui se contredisent (liste dans `docs/METHODES.md`).
+
 ## 2026-10-20 (suite) — Trois retours d'Arnaud appliqués
 
 - **La barre de l'application se cache pendant la lecture**, partout dans le rapport : elle sort de l'écran au rythme
