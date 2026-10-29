@@ -2173,7 +2173,7 @@ async function checkSupport(state: AnalysisState, runner: LlmRunner, emit: () =>
  * reçoit une phrase écrite par le code, avec ses renvois. Un camp compté dans
  * l'en-tête n'est jamais absent du texte.
  */
-function ensureCamps(state: AnalysisState) {
+export function ensureCamps(state: AnalysisState) {
   const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
   for (const g of state.groups) {
     if (!g.summary) continue
@@ -2192,7 +2192,7 @@ function ensureCamps(state: AnalysisState) {
 // ─── Contrôle final des chiffres ─────────────────────────────────────────────
 
 /** Repère, dans chaque synthèse, les nombres et les comptes de personnes que rien n'appuie (sans rien retirer). */
-function markUnverified(corpus: Corpus, state: AnalysisState) {
+export function markUnverified(corpus: Corpus, state: AnalysisState) {
   const ideaById = new Map(state.ideas.map((i) => [i.id, i]))
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
   const quotes = (ids: string[]) => ids.map((id) => ideaById.get(id)!.verbatim)
@@ -2252,7 +2252,7 @@ function markUnverified(corpus: Corpus, state: AnalysisState) {
 }
 
 /** Contrôle final : une phrase dont un nombre ou un compte reste sans appui n'est pas livrée ; on la retire et on le note dans la Méthode. */
-function verifyNumbers(corpus: Corpus, state: AnalysisState) {
+export function verifyNumbers(corpus: Corpus, state: AnalysisState) {
   markUnverified(corpus, state)
   let removed = 0
   // Le signalement ne reste que si la phrase n'a pas pu être retirée.
