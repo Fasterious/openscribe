@@ -1,0 +1,2 @@
+Arbitre 1 : X = B (boucle unique, passe 2 après évaluation), Y = A (pipeline à neuf, après correction).
+Arbitre 2 : X = A, Y = B.
