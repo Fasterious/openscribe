@@ -1,5 +1,13 @@
 # Journal de l'Observatoire
 
+## 2026-10-29 — École republiée (méthode corrigée après l'essai boucle unique)
+
+- Sur décision d'Arnaud. Analyse : `2026-10-ecole/essai-boucle/A-corrections-v3/` (commit 873172c), le pipeline à neuf
+  rejoué avec les corrections tirées de l'essai. Méthode 7,5 et 8/10 (2 et 1 erreurs du résumé, structure saine), langue
+  7,5/10 ; la passe 17 publiée avait 7,5 et 7,5 (3 et 4 erreurs) avec les mêmes évaluateurs.
+- Export refait depuis le cache sur le code noté (le code a changé depuis : une consigne des thèmes) ; fiche réécrite et
+  relue par la `plume` : résumé, et les trois résultats à lire avec prudence dans « Méthode et limites ».
+
 ## 2026-10-17 — École, passe 13 (finale), notée sur 10, publiée
 
 - Code d'analyse de la passe 12 (commit d09a4cb), rejouée depuis le cache : mêmes idées, motifs et thèmes.
