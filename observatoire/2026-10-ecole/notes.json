@@ -206,5 +206,28 @@
   "erreurs_resume": 2,
   "reste": "école publique face au privé (24 sur 34 : 18 jugent le public moins bon, 6 dénoncent l'inégalité) ; réforme du système éducatif (20 sur 24 : 15 visent le fonctionnement, 5 des réformes). Les deux sont expliquées dans « Méthode et limites » de la fiche",
   "publie": true
+ },
+ {
+  "date": "2026-10-29",
+  "run": "essai-boucle/A-corrections-v3",
+  "commit": "873172c",
+  "methode": "consultation corrigée après l'essai boucle unique (exemple hors corpus, consignes non contradictoires, règle 15 à la relecture et au balayage, trustedPairs), analyse à neuf rejouée depuis son cache",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "note_sur_10": {
+   "methode": [
+    7.5,
+    8
+   ],
+   "langue": 7.5
+  },
+  "erreurs_du_resume": [
+   2,
+   1
+  ],
+  "structure": "saine",
+  "relecture_humaine": "1 h 30 à 2 h 30",
+  "publie": true,
+  "remplace": "run-opus-17",
+  "raison": "Mieux noté que la passe 17 publiée (7,5 et 7,5 ; 3 et 4 erreurs, mêmes évaluateurs). Fiche réécrite (relue par la plume) : trois résultats à lire avec prudence (gestion des enseignants critiquée pour des raisons opposées, passe-droits dans la carte scolaire, éloges de l'école publique comptés dans le jugement d'ensemble)."
  }
 ]

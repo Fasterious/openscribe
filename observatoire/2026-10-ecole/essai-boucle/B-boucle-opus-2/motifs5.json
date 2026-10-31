@@ -1,0 +1,8 @@
+[
+{"op":"ton","idee":"I0469","category":"neutral"},
+{"op":"retirer_copie","idee":"I0845"},
+{"op":"creer","titre":"Semaine de quatre jours et demi","definition":{"positive":"défendre la semaine de quatre jours et demi ou regretter son abandon","negative":"rejeter l'école le mercredi ou la réforme des rythmes","neutral":"évoquer la semaine scolaire sans la juger"},"idees":["I0120","I0122","I0673","I0550"]},
+{"op":"ton","idee":"I0550","category":"positive"},
+{"op":"renommer","motif":"G38","titre":"Horaires et calendrier scolaires"},
+{"op":"definir","motif":"G38","definition":{"positive":"approuver les horaires, le calendrier et leur harmonisation","negative":"critiquer des horaires ou vacances inadaptés ou non harmonisés","neutral":"décrire le calendrier scolaire sans le juger"}}
+]
