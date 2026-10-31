@@ -28,7 +28,7 @@ export function ContactPage({ back }: { back?: string }) {
           <h2 id="ecrire" className="text-xl font-semibold">
             Nous écrire
           </h2>
-          <Alert tone="warning">Ces échanges sont publics : n'y collez jamais de verbatim réel, de nom de participant ni de clé d'accès.</Alert>
+          <Alert tone="warning">Ces échanges sont publics : ne partagez pas d'informations sensibles.</Alert>
           <div className="grid gap-3">
             <LinkCard href={`${REPO}/discussions/new?category=q-a`} icon={<MessageCircleQuestion />} title="Poser une question">
               Comment faire, ce que veut dire un chiffre, quel moteur d'IA choisir.

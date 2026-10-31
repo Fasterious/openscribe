@@ -707,6 +707,6 @@ sourcées). Livré :
 ## 2026-10-31 — Contact et contribution
 
 - **GitHub, pas de formulaire** : un formulaire dans la page demanderait un serveur du projet ou un service tiers, contraires au principe « local d'abord ». Chaque carte ouvre donc le bon endroit sur GitHub ; rien de ce qui est dans le navigateur n'y part. Le lien de retour vient de l'adresse : seule une étude est acceptée.
-- **Pas d'adresse e-mail pour l'instant** : aucune adresse publique n'existe ni n'est vérifiée, et une adresse personnelle n'a pas à être publiée sans décision d'Arnaud. Le domaine `openscribe.fr` a des serveurs de messagerie OVH, mais rien ne montre qu'une boîte y soit créée.
+- **Pas d'adresse e-mail pour l'instant** (confirmé par Arnaud : GitHub seul, malgré son interface en anglais et le compte obligatoire pour écrire) : aucune adresse publique n'existe ni n'est vérifiée, et une adresse personnelle n'a pas à être publiée sans décision d'Arnaud. Le domaine `openscribe.fr` a des serveurs de messagerie OVH, mais rien ne montre qu'une boîte y soit créée.
 - **Sécurité** : le signalement privé de GitHub n'est pas activé sur le dépôt. Le guide demande en attendant d'ouvrir un ticket sans détail, puis de convenir d'un moyen privé.
 - **Branche des contributeurs : `main`** : `next` n'a plus aucun commit propre depuis le 20/10 (`main` a 33 commits d'avance). Les 12 tickets ouverts renvoient encore à `next` : leur lien vers le guide reste à corriger.

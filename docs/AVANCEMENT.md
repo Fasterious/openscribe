@@ -146,4 +146,5 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ✅ `CONTRIBUTING.md` et modèles de tickets et de PR repris de l'archive et remis à jour (branche `main`, vocabulaire, Observatoire)
 - ✅ En-tête : le nom du moteur s'affiche à partir de `md` et se tronque, « à vérifier » jamais
 - ⏳ Les 12 tickets ouverts renvoient encore à `next` et à un guide introuvable sur cette branche : à passer sur `main`
-- ⏳ Décision d'Arnaud : une adresse e-mail publique, pour ceux qui n'ont pas de compte GitHub, et activer le signalement privé de sécurité sur GitHub
+- ✅ GitHub seul pour l'instant (décision d'Arnaud, 31/10) : sans compte, pas de retour possible ; pas d'adresse e-mail
+- ⏳ Activer le signalement privé de sécurité sur GitHub
