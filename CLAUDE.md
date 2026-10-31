@@ -139,5 +139,7 @@ npm test           # tests unitaires
 npm run e2e        # parcours utilisateur dans Chromium (ordinateur + mobile)
 # Sur le Mac d'Arnaud (Chromium de Playwright absent) :
 # PW_CHROMIUM="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm run e2e
+# Dans un conteneur cloud (navigateur installé d'une autre version) :
+# PW_CHROMIUM="$(ls -d /opt/pw-browsers/chromium-*/chrome-linux64/chrome | head -1)" npm run e2e
 npm run build      # vérification des types + build de production
 ```
