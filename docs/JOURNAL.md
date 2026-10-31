@@ -2,6 +2,14 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-31 — Les modules en réserve restent accessibles (décision d'Arnaud)
+
+- Personas, workshop, transcription et ancienne analyse CSV viennent de l'application Next.js, mise de côté en août.
+  Leur code reste dans l'historique de `main`. Il reste aussi dans trois branches d'archive gardées comme marque-pages :
+  `archive/application-nextjs`, `archive/whisper-runpod` et `archive/email-password-auth`. On ne les supprime jamais.
+- `docs/MODULES-EN-RESERVE.md` dit où est chaque module, ce dont il dépend et comment le récupérer. Les autres branches,
+  finies et déjà fusionnées, peuvent être supprimées sans rien perdre.
+
 ## 2026-10-29 (fin) — L'école republiée avec la méthode corrigée (décision d'Arnaud)
 
 - `public/observatoire/ecole-grand-debat-2019/` refait par `scripts/observatoire/publier.ts` depuis l'analyse corrigée

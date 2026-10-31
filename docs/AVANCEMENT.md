@@ -106,7 +106,7 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Validation par Arnaud (`docs/VALIDATION.md`) : premier vrai appel (Groq, Mistral ou Ollama) depuis le navigateur
 - ⏳ Langue : confirmer les dernières consignes de style sur un vrai moteur
 - ✅ Mise en ligne : `openscribe.fr` sert la nouvelle application (Vercel, Vite), l'ancienne archivée sur `archive/application-nextjs`
-- ⏳ Module Entretiens et tests (transcription, vidéo synchronisée), puis Personas
+- ⏳ Module Entretiens et tests (transcription, vidéo synchronisée), puis Personas (code de l'ancienne application à reprendre : `docs/MODULES-EN-RESERVE.md`)
 - ⏳ Stratégie d'acquisition (une fois l'expérience validée)
 - ✅ L'Observatoire : étude école publiée et reliée depuis l'accueil (passe 13, finale, avec Opus 5.5 et la méthode « consultation » : **7/10** aux deux lectures `methodologue`, 2 erreurs du résumé signalées et corrigées dans la fiche, langue **6,5/10**), avec la section Méthode, ses limites, les mentions « à vérifier » et « fragile » du code et leurs explications au survol et au toucher (`public/observatoire/ecole-grand-debat-2019/`) ; méthode expliquée étape par étape dans `docs/METHODE.md`
 - ✅ L'Observatoire dans l'application seulement : l'article d'une page retiré après reprise de ce qu'il avait en plus (méthode détaillée, « Hors question », impression) ; son adresse ouvre l'étude ; étude école republiée (passe 16c : synthèses chiffrées camp par camp, 1 erreur au résumé, `methodologue` 7 et 7,5/10, `plume` 7/10)
