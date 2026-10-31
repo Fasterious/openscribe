@@ -1,0 +1,8 @@
+[
+{"op":"ton","idee":"I0823","category":"neutral"},
+{"op":"renommer","motif":"G29","titre":"Démarches administratives"},
+{"op":"definir","motif":"G29","definition":{"positive":"juger inscriptions et dossiers simples, rapides ou en ligne","negative":"subir paperasse répétée, dossiers multiples, perdus ou sur papier","neutral":"décrire une démarche sans la juger"}},
+{"op":"creer","titre":"Transports scolaires","definition":{"positive":"juger le ramassage et les bus scolaires adaptés","negative":"déplorer des transports scolaires rares, mal desservis ou mal calés","neutral":"décrire un trajet en bus sans le juger"},"idees":["I0457","I0474","I0647","I0704","I0728"]},
+{"op":"renommer","motif":"G22","titre":"Proximité de l'école"},
+{"op":"definir","motif":"G22","definition":{"positive":"apprécier une école ou une filière proche du domicile","negative":"subir l'éloignement de l'école ou de la filière","neutral":"décrire une distance sans la juger"}}
+]

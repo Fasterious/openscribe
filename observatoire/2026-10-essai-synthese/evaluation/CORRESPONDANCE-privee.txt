@@ -1,0 +1,1 @@
+A = méthode commune ; B = méthode de référence (ne pas montrer aux évaluateurs)

@@ -19,7 +19,7 @@ export default defineConfig({
   server: {
     headers: isolationHeaders,
     // Les exports, rapports et notes écrits pendant une analyse ne rechargent pas la page (sinon l'analyse s'arrête).
-    watch: { ignored: ['**/fixtures/**', '**/docs/**', '**/e2e/**', '**/*.md'] },
+    watch: { ignored: ['**/fixtures/**', '**/docs/**', '**/e2e/**', '**/*.md', `${fileURLToPath(new URL('./observatoire', import.meta.url))}/**`] },
   },
   preview: { headers: isolationHeaders },
   test: {

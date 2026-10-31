@@ -14,12 +14,15 @@ import { analyzeCsv } from './import/csv'
 const PRIVATE = 'fixtures/private'
 const N = 6
 /**
- * L'Observatoire publie, par construction, des réponses de consultations en données ouvertes (Licence Ouverte,
- * prénoms masqués) : ses corpus peuvent figurer dans les pages publiées `public/observatoire/`, et nulle part
- * ailleurs. Les corpus des autres études (ÉcoSol…) n'y figurent jamais : ils restent contrôlés partout.
+ * L'Observatoire analyse des consultations en données ouvertes (Licence Ouverte), telles que leur source les publie :
+ * ses corpus et ses analyses vivent dans `observatoire/`, ses pages publiées (prénoms masqués) dans
+ * `public/observatoire/`, et nulle part ailleurs. Les corpus des autres études (ÉcoSol…) n'y figurent jamais : ils
+ * restent contrôlés partout, `observatoire/` compris.
  */
-const OPEN_DATA = join(PRIVATE, 'observatoire')
-const PUBLISHED = join('public', 'observatoire')
+const OBSERVATOIRE = 'observatoire'
+const OPEN_DATA = [OBSERVATOIRE, join(PRIVATE, 'observatoire')]
+const OPEN_PLACES = [OBSERVATOIRE, join('public', 'observatoire')]
+const isOpen = (f: string) => OPEN_DATA.some((d) => f.startsWith(d))
 
 const words = (t: string) =>
   t
@@ -41,12 +44,12 @@ const walk = (d: string): string[] =>
 const MAX_BYTES = 20 * 1024 * 1024
 
 function privateAnswers(): { open: boolean; text: string }[] {
-  const csv = walk(PRIVATE).filter((f) => f.endsWith('.csv'))
+  const csv = [...walk(PRIVATE), ...walk(OBSERVATOIRE)].filter((f) => f.endsWith('.csv'))
   const tooBig = csv.filter((f) => statSync(f).size > MAX_BYTES)
   if (tooBig.length) console.warn(`Confidentialité : fichiers trop gros, non contrôlés : ${tooBig.join(', ')}`)
   return csv
     .filter((f) => !tooBig.includes(f))
-    .flatMap((f) => analyzeCsv(readFileSync(f, 'utf8')).table.rows.flat().map((text) => ({ open: f.startsWith(OPEN_DATA), text })))
+    .flatMap((f) => analyzeCsv(readFileSync(f, 'utf8')).table.rows.flat().map((text) => ({ open: isOpen(f), text })))
     .filter((cell) => words(cell.text).length >= N)
 }
 
@@ -63,12 +66,12 @@ describe('confidentialité', () => {
         grams.set(g, (grams.get(g) ?? true) && a.open)
       }
     }
-    const files = [...walk('src'), ...walk('e2e'), ...walk('docs'), ...walk('public'), ...walk('scripts'), ...walk('essais'), 'CLAUDE.md'].filter((f) =>
+    const files = [...walk('src'), ...walk('e2e'), ...walk('docs'), ...walk('public'), ...walk('scripts'), ...walk('essais'), ...walk(OBSERVATOIRE), 'CLAUDE.md'].filter((f) =>
       /\.(ts|tsx|md|json|css|html)$/.test(f),
     )
     const leaks: string[] = []
     for (const f of files) {
-      const published = f.startsWith(PUBLISHED)
+      const published = OPEN_PLACES.some((d) => f.startsWith(d))
       const w = words(readFileSync(f, 'utf8'))
       for (let i = 0; i + N <= w.length; i++) {
         const g = w.slice(i, i + N).join(' ')
@@ -87,7 +90,7 @@ describe('confidentialité', () => {
    */
   const titles = [
     ...new Set(
-      walk(PRIVATE)
+      [...walk(PRIVATE), ...walk(OBSERVATOIRE)]
         .filter((f) => f.endsWith('.openscribe.json'))
         .flatMap((f): string[] => {
           const d = JSON.parse(readFileSync(f, 'utf8'))

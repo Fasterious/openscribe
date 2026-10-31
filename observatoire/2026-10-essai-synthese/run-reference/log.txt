@@ -1,0 +1,32 @@
+Colonnes : Région → attribute | Si vous avez été amené à chercher une fo → open | Si vous avez été amené à scolariser votr → open
+13:16:32 extract:running 0/50 group:pending summarize:pending themes:pending report:pending polish:pending
+13:16:32 extract:running 50/50 group:pending summarize:pending themes:pending report:pending polish:pending
+13:16:32 extract:done 50/50 group:pending summarize:pending themes:pending report:pending polish:pending
+13:16:32 extract:done 50/50 group:running summarize:pending themes:pending report:pending polish:pending
+13:20:44 extract:done 50/50 group:running 350/368 summarize:pending themes:pending report:pending polish:pending
+13:21:52 extract:done 50/50 group:running 368/368 summarize:pending themes:pending report:pending polish:pending
+13:21:52 extract:done 50/50 group:running 368/368 summarize:pending themes:pending report:pending polish:pending
+13:22:26 extract:done 50/50 group:running 368/368 summarize:pending themes:pending report:pending polish:pending
+13:24:30 extract:done 50/50 group:done 368/368 summarize:pending themes:pending report:pending polish:pending
+13:24:30 extract:done 50/50 group:done 368/368 summarize:running 0/37 themes:pending report:pending polish:pending
+13:25:28 extract:done 50/50 group:done 368/368 summarize:running 7/37 themes:pending report:pending polish:pending
+13:26:50 extract:done 50/50 group:done 368/368 summarize:running 13/37 themes:pending report:pending polish:pending
+13:28:21 extract:done 50/50 group:done 368/368 summarize:running 26/37 themes:pending report:pending polish:pending
+13:29:17 extract:done 50/50 group:done 368/368 summarize:running 30/37 themes:pending report:pending polish:pending
+13:30:29 extract:done 50/50 group:done 368/368 summarize:running 37/37 themes:pending report:pending polish:pending
+13:30:29 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:pending report:pending polish:pending
+13:30:29 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:running 0/37 report:pending polish:pending
+13:34:57 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:pending polish:pending
+13:34:57 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:running polish:pending
+13:35:59 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 0/45
+13:36:53 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 9/45
+13:37:17 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 21/45
+13:38:07 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 33/45
+13:38:27 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:running 45/45
+13:38:27 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45
+13:38:27 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45
+13:41:49 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45
+13:41:50 extract:done 50/50 group:done 368/368 summarize:done 37/37 themes:done 37/37 report:done polish:done 45/45
+Terminé : done  380 idées, 37 groupes, 7 thèmes, 0 citations écartées
+Demandes sans réponse : 0
+Étude exportée : observatoire/2026-10-essai-synthese/run-reference/essai.openscribe.json

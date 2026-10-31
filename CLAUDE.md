@@ -115,9 +115,9 @@ Règles apprises :
 - Aucun code copié d'un projet dont la licence n'est pas compatible AGPL-3.0.
 - **Données de participants réelles : jamais dans le dépôt.** Elles vont dans
   `fixtures/private/` (ignoré par git). Les données publiques de test sont
-  fictives (`fixtures/*.csv`). Seule exception : les pages publiées de
-  l'Observatoire (`public/observatoire/`), faites de consultations en données
-  ouvertes, prénoms masqués.
+  fictives (`fixtures/*.csv`). Seule exception : l'Observatoire, fait de
+  consultations en données ouvertes, analysées telles que leur source les publie
+  (`observatoire/`), et ses pages publiées, prénoms masqués (`public/observatoire/`).
 - Pas de clé API dans le code, les tests ou les commits.
 
 ## Technique

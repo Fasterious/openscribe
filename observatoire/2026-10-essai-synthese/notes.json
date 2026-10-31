@@ -1,0 +1,40 @@
+[
+ {
+  "date": "2026-10-25",
+  "corpus": "questionnaire.csv (50 personnes, 2 questions, Grand débat 2019)",
+  "modele": "claude-opus-5-5 (joué par sous-agents)",
+  "commune": {
+   "run": "run-commune",
+   "idees": 387,
+   "themes": 40,
+   "grands_themes": 8,
+   "methodologue": [
+    7,
+    7
+   ],
+   "erreurs": [
+    3,
+    4
+   ],
+   "plume": 7,
+   "relecture": "1 h à 1 h 30"
+  },
+  "reference": {
+   "run": "run-reference",
+   "idees": 380,
+   "themes": 37,
+   "grands_themes": 7,
+   "methodologue": [
+    6,
+    6
+   ],
+   "erreurs": [
+    4,
+    3
+   ],
+   "plume": 5,
+   "relecture": "2 h 30 à 3 h"
+  },
+  "verdict": "méthode commune meilleure d'un point aux deux lectures (aveugle, ordres inverses) ; décision : la méthode commune sert à toute nouvelle synthèse"
+ }
+]

@@ -37,7 +37,7 @@ Corpus réel d'une autre forme que l'école : 50 personnes du Grand débat 2019 
 deux questions (chercher une formation, scolariser son enfant), région en attribut ; échantillon tiré au hasard
 (graine 20261025), hors échantillon de l'école. Même découpage pour les deux méthodes (cache commun), modèle joué par
 des sous-agents (niveau Opus), rapports anonymisés (A, B) ; deux lectures `methodologue` dans des ordres inverses,
-une lecture `plume`. Fichiers : dépôt de l'Observatoire, `2026-10-essai-synthese/`.
+une lecture `plume`. Fichiers : `observatoire/2026-10-essai-synthese/`.
 
 | | Méthode commune | Référence (ancienne méthode de la Synthèse) |
 |---|---|---|
@@ -669,7 +669,7 @@ Question d'Arnaud, d'après l'article d'Anthropic du 22/10/2026 (« Building age
 agent loop ») : un seul agent qui garde tout le contexte, avec des compétences (le savoir-faire des consignes) et des outils
 (les contrôles du code), fait-il mieux que le pipeline à étapes, où chaque demande ne voit qu'un lot ? Kit : `essais/boucle-unique/`
 (outils `outil.ts`, compétences reprises mot pour mot de la méthode « consultation », consigne de l'agent). Le rapport est
-rendu par le même code ; seule l'architecture change. Données : dépôt de l'Observatoire, `2026-10-ecole/essai-boucle/`.
+rendu par le même code ; seule l'architecture change. Données : `observatoire/2026-10-ecole/essai-boucle/`.
 
 **Protocole à armes égales (demande d'Arnaud)** : deux premiers essais sur le même corpus, sans rien des passes
 précédentes ; une ronde d'évaluation et de correction dans chacun ; deux arbitres externes à la fin.

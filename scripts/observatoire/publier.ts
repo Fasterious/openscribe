@@ -4,7 +4,8 @@
  * L'étude se lit dans l'application (`#/observatoire/<slug>`), à partir de `<slug>/etude.json` : rapport et réponses
  * entières, prénoms de particuliers masqués à la source. À l'adresse `/observatoire/<slug>/`, une page légère porte le
  * titre, le résumé et l'aperçu pour les moteurs de recherche et les réseaux, puis ouvre l'étude dans l'application.
- * Les réponses du moteur et la liste des prénoms restent hors du dépôt.
+ * Les réponses du moteur et la liste des prénoms ne partent pas dans la page : elles restent avec l'analyse, dans
+ * `observatoire/<étude>/`.
  *
  * Usage :
  *   npx tsx scripts/observatoire/publier.ts <etude.openscribe.json> <fiche.json>

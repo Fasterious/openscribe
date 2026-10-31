@@ -89,4 +89,4 @@ Vérification (même analyse rejouée depuis son cache, deux lectures `methodolo
 erreurs du résumé 4 et 3 avant, **2 et 1 après** ; langue 7 puis 7,5. Corrections gardées.
 
 Détail des notes et des passes : `docs/METHODES.md`, « Boucle unique contre pipeline ». Toutes les analyses, notations et
-arbitrages : dépôt de l'Observatoire, `2026-10-ecole/essai-boucle/`.
+arbitrages : `observatoire/2026-10-ecole/essai-boucle/`.

@@ -2,6 +2,20 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-31 — L'Observatoire rejoint le dépôt d'OpenScribe ; prénoms : le chercheur choisit (décisions d'Arnaud)
+
+- **Un seul projet.** L'Observatoire améliore la méthode et repose sur des données ouvertes : ses études vivent
+  désormais dans `observatoire/` (sources, échantillons et tirages, fiches, notes, rapports et notations des passes,
+  analyse publiée avec son cache, essais de méthode). Les fichiers de travail
+  des passes intermédiaires (environ 300 Mo) sont sur la branche `archive/observatoire`.
+- **Prénoms.** L'analyse se fait toujours sur les données brutes, avec le même algorithme, sans masquage préalable :
+  dans un petit collectif, nommer quelqu'un peut être le propos. Masquer est un choix de lecture laissé à qui tient
+  l'analyse (« Masquer les prénoms », à l'écran et dans les exports). Les données ouvertes s'analysent telles que leur
+  source les publie ; les pages publiées de l'Observatoire masquent les prénoms. ÉcoSol n'est jamais publié.
+- `privacy.test.ts` lit les données ouvertes dans `observatoire/` : il tourne donc partout, plus seulement là où le
+  dossier privé existe ; il les autorise dans `observatoire/` et `public/observatoire/`, et refuse toute citation d'un
+  corpus privé, `observatoire/` compris. Vérifié par une fuite volontaire, attrapée.
+
 ## 2026-10-31 — Les modules en réserve restent accessibles (décision d'Arnaud)
 
 - Personas, workshop, transcription et ancienne analyse CSV viennent de l'application Next.js, mise de côté en août.

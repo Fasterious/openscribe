@@ -1,0 +1,39 @@
+[
+ {"op":"ton","idee":"I0010","category":"negative"},
+ {"op":"ton","idee":"I0100","category":"negative"},
+ {"op":"ton","idee":"I0532","category":"negative"},
+ {"op":"definir","motif":"G43","definition":{"positive":"se dire satisfait des décisions de passage en classe supérieure","negative":"critiquer le passage automatique ou subir la menace d'un redoublement","neutral":"évoquer le redoublement sans juger les décisions de passage"}},
+ {"op":"renommer","motif":"G43","titre":"Passage en classe supérieure"},
+
+ {"op":"retirer_copie","idee":"I0965"},
+ {"op":"creer","titre":"Contournement de la carte scolaire","definition":{"positive":"juger la carte scolaire appliquée à tous de façon équitable","negative":"dénoncer passe-droits, dérogations de complaisance ou abandon de la carte","neutral":"décrire les dérogations sans juger leur équité"},"idees":["I0246","I0784","I0912"]},
+ {"op":"ton","idee":"I0246","category":"negative"},
+ {"op":"ton","idee":"I0784","category":"negative"},
+ {"op":"ton","idee":"I0912","category":"negative"},
+ {"op":"copier","idee":"I0038","motif":"Contournement de la carte scolaire","category":"negative"},
+ {"op":"copier","idee":"I0912","motif":"G3","category":"negative"},
+ {"op":"definir","motif":"G3","definition":{"positive":"apprécier la sectorisation, sa souplesse ou un libre choix obtenu","negative":"subir la sectorisation, ses refus de dérogation ou ses trajets imposés","neutral":"décrire un effet de la sectorisation sans la juger"}},
+ {"op":"ranger","motif":"G3","idees":["I0644"]},
+
+ {"op":"creer","titre":"Reconnaissance des enseignants","definition":{"positive":"juger les enseignants bien payés et reconnus","negative":"regretter des salaires bas ou un manque de reconnaissance","neutral":"décrire le métier sans juger sa reconnaissance"},"idees":["I0008","I0218","I0354","I0573","I0649","I0651","I0742","I0756","I0776","I0780"]},
+ {"op":"definir","motif":"G6","definition":{"positive":"approuver l'évaluation, le contrôle ou le recrutement des enseignants","negative":"dénoncer l'absence de contrôle, de sanction ou un recrutement inadapté","neutral":"énoncer un principe sur le métier sans juger sa gestion"}},
+
+ {"op":"ton","idee":"I0069","category":"neutral"},
+ {"op":"ton","idee":"I0744","category":"neutral"},
+
+ {"op":"definir","motif":"G32","definition":{"positive":"apprécier la gratuité de l'école","negative":"juger que la scolarité coûte trop cher aux familles","neutral":"constater un coût sans le juger"}},
+
+ {"op":"retirer_copie","idee":"I1001"},
+ {"op":"retirer_copie","idee":"I1002"},
+ {"op":"retirer_copie","idee":"I1003"},
+ {"op":"retirer_copie","idee":"I1006"},
+ {"op":"retirer_copie","idee":"I0986"},
+
+ {"op":"ton","idee":"I0862","category":"neutral"},
+ {"op":"ton","idee":"I0219","category":"neutral"},
+
+ {"op":"fusionner","motifs":["G8","G57"],"titre":"Absences des enseignants","raison":"Une grève est une absence d'enseignant ; I0402 et I0540 parlent déjà des grèves dans G8."},
+ {"op":"definir","motif":"Absences des enseignants","definition":{"positive":"apprécier la rareté des absences ou leur remplacement rapide","negative":"déplorer absences, grèves ou non-remplacement des enseignants","neutral":"évoquer les absences sans juger la situation"}},
+
+ {"op":"renommer","motif":"G2","titre":"Déroulement de la scolarité"}
+]

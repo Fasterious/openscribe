@@ -74,7 +74,11 @@ bloqué sur ça. » Concrètement :
 - **Restitution brute, le moins de biais possible** (13/10) : verbatims tels
   quels, nuances comprises, prénoms compris ; c'est le chercheur qui anonymise
   ensuite s'il le souhaite. Une contradiction d'une même personne se montre,
-  elle ne se juge pas.
+  elle ne se juge pas. Précisé le 31/10 : l'analyse se fait toujours sur les données brutes, avec le même algorithme ;
+  jamais de masquage avant l'analyse (dans un petit collectif, nommer quelqu'un peut être le propos). Masquer les
+  prénoms est un choix de lecture, à l'écran et dans les exports, laissé à qui a l'analyse en main, et mis en avant.
+  Une consultation en données ouvertes s'analyse telle que sa source la publie ; ses pages publiées masquent les
+  prénoms. Les études dont on connaît les participants (ÉcoSol) ne sont jamais publiées.
 - **Comprendre ce que la personne a voulu dire** (13/10) : la question posée, le fil d'un entretien, l'ironie ou un conditionnel peuvent inverser le sens apparent des mots. On y reste attentif sans alourdir le processus ; dans le doute, le sens littéral.
 - **La langue fait partie de la qualité** (12/10) : un rapport qui sonne
   traduit n'est pas fini, dans chaque langue. Mais la fidélité aux données
@@ -129,7 +133,7 @@ bloqué sur ça. » Concrètement :
 
 ## Idées pour plus tard
 
-- Anonymisation en un geste, à la demande du chercheur (pas de masquage automatique).
+- Masquer les prénoms : un geste fait (« Masquer les prénoms », écran et exports, 13/10). À affiner : remplacer le prénom par un terme qui garde la phrase lisible (« une personne ») plutôt que « [prénom] ».
 - Segments : comparer ce que disent des groupes (rôle, ancienneté) quand les données le permettent, proposés par l'outil quand rien n'est étiqueté, au choix du chercheur.
 
 - Analyse d'écran : relier ce qui est dit à ce que la personne avait sous les

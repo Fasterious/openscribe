@@ -2,9 +2,10 @@
  * Observatoire : tire un échantillon reproductible d'une question ouverte
  * d'une consultation publique, prêt pour le pont d'analyse.
  *
- * Le fichier brut n'est jamais modifié ni versionné : il
- * reste hors du dépôt pour pouvoir rejouer l'analyse
- * quand la méthode progresse.
+ * Le fichier brut n'est jamais modifié ni versionné (trop lourd) : son adresse,
+ * son empreinte et ses colonnes utiles sont dans `observatoire/sources/`, et
+ * l'échantillon avec son tirage dans `observatoire/<étude>/`, pour pouvoir
+ * rejouer l'analyse quand la méthode progresse.
  *
  * Usage :
  *   npx tsx scripts/observatoire/echantillon.ts <brut.csv> <sortie.csv>

@@ -1,0 +1,46 @@
+Colonnes : Région → attribute | Si vous avez été amené à scolariser votr → open
+08:21:04 extract:running 0/378 group:pending summarize:pending themes:pending report:pending polish:pending
+08:28:43 extract:running 378/378 group:pending summarize:pending themes:pending report:pending polish:pending
+08:28:43 extract:done 378/378 group:pending summarize:pending themes:pending report:pending polish:pending
+08:28:43 extract:done 378/378 group:running summarize:pending themes:pending report:pending polish:pending
+08:32:07 extract:done 378/378 group:running 350/888 summarize:pending themes:pending report:pending polish:pending
+08:34:29 extract:done 378/378 group:running 550/888 summarize:pending themes:pending report:pending polish:pending
+08:36:49 extract:done 378/378 group:running 750/888 summarize:pending themes:pending report:pending polish:pending
+08:38:44 extract:done 378/378 group:running 888/888 summarize:pending themes:pending report:pending polish:pending
+08:39:42 extract:done 378/378 group:running 888/888 summarize:pending themes:pending report:pending polish:pending
+08:43:22 extract:done 378/378 group:running 888/888 summarize:pending themes:pending report:pending polish:pending
+08:45:14 extract:done 378/378 group:running 888/888 summarize:pending themes:pending report:pending polish:pending
+08:48:57 extract:done 378/378 group:running 888/888 summarize:pending themes:pending report:pending polish:pending
+08:52:07 extract:done 378/378 group:done 888/888 summarize:pending themes:pending report:pending polish:pending
+08:52:07 extract:done 378/378 group:done 888/888 summarize:running 0/66 themes:pending report:pending polish:pending
+08:54:39 extract:done 378/378 group:done 888/888 summarize:running 3/66 themes:pending report:pending polish:pending
+08:55:17 extract:done 378/378 group:done 888/888 summarize:running 15/66 themes:pending report:pending polish:pending
+08:55:19 extract:done 378/378 group:done 888/888 summarize:running 23/66 themes:pending report:pending polish:pending
+08:55:25 extract:done 378/378 group:done 888/888 summarize:running 25/66 themes:pending report:pending polish:pending
+08:55:51 extract:done 378/378 group:done 888/888 summarize:running 26/66 themes:pending report:pending polish:pending
+08:56:21 extract:done 378/378 group:done 888/888 summarize:running 28/66 themes:pending report:pending polish:pending
+08:56:37 extract:done 378/378 group:done 888/888 summarize:running 30/66 themes:pending report:pending polish:pending
+08:56:39 extract:done 378/378 group:done 888/888 summarize:running 33/66 themes:pending report:pending polish:pending
+08:57:11 extract:done 378/378 group:done 888/888 summarize:running 36/66 themes:pending report:pending polish:pending
+08:57:21 extract:done 378/378 group:done 888/888 summarize:running 37/66 themes:pending report:pending polish:pending
+08:57:39 extract:done 378/378 group:done 888/888 summarize:running 42/66 themes:pending report:pending polish:pending
+08:58:05 extract:done 378/378 group:done 888/888 summarize:running 63/66 themes:pending report:pending polish:pending
+08:58:21 extract:done 378/378 group:done 888/888 summarize:running 66/66 themes:pending report:pending polish:pending
+08:58:21 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:pending report:pending polish:pending
+08:58:21 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:running 0/66 report:pending polish:pending
+09:02:38 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:pending polish:pending
+09:02:38 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:running polish:pending
+09:04:10 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:running 0/77
+09:05:58 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:running 5/77
+09:06:28 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:running 17/77
+09:06:52 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:running 29/77
+09:07:02 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:running 41/77
+09:07:20 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:running 53/77
+09:07:42 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:running 65/77
+09:08:18 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:running 77/77
+09:08:18 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:done 77/77
+09:08:18 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:done 77/77
+09:12:03 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:done 77/77
+09:12:03 extract:done 378/378 group:done 888/888 summarize:done 66/66 themes:done 66/66 report:done polish:done 77/77
+Terminé : done  1013 idées, 66 groupes, 10 thèmes, 0 citations écartées
+Demandes sans réponse : 0

@@ -1,0 +1,12 @@
+{
+  "lignes": 111953,
+  "supprimees": 12,
+  "videsOuTropCourtes": 89154,
+  "doublons": 919,
+  "textesCopiesAuMoins5Fois": 47,
+  "eligibles": 21868,
+  "echantillon": 378,
+  "graine": 20261014,
+  "min": 15,
+  "margeAnnoncee": 5
+}
