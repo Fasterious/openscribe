@@ -20,7 +20,7 @@ export function ContactPage({ back }: { back?: string }) {
         )}
         <h1 className="text-3xl font-bold tracking-tight">Contact et contribution</h1>
         <p className="max-w-lecture text-muted-foreground">
-          OpenScribe est un logiciel libre : il progresse grâce à ceux qui l'utilisent. Tout se passe sur GitHub, le site qui héberge le projet, avec un compte gratuit.
+          OpenScribe est un logiciel libre : il progresse grâce à ceux qui l'utilisent. Tout se passe sur GitHub, le site qui héberge le projet, avec un compte gratuit. Le site est en anglais, mais vous pouvez nous écrire en français.
         </p>
       </header>
       <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
