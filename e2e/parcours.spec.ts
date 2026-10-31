@@ -329,6 +329,64 @@ test('import de texte : l’animateur est exclu, sa question devient le contexte
   await expect(page.getByText(/2 participants/).first()).toBeVisible()
 })
 
+test('contact : joignable partout, avertit avant de partir sur GitHub, et ramène à l’étude', async ({ page }) => {
+  await newStudy(page, 'Étude contact')
+  await page.getByLabel('Fichier à importer').setInputFiles('fixtures/mediatheque.csv')
+  await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
+  await page.getByRole('tab', { name: /Analyse/ }).click()
+  await expect(page).toHaveURL(/\/analyse$/)
+  const studyUrl = page.url()
+  const footerLink = page.getByRole('contentinfo').getByRole('link', { name: 'Contact et contribution' })
+
+  await footerLink.click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Contact et contribution')
+  const links = {
+    'Poser une question': /\/discussions\/new\?category=q-a$/,
+    'Signaler un défaut': /\/issues\/new\?template=bug\.yml$/,
+    'Proposer une amélioration': /\/discussions\/new\?category=ideas$/,
+    'Lire le guide de contribution': /\/blob\/main\/CONTRIBUTING\.md$/,
+    'Choisir une première tâche': /good\+first\+issue/,
+  }
+  for (const [name, url] of Object.entries(links)) {
+    const link = page.getByRole('link', { name: new RegExp(`^${name}`) })
+    await expect(link).toHaveAttribute('href', url)
+    await expect(link).toHaveAttribute('target', '_blank')
+  }
+  // L'avertissement se lit avant les actions, sur ordinateur comme sur téléphone.
+  const warning = (await page.getByText('Ces échanges sont publics').boundingBox())!
+  const firstAction = (await page.getByRole('link', { name: /^Poser une question/ }).boundingBox())!
+  expect(warning.y + warning.height).toBeLessThanOrEqual(firstAction.y)
+  await noHorizontalScroll(page)
+  await shot(page, '10-contact')
+
+  // Retour à l'onglet quitté.
+  await page.getByRole('link', { name: 'Revenir à votre synthèse' }).click()
+  await expect(page).toHaveURL(studyUrl)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Étude contact')
+
+  // L'icône de l'en-tête sert à partir de 432 px ; en dessous, elle ne pousse rien hors de l'écran et le pied de page reste.
+  const headerLink = page.getByRole('navigation', { name: 'Contact et réglages' }).getByRole('link', { name: 'Contact', exact: true })
+  if (page.viewportSize()!.width >= 432) {
+    await headerLink.click()
+    await expect(page.getByRole('link', { name: 'Revenir à votre synthèse' })).toBeVisible()
+    await page.goBack()
+  } else {
+    await expect(headerLink).toBeHidden()
+    await expect(footerLink).toBeVisible()
+  }
+
+  // Une étude de l'Observatoire offre aussi son retour.
+  await page.goto('/#/observatoire/ecole-grand-debat-2019')
+  await footerLink.click()
+  await page.getByRole('link', { name: "Revenir à l'étude" }).click()
+  await expect(page).toHaveURL(/#\/observatoire\/ecole-grand-debat-2019$/)
+
+  // Une adresse trafiquée n'offre aucun lien de retour.
+  await page.goto('/#/contact?retour=javascript:alert(1)')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Contact et contribution')
+  await expect(page.getByRole('link', { name: /^Revenir/ })).toHaveCount(0)
+})
+
 test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’étude', async ({ page }) => {
   await newStudy(page, 'Étude moteur')
   const studyUrl = page.url()

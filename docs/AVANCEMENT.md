@@ -138,3 +138,11 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
   résumé 4 et 3 → 2 et 1, `plume` 7 → 7,5 (`docs/METHODES.md`)
 - ✅ École republiée avec cette version (29/10)
 - ⏳ Décisions d'Arnaud : « unanime » à remèdes contraires ; sens d'« avis partagés »
+
+## Contact et contribution (31/10)
+
+- ✅ Page `#/contact` : question, défaut et amélioration ouvrent directement le bon endroit sur GitHub, avec un avertissement avant de partir (échanges publics) ; contribuer avec ou sans code ; retour à l'onglet quitté, couvert par un test de parcours
+- ✅ Entrées : icône de l'en-tête à partir de 432 px, pied de page partout, phrase sous « Ce qui arrive » ; lien « Code source » au pied de page
+- ✅ `CONTRIBUTING.md` et modèles de tickets et de PR repris de l'archive et remis à jour (branche `main`, vocabulaire, Observatoire)
+- ✅ En-tête : le nom du moteur s'affiche à partir de `md` et se tronque, « à vérifier » jamais
+- ⏳ Décision d'Arnaud : une adresse e-mail publique, pour ceux qui n'ont pas de compte GitHub, et activer le signalement privé de sécurité sur GitHub

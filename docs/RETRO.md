@@ -304,3 +304,9 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - **À trancher par Arnaud** : sur un petit corpus (exemple : 12 personnes), aucun thème n'atteint le seuil de 4 avis ;
   « Ce qui a marché » et « Ce qui bloque » sont vides et le résumé n'a plus de chiffres (« plusieurs »). Pour la
   Synthèse (souvent 5 à 20 personnes), faut-il lister aussi les thèmes à 2 ou 3 avis, avec leur nombre et « peu d'avis » ?
+
+## 2026-10-31 — Contact et contribution
+
+- **Bien marché** : chercher dans les branches d'archive avant d'écrire : le guide et les modèles existaient, il a suffi de les remettre à jour ; la critique sur rendu réel a trouvé un chevauchement de l'en-tête que le calcul des classes n'avait pas vu.
+- **Coûté pour rien** : `node_modules` restait celui de l'ancienne application : la première passe `designer-ui` n'a pas pu lancer l'application.
+- **On change** : après un changement de pile ou une récupération du dépôt, `npm ci` d'abord.

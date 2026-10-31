@@ -1,7 +1,8 @@
-import { House, KeyRound, Layers, Mic, PenTool, Telescope, UserRound } from 'lucide-react'
+import { House, KeyRound, Layers, MessagesSquare, Mic, PenTool, Telescope, UserRound } from 'lucide-react'
 import { useRef } from 'react'
 import { useEngines } from '@/app/engines'
-import { href, useRoute } from '@/app/router'
+import { href, isStudy, useRoute } from '@/app/router'
+import { ContactPage, SOURCE_URL } from './Contact'
 import { Home } from './Home'
 import { ObservatoryList, ObservatoryPage } from './Observatory'
 import { cn, Explain, Tooltip } from './primitives'
@@ -16,6 +17,8 @@ export function App() {
   const engine = engines.find((e) => e.id === defaultId) ?? engines.find((e) => e.verified !== false)
   const engineOk = engine?.verified !== false
   const inSynthesis = route.name === 'synthesis' || route.name === 'project'
+  // Depuis une étude, Contact offre le retour, à l'onglet où l'on était.
+  const contact = href({ name: 'contact', back: isStudy(route) ? href(route) : undefined })
   // Sur les pages de lecture (rapport, étude de l'Observatoire), la barre se cache quand on descend, revient quand on remonte.
   const reading = route.name === 'observatory' || (route.name === 'project' && route.tab === 'report')
   const header = useRef<HTMLElement>(null)
@@ -46,7 +49,9 @@ export function App() {
             <SoonItem icon={<UserRound />} label="Personas" />
             <SoonItem icon={<PenTool />} label="Ateliers" />
           </nav>
-          <nav aria-label="Réglages" className="flex shrink-0 items-center">
+          <nav aria-label="Contact et réglages" className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+            {/* Sous 432 px, elle passerait sous les modules : le pied de page reste l'entrée (designer-ui, 31/10). */}
+            <NavItem href={contact} active={route.name === 'contact'} icon={<MessagesSquare />} label="Contact" className="max-[27rem]:hidden" />
             <a
               href={href({ name: 'settings' })}
               aria-current={route.name === 'settings' ? 'page' : undefined}
@@ -62,14 +67,16 @@ export function App() {
                 <span
                   className={cn(
                     'flex items-center gap-1 rounded-full text-xs',
-                    'max-sm:absolute max-sm:top-1.5 max-sm:right-1 sm:px-2 sm:py-0.5',
-                    engine && engineOk ? 'sm:bg-positive/15 sm:text-positive' : 'sm:bg-warning/25 sm:text-foreground',
+                    // Le nom du moteur se modifie : il n'apparaît qu'à partir de `md` et se tronque, « à vérifier » jamais (designer-ui, 31/10).
+                    'max-md:absolute max-md:top-1.5 max-md:right-1 md:px-2 md:py-0.5',
+                    engine && engineOk ? 'md:bg-positive/15 md:text-positive' : 'md:bg-warning/25 md:text-foreground',
                   )}
                   aria-hidden
                 >
-                  <span className={cn('size-1.5 rounded-full max-sm:size-2', engine && engineOk ? 'bg-positive' : 'bg-warning')} />
-                  <span className="hidden whitespace-nowrap sm:inline">
-                    {engine ? `${engine.name.replace(/ \(.*\)$/, '')}${engineOk ? '' : ' · à vérifier'}` : 'à choisir'}
+                  <span className={cn('size-1.5 rounded-full max-md:size-2', engine && engineOk ? 'bg-positive' : 'bg-warning')} />
+                  <span className="hidden max-w-40 min-w-0 whitespace-nowrap md:flex" title={engine?.name}>
+                    <span className="truncate">{engine ? engine.name.replace(/ \(.*\)$/, '') : 'à choisir'}</span>
+                    {engine && !engineOk && <span className="shrink-0 whitespace-pre"> · à vérifier</span>}
                   </span>
                 </span>
               )}
@@ -84,6 +91,7 @@ export function App() {
         {route.name === 'project' && <ProjectPage id={route.id} tab={route.tab} />}
         {route.name === 'observatory' && <ObservatoryPage slug={route.slug} />}
         {route.name === 'observatories' && <ObservatoryList />}
+        {route.name === 'contact' && <ContactPage back={route.back} />}
         {route.name === 'not-found' && (
           <p>
             Page introuvable.{' '}
@@ -93,11 +101,21 @@ export function App() {
           </p>
         )}
       </main>
-      <footer className="no-print mt-12 border-t py-5 text-center text-xs text-muted-foreground">
-        OpenScribe, logiciel libre de recherche utilisateur (AGPL-3.0) · Vos données restent dans votre navigateur ·{' '}
-        <a href={href({ name: 'observatories' })} className="underline hover:text-foreground">
-          L'Observatoire
-        </a>
+      <footer className="no-print mt-12 border-t px-4 py-5 text-center text-xs text-muted-foreground">
+        <p>
+          OpenScribe, logiciel libre de recherche utilisateur (<span className="whitespace-nowrap">AGPL-3.0</span>) · Vos données restent dans votre navigateur
+        </p>
+        <div className="mt-1 flex flex-wrap justify-center gap-x-3">
+          <a href={href({ name: 'observatories' })} className="inline-block py-1 underline hover:text-foreground">
+            L'Observatoire
+          </a>
+          <a href={contact} className="inline-block py-1 underline hover:text-foreground">
+            Contact et contribution
+          </a>
+          <a href={SOURCE_URL} target="_blank" rel="noreferrer" className="inline-block py-1 underline hover:text-foreground">
+            Code source
+          </a>
+        </div>
       </footer>
     </div>
   )
@@ -116,7 +134,7 @@ function SoonItem({ icon, label }: { icon: React.ReactNode; label: string }) {
 }
 
 /** Une entrée du menu : l'icône seule ; la page où l'on est affiche aussi son nom. */
-function NavItem({ href, active, icon, label }: { href: string; active: boolean; icon: React.ReactNode; label: string }) {
+function NavItem({ href, active, icon, label, className }: { href: string; active: boolean; icon: React.ReactNode; label: string; className?: string }) {
   return (
     <Tooltip content={label}>
       <a
@@ -126,6 +144,7 @@ function NavItem({ href, active, icon, label }: { href: string; active: boolean;
         className={cn(
           'flex h-9 shrink-0 items-center gap-1.5 rounded-md px-1.5 text-sm font-medium transition-colors hover:bg-accent min-[400px]:px-2 sm:px-2.5 [&_svg]:size-4',
           active && 'bg-accent text-accent-foreground',
+          className,
         )}
       >
         {icon}

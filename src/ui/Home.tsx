@@ -249,7 +249,13 @@ export function Home() {
             </li>
           ))}
         </ol>
-        <p className="text-sm text-muted-foreground">Nous réfléchissons aussi à une offre hébergée clé en main, pour ceux qui ne veulent rien configurer.</p>
+        <p className="text-sm text-muted-foreground">
+          Nous réfléchissons aussi à une offre hébergée clé en main, pour ceux qui ne veulent rien configurer. Une idée à proposer, un défaut à signaler ?{' '}
+          <a className="text-primary underline-offset-4 hover:underline" href={href({ name: 'contact' })}>
+            Dites-le-nous
+          </a>
+          .
+        </p>
       </section>
 
       {actions.dialogs}

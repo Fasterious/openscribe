@@ -54,6 +54,10 @@ Puis ouvrez l'adresse affichée (en général http://localhost:5173).
 
 OpenScribe s'appuie sur des pratiques reconnues de l'analyse qualitative : unités de sens (idées atomiques), codage ouvert ou par grille, cartographie par affinités, synthèses étayées par les verbatims, et traçabilité de chaque affirmation jusqu'à sa source.
 
+## Contribuer
+
+Une question ou une idée : le forum [Discussions](https://github.com/Fasterious/openscribe/discussions). Un défaut : un [ticket](https://github.com/Fasterious/openscribe/issues/new/choose) (onglet *Issues* de GitHub). Pour contribuer, avec ou sans code, le [guide de contribution](CONTRIBUTING.md) dit par où commencer ; les tickets [`good first issue`](https://github.com/Fasterious/openscribe/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) sont faits pour débuter.
+
 ## Licence
 
 [AGPL-3.0-or-later](LICENSE). Vous pouvez utiliser, modifier et redistribuer OpenScribe librement. Si vous proposez une version modifiée en service en ligne, vous devez en publier le code.

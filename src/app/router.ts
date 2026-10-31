@@ -14,6 +14,8 @@ export type Route =
   | { name: 'observatory'; slug: string }
   /** La liste des études publiées. */
   | { name: 'observatories' }
+  /** `back` : l'adresse de l'étude d'où l'on vient, pour y revenir. */
+  | { name: 'contact'; back?: string }
   | { name: 'not-found' }
 
 export function parseRoute(hash: string): Route {
@@ -22,6 +24,11 @@ export function parseRoute(hash: string): Route {
   if (path === '/' || path === '') return { name: 'home' }
   if (path === '/synthese') return { name: 'synthesis' }
   if (path === '/moteurs' || path === '/reglages') return { name: 'settings', back: params.get('retour') ?? undefined }
+  if (path === '/contact') {
+    const back = params.get('retour') ?? ''
+    // Le retour vient de l'adresse : seule une étude est acceptée, jamais un lien quelconque.
+    return { name: 'contact', back: isStudy(parseRoute(back)) ? back : undefined }
+  }
   if (path === '/observatoire') return { name: 'observatories' }
   const o = path.match(/^\/observatoire\/([a-z0-9-]+)$/)
   if (o) return { name: 'observatory', slug: o[1] }
@@ -31,6 +38,11 @@ export function parseRoute(hash: string): Route {
     return { name: 'project', id: decodeURIComponent(m[1]), tab }
   }
   return { name: 'not-found' }
+}
+
+/** Une étude ouverte, la sienne ou celle de l'Observatoire : la quitter doit offrir le retour. */
+export function isStudy(route: Route): boolean {
+  return route.name === 'project' || route.name === 'observatory'
 }
 
 export function href(route: Route): string {
@@ -47,6 +59,8 @@ export function href(route: Route): string {
       return '#/observatoire'
     case 'observatory':
       return `#/observatoire/${route.slug}`
+    case 'contact':
+      return route.back ? `#/contact?retour=${encodeURIComponent(route.back)}` : '#/contact'
     default:
       return '#/'
   }

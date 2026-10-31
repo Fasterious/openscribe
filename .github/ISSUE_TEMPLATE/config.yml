@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "Une question / A question"
+    url: https://github.com/Fasterious/openscribe/discussions/categories/q-a
+    about: "Comment faire, que veut dire ce chiffre, quel moteur d'IA choisir : posez la question dans les Discussions."
+  - name: "Proposer une consultation pour l'Observatoire / Suggest a consultation"
+    url: https://github.com/Fasterious/openscribe/discussions/categories/ideas
+    about: "Une consultation citoyenne en données ouvertes à analyser : lien, licence, question posée, nombre de réponses."
