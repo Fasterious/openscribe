@@ -2,6 +2,15 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-31 — Historique anonymisé avant l'ouverture publique
+
+- Avant de rendre le dépôt public, tout l'historique a été relu puis réécrit pour en retirer des informations
+  personnelles sans rapport avec le projet (coordonnées, chemins de fichiers locaux, nom d'un fichier d'essai).
+- Aucune clé d'API n'y figurait. Le code et les décisions sont inchangés ; les identifiants de commit ont changé : les
+  copies locales sont à recloner.
+- Un seul dépôt : l'historique de travail de l'Observatoire, passes intermédiaires comprises, rejoint OpenScribe dans la
+  branche `archive/observatoire`, à côté des branches d'archive des autres modules.
+
 ## 2026-10-31 — L'Observatoire rejoint le dépôt d'OpenScribe ; prénoms : le chercheur choisit (décisions d'Arnaud)
 
 - **Un seul projet.** L'Observatoire améliore la méthode et repose sur des données ouvertes : ses études vivent

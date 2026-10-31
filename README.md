@@ -28,7 +28,6 @@ Il faut Node.js 20 ou plus récent.
 ```bash
 git clone https://github.com/Fasterious/openscribe.git
 cd openscribe
-git checkout next
 npm install
 npm run dev
 ```

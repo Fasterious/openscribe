@@ -14,6 +14,8 @@ Les branches se citent par leur nom, pas par un identifiant de commit.
 | `archive/application-nextjs` | **Le dernier état de l'ancienne application (23/08/2026)** : personas V1 et V2, workshop, transcription Voxtral, analyse CSV, comptes, clés par utilisateur. C'est la référence pour tous les modules ci-dessous. |
 | `archive/whisper-runpod` | La toute première transcription (02/2026) : WhisperX sur un serveur RunPod, avant Voxtral. |
 | `archive/email-password-auth` | La connexion par e-mail et mot de passe, retirée du MVP (problèmes de réinitialisation documentés dans `docs/AUTH_EMAIL_PASSWORD.md` de la branche). |
+| `archive/observatoire` | L'historique de travail de l'Observatoire : toutes les passes de l'étude école, les essais de méthode et leurs fichiers intermédiaires. |
+| `archive/observatoire-14-10` | Une première rubrique Observatoire (14/10) et l'accueil des contributeurs : `CONTRIBUTING.md`, modèles de tickets, `docs/TICKETS-ACCUEIL.md`, `docs/OBSERVATOIRE.md`, `docs/ROUTINE-OBSERVATOIRE.md`. |
 
 ## Personas
 
