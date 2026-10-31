@@ -10,16 +10,16 @@ Vous importez les réponses ouvertes de vos participants (questionnaire, transcr
 
 - **L'IA lit et rédige, OpenScribe vérifie.** Chaque verbatim cité est retrouvé mot pour mot dans les réponses, sinon il est écarté et vous voyez lequel. Chaque idée est rangée une seule fois. Tous les chiffres sont calculés par le programme, jamais par l'IA. Un nombre cité dans une synthèse qui ne correspond à rien est signalé « À vérifier ».
 - **Des participants, pas seulement des occurrences.** Huit critiques du même participant comptent pour un participant. Les avis partagés et les minorités constantes sont mis en évidence, pas noyés dans une moyenne.
-- **Reproductible.** La même analyse, relancée sur les mêmes données avec les mêmes réglages, donne le même rapport, mot pour mot.
-- **Vos données restent chez vous.** Pas de serveur ni de compte : tout reste dans votre navigateur. Seuls des pseudonymes (P1, P2…) et le texte des réponses partent vers le moteur d'IA que vous choisissez.
-- **Votre moteur, votre clé.** Mistral, Groq, Gemini, OpenRouter, ou Ollama sur votre propre ordinateur. Plusieurs fournisseurs ont une offre gratuite. Vous ne payez que ce que vous consommez chez eux.
+- **Reproductible.** Les réponses du moteur sont gardées en cache : la même analyse, relancée sur les mêmes données avec les mêmes réglages, redonne le même rapport, mot pour mot.
+- **Vos données restent chez vous.** Pas de serveur ni de compte : tout reste dans votre navigateur. Seuls des pseudonymes (P1, P2…) et le texte des réponses, tel qu'il a été écrit, partent vers le moteur d'IA que vous choisissez. Les prénoms présents dans les réponses se masquent en un geste, à l'écran et dans les exports.
+- **Votre moteur, votre clé.** Google Gemini pour démarrer gratuitement, Claude pour la meilleure qualité, ou un autre fournisseur du catalogue. Vous ne payez que ce que vous consommez chez eux.
 - **Des rapports qui se lisent bien.** Une étape de relecture rend les synthèses fluides et naturelles. Le programme refuse toute réécriture qui toucherait à un verbatim ou à un chiffre.
 
 ## Essayer
 
-Ouvrez l'application, puis cliquez sur **Voir un exemple de rapport** : un rapport complet sur un questionnaire fictif s'affiche, sans clé ni inscription.
+Ouvrez l'application, puis cliquez sur **Voir un exemple de rapport** : un rapport complet sur une étude de l'Observatoire, en données ouvertes, s'affiche, sans clé ni inscription.
 
-Pour analyser vos propres données, choisissez un moteur dans **Moteurs d'IA** : un guide pas à pas vous mène jusqu'à la clé gratuite (Groq, Mistral) ou à l'installation d'Ollama.
+Pour analyser vos propres données, choisissez un moteur dans **Moteurs d'IA** : un guide pas à pas vous mène jusqu'à la clé gratuite de Google Gemini.
 
 ## Installer en local
 

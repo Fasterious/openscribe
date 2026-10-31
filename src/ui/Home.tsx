@@ -269,7 +269,7 @@ const FAQ: [string, string][] = [
   ['Faut-il créer un compte ?', 'Non, ni inscription ni adresse e-mail. Pour retrouver une synthèse ailleurs, sauvegardez-la dans un fichier et rouvrez-la.'],
   [
     'Où vont mes données ?',
-    "Nulle part chez nous. Elles restent dans votre navigateur. Pour l'analyse, les verbatims partent uniquement vers le moteur d'IA que vous avez choisi, accompagnés d'un pseudonyme (P1, P2…), jamais de noms ni d'adresses.",
+    "Nulle part chez nous. Elles restent dans votre navigateur. Pour l'analyse, les verbatims partent uniquement vers le moteur d'IA que vous avez choisi, avec un pseudonyme (P1, P2…). Les colonnes de nom et d'adresse ne partent pas. Les prénoms écrits dans les réponses font partie du texte envoyé : vous pouvez les masquer à l'écran et dans les exports.",
   ],
   [
     "Quel moteur d'IA choisir ?",

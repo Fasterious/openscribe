@@ -151,8 +151,9 @@ function CorpusSummary({ project, update }: { project: Project; update: Update }
             Les participants
           </h2>
           <p className="text-sm text-muted-foreground">
-            Chaque participant reçoit un pseudonyme (P1, P2…). Pour l'analyse, seuls ce pseudonyme et ses verbatims partent vers le moteur d'IA :
-            jamais son nom ni son adresse.
+            Chaque participant reçoit un pseudonyme (P1, P2…). Pour l'analyse, seuls ce pseudonyme et ses verbatims partent vers le moteur d'IA. Les
+            colonnes de nom et d'adresse ne partent pas. Les prénoms écrits dans les réponses font partie du texte envoyé : vous
+            pourrez les masquer à l'écran et dans les exports.
           </p>
         </header>
         <div className="max-h-[32rem] divide-y overflow-y-auto border-y">

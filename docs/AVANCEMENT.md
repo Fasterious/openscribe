@@ -78,6 +78,7 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Pour 5/5 : mot isolé sans sens compté comme avis, passages au ton non couverts, « autres / l'une d'elles » à vérifier, motif fourre-tout ; deuxième corpus réel, double codage, relance sans cache, modèle léger
 - ⏳ Décisions d'Arnaud : échelle d'avis (proposition du `methodologue`), pistes opposées d'un motif à l'autre
 - ✅ Historique anonymisé avant l'ouverture publique (`docs/JOURNAL.md`)
+- ✅ Prénoms : l'application dit ce qui part vers le moteur et rappelle que le masquage est possible (`docs/JOURNAL.md`)
 - ✅ Parcours Mistral joué dans le vrai compte (13/10) : la clé gratuite n'existe plus, il faut activer le paiement à l'usage ; guide et accueil corrigés (`docs/PARCOURS-FOURNISSEURS.md`)
 - ✅ Parcours Mistral, deuxième passage avec Arnaud : clé gratuite par Admin › Clés API (Ministral inclus, Small et Medium payants) ; liste des modèles expliquée, recommandé en tête
 - ✅ Synthèse ÉcoSol avec Ministral 14B (gratuit) en trois passes : 3/5 (`methodologue` et `plume`), contre 4,5 et 4 pour Sonnet (`docs/METHODES.md`)

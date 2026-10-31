@@ -2,6 +2,13 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-31 — Prénoms : ce que l'application dit à l'utilisateur
+
+- L'application annonçait « jamais de noms ni d'adresses ». C'est vrai des colonnes, pas des prénoms écrits dans les
+  réponses : l'analyse se fait sur le texte brut, ils partent donc avec lui vers le moteur.
+- On n'interdit pas les noms : le chercheur choisit de les masquer ou non, à l'écran et dans les exports. L'accueil, les
+  moteurs d'IA, l'onglet Données et le README le disent désormais. Le README est aussi remis à jour (moteurs, exemple).
+
 ## 2026-10-31 — Historique anonymisé avant l'ouverture publique
 
 - Avant de rendre le dépôt public, tout l'historique a été relu puis réécrit pour en retirer des informations

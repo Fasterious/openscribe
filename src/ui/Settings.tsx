@@ -267,8 +267,9 @@ export function SettingsPage({ back }: { back?: string }) {
       <section className="space-y-2 rounded-xl bg-muted/50 p-5 text-sm text-muted-foreground">
         <h2 className="font-semibold text-foreground">Bon à savoir</h2>
         <p>
-          Vos clés restent enregistrées dans ce navigateur. Pour l'analyse, seuls les verbatims partent vers le moteur choisi, avec un pseudonyme (P1, P2…) :
-          jamais les noms ni les adresses.
+          Vos clés restent enregistrées dans ce navigateur. Pour l'analyse, seuls les verbatims partent vers le moteur choisi, avec un pseudonyme (P1, P2…). Les
+          colonnes de nom et d'adresse ne partent pas. Les prénoms écrits dans les réponses font partie du texte envoyé : vous
+          pouvez les masquer à l'écran et dans les exports.
         </p>
         <p>
           Données de participants : vérifiez que la politique du fournisseur est compatible avec le consentement recueilli. Avant d'ajouter une carte bancaire
