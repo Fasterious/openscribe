@@ -145,4 +145,5 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ✅ Entrées : icône de l'en-tête à partir de 432 px, pied de page partout, phrase sous « Ce qui arrive » ; lien « Code source » au pied de page
 - ✅ `CONTRIBUTING.md` et modèles de tickets et de PR repris de l'archive et remis à jour (branche `main`, vocabulaire, Observatoire)
 - ✅ En-tête : le nom du moteur s'affiche à partir de `md` et se tronque, « à vérifier » jamais
+- ⏳ Les 12 tickets ouverts renvoient encore à `next` et à un guide introuvable sur cette branche : à passer sur `main`
 - ⏳ Décision d'Arnaud : une adresse e-mail publique, pour ceux qui n'ont pas de compte GitHub, et activer le signalement privé de sécurité sur GitHub
