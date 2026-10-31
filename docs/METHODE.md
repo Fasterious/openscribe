@@ -163,6 +163,15 @@ servira un jour de point de comparaison : on pourra laisser un moteur imaginer l
 comprendre les consensus, les dissensus et les avis d'une population, puis la mesurer contre celle-ci, avec la
 même grille, sur les mêmes corpus (l'école, ÉcoSol). Elle gagnera, ou la référence restera.
 
+**Premier essai, le 29/10/2026 : un seul agent au lieu des étapes.** Sur la recommandation d'un article d'Anthropic, un
+seul agent d'IA a mené toute l'analyse de l'école dans un seul contexte, avec les mêmes règles (devenues des
+« compétences ») et les mêmes vérifications du code (devenues des outils). Comparé à armes égales à la méthode de
+référence (deux premiers essais, une ronde de relecture chacun, deux arbitres externes à l'aveugle), il écrit un peu
+mieux et demande six fois moins d'appels, mais découpe les réponses plus grossièrement et laisse des minorités moins
+visibles : les deux arbitres ont préféré la référence. Elle reste. L'essai a aussi mis au jour des défauts de la
+référence, corrigés depuis (un regret qu'une règle ait disparu compté comme un avis favorable, des consignes qui se
+contredisaient). Bilan complet et kit pour le rejouer : `essais/boucle-unique/`.
+
 ## Où se trouve quoi dans le code
 
 | Étape | Fichier |

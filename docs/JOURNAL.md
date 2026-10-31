@@ -2,6 +2,47 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-10-29 (fin) — L'école republiée avec la méthode corrigée (décision d'Arnaud)
+
+- `public/observatoire/ecole-grand-debat-2019/` refait par `scripts/observatoire/publier.ts` depuis l'analyse corrigée
+  (`observatoire/2026-10-ecole/essai-boucle/A-corrections-v3`) : méthode 7,5 et 8/10 au lieu de 7,5 et 7,5,
+  erreurs du résumé 2 et 1 au lieu de 3 et 4, langue 7,5. Fiche réécrite et relue par la `plume`.
+- L'export s'est fait sur le code noté (une consigne des thèmes a changé depuis, son cache ne servait plus) : une étude se
+  publie depuis le commit de sa notation.
+- Vérifié : build, 152 tests, 39 parcours (ordinateur et mobile), page chargée dans le navigateur, aucun prénom en clair.
+
+## 2026-10-29 (suite) — Défauts du pipeline relevés par l'essai, corrigés et vérifiés
+
+- **Demande d'Arnaud** : garder la méthode actuelle, la meilleure, corriger les défauts identifiés, et garder la trace de
+  l'essai sans l'utiliser dans le projet.
+- **Fait** : exemple tiré du corpus remplacé ; contradictions de consignes tranchées ; règle 15 (un regret de règle ou de
+  service disparu ou contourné est une critique, à la relecture et au balayage) ; contrôle `trustedPairs` ; locution
+  « d'un côté… à l'autre ». Kit de l'essai déplacé dans `essais/boucle-unique/` avec son `BILAN.md` ; rien dans `src/` ne
+  l'appelle ; règle du protocole à armes égales dans `CLAUDE.md`.
+- **Vérifié** sur l'école, même analyse rejouée depuis son cache : `methodologue` 7 et 7 → 7,5 et 8, erreurs du résumé
+  4 et 3 → 2 et 1, `plume` 7 → 7,5. Détail : `docs/METHODES.md`, « Corrections tirées de l'essai ».
+- **À trancher par Arnaud** : republier l'étude école avec cette version (meilleure que la passe 17 publiée, mêmes
+  évaluateurs : 7,5 et 7,5, 3 et 4 erreurs) ; « unanime » à remèdes contraires ; « avis partagés » quand les camps décrivent
+  des situations différentes (et le seuil, 20 contre 10 affiché partagé).
+
+## 2026-10-29 — Boucle unique (article d'Anthropic) : essayée, pas de migration
+
+- **Demande d'Arnaud** : essayer, sur une branche, la recommandation d'Anthropic (« Building agents: When to fold subagents
+  into your main agent loop », 22/10/2026) : un seul agent qui garde tout le contexte, avec des compétences, au lieu de
+  sous-agents ; migrer seulement si la note monte, et à armes égales (deux premiers essais, une ronde d'évaluation interne
+  chacun, arbitres externes).
+- **Fait** (branche `claude/agent-architecture-refactor-8v45n3`) : kit `essais/boucle-unique/` (outils qui appliquent les
+  contrôles du code, compétences reprises des consignes, import d'une analyse du pipeline) ; pipeline rejoué à neuf
+  (452 demandes) ; deux arbitres Opus à l'aveugle. Détail et chiffres : `docs/METHODES.md`, « Boucle unique contre pipeline ».
+- **Résultat** : les deux arbitres préfèrent le pipeline (confiance faible, puis modérée) ; méthode 7,25 contre 6,75 en
+  moyenne, langue 7,5 contre 8. **On garde le pipeline.** La boucle reste dans `essais/boucle-unique/` comme banc d'essai (six fois
+  moins d'appels : à reprendre si un futur modèle change la donne).
+- **Casquettes** (`.claude/agents/`) : gardées. Le `methodologue`, la `plume`, le `testeur`, le `relecteur-code` et le
+  `modele-simule` sont des vérificateurs au contexte neuf, le cas où l'article garde des sous-agents (vérification en boîte
+  noire, contexte jetable) ; la note ne mesure pas les autres, rien ne justifie de les convertir.
+- **À trancher par Arnaud** (relevé par l'essai) : le seuil « avis partagés » (20 contre 10 s'affiche partagé) ; corriger
+  l'exemple tiré du corpus de certification et les consignes qui se contredisent (liste dans `docs/METHODES.md`).
+
 ## 2026-10-20 (suite) — Trois retours d'Arnaud appliqués
 
 - **La barre de l'application se cache pendant la lecture**, partout dans le rapport : elle sort de l'écran au rythme
@@ -611,3 +652,16 @@ sourcées). Livré :
   (Synthèse), l'empreinte des données est recalculée (prénoms masqués). Une étude plus récente remplace l'exemple ;
   l'ancien exemple fictif est remplacé à la prochaine ouverture. L'encart de l'accueil devient une illustration
   (« Comment se lit un constat ») : ses verbatims sont fictifs.
+
+## 2026-10-31 — Fusion de l'essai « boucle unique » (session du 29/10)
+
+- **Fusionné** : la branche `claude/agent-architecture-refactor-8v45n3`. L'essai lui-même (une seule boucle d'agent à la
+  place du pipeline) ne change rien : le pipeline reste, préféré par les deux arbitres (`essais/boucle-unique/BILAN.md`).
+  Ses corrections de méthode, elles, sont gardées : règle 15 de la relecture (un regret de règle ou de service disparu
+  est une critique, rangée avec ce qui ne va pas), règle 6 du balayage, règles des nombres dans les thèmes et le résumé,
+  contrôle des paires de la réconciliation. École rejouée : `methodologue` 7 et 7 → 7,5 et 8, erreurs du résumé 4 et 3
+  → 2 et 1, langue 7 → 7,5.
+- **Où elles vont** : écrites pour la méthode « consultation », elles sont reportées dans la méthode commune (`COMMUNE`) ;
+  elles valent donc aussi pour la Synthèse, tous moteurs compris.
+- **L'école republiée par cette session** est gardée, sans marque « à vérifier » (réglage `doubtMarks` coupé) ; sa fiche
+  ne les cite plus (résumé et limites récrits, chiffres inchangés).

@@ -662,3 +662,92 @@ Gardé : tout ce qui précède (chacun a corrigé un défaut observé). L'erreur
 privé ») vient de la définition du motif, qui réunit dans un camp « juger le public moins bon » et « dénoncer
 l'inégalité entre les deux » : décision de méthode soumise à Arnaud. Restent pour la langue : « qui donnent un
 avis » répété (46 fois), des passifs « par N personnes », « 18 sur 18 » écrit par `highlightLine`.
+
+## Boucle unique contre pipeline, école (Grand débat 2019) — 29/10/2026
+
+Question d'Arnaud, d'après l'article d'Anthropic du 22/10/2026 (« Building agents: When to fold subagents into your main
+agent loop ») : un seul agent qui garde tout le contexte, avec des compétences (le savoir-faire des consignes) et des outils
+(les contrôles du code), fait-il mieux que le pipeline à étapes, où chaque demande ne voit qu'un lot ? Kit : `essais/boucle-unique/`
+(outils `outil.ts`, compétences reprises mot pour mot de la méthode « consultation », consigne de l'agent). Le rapport est
+rendu par le même code ; seule l'architecture change. Données : dépôt de l'Observatoire, `2026-10-ecole/essai-boucle/`.
+
+**Protocole à armes égales (demande d'Arnaud)** : deux premiers essais sur le même corpus, sans rien des passes
+précédentes ; une ronde d'évaluation et de correction dans chacun ; deux arbitres externes à la fin.
+- **A, pipeline** : à neuf, sans cache, 452 demandes répondues par des modèles simulés Opus (un agent neuf par étape, une
+  passe) ; `methodologue` et `plume` en sous-agents notent et proposent ; un orchestrateur applique leurs corrections.
+- **B, boucle unique** : un agent Opus, 66 appels d'outils ; puis, dans le même contexte, les deux casquettes converties en
+  compétences (`essais/boucle-unique/kit/competences-evaluation/`) : il s'évalue et corrige.
+- **Arbitres** : deux Opus neufs, sans les casquettes du projet, grille de `NOTATION.md`, à l'aveugle (X/Y, même titre,
+  même rendu), ordre inversé de l'un à l'autre.
+
+| | A pipeline | B boucle unique |
+|---|---|---|
+| Idées (copies) · motifs · thèmes | 1 009 (74) · 67 · 10 | 804 (51) · 52 · 9 |
+| Appels au moteur · durée | 452 · 51 min, plus la correction | 78 · 39 min |
+| Note interne (méthode / langue) | 7 · 4 erreurs du résumé / 7 (sous-agents) | 7,5 · 1 erreur / 8 (auto-évaluation) |
+| Arbitre 1 (méthode · erreurs · langue) | 7 · 1 · 7,5 | 7 · 1 · 8 |
+| Arbitre 2 | 7,5 · 3 · 7,5 | 6,5 · 3 · 8 |
+| Verdict | préféré par les deux (confiance faible, puis modérée) | |
+
+Première comparaison (passe 17, réglée 17 fois, contre la passe 1 de la boucle) : 7,5 et 7,5 contre 7 et 7,5 ; erreurs du
+résumé 3 et 4 contre 2 et 2 ; langue 8 contre 7,5. Même conclusion : pas de gain de note.
+
+**Verdict : la boucle unique ne fait pas monter la note (méthode 6,75 contre 7,25 en moyenne des arbitres) ; on ne migre
+pas le moteur** (critère d'Arnaud). Ce qu'elle fait mieux, aux deux arbitres : la langue (+0,5), une structure plus saine
+(moins de copies, moins de motifs émiettés), six fois moins d'appels. Ce qu'elle fait moins bien : un découpage plus large
+(753 idées contre 935) qui perd des nuances, des minorités moins visibles (jugements négatifs d'ensemble, critiques des
+enseignants), des tons de la carte scolaire retournés. Les deux versions gardent chacune une erreur que l'autre n'a pas :
+la boucle compte des plaintes contre les passe-droits comme favorables à la carte scolaire ; le pipeline invente une
+opposition sur la gestion des enseignants.
+
+**Les autres moteurs** : non testés, faute de clé, et la note ne justifie pas l'effort. La boucle demanderait en plus un
+appel d'outils dans `openai-compatible.ts` (absent aujourd'hui) et un contexte de 100 à 300 000 jetons renvoyé à chaque
+tour : hors de portée des offres gratuites (Groq : 8 000 jetons par minute ; Gemini Flash-Lite : 500 demandes par jour) et
+des modèles locaux.
+
+**Défauts du pipeline mis au jour par l'essai** (à corriger à la source, hors de cet essai) :
+1. L'exemple du codage en double (« 40 km par jour à cause du regroupement scolaire », `prompts.ts`) reprend une réponse du
+   corpus de certification (école, P275) : contraire à la règle des exemples ; `privacy.test.ts` ne couvre pas les corpus de
+   l'Observatoire.
+2. Consignes qui se contredisent, relevées par les modèles simulés : « ne recopie pas les chiffres » (style) contre la
+   règle 11 et la règle absolue 2 de la relecture ; « unanime » imposé (règle 7 du résumé) et interdit (règle 3) ; une ligne
+   à la fois dans « Ce qui a marché » et « Ce qui divise » ; la relecture demande `{"changes"}` mais la règle 14 exige des
+   définitions.
+3. Une paire de la réconciliation qui nomme le mauvais motif (G11 pour G42) est acceptée par le code et sa règle appliquée
+   à un motif sans rapport.
+4. Le balayage, qui cherche d'abord le camp le moins nombreux, retourne encore des étiquettes par des copies (déjà vu en
+   passe 12).
+
+### Corrections tirées de l'essai, vérifiées sur l'école (29/10/2026)
+
+Appliquées à la méthode « consultation » (commits `bd3943d`, `873172c`, `bba498b`), puis éprouvées sur l'analyse A
+rejouée depuis son cache : découpage et premier regroupement gardés, tout le reste redemandé (relectures, balayage,
+synthèses, thèmes, résumé, langue, renvois), modèles simulés Opus en une passe.
+
+1. Exemple du codage en double tiré du corpus de certification → exemple fictif (médiathèque, annexe fermée).
+2. Contradictions de consignes tranchées : chiffres de la première phrase d'une synthèse et des intros de thèmes (la règle
+   de la méthode remplace la ligne du style), « unanime » permis au résumé comme mot de l'échelle, ligne à la fois force et
+   sujet qui divise, chiffres gardés à la relecture, format de réponse de la relecture avec le livre de codes.
+3. Règle 15 (relecture et balayage) : regretter qu'une règle ou un service manque, ait disparu ou soit contourné est une
+   critique, rangée avec ce qui ne va pas ; plus jamais un avis favorable à la règle.
+4. Contrôle `trustedPairs` : une paire de la réconciliation dont la règle nomme d'autres motifs est corrigée ou écartée
+   (sans effet sur les passes en cache, sauf le cas défectueux).
+5. Contrôle « l'autre » : « d'un côté de la rue à l'autre » est une locution.
+
+Étiquettes avant et après, par script : Redoublement passe de « majorité positive » (3 sur 4) à « unanime négatif » (4 sur
+4) ; Carte scolaire de 23 sur 30 à 25 sur 29 (large majorité). Une première version (balayage sans la règle 15) recopiait en
+positif le regret d'une carte disparue et en négatif des regrets de fermetures dans « Écoles rurales » : arrêtée avant les
+synthèses, corrigée, rejouée.
+
+| Même analyse A | avant | après |
+|---|---|---|
+| `methodologue`, lecture 1 | 7 · 4 erreurs du résumé | 7,5 · 2 erreurs |
+| `methodologue`, lecture 2 | 7 · 3 erreurs | 8 · 1 erreur |
+| `plume` | 7 | 7,5 |
+
+**Gardé** : gain d'au moins un demi-point aux deux lectures, erreurs du résumé de 3,5 à 1,5 en moyenne. Restent, relevés
+aux deux lectures : un « unanime » qui réunit deux remèdes contraires (gestion des enseignants : sanctionner ou mieux
+payer), des éloges de l'école publique restés dans le motif d'appréciation d'ensemble, « Écoles rurales » encore partagé
+par des regrets de fermetures (la définition du motif les réclame), et la refusion de « Respect de la carte scolaire » dans
+« Carte scolaire ». Prochain levier, décision de méthode : signaler « unanime » quand les propositions du camp vont en sens
+contraire (`opposed`), et définir ce qu'affiche « avis partagés » quand les deux camps décrivent des situations différentes.

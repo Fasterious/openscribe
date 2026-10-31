@@ -89,6 +89,7 @@ Règles apprises :
 - Une étape qui ajoute ou déplace des avis se juge aux étiquettes qu'elle change : comparer par script les étiquettes avant et après, avant de payer l'aval.
 - Une seule méthode, la méthode commune, pour l'Observatoire et la Synthèse ; un moteur n'a qu'un réglage posé dessus (lots, exemple, règles ajoutées), jamais d'autres étapes. Un apport de réglage ne reste que si sa note monte (`docs/METHODES.md`).
 - Un moteur d'IA n'est proposé qu'au niveau de Gemini Flash-Lite au moins sur ÉcoSol (grille `docs/NOTATION.md`, deux lectures `methodologue` sur Opus), idéalement à celui de la référence, et s'il n'est pas pénible à utiliser.
+- Une architecture d'agents (boucle unique, sous-agents) se compare à armes égales : deux premiers essais, une ronde interne chacun, deux arbitres externes à l'aveugle (`essais/boucle-unique/BILAN.md`).
 - « Gratuit, sans carte » ne s'affiche qu'après un parcours réel dans la console du fournisseur, daté dans `docs/PARCOURS-FOURNISSEURS.md`.
 
 ## Principes produit (non négociables)
