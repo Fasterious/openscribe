@@ -1,0 +1,11 @@
+{
+  "jeu": "Données ouvertes du Grand Débat National",
+  "page": "https://www.data.gouv.fr/datasets/donnees-ouvertes-du-grand-debat-national",
+  "fichier": "https://static.data.gouv.fr/resources/donnees-ouvertes-du-grand-debat-national/20200611-233643/organisation-de-letat-et-des-services-publics.csv",
+  "licence": "Licence Ouverte v2.0 (Etalab)",
+  "telecharge_le": "2026-11-01",
+  "sha256": "bead581bc742373deccbea64de33055b937489f382ccef098321c60ff2c9d5a5",
+  "extrait": "grand-debat-services-publics-2019-03-21-sante.colonnes.csv.gz",
+  "colonnes_gardees": ["id", "trashed", "authorZipCode", "soins (Q35)"],
+  "note": "Même fichier que l'étude école (même empreinte). On garde l'URL, l'empreinte et les colonnes utiles : la question « remboursement de soins de santé » (colonne 35)."
+}

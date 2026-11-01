@@ -15,6 +15,7 @@ les vérifier et les refaire.
 | `sources/` | Pour chaque consultation : l'adresse et l'empreinte du fichier officiel (`*.source.json`) et ses colonnes utiles, compressées (`*.colonnes.csv.gz`). Le fichier complet est trop lourd pour le dépôt. |
 | `2026-10-ecole/` | L'école vue par les familles (Grand débat national, 2019) : la fiche publiée (`fiche.json`), l'échantillon et son tirage, les notes de chaque passe (`notes.json`), les rapports et notations des passes 1 à 17 (`run-opus-*/`), l'essai « boucle unique » (`essai-boucle/`). |
 | `2026-10-ecole/essai-boucle/A-corrections-v3/` | L'analyse publiée de l'école : cache des réponses du moteur, état complet, rapport, deux notations `methodologue` et une `plume`. |
+| `2026-11-sante/` | Le remboursement des soins vu par les assurés (Grand débat national, 2019) : fiche publiée, échantillon et son tirage, notes, et `run-opus-1/` (cache, état, rapport, deux notations `methodologue`, une `plume`). |
 | `2026-10-essai-synthese/` | L'essai qui a validé la méthode commune : 50 contributions, deux méthodes, deux lectures `methodologue` à l'aveugle et une lecture `plume`. |
 
 ## Refaire une étude

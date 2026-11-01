@@ -1,0 +1,29 @@
+[
+ {
+  "date": "2026-11-01",
+  "run": "run-opus-1",
+  "commit": "f183e83",
+  "methode": "commune (--multi-coding --sans-a-verifier), code du commit f183e83, aucun changement de méthode pour cette étude",
+  "modele": "claude-opus-5-5 (joué par sous-agents modele-simule, en parallèle par lots)",
+  "idees": 773,
+  "motifs": 46,
+  "grands_themes": 9,
+  "citations_ecartees": 0,
+  "note_sur_10": {
+   "methode": [
+    7.5,
+    7
+   ],
+   "langue": 8
+  },
+  "erreurs_du_resume": [
+   3,
+   3
+  ],
+  "structure": "saine",
+  "relecture_humaine": "1 h 30 à 3 h",
+  "publie": true,
+  "raison": "Une seule passe, sans seuil de publication. Défaut commun aux deux lectures, qui relève d'une décision de méthode (soumise à Arnaud) : le livre de codes compte comme négatif celui qui regrette qu'un objet manque (tiers payant, carte Vitale), d'où un faux sujet qui divise (tiers payant), une fausse majorité fragile (télétransmission) ; et la relecture des tons a basculé à tort une idée (P9). Les trois erreurs sont dites dans « Méthode et limites » de la fiche.",
+  "reste": "Voir observatoire/JOURNAL.md : leviers proposés (livre de codes : le manque d'un objet n'est pas une critique de l'objet ; comparaison par script des étiquettes avant/après la relecture des tons ; extension de la détection des oppositions ; sigles et « personne mitigée » dans STYLE.fr)."
+ }
+]

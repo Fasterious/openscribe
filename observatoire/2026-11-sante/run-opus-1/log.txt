@@ -1,0 +1,45 @@
+Colonnes : Région → attribute | remboursement de soins de santé → open
+08:38:48 extract:running 0/380 group:pending summarize:pending themes:pending report:pending polish:pending
+08:43:30 extract:running 80/380 group:pending summarize:pending themes:pending report:pending polish:pending
+08:44:45 extract:running 160/380 group:pending summarize:pending themes:pending report:pending polish:pending
+08:46:03 extract:running 240/380 group:pending summarize:pending themes:pending report:pending polish:pending
+08:47:19 extract:running 320/380 group:pending summarize:pending themes:pending report:pending polish:pending
+08:48:27 extract:running 380/380 group:pending summarize:pending themes:pending report:pending polish:pending
+08:48:27 extract:done 380/380 group:pending summarize:pending themes:pending report:pending polish:pending
+08:48:27 extract:done 380/380 group:running summarize:pending themes:pending report:pending polish:pending
+08:50:51 extract:done 380/380 group:running 350/679 summarize:pending themes:pending report:pending polish:pending
+08:52:25 extract:done 380/380 group:running 550/679 summarize:pending themes:pending report:pending polish:pending
+08:53:19 extract:done 380/380 group:running 679/679 summarize:pending themes:pending report:pending polish:pending
+08:53:41 extract:done 380/380 group:running 679/679 summarize:pending themes:pending report:pending polish:pending
+08:55:22 extract:done 380/380 group:running 679/679 summarize:pending themes:pending report:pending polish:pending
+08:56:26 extract:done 380/380 group:running 679/679 summarize:pending themes:pending report:pending polish:pending
+08:58:40 extract:done 380/380 group:running 679/679 summarize:pending themes:pending report:pending polish:pending
+09:00:36 extract:done 380/380 group:done 679/679 summarize:pending themes:pending report:pending polish:pending
+09:00:36 extract:done 380/380 group:done 679/679 summarize:running 0/46 themes:pending report:pending polish:pending
+09:00:58 extract:done 380/380 group:done 679/679 summarize:running 4/46 themes:pending report:pending polish:pending
+09:01:06 extract:done 380/380 group:done 679/679 summarize:running 5/46 themes:pending report:pending polish:pending
+09:01:36 extract:done 380/380 group:done 679/679 summarize:running 7/46 themes:pending report:pending polish:pending
+09:01:48 extract:done 380/380 group:done 679/679 summarize:running 9/46 themes:pending report:pending polish:pending
+09:01:54 extract:done 380/380 group:done 679/679 summarize:running 11/46 themes:pending report:pending polish:pending
+09:02:10 extract:done 380/380 group:done 679/679 summarize:running 15/46 themes:pending report:pending polish:pending
+09:02:18 extract:done 380/380 group:done 679/679 summarize:running 18/46 themes:pending report:pending polish:pending
+09:02:54 extract:done 380/380 group:done 679/679 summarize:running 23/46 themes:pending report:pending polish:pending
+09:03:00 extract:done 380/380 group:done 679/679 summarize:running 39/46 themes:pending report:pending polish:pending
+09:04:04 extract:done 380/380 group:done 679/679 summarize:running 46/46 themes:pending report:pending polish:pending
+09:04:04 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:pending report:pending polish:pending
+09:04:04 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:running 0/46 report:pending polish:pending
+09:06:45 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:pending polish:pending
+09:06:45 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:running polish:pending
+09:07:39 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:running 0/56
+09:08:27 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:running 12/56
+09:08:33 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:running 24/56
+09:08:41 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:running 32/56
+09:09:01 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:running 44/56
+09:09:31 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:running 56/56
+09:09:31 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:done 56/56
+09:09:31 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:done 56/56
+09:13:55 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:done 56/56
+09:13:56 extract:done 380/380 group:done 679/679 summarize:done 46/46 themes:done 46/46 report:done polish:done 56/56
+Terminé : done  773 idées, 46 groupes, 9 thèmes, 0 citations écartées
+Demandes sans réponse : 0
+Étude exportée : /home/user/openscribe/observatoire/2026-11-sante/run-opus-1/etude.openscribe.json

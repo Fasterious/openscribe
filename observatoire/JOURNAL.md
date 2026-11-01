@@ -1,5 +1,13 @@
 # Journal de l'Observatoire
 
+## 2026-11-01 — Soins : le remboursement vu par les assurés (Grand débat 2019), publiée
+
+- Actualité : franchises et participations forfaitaires, plafond annuel de 100 à 140 € depuis le 1er octobre 2026 ; budget de la Sécurité sociale 2027 en débat. Lien indirect (témoignages de 2019), dit dans la fiche. Aucune consultation plus proche n'a pu être trouvée : l'API de data.gouv.fr était coupée par le proxy, le fichier du Grand débat (déjà utilisé pour l'école, même empreinte) a été téléchargé après reprises.
+- Question 35 du même fichier (« remboursement de soins de santé »), 29 080 réponses distinctes, 380 tirées (graine 20261101, ± 5 points). Choix validé par le `methodologue` (réserves reportées dans la fiche : question conditionnelle, « administration concernée » qui pousse vers les caisses, 1 réponse sur 30 hors sujet, franchises très peu évoquées).
+- Méthode commune (`--multi-coding --sans-a-verifier`), code du commit f183e83, Opus 5.5 joué par des sous-agents : 773 idées, 46 motifs, 9 grands thèmes, 0 citation écartée, 378 personnes sur 380 donnent au moins une idée.
+- `methodologue` 7,5 et 7/10 (3 et 3 erreurs du résumé, structure saine), `plume` 8/10. Une seule passe jouée : le défaut commun est une décision de méthode (le livre de codes compte « négatif » celui qui regrette qu'un objet manque : tiers payant donné comme sujet qui divise, télétransmission comme majorité fragile), à soumettre à Arnaud ; la relecture des tons a aussi basculé P9 à tort.
+- Orchestration : les réponses du moteur ont été écrites par huit agents qui interrogent une même file ; relancés au fil des étapes, deux ont parfois écrit la même réponse (la dernière écrite l'emporte, le cache garde ce que le pont a lu). Pour une prochaine fois : un seul agent par file à la fois.
+
 ## 2026-10-29 — École republiée (méthode corrigée après l'essai boucle unique)
 
 - Sur décision d'Arnaud. Analyse : `2026-10-ecole/essai-boucle/A-corrections-v3/` (commit 873172c), le pipeline à neuf
@@ -62,10 +70,12 @@
 | Date | Sujet d'actualité | Source | Échantillon | Notes (méthode / langue) | Publié |
 |---|---|---|---|---|---|
 | 2026-10-14/17 | Mobilisation lycéenne et étudiante | Grand débat 2019, « Organisation de l'État et des services publics », question scolarisation | 378 / 21 868 (± 5 pts) | 7 et 7,5/10 / 7/10 (passe 16c ; passe 17 non re-notée) | Oui, 17/10 ; passe 17 le 18/10 |
+| 2026-11-01 | Franchises médicales à 140 € par an, budget de la Sécurité sociale 2027 | Grand débat 2019, « Organisation de l'État et des services publics », question remboursement de soins | 380 / 29 080 (± 5 pts) | 7,5 et 7/10 / 8/10 (3 et 3 erreurs du résumé) | Oui, 01/11 |
 
 ## Consultations repérées pour plus tard
 
 - Ville de Paris, consultations numériques 2015–2025 (opendata.paris.fr) : « Paris accessible » 2026 (questions ouvertes courtes), « Animaux en ville » 2025 (surtout des choix fermés).
+- Grand débat 2019, même fichier : questions « retraite » (colonne 34) et « handicap » (colonne 36), pas encore faites.
 - Grand débat 2019 : trois autres espaces (fiscalité, transition écologique, démocratie), question « formation » (colonne 31) du même fichier.
 - Consultation République numérique (2015, 21 330 contributions, licence ouverte).
 - Consultation citoyenne sur les retraites (2019) : licence non précisée, à vérifier avant usage.

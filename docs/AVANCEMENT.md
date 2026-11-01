@@ -148,3 +148,11 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Les 12 tickets ouverts renvoient encore à `next` et à un guide introuvable sur cette branche : à passer sur `main`
 - ✅ GitHub seul pour l'instant (décision d'Arnaud, 31/10) : sans compte, pas de retour possible ; pas d'adresse e-mail
 - ⏳ Activer le signalement privé de sécurité sur GitHub
+
+## Observatoire, deuxième étude (1er/11)
+
+- ✅ Publiée : « Le remboursement des soins vu par les assurés » (Grand débat 2019, 380 réponses sur 29 080), méthode commune, Opus 5.5 :
+  `methodologue` 7,5 et 7/10 (3 et 3 erreurs du résumé), `plume` 8/10 ; `observatoire/2026-11-sante/`
+- ⏳ À trancher par Arnaud : dans le livre de codes, celui qui regrette qu'un objet manque (tiers payant, carte Vitale) ne doit
+  pas compter comme critique de l'objet ; contrôle par script des étiquettes avant/après la relecture des tons
+

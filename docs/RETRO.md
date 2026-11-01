@@ -2,6 +2,17 @@
 
 Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'on change. Le plus récent en haut.
 
+## 2026-11-01 — Observatoire : étude « soins » (rythme tous les 15 jours)
+
+- **Bien marché** : le même fichier du Grand débat, déjà vérifié (même empreinte), a évité de dépendre de data.gouv.fr coupé
+  par le proxy ; des agents « travailleurs » qui interrogent eux-mêmes la file des demandes ont remplacé des dizaines de tours
+  d'orchestration ; deux lectures `methodologue` convergent sur les mêmes erreurs (tiers payant, P9).
+- **Coûté pour rien** : des agents relancés pour la même part de la file ont parfois écrit deux fois la même réponse ; le
+  pont ne lit qu'une fois, mais l'ordre d'écriture n'est pas maîtrisé. Les extractions (380 demandes d'une personne) sont le
+  gros du travail, les étapes suivantes sont peu nombreuses mais longues.
+- **On change** : un seul agent par part de file et un arrêt sur fichier STOP ; le défaut commun aux lectures (manque
+  d'un objet compté comme critique) est une décision de méthode, soumise à Arnaud, pas jouée en passe 2.
+
 ## 2026-10-29 — Essai boucle unique
 
 - **Bien marché** : comparer à armes égales (deux premiers essais, une ronde interne chacun, arbitres externes à

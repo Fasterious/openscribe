@@ -2,6 +2,16 @@
 
 Chaque décision structurante, datée, avec sa raison. Le plus récent en haut.
 
+## 2026-11-01 — Observatoire : deuxième étude, rythme de quinze jours
+
+- **Décision d'Arnaud** : une étude tous les 15 jours, liée à l'actualité, publiée sans relecture humaine (la transparence
+  remplace la relecture : limites, notes et erreurs relevées sont dites dans la fiche).
+- **Fait** : « Le remboursement des soins vu par les assurés » (Grand débat 2019, question 35), publiée avec la méthode commune
+  et le meilleur moteur. Actualité : plafond des franchises relevé au 1er octobre 2026 ; lien indirect, dit en tête de la fiche.
+- **Pourquoi pas de passe 2** : les deux lectures `methodologue` (7,5 et 7/10, 3 erreurs chacune) s'accordent sur un défaut qui
+  relève de la méthode (le livre de codes compte comme critique celui qui regrette qu'un objet manque) ; selon la règle apprise,
+  on le soumet à Arnaud au lieu de jouer la passe. Détail : `observatoire/JOURNAL.md`.
+
 ## 2026-10-31 — Prénoms : ce que l'application dit à l'utilisateur
 
 - L'application annonçait « jamais de noms ni d'adresses ». C'est vrai des colonnes, pas des prénoms écrits dans les
