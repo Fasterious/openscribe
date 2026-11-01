@@ -728,4 +728,6 @@ sourcées). Livré :
 - **Claude Sonnet recommandé** : même note qu'Opus (à un demi-point près) pour 40 % de moins. Haiku reste proposé comme option économique.
 - **Large 4 à l'étude** malgré une note au seuil : la règle exclut un moteur pénible, et l'offre gratuite demande plus d'une heure. Payé, il faudrait le remesurer.
 - **Clé Anthropic** : réservée à cet essai (décision d'Arnaud) ; les analyses courantes restent sur l'abonnement.
+- **Comparatif par usage, pas par note** : recommandé d'abord, puis gratuit ; la meilleure valeur de chaque colonne est en gras, calculée par le code. Minimum de texte (demande d'Arnaud) ; le protocole reste derrière le « i ».
+- **Sonnet reste recommandé après le Grand débat** : par l'API, à l'aveugle, Opus prend un demi-point sur 378 réponses, pas sur 20, pour presque deux fois le prix.
 

@@ -40,7 +40,7 @@ note. `scripts/aveugle.ts masquer` copie les synthèses dans `aveugle/<code>/`, 
 mêlé, sans nom de moteur ni réglage ; le script s'arrête s'il en trouve un. Deux lectures `methodologue` par code, sur
 Opus en réflexion moyenne, chacune dans le seul dossier du code, sans jamais citer le nombre d'idées ou de motifs (ces
 chiffres trahissent le moteur à l'orchestrateur). Une fois tout noté, un agent qui n'a pas participé à la notation lance
-`aveugle.ts lever`, puis contrôle la correspondance. Les relevés sont dans `docs/PERFORMANCES-MOTEURS.md`.
+`aveugle.ts lever`, puis contrôle la correspondance. Chaque lecture garde ses scripts dans un dossier à elle : dans un bloc-notes partagé, deux lectures ont vu un fragment l'une de l'autre (1/11). Les relevés sont dans `docs/PERFORMANCES-MOTEURS.md`.
 
 ## `methodologue` : la méthode (note sur 10)
 

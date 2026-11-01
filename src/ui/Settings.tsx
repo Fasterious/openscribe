@@ -1,4 +1,4 @@
-import { ArrowLeft, BadgeCheck, Check, CheckCircle2, Cloud, Copy, ExternalLink, FlaskConical, HardDrive, Info, Loader2, Lock, RefreshCw, Sparkles, Trash2, Zap } from 'lucide-react'
+import { ArrowLeft, Check, CheckCircle2, Cloud, Copy, ExternalLink, Info, Loader2, Lock, RefreshCw, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import {
   detectOllama,
@@ -14,8 +14,8 @@ import {
 } from '@/app/engines'
 import { href } from '@/app/router'
 import { runsLocally } from '@/core/providers/location'
-import { PROVIDER_PRESETS, modelProposed, presetById, presetStudy, type BlindTest, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
-import { Alert, Badge, Button, Card, CardContent, Chevron, Dialog, DropMenu, Input, Label, MenuItem, MenuSection, Select, Tooltip, cn } from './primitives'
+import { COMPARED, LARGE_PARTICIPANTS, NOT_EVALUATED, PROVIDER_PRESETS, modelProposed, presetById, presetStudy, type BlindTest, type DataPolicy, type ModelChoice, type ProviderPreset } from '@/core/providers/presets'
+import { Alert, Badge, Button, Card, CardContent, Chevron, Dialog, Disclosure, DropMenu, Explain, Input, Label, MenuItem, MenuSection, Select, cn } from './primitives'
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
   local: { label: 'Rien ne quitte votre ordinateur', tone: 'positive' },
@@ -25,31 +25,6 @@ const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' |
 }
 
 /** Les autres fournisseurs, rangés par type : l'explication reste discrète, au survol. */
-const KINDS: { id: ProviderKind | null; title: string; hint: string }[] = [
-  {
-    id: 'direct',
-    title: 'Fournisseurs directs',
-    hint: "L'éditeur sert ses propres modèles : un seul contrat, une politique de données claire, le prix catalogue. Il faut une clé par éditeur.",
-  },
-  {
-    id: 'host',
-    title: 'Hébergeurs de modèles ouverts',
-    hint: "Ils font tourner sur leurs machines des modèles publiés par d'autres (Mistral, Qwen, gpt-oss…) : on sait qui traite les données, et le choix se limite aux modèles ouverts.",
-  },
-  {
-    id: 'router',
-    title: 'Plateformes multi-fournisseurs',
-    hint: 'Une seule clé pour des centaines de modèles, relayés vers de nombreux hébergeurs. En contrepartie, un intermédiaire de plus voit passer les données, et la politique de données dépend du modèle choisi.',
-  },
-  { id: 'custom', title: 'Autre service', hint: "Tout service compatible avec l'API d'OpenAI (vLLM, un relais personnel…)." },
-]
-
-const FAMILIES: { id: PresetFamily; title: string; icon: React.ReactNode }[] = [
-  { id: 'free', title: 'Pour essayer gratuitement', icon: <Zap /> },
-  { id: 'local', title: 'Pour que rien ne quitte votre ordinateur', icon: <HardDrive /> },
-  { id: 'other', title: 'Autres fournisseurs', icon: <Sparkles /> },
-]
-
 /**
  * Depuis le site en ligne, interroger Ollama fait demander au navigateur l'accès aux applications de cet appareil :
  * on ne le cherche donc que sur demande, sauf si la page tourne déjà sur l'ordinateur ou si l'accès est déjà accordé.
@@ -99,8 +74,7 @@ export function SettingsPage({ back }: { back?: string }) {
         )}
         <h1 className="text-3xl font-bold tracking-tight">Moteurs d'IA</h1>
         <p className="max-w-2xl text-muted-foreground">
-          Le moteur d'IA lit et rédige ; OpenScribe vérifie les citations et fait les comptes. Seuls les moteurs dont la qualité a été vérifiée sont
-          proposés : les autres restent à l'étude.
+          Le moteur d'IA lit et rédige ; OpenScribe vérifie les citations et fait les comptes.
         </p>
       </header>
 
@@ -183,7 +157,7 @@ export function SettingsPage({ back }: { back?: string }) {
           <h2 id="mes-moteurs" className="text-lg font-semibold">
             Vos moteurs
           </h2>
-          <ul className="grid gap-3">
+          <ul className="grid grid-cols-[minmax(0,1fr)] gap-3">
             {engines.map((e) => {
               const preset = presetById(e.presetId)
               const policy = POLICY[preset?.dataPolicy ?? 'check']
@@ -221,50 +195,40 @@ export function SettingsPage({ back }: { back?: string }) {
         </section>
       )}
 
-      <section aria-labelledby="choisir" className="space-y-6">
+      <section aria-labelledby="choisir" className="space-y-4">
         <h2 id="choisir" className="text-lg font-semibold">
           {engines.length ? 'Ajouter un autre moteur' : 'Choisissez votre moteur'}
         </h2>
-        {FAMILIES.map((f) => (
-          <div key={f.id} className="space-y-3">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground [&_svg]:size-4">
-              {f.icon} {f.title}
-            </h3>
-            {(f.id === 'other' ? KINDS : [{ id: null, title: '', hint: '' }]).map((k) => {
-              // Les moteurs validés d'abord, puis ceux à l'étude.
-              const rank = (p: ProviderPreset) => (presetStudy(p) ? 0 : 2) + Number(!!p.featured)
-              const presets = PROVIDER_PRESETS.filter((p) => p.family === f.id && (k.id === null || p.kind === k.id)).sort((a, b) => rank(b) - rank(a))
-              if (!presets.length) return null
-              return (
-                <div key={k.id ?? f.id} className="space-y-2">
-                  {k.id && (
-                    <Tooltip content={k.hint}>
-                      <h4 tabIndex={0} className="inline-flex cursor-help items-center gap-1 text-xs font-medium text-muted-foreground">
-                        {k.title} <Info className="size-3" />
-                      </h4>
-                    </Tooltip>
-                  )}
-                  <ul className={cn('grid gap-3', f.id === 'other' ? 'sm:grid-cols-3' : 'sm:grid-cols-2')}>
-                    {presets.map((p) => (
-                      <li key={p.id}>
-                        <ProviderCard
-                          preset={p}
-                          configured={engines.some((e) => e.presetId === p.id && e.verified !== false)}
-                          ollama={p.id === 'ollama' ? ollama.status : undefined}
-                          compact={f.id === 'other'}
-                          onSetup={() => setEditing(engines.find((e) => e.presetId === p.id) ?? newEngineFromPreset(p.id))}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )
-            })}
+        <EngineComparison
+          engines={engines}
+          onSetup={(presetId, model) => {
+            // Un autre modèle du même fournisseur s'ajoute, avec la même clé : il ne remplace jamais le moteur déjà enregistré.
+            const same = engines.find((e) => e.presetId === presetId && e.model === model)
+            const sibling = engines.find((e) => e.presetId === presetId)
+            setEditing(same ?? { ...newEngineFromPreset(presetId), apiKey: sibling?.apiKey ?? '', model })
+          }}
+        />
+        <Disclosure plain className="max-w-3xl" summary="Autres moteurs">
+          <div className="space-y-3 pt-3">
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {PROVIDER_PRESETS.filter((p) => presetStudy(p) && presetStudy(p) !== NOT_EVALUATED).map((p) => (
+                <li key={p.id}>
+                  <ProviderCard preset={p} ollama={p.id === 'ollama' ? ollama.status : undefined} />
+                </li>
+              ))}
+            </ul>
+            <p className="text-sm text-muted-foreground">
+              Pas encore évalués :{' '}
+              {PROVIDER_PRESETS.filter((p) => presetStudy(p) === NOT_EVALUATED)
+                .map((p) => p.label.replace(/ \(.*\)$/, ''))
+                .join(', ')}
+              .
+            </p>
           </div>
-        ))}
+        </Disclosure>
       </section>
 
-      <section className="space-y-2 rounded-xl bg-muted/50 p-5 text-sm text-muted-foreground">
+      <section className="max-w-3xl space-y-2 rounded-xl bg-muted/50 p-5 text-sm text-muted-foreground">
         <h2 className="font-semibold text-foreground">Bon à savoir</h2>
         <p>
           Vos clés restent enregistrées dans ce navigateur. Pour l'analyse, seuls les verbatims partent vers le moteur choisi, avec un pseudonyme (P1, P2…). Les
@@ -282,64 +246,122 @@ export function SettingsPage({ back }: { back?: string }) {
   )
 }
 
-function ProviderCard({
-  preset,
-  configured,
-  ollama,
-  compact,
-  onSetup,
-}: {
-  preset: ProviderPreset
-  configured: boolean
-  ollama?: OllamaStatus | null
-  compact?: boolean
-  onSetup: () => void
-}) {
-  const policy = POLICY[preset.dataPolicy]
-  const study = presetStudy(preset)
+/** Une colonne par critère, une ligne par moteur proposé : en mobile, le nom passe sur toute la largeur et les chiffres restent alignés. */
+const COMPARISON_ROW = 'grid grid-cols-[repeat(3,minmax(0,1fr))_5.5rem] items-center gap-2 border-b py-3 @2xl:grid-cols-[minmax(0,1fr)_4.5rem_4.5rem_4.5rem_5.5rem] @2xl:gap-4'
+
+const mean = (scores: [number, number]) => (scores[0] + scores[1]) / 2
+const duration = (minutes: number) => (minutes < 60 ? `${minutes}\u00a0min` : `${Math.floor(minutes / 60)}\u00a0h\u00a0${String(minutes % 60).padStart(2, '0')}`)
+
+/** Les trois chiffres d'un moteur pour une taille d'étude ; `value` sert à repérer la meilleure valeur, `undefined` tant que le moteur n'a pas terminé. */
+function comparisonCells(test: BlindTest, large: boolean) {
+  const m = large ? test.large : test
+  return [
+    { text: m?.scores ? range(m.scores) : '—', value: m?.scores ? mean(m.scores) : undefined },
+    {
+      text: m?.minutes !== undefined ? duration(m.minutes) : `≈\u00a0${test.large?.days ?? '?'}\u00a0jours`,
+      value: m?.minutes,
+    },
+    { text: m?.costUsd === undefined ? 'Gratuit' : `≈\u00a0${fr(m.costUsd)}\u00a0$`, value: m?.costUsd ?? 0 },
+  ]
+}
+
+/** Note, durée, coût : de quoi choisir un moteur d'un coup d'œil, pour une petite ou une grosse synthèse. La meilleure valeur de chaque colonne ressort ; le protocole reste derrière le « i ». */
+function EngineComparison({ engines, onSetup }: { engines: EngineConfig[]; onSetup: (presetId: string, model: string) => void }) {
+  const [large, setLarge] = useState(false)
+  const rows = COMPARED.map((c) => ({ ...c, choice: presetById(c.preset)!.models!.find((m) => m.id === c.model)! }))
+  const cells = rows.map((r) => comparisonCells(r.choice.blindTest!, large))
+  const column = (i: number) => cells.map((c) => c[i].value).filter((v): v is number => v !== undefined)
+  const best = [Math.max(...column(0)), Math.min(...column(1)), Math.min(...column(2))]
   return (
-    <Card className={cn('flex h-full flex-col p-4', configured && 'border-positive/60', study && !configured && 'bg-muted/40')}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className={cn('font-semibold', study && !configured && 'text-muted-foreground')}>{preset.label.replace(/ \(.*\)$/, '')}</span>
-        <span className="flex flex-wrap gap-1">
-          {configured && (
-            <Badge tone="positive">
-              <Check className="size-3" /> Configuré
-            </Badge>
-          )}
-          {study ? (
-            <Badge tone="outline" className="gap-1">
-              <FlaskConical className="size-3" /> À l'étude
-            </Badge>
-          ) : (
-            <>
-              <Badge tone="positive" className="gap-1">
-                <BadgeCheck className="size-3" /> Qualité vérifiée
-              </Badge>
-              {!configured && preset.family === 'free' && <Badge tone="default">Gratuit, sans carte</Badge>}
-            </>
-          )}
-        </span>
+    <div className="@container max-w-3xl">
+      <div role="group" aria-label="Taille de la synthèse" className="mb-3 inline-flex rounded-md border p-0.5">
+        {[false, true].map((value) => (
+          <button
+            key={String(value)}
+            type="button"
+            aria-pressed={large === value}
+            onClick={() => setLarge(value)}
+            className={cn(
+              'rounded px-3 py-1 text-sm tabular-nums pointer-coarse:py-2.5 focus-visible:outline-2 focus-visible:outline-ring',
+              large === value ? 'bg-accent font-medium text-accent-foreground' : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {value ? LARGE_PARTICIPANTS : 20} participants
+          </button>
+        ))}
       </div>
-      <p className="mt-2 text-sm">{preset.bestFor}</p>
-      {study ? (
-        <p className="mt-1 text-xs text-muted-foreground">{study}</p>
-      ) : (
-        !compact && <p className="mt-1 text-xs text-muted-foreground">{preset.freeTier}</p>
-      )}
+      <div role="table" aria-label="Comparaison des moteurs d'IA" className="border-t">
+        <div role="row" className={cn(COMPARISON_ROW, 'items-end py-2 text-xs font-medium text-muted-foreground')}>
+          <span role="columnheader" className="sr-only @2xl:not-sr-only">
+            Moteur d'IA
+          </span>
+          <span role="columnheader" className="@2xl:text-right">
+            Note /10
+          </span>
+          <span role="columnheader" className="@2xl:text-right">
+            Durée
+          </span>
+          <span role="columnheader" className="@2xl:text-right">
+            Coût
+          </span>
+          <span role="columnheader" className="sr-only">
+            Action
+          </span>
+        </div>
+        {rows.map((r, index) => {
+          const configured = engines.some((e) => e.presetId === r.preset && e.model === r.model && e.verified !== false)
+          return (
+            <div role="row" key={r.model} className={COMPARISON_ROW}>
+              <div role="rowheader" className="col-span-full min-w-0 @2xl:col-span-1">
+                <div className="flex min-h-6 flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold">{r.choice.label}</span>
+                  {r.tag && <Badge tone="default">{r.tag}</Badge>}
+                  {configured && (
+                    <Badge tone="positive">
+                      <Check className="size-3" /> Configuré
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">{r.pitch}</p>
+              </div>
+              {cells[index].map((cell, i) => (
+                <span role="cell" key={i} className={cn('text-base tabular-nums whitespace-nowrap @2xl:text-right', cell.value === best[i] && 'font-semibold')}>
+                  {cell.text}
+                </span>
+              ))}
+              <span role="cell" className="justify-self-end">
+                <Button
+                  size="sm"
+                  className="pointer-coarse:h-11"
+                  variant={index === 0 && !configured ? 'default' : 'outline'}
+                  aria-label={`${configured ? 'Modifier' : 'Configurer'} ${r.choice.label}`}
+                  onClick={() => onSetup(r.preset, r.model)}
+                >
+                  {configured ? 'Modifier' : 'Configurer'}
+                </Button>
+              </span>
+            </div>
+          )
+        })}
+      </div>
+      <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+        <span>Mesuré le {blindTestDate(rows[0].choice.blindTest!.date)}</span>
+        <Explain content="Chaque moteur a rédigé une synthèse des mêmes réponses réelles, notée deux fois à l’aveugle par Claude Opus 5.5. Un repère, pas une garantie.">
+          <span className="inline-flex size-6 items-center justify-center pointer-coarse:-my-2.5 pointer-coarse:size-11" aria-label="Comment ces chiffres sont obtenus">
+            <Info className="size-3.5" />
+          </span>
+        </Explain>
+      </p>
+    </div>
+  )
+}
+
+function ProviderCard({ preset, ollama }: { preset: ProviderPreset; ollama?: OllamaStatus | null }) {
+  return (
+    <Card className="flex h-full flex-col bg-muted/40 p-4">
+      <span className="font-semibold text-muted-foreground">{preset.label.replace(/ \(.*\)$/, '')}</span>
+      <p className="mt-1 text-xs text-muted-foreground">{presetStudy(preset)}</p>
       {ollama !== undefined && <OllamaLine status={ollama} />}
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
-        {!compact ? <Badge tone={policy.tone}>{policy.label}</Badge> : <span />}
-        {study && !configured ? (
-          <Button size="sm" variant="outline" disabled aria-label={`Configurer ${preset.label} : à l'étude`}>
-            Non proposé
-          </Button>
-        ) : (
-          <Button size="sm" variant={configured ? 'outline' : 'default'} onClick={onSetup}>
-            {configured ? 'Modifier' : 'Configurer'}
-          </Button>
-        )}
-      </div>
     </Card>
   )
 }
@@ -438,7 +460,7 @@ function SetupDialog({
   }
 
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()} title={`Configurer ${preset?.label ?? 'un moteur'}`} className="max-w-xl">
+    <Dialog open onOpenChange={(o) => !o && onClose()} title={`Configurer ${preset?.models?.find((m) => m.id === draft.model)?.label ?? preset?.label ?? 'un moteur'}`} className="max-w-xl">
       {state.phase === 'ok' ? (
         <div className="space-y-4">
           <Alert tone="success">
@@ -728,11 +750,13 @@ function BlindTestNote({ test }: { test: BlindTest }) {
       <span>
         {blindTestLine(test)} pour 20 participants, testé le {blindTestDate(test.date)}
       </span>
-      <Tooltip
+      <Explain
         content={`Note donnée à une synthèse réelle de 20 participants, lue deux fois à l'aveugle par Claude Opus 5.5, sans savoir quel moteur l'avait produite. Chaque lecture a relevé ${range(test.errors)} erreurs qui changent une conclusion. C'est un repère pour comparer les moteurs, pas une garantie : relisez toujours le rapport.`}
       >
-        <Info className="size-3.5" aria-label="Comment cette note est obtenue" />
-      </Tooltip>
+        <span className="inline-flex size-6 items-center justify-center" aria-label="Comment cette note est obtenue">
+          <Info className="size-3.5" />
+        </span>
+      </Explain>
     </p>
   )
 }

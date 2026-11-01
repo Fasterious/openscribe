@@ -21,7 +21,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        default: 'border border-transparent bg-primary text-primary-foreground hover:bg-primary/90',
         outline: 'border border-input bg-card hover:bg-accent hover:text-accent-foreground',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         destructive: 'bg-negative text-white hover:bg-negative/90',
@@ -307,7 +307,7 @@ export function Explain({ content, children }: { content: React.ReactNode; child
             collisionPadding={12}
             // Un toucher ailleurs ferme la bulle (Radix) ; sur l'étiquette elle-même, c'est le clic qui décide.
             onPointerDownOutside={(e) => trigger.current?.contains(e.target as Node) && e.preventDefault()}
-            className="z-50 max-w-80 rounded-md border bg-card px-3 py-2 text-sm leading-relaxed text-foreground shadow-lg"
+            className="z-50 max-w-[min(20rem,calc(100vw-1.5rem))] rounded-md border bg-card px-3 py-2 text-sm leading-relaxed text-foreground shadow-lg"
           >
             {content}
           </TooltipPrimitive.Content>

@@ -159,6 +159,7 @@ Mesures : `docs/PERFORMANCES-MOTEURS.md`.
   être relu (navigateur non connecté) : les quotas restent ceux du 13/10.
 - **Anthropic** : clé par Authorization, appel depuis le navigateur vérifié ; pas de longueur de réponse requise par l'accès
   compatible OpenAI ; 4 000 demandes et 2,4 millions de jetons par minute sur ce compte. `reasoning_effort` y est ignoré.
+- **Gemini gratuit** : limites par projet et par modèle. Flash-Lite 500 demandes par jour ; Flash 20 ; reprise vers 9 h à Paris. Argon, 3.1 Pro et Omni Flash : pas d'offre gratuite.
 - **Abonnement Claude** : l'usage de Claude Code est inclus dans Pro et Max, sans clé (documentation du 1/11). Le parcours
   depuis une installation neuve n'a pas été rejoué. Pour Gemini CLI, remplacé par Antigravity CLI en juin 2026, et pour Codex,
   les sources se contredisent ou ne sont pas officielles : rien à annoncer sans essai.

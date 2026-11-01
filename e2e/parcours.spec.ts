@@ -395,21 +395,39 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   await page.getByRole('tab', { name: /Analyse/ }).click()
   await page.getByRole('link', { name: 'Choisir un moteur' }).click()
 
-  // Les fournisseurs sont visibles d'emblée, sans clic préalable.
+  // Le choix se lit d'emblée : qualité, durée et coût, le moteur recommandé en tête.
   await expect(page.getByRole('heading', { name: "Moteurs d'IA" })).toBeVisible()
-  for (const name of ['Mistral AI', 'Google Gemini', 'Groq', 'Ollama']) await expect(page.getByText(name, { exact: true }).first()).toBeVisible()
-  // Seuil de qualité : Gemini est vérifié ; Mistral et Ollama restent visibles, à l'étude, avec la raison, et ne se configurent pas.
+  const row = (name: string) => page.getByRole('row').filter({ hasText: name })
+  await expect(page.getByRole('row').nth(1)).toContainText('Claude Sonnet 5.5')
+  await expect(page.getByRole('row').nth(1)).toContainText('Recommandé')
+  await expect(row('Gemini 3.5 Flash-Lite')).toContainText('Gratuit')
+  await expect(row('Gemini 3.5 Flash-Lite')).toContainText('5,5')
+  // Le bouton passe aux mesures sur 378 participants ; un moteur sans mesure le dit, sans chiffre inventé.
+  await page.getByRole('button', { name: '378 participants' }).click()
+  await expect(page.getByRole('button', { name: '378 participants' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(row('Claude Opus 5.5')).toContainText('7,5 à 8')
+  await expect(row('Gemini 3.5 Flash-Lite')).toContainText('2\u00a0jours')
+  await expect(row('Gemini 3.5 Flash-Lite')).toContainText('—')
+  await page.getByRole('button', { name: '20 participants' }).click()
+  // Le « i » s'ouvre aussi au toucher ; il dit comment les chiffres sont obtenus.
+  if (await page.evaluate(() => matchMedia('(pointer: coarse)').matches)) {
+    const button = await row('Gemini 3.5 Flash-Lite').getByRole('button').boundingBox()
+    expect(button!.height).toBeGreaterThanOrEqual(44)
+  }
+  await page.getByLabel('Comment ces chiffres sont obtenus').click()
+  await expect(page.getByRole('tooltip').first()).toContainText('à l’aveugle')
+  await page.keyboard.press('Escape')
+  // Les autres moteurs restent visibles, à l'étude, avec la raison, et ne se configurent pas.
+  await page.getByText('Autres moteurs', { exact: true }).click()
   const card = (name: string) => page.getByRole('listitem').filter({ hasText: name })
-  await expect(card('Google Gemini')).toContainText('Qualité vérifiée')
-  await expect(card('Mistral AI')).toContainText("À l'étude")
   await expect(card('Mistral AI')).toContainText('fait moins bien')
-  await expect(card('Mistral AI').getByRole('button', { name: /à l'étude/ })).toBeDisabled()
+  await expect(card('Mistral AI').getByRole('button')).toHaveCount(0)
   await expect(card('Ollama').first()).toContainText('24 Go')
   await noHorizontalScroll(page)
   await shot(page, '8-moteurs')
 
   // Le guide Gemini mène directement à la page des clés.
-  await card('Google Gemini').getByRole('button', { name: 'Configurer' }).click()
+  await row('Gemini 3.5 Flash-Lite').getByRole('button', { name: 'Configurer' }).click()
   // La note du modèle choisi se lit sous la liste, et le « i » dit comment elle a été obtenue.
   await expect(page.getByRole('dialog')).toContainText('Note 5,5/10 · 6\u00a0min · gratuit pour 20 participants, testé le 1er nov. 2026')
   const dialog = page.getByRole('dialog')
@@ -431,9 +449,27 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   await expect(page.getByText(/Modèle : gemini-3.5-flash-lite/)).toBeVisible()
 })
 
+test('moteurs d’IA : configurer un second modèle du même fournisseur ne remplace pas le premier', async ({ page }) => {
+  await page.goto('/#/moteurs')
+  const row = (name: string) => page.getByRole('row').filter({ hasText: name })
+  await row('Claude Sonnet 5.5').getByRole('button').click()
+  let dialog = page.getByRole('dialog')
+  await dialog.getByLabel("Clé d'accès").fill('cle-de-test')
+  await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()
+  await dialog.getByRole('button', { name: 'Enregistrer quand même' }).click()
+  await row('Claude Haiku 5.5').getByRole('button').click()
+  dialog = page.getByRole('dialog')
+  // La clé est reprise : pas besoin de la retrouver pour un autre modèle du même compte.
+  await expect(dialog.getByLabel("Clé d'accès")).toHaveValue('cle-de-test')
+  await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()
+  await dialog.getByRole('button', { name: 'Enregistrer quand même' }).click()
+  await expect(page.getByText('Modèle : claude-sonnet-5-5')).toBeVisible()
+  await expect(page.getByText('Modèle : claude-haiku-5-5')).toBeVisible()
+})
+
 test('moteurs d’IA : le modèle se choisit dans une liste expliquée, le recommandé en tête', async ({ page }) => {
   await page.goto('/#/moteurs')
-  await page.getByRole('listitem').filter({ hasText: 'Google Gemini' }).getByRole('button', { name: 'Configurer' }).click()
+  await page.getByRole('row').filter({ hasText: 'Gemini 3.5 Flash-Lite' }).getByRole('button', { name: 'Configurer' }).click()
   const dialog = page.getByRole('dialog')
   const picker = dialog.getByRole('button', { name: 'Choisir le modèle' })
   await expect(picker).toContainText('Gemini 3.5 Flash-Lite')
@@ -454,7 +490,7 @@ test('moteurs d’IA : le modèle se choisit dans une liste expliquée, le recom
 test('qui fait quoi : le moteur en ligne est annoncé, et le mode Confidentiel ne s’affiche pas sans moteur local', async ({ page }) => {
   // Un moteur en ligne, enregistré sans test réussi (pas de réseau ici).
   await page.goto('/#/moteurs')
-  await page.getByRole('listitem').filter({ hasText: 'Google Gemini' }).getByRole('button', { name: 'Configurer' }).click()
+  await page.getByRole('row').filter({ hasText: 'Gemini 3.5 Flash-Lite' }).getByRole('button', { name: 'Configurer' }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel("Clé d'accès").fill('cle-de-test')
   await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()
@@ -535,7 +571,7 @@ test('un moteur qui n’a pas répondu au test n’est ni annoncé prêt ni choi
   await page.getByRole('button', { name: /Importer les réponses à \d+ questions?/ }).click()
   await page.getByRole('tab', { name: /Analyse/ }).click()
   await page.getByRole('link', { name: 'Choisir un moteur' }).click()
-  await page.getByRole('listitem').filter({ hasText: 'Google Gemini' }).getByRole('button', { name: 'Configurer' }).click()
+  await page.getByRole('row').filter({ hasText: 'Gemini 3.5 Flash-Lite' }).getByRole('button', { name: 'Configurer' }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel("Clé d'accès").fill('cle-de-test')
   await dialog.getByRole('button', { name: 'Enregistrer et tester' }).click()

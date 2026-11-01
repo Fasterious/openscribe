@@ -498,6 +498,7 @@ describe('codage en double, de bout en bout', () => {
     const md = reportToMarkdown(state, corpus, 'Test')
     // Le nombre de personnes s'annonce en tête, pas seulement dans la section Méthode de la fin.
     expect(md.split('\n')[2]).toMatch(/^\d+ participants? · \d+ idées?$/)
+    expect(reportToMarkdown({ ...state, merges: [], reconciled: { pairs: 0, merges: 2 } }, corpus, 'Test')).not.toContain('-2')
     expect(md).toContain('aussi dans «')
     expect(md).toContain('Codage en double')
     // La mention figure sous les deux exemplaires : l'original renvoie au motif de la copie, et inversement.
@@ -2076,6 +2077,12 @@ describe('réponses invalides', () => {
   }
   const spec = { task: 'test', system: '', user: 'demande', json: true }
   const shape = z.object({ ok: z.boolean() })
+
+  it('une liste nue est lue comme le champ attendu, une réponse sans rapport reste refusée', async () => {
+    const list = z.object({ groups: z.array(z.object({ id: z.string() })) })
+    await expect(runnerFor(['[{"id":"g1"}]']).runner.json(spec, list)).resolves.toEqual({ groups: [{ id: 'g1' }] })
+    await expect(runnerFor(['[1]']).runner.json(spec, list)).rejects.toThrow(/forme attendue/)
+  })
 
   it('deux réponses invalides de suite n’arrêtent pas la synthèse', async () => {
     const { runner, calls } = runnerFor(['pas du json', '{toujours pas', '{"ok":true}'])

@@ -279,7 +279,7 @@ const FAQ: [string, string][] = [
   ],
   [
     "Quel moteur d'IA choisir ?",
-    "Pour démarrer, prenez Google Gemini : c'est gratuit et la clé se crée en quelques minutes. Pour un rapport à diffuser ou des données sensibles, prenez Claude Sonnet (Anthropic) : il est payant, mais c'est le mieux noté de nos essais à l'aveugle et vos données ne servent pas à entraîner ses modèles. Vous pouvez en changer à tout moment.",
+    "Pour démarrer, prenez Google Gemini : c'est gratuit et la clé se crée en quelques minutes. Pour un rapport à diffuser ou des données sensibles, prenez Claude Sonnet (Anthropic) : il est payant, mais c'est le meilleur rapport qualité-prix de nos essais à l'aveugle et vos données ne servent pas à entraîner ses modèles. Vous pouvez en changer à tout moment.",
   ],
   ['Et après ?', 'Les modules « Entretiens et tests » et « Personas » sont en préparation. Voir « Ce qui arrive » ci-dessous.'],
 ]

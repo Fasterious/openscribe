@@ -75,7 +75,8 @@ export function methodNote(state: AnalysisState, corpus: Corpus): string[] {
   const withIdeas = new Set(state.ideas.map((i) => i.participantId)).size
   const single = state.groups.filter((g) => g.metrics.participants === 1).length
   // Les fusions de la réconciliation du livre de codes sont annoncées avec lui, pas deux fois.
-  const consolidated = (state.merges?.length ?? 0) - (state.reconciled?.merges ?? 0)
+  // La réconciliation compte ses propositions, dont certaines ne s'appliquent pas : jamais un nombre négatif (« fusionné -1 »).
+  const consolidated = Math.max(0, (state.merges?.length ?? 0) - (state.reconciled?.merges ?? 0))
   // Part des idées venues des trois participants les plus prolixes : un rapport peut être tiré par quelques voix.
   const perPerson = [...state.ideas.reduce((m, i) => m.set(i.participantId, (m.get(i.participantId) ?? 0) + 1), new Map<string, number>()).values()].sort(
     (a, b) => b - a,

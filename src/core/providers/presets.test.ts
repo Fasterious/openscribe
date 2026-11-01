@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { blendSpeed, estimateDuration, observedSecondsPerCall, predictedCalls } from '../analysis/estimate'
-import { BLIND_THRESHOLD, PROVIDER_PRESETS, modelProposed, modelStudy, presetStudy, typicalSecondsPerCall } from './presets'
+import { BLIND_THRESHOLD, COMPARED, PROVIDER_PRESETS, modelProposed, modelStudy, presetStudy, typicalSecondsPerCall } from './presets'
 
 describe('fiches des fournisseurs', () => {
   it('le modèle par défaut est le seul recommandé de sa liste expliquée', () => {
@@ -31,6 +31,14 @@ describe('erreurs du fournisseur', () => {
         new Response(JSON.stringify({ message: 'This model is not available in your subscription tier', type: 'tier_not_allowed' }), { status: 403 }),
     })
     await expect(provider.complete({ task: 'ping', system: '', user: '', json: false, temperature: 0 })).rejects.toThrow(/ne donne pas accès au modèle « gros-modele »/)
+  })
+})
+
+describe('comparatif des moteurs', () => {
+  it('reprend exactement les modèles proposés, avec leurs mesures', () => {
+    const proposed = PROVIDER_PRESETS.flatMap((p) => (p.models ?? []).filter(modelProposed).map((m) => `${p.id}/${m.id}`))
+    expect(COMPARED.map((c) => `${c.preset}/${c.model}`).sort()).toEqual(proposed.sort())
+    expect(COMPARED[0].tag).toBe('Recommandé')
   })
 })
 

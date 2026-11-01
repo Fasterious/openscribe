@@ -24,6 +24,18 @@ export class JsonShapeError extends Error {
   }
 }
 
+/** Un modèle léger renvoie parfois la liste nue au lieu de `{"groups": […]}` (Gemini 3.1 Flash-Lite, à chaque reprise, 1/11/2026). */
+function safeParseUnwrapped<T>(value: unknown, schema: z.ZodType<T>) {
+  const result = schema.safeParse(value)
+  const keys = schema instanceof z.ZodObject ? Object.keys(schema.shape) : []
+  if (result.success || !Array.isArray(value)) return result
+  for (const key of keys) {
+    const wrapped = schema.safeParse({ [key]: value })
+    if (wrapped.success) return wrapped
+  }
+  return result
+}
+
 export function parseJson<T>(raw: string, schema: z.ZodType<T>): T {
   let value: unknown
   try {
@@ -31,7 +43,7 @@ export function parseJson<T>(raw: string, schema: z.ZodType<T>): T {
   } catch {
     throw new JsonShapeError("La réponse du modèle n'est pas un JSON valide.")
   }
-  const result = schema.safeParse(value)
+  const result = safeParseUnwrapped(value, schema)
   if (!result.success) {
     const issue = result.error.issues[0]
     throw new JsonShapeError(`La réponse du modèle n'a pas la forme attendue (${issue?.path.join('.') || 'racine'} : ${issue?.message}).`)

@@ -102,6 +102,9 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ✅ Six moteurs passés sur ÉcoSol avec de vraies clés, notés à l'aveugle (`docs/PERFORMANCES-MOTEURS.md`) : Sonnet recommandé (7,5), Gemini gratuit pour démarrer (5,5, seuil), Haiku économique (6,5), Ministral et Large 4 à l'étude
 - ✅ Note, durée, coût et date affichés par modèle, avec une explication du protocole ; `scripts/aveugle.ts` ; jetons relevés par demande
 - ✅ Corrigé : Mistral Large exige `top_p` à 1 ; deux réponses invalides de suite n'arrêtent plus une synthèse ; participants et idées en tête des exports ; coûts de la FAQ
+- ✅ Autres modèles gratuits de Gemini essayés : 3.1 Flash-Lite 4 à 4,5 (une réponse en liste nue arrêtait tout : tolérée), Flash à 20 demandes par jour, Gemma en erreur ; Flash-Lite 3.5 reste le meilleur gratuit
+- ✅ Page Moteurs d'IA refaite : comparatif note, durée, coût pour 20 participants, recommandé en tête, autres moteurs repliés ; un second modèle d'un même fournisseur s'ajoute au lieu d'écraser le premier (`designer-ui` 8,5/10, `plume` 8/10)
+- ✅ Grand débat par l'API, à l'aveugle : Opus 8 et 7,5 (19 $), Sonnet 7,5 et 7 (10 $), Haiku 6,5 et 6,5 (1,85 $) ; Gemini sur deux jours, à noter ; bouton 20 / 378 participants dans le comparatif
 - ⏳ Mistral Small et Medium (paiement à l'usage) ; OpenAI ; note `plume` par moteur ; parcours sans clé depuis une installation neuve
 
 ## Backlog (idées gardées, pas prioritaires)

@@ -42,7 +42,20 @@ export interface BlindTest {
   /** Coût estimé en dollars, si le modèle est payant. */
   costUsd?: number
   date: string
+  /** Même mesure sur le gros corpus (Grand débat, 378 participants), avec les réglages par défaut de l'application. */
+  large?: LargeTest
 }
+
+/** `scores` et `minutes` manquent tant que le moteur n'a pas terminé : `days` donne alors la durée estimée. */
+export interface LargeTest {
+  scores?: [number, number]
+  minutes?: number
+  days?: number
+  costUsd?: number
+}
+
+/** Taille du gros corpus des essais. */
+export const LARGE_PARTICIPANTS = 378
 
 export interface ModelChoice {
   id: string
@@ -121,7 +134,15 @@ export function modelProposed(model: ModelChoice): boolean {
   return (model.blindTest.scores[0] + model.blindTest.scores[1]) / 2 >= BLIND_THRESHOLD
 }
 
-const NOT_EVALUATED =
+/** Les modèles proposés, dans l'ordre du comparatif : par usage, pas par note (une note est un repère, pas un classement). */
+export const COMPARED: { preset: string; model: string; tag?: string; pitch: string }[] = [
+  { preset: 'anthropic', model: 'claude-sonnet-5-5', tag: 'Recommandé', pitch: 'Le meilleur rapport qualité-prix' },
+  { preset: 'gemini', model: 'gemini-3.5-flash-lite', pitch: 'Pour essayer · 150 à 200 participants par jour' },
+  { preset: 'anthropic', model: 'claude-haiku-5-5', pitch: 'Bon marché, à relire de près' },
+  { preset: 'anthropic', model: 'claude-opus-5-5', pitch: 'Le plus cher' },
+]
+
+export const NOT_EVALUATED =
   "Pas encore évalué sur un corpus réel : OpenScribe ne propose un moteur d'IA qu'après une synthèse au moins du niveau de l'offre gratuite de Gemini."
 
 /** Un fournisseur est proposé quand au moins un de ses modèles est validé. */
@@ -282,7 +303,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         section: "Inclus dans l'offre gratuite",
         recommended: true,
         method: 'commune-gemini',
-        blindTest: { scores: [5.5, 5.5], errors: [4, 5], minutes: 6, date: '2026-11-01' },
+        // Grand débat : le quota de 500 demandes par jour étale la synthèse sur deux jours (estimation, essai inachevé le 1/11/2026).
+        blindTest: { scores: [5.5, 5.5], errors: [4, 5], minutes: 6, date: '2026-11-01', large: { days: 2 } },
         // ÉcoSol, méthode commune : 64 demandes en 5,5 minutes (1/11/2026).
         secondsPerCall: 5,
       },
@@ -292,6 +314,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         hint: 'Plus ancien, mêmes limites.',
         section: "Inclus dans l'offre gratuite",
         method: 'commune-gemini',
+        blindTest: { scores: [4, 4.5], errors: [9, 8], minutes: 7, date: '2026-11-01' },
+        study: 'Sous le niveau de Gemini 3.5 Flash-Lite sur un corpus réel, à l’aveugle (1er novembre 2026).',
       },
       {
         id: 'gemini-3.8-flash',
@@ -299,7 +323,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         hint: 'Plus fin, mais 20 demandes par jour en gratuit : une synthèse n’y tient pas.',
         section: 'Avec la facturation activée',
         method: 'commune-gemini',
-        study: 'Payant : pas encore évalué sur un corpus réel.',
+        study: 'Payant : pas encore évalué sur un corpus réel. En gratuit, 20 demandes par jour, soit environ quatre jours par synthèse.',
       },
     ],
     needsKey: true,
@@ -410,12 +434,12 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
       {
         id: 'claude-sonnet-5-5',
         label: 'Claude Sonnet 5.5',
-        hint: 'La meilleure qualité de nos essais à l’aveugle.',
+        hint: 'Le meilleur rapport qualité-prix de nos essais à l’aveugle.',
         recommended: true,
         // Sonnet réfléchit davantage par défaut que Haiku et Opus ; la couche compatible OpenAI ignore `reasoning_effort`.
         extraBody: { output_config: { effort: 'medium' } },
         // ÉcoSol, méthode commune : 54 demandes en 12,5 minutes, 427 000 jetons envoyés et 211 000 écrits (1/11/2026).
-        blindTest: { scores: [7.5, 7.5], errors: [1, 2], minutes: 13, costUsd: 3, date: '2026-11-01' },
+        blindTest: { scores: [7.5, 7.5], errors: [1, 2], minutes: 13, costUsd: 3, date: '2026-11-01', large: { scores: [7.5, 7], minutes: 29, costUsd: 10 } },
         secondsPerCall: 14,
       },
       {
@@ -423,15 +447,15 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         label: 'Claude Haiku 5.5',
         hint: 'Bien moins cher que Sonnet, mais à relire de plus près.',
         // ÉcoSol, méthode commune : 58 demandes en 19 minutes, 474 000 jetons envoyés et 608 000 écrits (1/11/2026).
-        blindTest: { scores: [6.5, 6.5], errors: [2, 3], minutes: 19, costUsd: 0.35, date: '2026-11-01' },
+        blindTest: { scores: [6.5, 6.5], errors: [2, 3], minutes: 19, costUsd: 0.35, date: '2026-11-01', large: { scores: [6.5, 6.5], minutes: 70, costUsd: 1.9 } },
         secondsPerCall: 20,
       },
       {
         id: 'claude-opus-5-5',
         label: 'Claude Opus 5.5',
-        hint: 'Le plus cher, et pas meilleur que Sonnet dans nos essais.',
+        hint: 'Le plus cher, un peu mieux noté sur un gros corpus.',
         // ÉcoSol, méthode commune : 53 demandes en 12 minutes, 441 000 jetons envoyés et 158 000 écrits (1/11/2026).
-        blindTest: { scores: [7.5, 7], errors: [2, 3], minutes: 12, costUsd: 4.9, date: '2026-11-01' },
+        blindTest: { scores: [7.5, 7], errors: [2, 3], minutes: 12, costUsd: 4.9, date: '2026-11-01', large: { scores: [8, 7.5], minutes: 30, costUsd: 19 } },
         secondsPerCall: 14,
       },
     ],
@@ -443,7 +467,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     dataPolicy: 'no-training',
     dataNote: "Les appels à l'API ne servent pas à entraîner les modèles ; ils sont supprimés sous 30 jours par défaut.",
     family: 'other',
-    bestFor: 'Une rédaction et une analyse de longs textes de grande qualité, pour un rapport à diffuser.',
+    bestFor: 'Rédiger et analyser de longs textes.',
     kind: 'direct',
     featured: true,
     extraHeaders: { 'anthropic-dangerous-direct-browser-access': 'true' },
