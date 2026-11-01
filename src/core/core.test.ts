@@ -60,7 +60,7 @@ import { appendRules, METHODS, methodRules, TUNINGS } from './analysis/methods'
 import { activeParticipants, duplicateContributions, type Corpus } from './corpus'
 import { analyzeCsv, csvToCorpus, decodeText, type ColumnRole } from './import/csv'
 import { detectSpeakers, textToCorpus } from './import/text'
-import { corpusForAnalysis, exportProject, importProject, newProject } from './project'
+import { corpusForAnalysis, exportProject, importProject, newProject, uniqueName } from './project'
 import { withLimits } from './providers/limits'
 import { createSimulationProvider } from './providers/simulation'
 import { ProviderError, type LlmProvider } from './providers/types'
@@ -2001,6 +2001,19 @@ describe('projet', () => {
     expect(back.project.id).not.toBe(project.id)
     expect(back.responses).toEqual({ k: 'v' })
     expect(() => importProject('{"kind":"autre"}')).toThrow()
+  })
+})
+
+describe('noms uniques', () => {
+  it('garde un nom libre tel quel, puis numérote les doublons', () => {
+    expect(uniqueName('Synthèse du 1 nov.', [])).toBe('Synthèse du 1 nov.')
+    expect(uniqueName('Synthèse du 1 nov.', ['Autre'])).toBe('Synthèse du 1 nov.')
+    expect(uniqueName('Synthèse du 1 nov.', ['Synthèse du 1 nov.'])).toBe('Synthèse du 1 nov. (2)')
+    expect(uniqueName('Synthèse du 1 nov.', ['Synthèse du 1 nov.', 'Synthèse du 1 nov. (2)'])).toBe('Synthèse du 1 nov. (3)')
+  })
+
+  it('comble le trou de la suite', () => {
+    expect(uniqueName('X', ['X', 'X (3)'])).toBe('X (2)')
   })
 })
 

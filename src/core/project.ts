@@ -30,6 +30,15 @@ export interface Project {
   brief?: PublishedStudy['fiche']
 }
 
+/** Le nom `base` s'il est libre, sinon « base (2) », « base (3) »… : le plus petit numéro libre. */
+export function uniqueName(base: string, existingNames: string[]): string {
+  const taken = new Set(existingNames)
+  if (!taken.has(base)) return base
+  let n = 2
+  while (taken.has(`${base} (${n})`)) n++
+  return `${base} (${n})`
+}
+
 export function newProject(name: string): Project {
   const now = new Date().toISOString()
   return {
