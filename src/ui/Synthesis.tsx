@@ -6,7 +6,7 @@ import { createProject, notifyProjectsChanged, updateProject, useProjects } from
 import { activeParticipants } from '@/core/corpus'
 import { corpusHash } from '@/core/analysis/pipeline'
 import { exampleProject, EXAMPLE_MARK, type PublishedStudy } from '@/core/observatoire'
-import { corpusForAnalysis, exportProject, importProject, newProject, ProjectFileError, type Project } from '@/core/project'
+import { corpusForAnalysis, exportProject, importProject, newProject, ProjectFileError, uniqueName, type Project } from '@/core/project'
 import { formatDate, plural } from './format'
 import { Alert, Button, Dialog, DropMenu, Input, Label, MenuItem, Tooltip } from './primitives'
 
@@ -127,6 +127,7 @@ export function useStudyActions() {
 function NewStudyDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const [name, setName] = useState('')
   const [creating, setCreating] = useState(false)
+  const projects = useProjects()
   return (
     <Dialog open={open} onOpenChange={onOpenChange} title="Nouvelle synthèse" description="Donnez un nom à votre synthèse ; vous pourrez le changer plus tard.">
       <form
@@ -136,7 +137,9 @@ function NewStudyDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (
           // Un double clic ou un double Entrée ne doit pas créer deux études.
           if (creating) return
           setCreating(true)
-          const p = newProject(name || `Synthèse du ${formatDate(new Date().toISOString())}`)
+          // Sans nom, la date sert de base, numérotée si une autre synthèse du même jour porte déjà ce nom. Un nom choisi reste tel quel.
+          const base = `Synthèse du ${formatDate(new Date().toISOString())}`
+          const p = newProject(name || uniqueName(base, (projects ?? []).map((s) => s.name)))
           await createProject(p)
           onOpenChange(false)
           setName('')
