@@ -17,7 +17,7 @@
  * `<dossier>/rapport.md` et `<dossier>/rapport.html` à la fin.
  */
 import { createHash } from 'node:crypto'
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { appendFileSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import { exportProject, newProject } from '../src/core/project'
 import { newAnalysis, runAnalysis } from '../src/core/analysis/pipeline'
@@ -136,8 +136,20 @@ function realProvider(presetId: string): LlmProvider {
     onRetry: ({ waitMs, error }) => console.log(`Nouvel essai dans ${Math.round(waitMs / 1000)} s : ${error.message}`),
   })
 }
+/** Une ligne par demande réellement envoyée (`<dossier>/jetons.jsonl`) : de quoi chiffrer le coût et le contexte nécessaire d'un moteur. */
+function withTokenLog(provider: LlmProvider): LlmProvider {
+  return {
+    ...provider,
+    async complete(req: ChatRequest) {
+      const started = Date.now()
+      const result = await provider.complete(req)
+      appendFileSync(join(dir, 'jetons.jsonl'), `${JSON.stringify({ task: req.task, ms: Date.now() - started, ...result.usage })}\n`)
+      return result
+    },
+  }
+}
 const presetOpt = opt('preset')
-const bridge: LlmProvider = presetOpt ? realProvider(presetOpt) : files
+const bridge: LlmProvider = presetOpt ? withTokenLog(realProvider(presetOpt)) : files
 
 const csv = analyzeCsv(readFileSync(csvPath, 'utf8'))
 const roles: Record<number, ColumnRole> = Object.fromEntries(csv.columns.map((c) => [c.index, c.suggestedRole]))

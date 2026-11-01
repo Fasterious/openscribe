@@ -54,6 +54,16 @@ jugement positif suivi d'une critique du collège), une idée de la première qu
 commune : deux fausses unanimités (une voix contraire rangée ailleurs), un détail surinterprété repris dans le résumé.
 Prochains leviers : la réserve qui suit un éloge au découpage ; une vérification des unanimités du résumé.
 
+### Six moteurs sur la méthode commune, à l'aveugle (1/11/2026)
+
+Première mesure des réglages sur la méthode commune (ÉcoSol, une passe par moteur, lecture à l'aveugle) : tableau dans
+`docs/PERFORMANCES-MOTEURS.md`. Sonnet 7,5 et 7,5, Opus 7,5 et 7, Haiku 6,5 et 6,5, Large 4 6 et 5,5, Gemini 5,5 et 5,5,
+Ministral 4 et 3,5. Les citations sont exactes partout ; les écarts viennent du rangement et du ton. Le passage à la méthode
+commune fait reculer Ministral malgré ses lots réduits : 25 motifs dont les titres ne disent plus le contenu (345 déplacements).
+Défauts relevés sur plusieurs moteurs, à reprendre : un avis logé dans une suggestion échappe au balayage ; la relecture des
+tons juge une réponse courte sans sa question ; « fragile » affiché de façon incohérente ; phrase du résumé qui généralise le
+compte d'un motif à une seule idée ; départs de membres et centralisation absents du résumé (signaux forts mais rares).
+
 ## Historique : une méthode par famille de modèles (13-24/10)
 
 Décision d'Arnaud (13/10/2026) : chaque famille de modèles a sa méthode d'analyse,

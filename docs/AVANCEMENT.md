@@ -97,6 +97,13 @@ Reste, non bloquant : confirmation avant de supprimer un moteur ; deux études c
 - ⏳ Méthode Ministral : phrase orpheline retirée avec sa phrase d'appui, un camp compté une fois, rangement guidé par la question, 6 à 8 thèmes
 - ⏳ Chantiers communs listés dans `docs/METHODES.md` (sujets qui divisent reformulés, consensus rétablis, comptes des intros de thème, renvois en double, motifs fourre-tout) ; message de délai dépassé qui accuse la connexion
 
+## Moteurs par API, essai à l'aveugle (1/11)
+
+- ✅ Six moteurs passés sur ÉcoSol avec de vraies clés, notés à l'aveugle (`docs/PERFORMANCES-MOTEURS.md`) : Sonnet recommandé (7,5), Gemini gratuit pour démarrer (5,5, seuil), Haiku économique (6,5), Ministral et Large 4 à l'étude
+- ✅ Note, durée, coût et date affichés par modèle, avec une explication du protocole ; `scripts/aveugle.ts` ; jetons relevés par demande
+- ✅ Corrigé : Mistral Large exige `top_p` à 1 ; deux réponses invalides de suite n'arrêtent plus une synthèse ; participants et idées en tête des exports ; coûts de la FAQ
+- ⏳ Mistral Small et Medium (paiement à l'usage) ; OpenAI ; note `plume` par moteur ; parcours sans clé depuis une installation neuve
+
 ## Backlog (idées gardées, pas prioritaires)
 
 - Anonymisation en un geste : liste des prénoms détectés, validée par le chercheur, puis masquage (décision d'Arnaud du 13/10 : pas de masquage automatique pour l'instant ; priorité à la qualité de l'analyse).

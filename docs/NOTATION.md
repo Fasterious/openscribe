@@ -4,7 +4,7 @@ Sert à comparer les moteurs d'IA et les méthodes sur un corpus réel (ÉcoSol 
 La même grille, le même évaluateur (`methodologue` et `plume` sur Opus, réflexion moyenne),
 pour chaque passe : sinon les notes ne se comparent pas.
 
-Seuil pour proposer un moteur : le niveau de Gemini Flash-Lite (3,5/5 sur l'ancienne échelle, **2,5/5 sur cette grille**), mesuré par le même évaluateur ; idéalement le niveau de la référence. Voir « Variabilité » plus bas.
+Seuil pour proposer un moteur : le niveau de Gemini Flash-Lite, **5,5/10 à l'aveugle** sur ÉcoSol et la méthode commune (1/11/2026), mesuré par le même évaluateur ; idéalement le niveau de la référence. Les modèles sans essai à l'aveugle gardent leur ancienne validation jusqu'à leur essai. Voir « Variabilité » plus bas.
 
 ## Une note relative, sur 10 (décision d'Arnaud, 17/10/2026)
 
@@ -32,6 +32,15 @@ l'ancienne échelle (sur ÉcoSol, Gemini Flash-Lite 2,5/5, Sonnet avec la réfé
 avec Opus 5.5, moyennes 3,33/5 aux deux lectures, langue 3,5/5). Chaque repère sera re-noté sur 10 au prochain
 essai. Premier repère sur 10 : l'école, passe 13 (même analyse que la passe 12), **7/10 · 2 erreurs du résumé ·
 structure saine** aux deux lectures, langue **6,5/10**.
+
+## Lecture à l'aveugle (demande d'Arnaud, 1/11/2026)
+
+Un évaluateur Opus pourrait favoriser un moteur de sa famille : pour comparer des moteurs, il ne sait jamais lequel il
+note. `scripts/aveugle.ts masquer` copie les synthèses dans `aveugle/<code>/`, sous un code tiré au hasard et dans un ordre
+mêlé, sans nom de moteur ni réglage ; le script s'arrête s'il en trouve un. Deux lectures `methodologue` par code, sur
+Opus en réflexion moyenne, chacune dans le seul dossier du code, sans jamais citer le nombre d'idées ou de motifs (ces
+chiffres trahissent le moteur à l'orchestrateur). Une fois tout noté, un agent qui n'a pas participé à la notation lance
+`aveugle.ts lever`, puis contrôle la correspondance. Les relevés sont dans `docs/PERFORMANCES-MOTEURS.md`.
 
 ## `methodologue` : la méthode (note sur 10)
 

@@ -321,3 +321,10 @@ Après chaque itération : ce qui a marché, ce qui a coûté pour rien, ce qu'o
 - **Bien marché** : chercher dans les branches d'archive avant d'écrire : le guide et les modèles existaient, il a suffi de les remettre à jour ; la critique sur rendu réel a trouvé un chevauchement de l'en-tête que le calcul des classes n'avait pas vu.
 - **Coûté pour rien** : `node_modules` restait celui de l'ancienne application : la première passe `designer-ui` n'a pas pu lancer l'application.
 - **On change** : après un changement de pile ou une récupération du dépôt, `npm ci` d'abord.
+
+## 2026-11-01 — Moteurs par API
+
+- **Bien marché** : tester de vraies clés avant de supposer (Large 4 passe en gratuit, un paramètre manquait) ; l'aveugle, proposé par Arnaud, a renversé des a priori (Sonnet devant Opus, Haiku lent).
+- **Coûté pour rien** : deux lectures lancées avant de masquer le nom du moteur ; un fichier `fin.txt` périmé pris pour la fin d'une synthèse ; une estimation de coût tirée de Ministral, deux fois fausse.
+- **On change** : les lectures à l'aveugle passent par `scripts/aveugle.ts`, et les rapports d'évaluateurs ne citent plus les nombres d'idées ou de motifs, qui trahissent le moteur.
+

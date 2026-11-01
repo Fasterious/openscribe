@@ -147,6 +147,22 @@ Kimi K3, GLM 5.3, Qwen 3.8), hébergés hors de Chine. Crédit gratuit : 0,10 $ 
 synthèse ; PRO (environ 9 $ par mois) : 2 $ inclus. **Mis de côté par Arnaud** : l'offre gratuite ne
 suffit pas. Piste à rouvrir pour des modèles ouverts payants peu chers.
 
+## Mise à jour du 1/11/2026 : clés réelles, synthèses complètes
+
+Mesures : `docs/PERFORMANCES-MOTEURS.md`.
+
+- **Mistral, sans paiement à l'usage** : `ministral-*` passent (30 demandes et 937 500 jetons par minute) ; `mistral-large-4`
+  passe aussi, ce qui est nouveau (403 le 13/10), mais à 20 000 jetons par minute ; Small, Medium et Magistral restent à 429
+  (code 1300). Avec une température de 0, Large exige `top_p` à 1 (400 sinon). Tarifs de la documentation : Small 0,15 / 0,60 $,
+  Large 0,70 / 2,10 $, Ministral 14B 0,20 / 0,20 $ par million de jetons.
+- **Gemini** : clé gratuite, appel depuis le navigateur vérifié (`access-control-allow-origin` renvoyé). AI Studio n'a pas pu
+  être relu (navigateur non connecté) : les quotas restent ceux du 13/10.
+- **Anthropic** : clé par Authorization, appel depuis le navigateur vérifié ; pas de longueur de réponse requise par l'accès
+  compatible OpenAI ; 4 000 demandes et 2,4 millions de jetons par minute sur ce compte. `reasoning_effort` y est ignoré.
+- **Abonnement Claude** : l'usage de Claude Code est inclus dans Pro et Max, sans clé (documentation du 1/11). Le parcours
+  depuis une installation neuve n'a pas été rejoué. Pour Gemini CLI, remplacé par Antigravity CLI en juin 2026, et pour Codex,
+  les sources se contredisent ou ne sont pas officielles : rien à annoncer sans essai.
+
 ## Leçons pour tous les fournisseurs
 
 - **Une offre gratuite est un fait daté**, pas une propriété du fournisseur : la fiche

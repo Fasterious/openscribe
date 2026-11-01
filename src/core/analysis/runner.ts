@@ -96,8 +96,9 @@ export class LlmRunner {
 
   /**
    * Appelle le modèle et vérifie la forme de la réponse. Une réponse mal
-   * formée est redemandée une fois (sans passer par le cache). Seule une
-   * réponse valide est mise en cache.
+   * formée est redemandée deux fois (sans passer par le cache) : sur 378 réponses,
+   * deux ratés de suite ont arrêté une synthèse entière (Gemini, 1/11/2026).
+   * Seule une réponse valide est mise en cache.
    */
   async json<T>(spec: PromptSpec, schema: z.ZodType<T>): Promise<T> {
     const key = await this.key(spec)
@@ -108,17 +109,25 @@ export class LlmRunner {
       return value
     } catch (e) {
       if (!(e instanceof JsonShapeError)) throw e
-      const retry = await this.provider.complete({
-        ...spec,
-        user: `${spec.user}\n\nATTENTION : ta réponse précédente était invalide (${e.message}). Réponds uniquement avec le JSON demandé.`,
-        temperature: this.settings.temperature,
-        seed: this.settings.seed,
-        signal: this.signal,
-      })
-      this.stats.total++
-      const value = parseJson(retry.text, schema)
-      await this.cache.set(key, retry.text)
-      return value
+      let reason = e.message
+      for (let attempt = 1; ; attempt++) {
+        const retry = await this.provider.complete({
+          ...spec,
+          user: `${spec.user}\n\nATTENTION : ta réponse précédente était invalide (${reason}). Réponds uniquement avec le JSON demandé.`,
+          temperature: this.settings.temperature,
+          seed: this.settings.seed,
+          signal: this.signal,
+        })
+        this.stats.total++
+        try {
+          const value = parseJson(retry.text, schema)
+          await this.cache.set(key, retry.text)
+          return value
+        } catch (again) {
+          if (!(again instanceof JsonShapeError) || attempt === 2) throw again
+          reason = again.message
+        }
+      }
     }
   }
 }

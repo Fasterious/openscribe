@@ -720,3 +720,12 @@ sourcées). Livré :
 - **Pas d'adresse e-mail pour l'instant** (confirmé par Arnaud : GitHub seul, malgré son interface en anglais et le compte obligatoire pour écrire) : aucune adresse publique n'existe ni n'est vérifiée, et une adresse personnelle n'a pas à être publiée sans décision d'Arnaud. Le domaine `openscribe.fr` a des serveurs de messagerie OVH, mais rien ne montre qu'une boîte y soit créée.
 - **Sécurité** : le signalement privé de GitHub n'est pas activé sur le dépôt. Le guide demande en attendant d'ouvrir un ticket sans détail, puis de convenir d'un moyen privé.
 - **Branche des contributeurs : `main`** : `next` n'a plus aucun commit propre depuis le 20/10 (`main` a 33 commits d'avance). Les 12 tickets ouverts renvoient encore à `next` : leur lien vers le guide reste à corriger.
+
+## 2026-11-01 — Moteurs par API, à l'aveugle
+
+- **Lecture à l'aveugle** (demande d'Arnaud) : un évaluateur Opus pourrait favoriser sa famille ; deux lectures par code, correspondance levée par un agent extérieur à la notation.
+- **Le seuil devient mesuré** : 5,5/10, le niveau de Gemini Flash-Lite sur la méthode commune. Les validations de l'ancienne grille disparaissent : un modèle est proposé sur son essai à l'aveugle.
+- **Claude Sonnet recommandé** : même note qu'Opus (à un demi-point près) pour 40 % de moins. Haiku reste proposé comme option économique.
+- **Large 4 à l'étude** malgré une note au seuil : la règle exclut un moteur pénible, et l'offre gratuite demande plus d'une heure. Payé, il faudrait le remesurer.
+- **Clé Anthropic** : réservée à cet essai (décision d'Arnaud) ; les analyses courantes restent sur l'abonnement.
+

@@ -830,12 +830,19 @@ function splitIsolated(groups: Group[]) {
   }
 }
 
+/** La ligne de tête d'un export, avec les mêmes chiffres que l'en-tête du rapport à l'écran. */
+function headlineFacts(state: AnalysisState): string {
+  const count = (n: number, word: string) => `${n.toLocaleString('fr-FR')} ${word}${n > 1 ? 's' : ''}`
+  const ideas = state.ideas.filter((i) => !i.copyOf)
+  return `${count(new Set(ideas.map((i) => i.participantId)).size, 'participant')} · ${count(ideas.length, 'idée')}`
+}
+
 export function reportToMarkdown(saved: AnalysisState, corpus: Corpus, title: string, opts: { stale?: boolean } = {}): string {
   const state = withCurrentMetrics(saved)
   const byId = new Map(state.ideas.map((i) => [i.id, i]))
   const groupById = new Map(state.groups.map((g) => [g.id, g]))
   const v = shown(state, corpus)
-  const out: string[] = [`# ${title}`, '']
+  const out: string[] = [`# ${title}`, '', headlineFacts(state), '']
   if (opts.stale) out.push(`> ${STALE_NOTE}`, '')
   const warn = (items?: string[]) => {
     if (items?.length && showsDoubts(state.settings)) out.push(`> À vérifier : ${items.map((x) => `« ${x} »`).join(', ')} ne correspond à aucun chiffre calculé ni cité.`, '')
@@ -1086,6 +1093,7 @@ a{color:var(--brand);text-decoration:none;border-bottom:1px dotted var(--brand)}
 @media print{details{display:block}details>summary{list-style:none}a{color:inherit;border:0}.panel,.help,.fold{display:none}.bar,li,.def>p{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style></head><body>
 <h1>${e(title)}</h1>
+<p class="facts">${e(headlineFacts(state))}</p>
 ${parts.join('\n')}
 <footer><p class="facts">Rapport produit avec OpenScribe, outil libre de recherche utilisateur.</p></footer>
 <script type="application/json" id="os-data">${scriptJson(context)}</script>

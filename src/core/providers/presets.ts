@@ -31,6 +31,19 @@ export type PresetFamily = 'free' | 'local' | 'other'
 export type ProviderKind = 'direct' | 'host' | 'router' | 'local' | 'custom'
 
 /** Un modèle proposé dans la liste, avec de quoi choisir sans connaître le fournisseur. */
+/** Une synthèse réelle de 20 participants, notée par deux lectures qui ignorent quel moteur l'a écrite. */
+export interface BlindTest {
+  /** Note de chaque lecture, sur 10. */
+  scores: [number, number]
+  /** Erreurs qui changent une conclusion, relevées par chaque lecture. */
+  errors: [number, number]
+  /** Durée de la synthèse. */
+  minutes: number
+  /** Coût estimé en dollars, si le modèle est payant. */
+  costUsd?: number
+  date: string
+}
+
 export interface ModelChoice {
   id: string
   /** Nom lisible. */
@@ -44,9 +57,9 @@ export interface ModelChoice {
   method?: MethodId
   /** Paramètres propres au modèle, ajoutés à chaque demande. */
   extraBody?: Record<string, unknown>
-  /** Note du `methodologue` sur le corpus réel (ÉcoSol), au moins QUALITY_THRESHOLD : le modèle est proposé. */
-  validated?: { score: number; date: string }
-  /** Pourquoi le modèle est encore à l'étude (sinon, la raison du fournisseur). */
+  /** Dernier essai à l'aveugle sur ÉcoSol (docs/NOTATION.md, docs/PERFORMANCES-MOTEURS.md) : proposé si sa note atteint BLIND_THRESHOLD. */
+  blindTest?: BlindTest
+  /** Pourquoi le modèle est encore à l'étude (sinon, la raison du fournisseur) : même au seuil, il n'est alors pas proposé. */
   study?: string
   /** Secondes par demande, mesurées sur une synthèse réelle (temps écoulé ÷ demandes, avec le parallélisme par défaut). */
   secondsPerCall?: number
@@ -98,19 +111,22 @@ export interface ProviderPreset {
 }
 
 /**
- * Seuil de qualité (décision d'Arnaud, 14/10/2026) : un moteur n'est proposé qu'au niveau de l'offre
- * gratuite de Gemini au moins, idéalement à celui de la référence. Notes du `methodologue` sur le corpus
- * réel ÉcoSol, avec la grille de docs/NOTATION.md (Gemini 2,5/5, Sonnet 3/5 ; 3,5 et 4,5 sur l'ancienne échelle).
- * En dessous, ou pas encore évalué, il reste visible « à l'étude », avec la raison.
+ * Seuil de qualité (décision d'Arnaud, 14/10/2026) : un moteur n'est proposé qu'au niveau de l'offre gratuite de Gemini
+ * au moins, mesuré à l'aveugle le 1/11/2026, et s'il n'est pas pénible à utiliser. Sinon il reste visible « à l'étude », avec la raison.
  */
-export const QUALITY_THRESHOLD = 2.5
+export const BLIND_THRESHOLD = 5.5
+
+export function modelProposed(model: ModelChoice): boolean {
+  if (!model.blindTest || model.study) return false
+  return (model.blindTest.scores[0] + model.blindTest.scores[1]) / 2 >= BLIND_THRESHOLD
+}
 
 const NOT_EVALUATED =
   "Pas encore évalué sur un corpus réel : OpenScribe ne propose un moteur d'IA qu'après une synthèse au moins du niveau de l'offre gratuite de Gemini."
 
 /** Un fournisseur est proposé quand au moins un de ses modèles est validé. */
 export function presetStudy(preset: ProviderPreset): string | undefined {
-  return preset.models?.some((m) => m.validated) ? undefined : (preset.study ?? NOT_EVALUATED)
+  return preset.models?.some(modelProposed) ? undefined : (preset.study ?? NOT_EVALUATED)
 }
 
 /** Pourquoi ce modèle est à l'étude, ou `undefined` s'il est validé. */
@@ -118,7 +134,7 @@ export function modelStudy(presetId: string, model: string): string | undefined 
   const p = presetById(presetId)
   if (!p) return NOT_EVALUATED
   const choice = p.models?.find((m) => m.id === model)
-  if (choice?.validated) return undefined
+  if (choice && modelProposed(choice)) return undefined
   return choice?.study ?? p.study ?? NOT_EVALUATED
 }
 
@@ -144,8 +160,9 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         section: "Inclus dans l'offre gratuite",
         recommended: true,
         method: 'commune-ministral',
-        study: 'Sous le niveau de l’offre gratuite de Gemini sur un corpus réel (13/10/2026).',
-        secondsPerCall: 10,
+        blindTest: { scores: [4, 3.5], errors: [9, 10], minutes: 13, date: '2026-11-01' },
+        study: 'Sous le niveau de l’offre gratuite de Gemini sur un corpus réel, à l’aveugle (1/11/2026).',
+        secondsPerCall: 11,
       },
       { id: 'ministral-8b-2512', label: 'Ministral 8B', hint: 'Plus rapide, des idées moins fines.', section: "Inclus dans l'offre gratuite", method: 'commune-ministral' },
       { id: 'ministral-3b-2512', label: 'Ministral 3B', hint: 'Très rapide, pour un essai seulement.', section: "Inclus dans l'offre gratuite", method: 'commune-ministral' },
@@ -161,11 +178,21 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         hint: 'La meilleure qualité de rédaction chez Mistral.',
         section: 'Avec le paiement à l’usage activé',
       },
+      {
+        id: 'mistral-large-4',
+        label: 'Mistral Large 4',
+        hint: 'Le plus capable chez Mistral.',
+        section: "Inclus dans l'offre gratuite",
+        // Avec une température de 0, Mistral Large exige top_p à 1 (erreur 400 sinon, vérifié le 1/11/2026).
+        extraBody: { top_p: 1 },
+        blindTest: { scores: [6, 5.5], errors: [7, 7], minutes: 80, date: '2026-11-01' },
+        study: 'Aussi bon que l’offre gratuite de Gemini, mais plus d’une heure par synthèse : l’offre gratuite de Mistral plafonne à 20\u00a0000 jetons par minute (1er novembre 2026).',
+      },
     ],
     needsKey: true,
     keyUrl: 'https://admin.mistral.ai/organization/api-keys',
     study:
-      "Ministral 14B, le meilleur modèle de l'offre gratuite, reste sous le niveau de l’offre gratuite de Gemini sur un corpus réel. Mistral Small et Medium (payants) restent à évaluer.",
+      'Sur un corpus réel, Ministral 14B fait moins bien que l’offre gratuite de Gemini, et Mistral Large 4 met plus d’une heure avec l’offre gratuite de Mistral. Mistral Small et Medium (payants) n’ont pas encore été évalués.',
     seedParam: 'random_seed',
     supportsJsonMode: true,
     freeRequestsPerMinute: 20,
@@ -255,8 +282,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
         section: "Inclus dans l'offre gratuite",
         recommended: true,
         method: 'commune-gemini',
-        validated: { score: 2.5, date: '2026-10-14' },
-        // ÉcoSol : 2 à 6 minutes pour 50 à 80 demandes.
+        blindTest: { scores: [5.5, 5.5], errors: [4, 5], minutes: 6, date: '2026-11-01' },
+        // ÉcoSol, méthode commune : 64 demandes en 5,5 minutes (1/11/2026).
         secondsPerCall: 5,
       },
       {
@@ -378,18 +405,35 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     label: 'Anthropic (Claude)',
     baseUrl: 'https://api.anthropic.com/v1',
     defaultModel: 'claude-sonnet-5-5',
-    suggestedModels: ['claude-sonnet-5-5', 'claude-opus-5-5', 'claude-haiku-5-5'],
+    suggestedModels: ['claude-sonnet-5-5', 'claude-haiku-5-5', 'claude-opus-5-5'],
     models: [
       {
         id: 'claude-sonnet-5-5',
         label: 'Claude Sonnet 5.5',
-        hint: 'La référence : la synthèse la mieux notée sur un corpus réel.',
+        hint: 'La meilleure qualité de nos essais à l’aveugle.',
         recommended: true,
-        validated: { score: 3, date: '2026-10-14' },
+        // Sonnet réfléchit davantage par défaut que Haiku et Opus ; la couche compatible OpenAI ignore `reasoning_effort`.
+        extraBody: { output_config: { effort: 'medium' } },
+        // ÉcoSol, méthode commune : 54 demandes en 12,5 minutes, 427 000 jetons envoyés et 211 000 écrits (1/11/2026).
+        blindTest: { scores: [7.5, 7.5], errors: [1, 2], minutes: 13, costUsd: 3, date: '2026-11-01' },
+        secondsPerCall: 14,
       },
-      // Opus 5.5 (réflexion moyenne), méthode de référence : 3 et 3,5 (deux lectures), 14/10/2026.
-      { id: 'claude-opus-5-5', label: 'Claude Opus 5.5', hint: 'Le plus puissant, plus cher ; au moins la qualité de Sonnet.', validated: { score: 3, date: '2026-10-14' } },
-      { id: 'claude-haiku-5-5', label: 'Claude Haiku 5.5', hint: 'Rapide et économique.', study: 'Pas encore évalué sur un corpus réel.' },
+      {
+        id: 'claude-haiku-5-5',
+        label: 'Claude Haiku 5.5',
+        hint: 'Bien moins cher que Sonnet, mais à relire de plus près.',
+        // ÉcoSol, méthode commune : 58 demandes en 19 minutes, 474 000 jetons envoyés et 608 000 écrits (1/11/2026).
+        blindTest: { scores: [6.5, 6.5], errors: [2, 3], minutes: 19, costUsd: 0.35, date: '2026-11-01' },
+        secondsPerCall: 20,
+      },
+      {
+        id: 'claude-opus-5-5',
+        label: 'Claude Opus 5.5',
+        hint: 'Le plus cher, et pas meilleur que Sonnet dans nos essais.',
+        // ÉcoSol, méthode commune : 53 demandes en 12 minutes, 441 000 jetons envoyés et 158 000 écrits (1/11/2026).
+        blindTest: { scores: [7.5, 7], errors: [2, 3], minutes: 12, costUsd: 4.9, date: '2026-11-01' },
+        secondsPerCall: 14,
+      },
     ],
     needsKey: true,
     keyUrl: 'https://platform.claude.com/settings/keys',

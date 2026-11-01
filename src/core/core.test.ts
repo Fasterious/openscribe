@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { computeMetrics, isFragile, stanceOf } from './analysis/metrics'
@@ -495,6 +496,8 @@ describe('codage en double, de bout en bout', () => {
     expect(grouped).toContain(copy.id)
     expect(grouped).toContain(copy.copyOf)
     const md = reportToMarkdown(state, corpus, 'Test')
+    // Le nombre de personnes s'annonce en tête, pas seulement dans la section Méthode de la fin.
+    expect(md.split('\n')[2]).toMatch(/^\d+ participants? · \d+ idées?$/)
     expect(md).toContain('aussi dans «')
     expect(md).toContain('Codage en double')
     // La mention figure sous les deux exemplaires : l'original renvoie au motif de la copie, et inversement.
@@ -2052,5 +2055,37 @@ describe('réconciliation : paires relues', () => {
       known,
     )
     expect(pairs.map((p) => `${p.a}/${p.b}`)).toEqual(['G1/G2', 'G3/G4'])
+  })
+})
+
+describe('réponses invalides', () => {
+  const runnerFor = (answers: string[]) => {
+    let calls = 0
+    const runner = new LlmRunner(
+      {
+        label: 'test',
+        fingerprint: { presetId: 'test', model: 't', baseUrl: '' },
+        async complete() {
+          return { text: answers[Math.min(calls++, answers.length - 1)] }
+        },
+      },
+      new MemoryCache(),
+      DEFAULT_SETTINGS,
+    )
+    return { runner, calls: () => calls }
+  }
+  const spec = { task: 'test', system: '', user: 'demande', json: true }
+  const shape = z.object({ ok: z.boolean() })
+
+  it('deux réponses invalides de suite n’arrêtent pas la synthèse', async () => {
+    const { runner, calls } = runnerFor(['pas du json', '{toujours pas', '{"ok":true}'])
+    await expect(runner.json(spec, shape)).resolves.toEqual({ ok: true })
+    expect(calls()).toBe(3)
+  })
+
+  it('au troisième échec, l’erreur remonte', async () => {
+    const { runner, calls } = runnerFor(['pas du json'])
+    await expect(runner.json(spec, shape)).rejects.toThrow(/JSON valide/)
+    expect(calls()).toBe(3)
   })
 })

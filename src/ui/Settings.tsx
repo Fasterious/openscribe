@@ -14,7 +14,7 @@ import {
 } from '@/app/engines'
 import { href } from '@/app/router'
 import { runsLocally } from '@/core/providers/location'
-import { PROVIDER_PRESETS, presetById, presetStudy, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
+import { PROVIDER_PRESETS, modelProposed, presetById, presetStudy, type BlindTest, type DataPolicy, type ModelChoice, type PresetFamily, type ProviderKind, type ProviderPreset } from '@/core/providers/presets'
 import { Alert, Badge, Button, Card, CardContent, Chevron, Dialog, DropMenu, Input, Label, MenuItem, MenuSection, Select, Tooltip, cn } from './primitives'
 
 const POLICY: Record<DataPolicy, { label: string; tone: 'positive' | 'warning' | 'outline' }> = {
@@ -645,16 +645,16 @@ function ModelPicker({ choices, value, onChange }: { choices: ModelChoice[]; val
                       <MenuItem
                         key={c.id}
                         checked={!custom && c.id === value}
-                        disabled={!c.validated && c.id !== value}
+                        disabled={!modelProposed(c) && c.id !== value}
                         label={
                           <>
                             {c.label}
-                            {!c.validated && (
+                            {!modelProposed(c) && (
                               <Badge tone="outline" className="ml-2 align-middle">
                                 À l'étude
                               </Badge>
                             )}
-                            {c.validated && c.recommended && (
+                            {modelProposed(c) && c.recommended && (
                               <Badge tone="default" className="ml-2 align-middle">
                                 Recommandé
                               </Badge>
@@ -663,7 +663,8 @@ function ModelPicker({ choices, value, onChange }: { choices: ModelChoice[]; val
                         }
                         hint={
                           <>
-                            {c.validated ? c.hint : (c.study ?? c.hint)}
+                            {modelProposed(c) ? c.hint : (c.study ?? c.hint)}
+                            {c.blindTest && <span className="block">{blindTestLine(c.blindTest)}</span>}
                             {c.label !== c.id && <span className="block font-mono text-[11px]">{c.id}</span>}
                           </>
                         }
@@ -700,7 +701,39 @@ function ModelPicker({ choices, value, onChange }: { choices: ModelChoice[]; val
         />
       )}
       {!custom && known?.hint && <p className="text-xs text-muted-foreground">{known.hint}</p>}
+      {!custom && known?.blindTest && <BlindTestNote test={known.blindTest} />}
     </div>
+  )
+}
+
+const fr = (n: number) => n.toLocaleString('fr-FR')
+const range = ([a, b]: [number, number]) => (a === b ? fr(a) : `${fr(Math.min(a, b))} à ${fr(Math.max(a, b))}`)
+
+/** « Note 6,5/10 · 19 min · environ 0,35 $ » : ce qu'un essai à l'aveugle apporte au choix d'un modèle. */
+function blindTestLine(test: BlindTest): string {
+  return [`Note ${range(test.scores)}/10`, `${test.minutes}\u00a0min`, test.costUsd === undefined ? 'gratuit' : `environ ${fr(test.costUsd)}\u00a0$`].join(' · ')
+}
+
+/** « 1er nov. 2026 » */
+function blindTestDate(date: string): string {
+  const day = new Date(date)
+  const rest = day.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })
+  return `${day.getDate() === 1 ? '1er' : day.getDate()} ${rest}`
+}
+
+/** La note du modèle choisi, avec sa date ; le « i » dit comment elle a été obtenue. */
+function BlindTestNote({ test }: { test: BlindTest }) {
+  return (
+    <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <span>
+        {blindTestLine(test)} pour 20 participants, testé le {blindTestDate(test.date)}
+      </span>
+      <Tooltip
+        content={`Note donnée à une synthèse réelle de 20 participants, lue deux fois à l'aveugle par Claude Opus 5.5, sans savoir quel moteur l'avait produite. Chaque lecture a relevé ${range(test.errors)} erreurs qui changent une conclusion. C'est un repère pour comparer les moteurs, pas une garantie : relisez toujours le rapport.`}
+      >
+        <Info className="size-3.5" aria-label="Comment cette note est obtenue" />
+      </Tooltip>
+    </p>
   )
 }
 

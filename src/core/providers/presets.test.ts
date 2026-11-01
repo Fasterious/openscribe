@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { blendSpeed, estimateDuration, observedSecondsPerCall, predictedCalls } from '../analysis/estimate'
-import { PROVIDER_PRESETS, QUALITY_THRESHOLD, modelStudy, presetStudy, typicalSecondsPerCall } from './presets'
+import { BLIND_THRESHOLD, PROVIDER_PRESETS, modelProposed, modelStudy, presetStudy, typicalSecondsPerCall } from './presets'
 
 describe('fiches des fournisseurs', () => {
   it('le modèle par défaut est le seul recommandé de sa liste expliquée', () => {
@@ -31,6 +31,25 @@ describe('erreurs du fournisseur', () => {
         new Response(JSON.stringify({ message: 'This model is not available in your subscription tier', type: 'tier_not_allowed' }), { status: 403 }),
     })
     await expect(provider.complete({ task: 'ping', system: '', user: '', json: false, temperature: 0 })).rejects.toThrow(/ne donne pas accès au modèle « gros-modele »/)
+  })
+})
+
+describe('quota du jour', () => {
+  it('reconnu même quand la réponse d’erreur est longue, comme chez Gemini', async () => {
+    const { createOpenAiCompatibleProvider } = await import('./openai-compatible')
+    const provider = createOpenAiCompatibleProvider({
+      presetId: 'gemini',
+      label: 'Google Gemini',
+      baseUrl: 'https://exemple.test/v1',
+      apiKey: 'cle-de-test',
+      model: 'modele',
+      supportsJsonMode: false,
+      fetchImpl: async () => new Response(`${'x'.repeat(500)} Generate content requests per day limit exceeded`, { status: 429 }),
+    })
+    await expect(provider.complete({ task: 'test', system: '', user: '', json: false, temperature: 0 })).rejects.toMatchObject({
+      fatal: true,
+      message: expect.stringContaining('quota du jour'),
+    })
   })
 })
 
@@ -147,8 +166,7 @@ describe('seuil de qualité : un moteur est validé ou à l’étude, jamais ent
   it('un modèle validé a une note au moins égale au seuil, et rien d’autre n’est proposé sans raison', () => {
     for (const p of PROVIDER_PRESETS) {
       for (const m of p.models ?? []) {
-        if (m.validated) expect(m.validated.score, `${p.id} ${m.id}`).toBeGreaterThanOrEqual(QUALITY_THRESHOLD)
-        expect(Boolean(m.validated) !== Boolean(modelStudy(p.id, m.id)), `${p.id} ${m.id}`).toBe(true)
+        expect(modelProposed(m) !== Boolean(modelStudy(p.id, m.id)), `${p.id} ${m.id}`).toBe(true)
       }
       if (presetStudy(p)) expect(presetStudy(p)!.length, p.id).toBeGreaterThan(20)
     }
@@ -160,6 +178,13 @@ describe('seuil de qualité : un moteur est validé ou à l’étude, jamais ent
     expect(modelStudy('gemini', 'gemini-3.8-flash')).toMatch(/pas encore évalué/)
     expect(modelStudy('anthropic', 'claude-opus-5-5')).toBeUndefined()
     expect(modelStudy('mistral', 'ministral-14b-2512')).toMatch(/sous le niveau/i)
+    expect(modelStudy('anthropic', 'claude-haiku-5-5')).toBeUndefined()
+    const choice = (preset: string, id: string) => PROVIDER_PRESETS.find((p) => p.id === preset)!.models!.find((m) => m.id === id)!
+    expect(choice('gemini', 'gemini-3.5-flash-lite').blindTest!.scores).toEqual([BLIND_THRESHOLD, BLIND_THRESHOLD])
+    expect(modelProposed(choice('mistral', 'ministral-14b-2512'))).toBe(false)
+    // Au niveau de Gemini, mais une synthèse prend plus d'une heure : pénible à utiliser, donc pas proposé.
+    expect(modelProposed(choice('mistral', 'mistral-large-4'))).toBe(false)
+    expect(modelStudy('mistral', 'mistral-large-4')).toMatch(/plus d’une heure/)
     expect(modelStudy('ollama', 'gemma4:12b')).toMatch(/24 Go/)
     expect(modelStudy('openai', 'gpt-5')).toMatch(/Pas encore évalué/)
     const study = (id: string) => presetStudy(PROVIDER_PRESETS.find((p) => p.id === id)!)

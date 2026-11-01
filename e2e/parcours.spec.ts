@@ -402,7 +402,7 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   const card = (name: string) => page.getByRole('listitem').filter({ hasText: name })
   await expect(card('Google Gemini')).toContainText('Qualité vérifiée')
   await expect(card('Mistral AI')).toContainText("À l'étude")
-  await expect(card('Mistral AI')).toContainText('sous le niveau')
+  await expect(card('Mistral AI')).toContainText('fait moins bien')
   await expect(card('Mistral AI').getByRole('button', { name: /à l'étude/ })).toBeDisabled()
   await expect(card('Ollama').first()).toContainText('24 Go')
   await noHorizontalScroll(page)
@@ -410,6 +410,8 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
 
   // Le guide Gemini mène directement à la page des clés.
   await card('Google Gemini').getByRole('button', { name: 'Configurer' }).click()
+  // La note du modèle choisi se lit sous la liste, et le « i » dit comment elle a été obtenue.
+  await expect(page.getByRole('dialog')).toContainText('Note 5,5/10 · 6\u00a0min · gratuit pour 20 participants, testé le 1er nov. 2026')
   const dialog = page.getByRole('dialog')
   await expect(dialog.getByRole('link', { name: /Ouvrir Google AI Studio/ })).toHaveAttribute('href', 'https://aistudio.google.com/api-keys')
   await dialog.getByLabel("Clé d'accès").fill('cle-de-test')

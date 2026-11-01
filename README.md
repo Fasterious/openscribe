@@ -34,6 +34,13 @@ npm run dev
 
 Puis ouvrez l'adresse affichée (en général http://localhost:5173).
 
+### Sans clé d'API, avec un abonnement Claude
+
+Avec un abonnement Claude Pro ou Max et [Claude Code](https://code.claude.com), l'analyse peut tourner sur le modèle
+inclus dans l'abonnement : `scripts/bridge.ts` écrit chaque demande dans un dossier et Claude Code y répond (voir
+`docs/METHODES.md`). C'est plus technique que l'application et l'usage compte dans les limites de l'abonnement. Pour les
+autres cas, une clé d'API dédiée, avec son propre plafond de dépenses, reste le chemin le plus simple.
+
 | Commande | Rôle |
 |---|---|
 | `npm run dev` | Application en développement |

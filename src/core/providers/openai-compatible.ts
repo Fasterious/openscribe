@@ -180,12 +180,13 @@ export function createOpenAiCompatibleProvider(config: OpenAiCompatibleConfig): 
         }
       }
       if (!response.ok) {
-        const detail = (await response.text()).slice(0, 400)
+        const body = await response.text()
+        const detail = body.slice(0, 400)
         const status = response.status
-        const fatal = status === 401 || status === 403 || status === 404 || status === 413 || (status === 429 && /per day|daily|TPD|RPD/i.test(detail))
+        // Sur le corps entier : chez Gemini, « per day » arrive après 400 caractères (vu le 1/11/2026, au 500e appel du jour).
+        const dailyQuota = status === 429 && /per ?day|daily|TPD|RPD/i.test(body)
+        const fatal = status === 401 || status === 403 || status === 404 || status === 413 || dailyQuota
         const tierRefused = status === 403 && /tier|subscription|plan/i.test(detail)
-        // Quota du jour épuisé : réessayer dans une minute ne sert à rien.
-        const dailyQuota = status === 429 && /per day|daily|TPD|RPD/i.test(detail)
         const message = tierRefused
           ? `Votre offre chez ${config.label} ne donne pas accès au modèle « ${config.model} » (erreur 403) : choisissez un autre modèle.`
           : status === 413
