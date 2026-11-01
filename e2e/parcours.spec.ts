@@ -400,6 +400,7 @@ test('moteurs d’IA : catalogue visible, guide pas à pas, et retour à l’ét
   const row = (name: string) => page.getByRole('row').filter({ hasText: name })
   await expect(page.getByRole('row').nth(1)).toContainText('Claude Sonnet 5.5')
   await expect(page.getByRole('row').nth(1)).toContainText('Recommandé')
+  await expect(page.getByRole('row').nth(1)).toContainText('effort moyen')
   await expect(row('Gemini 3.5 Flash-Lite')).toContainText('Gratuit')
   await expect(row('Gemini 3.5 Flash-Lite')).toContainText('5,5')
   // Le bouton passe aux mesures sur 378 participants ; un moteur sans mesure le dit, sans chiffre inventé.

@@ -322,7 +322,10 @@ function EngineComparison({ engines, onSetup }: { engines: EngineConfig[]; onSet
                     </Badge>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">{r.pitch}</p>
+                <p className="text-xs text-muted-foreground">
+                  {r.pitch}
+                  {r.effort && ` · effort ${r.effort}`}
+                </p>
               </div>
               {cells[index].map((cell, i) => (
                 <span role="cell" key={i} className={cn('text-base tabular-nums whitespace-nowrap @2xl:text-right', cell.value === best[i] && 'font-semibold')}>
@@ -346,7 +349,7 @@ function EngineComparison({ engines, onSetup }: { engines: EngineConfig[]; onSet
       </div>
       <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
         <span>Mesuré le {blindTestDate(rows[0].choice.blindTest!.date)}</span>
-        <Explain content="Chaque moteur a rédigé une synthèse des mêmes réponses réelles, notée deux fois à l’aveugle par Claude Opus 5.5. Un repère, pas une garantie.">
+        <Explain content="Chaque moteur a rédigé une synthèse des mêmes réponses réelles, notée deux fois à l’aveugle par Claude Opus 5.5. Un repère, pas une garantie. L’effort est le temps de réflexion accordé au moteur ; Gemini n’a pas ce réglage ici.">
           <span className="inline-flex size-6 items-center justify-center pointer-coarse:-my-2.5 pointer-coarse:size-11" aria-label="Comment ces chiffres sont obtenus">
             <Info className="size-3.5" />
           </span>

@@ -135,11 +135,11 @@ export function modelProposed(model: ModelChoice): boolean {
 }
 
 /** Les modèles proposés, dans l'ordre du comparatif : par usage, pas par note (une note est un repère, pas un classement). */
-export const COMPARED: { preset: string; model: string; tag?: string; pitch: string }[] = [
-  { preset: 'anthropic', model: 'claude-sonnet-5-5', tag: 'Recommandé', pitch: 'Le meilleur rapport qualité-prix' },
+export const COMPARED: { preset: string; model: string; tag?: string; pitch: string; effort?: string }[] = [
+  { preset: 'anthropic', model: 'claude-sonnet-5-5', tag: 'Recommandé', pitch: 'Le meilleur rapport qualité-prix', effort: 'moyen' },
   { preset: 'gemini', model: 'gemini-3.5-flash-lite', pitch: 'Pour essayer · 150 à 200 participants par jour' },
-  { preset: 'anthropic', model: 'claude-haiku-5-5', pitch: 'Bon marché, à relire de près' },
-  { preset: 'anthropic', model: 'claude-opus-5-5', pitch: 'Le plus cher' },
+  { preset: 'anthropic', model: 'claude-haiku-5-5', pitch: 'Bon marché, à relire de près', effort: 'moyen' },
+  { preset: 'anthropic', model: 'claude-opus-5-5', pitch: 'Le plus cher', effort: 'moyen' },
 ]
 
 export const NOT_EVALUATED =

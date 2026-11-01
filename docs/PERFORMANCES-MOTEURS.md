@@ -28,6 +28,11 @@ une soixantaine : environ quatre jours, inutilisable ; ces modèles ne sont donc
 réponses en plus d'un quart d'heure, avec des délais dépassés. Gemma 4 31B : erreurs 500 et 503 à répétition, 3 réponses, écarté. Gemini 4 Argon, 3.1 Pro et Omni Flash : pas d'offre
 gratuite. **Gemini 3.5 Flash-Lite reste le meilleur modèle gratuit utilisable.**
 
+## Effort de réflexion
+
+Haiku 5.5 et Opus 5.5 ont tourné à leur effort par défaut, moyen. Sonnet 5.5, élevé par défaut, a tourné avec l'effort moyen demandé (`output_config`), sans preuve que l'accès compatible
+OpenAI le respecte. Gemini et Mistral : pas de réglage envoyé. Prochain essai utile : comparer effort bas et effort élevé sur Sonnet, pour vérifier que le réglage passe.
+
 ## Contexte nécessaire
 
 Pour 20 participants, la plus grosse demande prend environ 70 000 jetons, réponse comprise (Haiku). Pour 378, environ 107 000
